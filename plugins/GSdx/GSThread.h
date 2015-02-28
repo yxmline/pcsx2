@@ -394,30 +394,54 @@ class TransactionScope
 public:
 	class Lock
 	{
+#ifdef _STD_ATOMIC_
+		std::atomic<bool> state;
+#else
 		volatile long state;
+#endif
 
 	public:
-		Lock() 
-			: state(0) 
+		Lock()
+#ifdef _STD_ATOMIC_
+			: state(false)
+#else
+			: state(0)
+#endif
 		{
 		}
 
 		void lock()
 		{
+#ifdef _STD_ATOMIC_
+			bool expected_value = false;
+			while(state.compare_exchange_strong(expected_value, true))
+			{
+				do {_mm_pause();} while(state);
+			}
+#else
 			while(_InterlockedCompareExchange(&state, 1, 0) != 0)
 			{
 				do {_mm_pause();} while(state == 1);
 			}
+#endif
 		}
 
 		void unlock() 
 		{
+#ifdef _STD_ATOMIC_
+			state = false;
+#else
 			_InterlockedExchange(&state, 0);
+#endif
 		}
 
 		bool isLocked() const 
 		{
+#ifdef _STD_ATOMIC_
+			return state.load();
+#else
 			return state == 1;
+#endif
 		}
 	};
 
