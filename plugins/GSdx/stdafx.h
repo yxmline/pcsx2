@@ -382,6 +382,7 @@ struct aligned_free_second {template<class T> void operator()(T& p) {_aligned_fr
 		return Mask ? 1 : 0;
 	}
 
+#ifndef _STD_ATOMIC_
 	__forceinline unsigned char _interlockedbittestandreset(volatile long* a, const long b)
 	{
 		unsigned char retval;
@@ -455,6 +456,7 @@ struct aligned_free_second {template<class T> void operator()(T& p) {_aligned_fr
 	{
 		return _InterlockedExchangeAdd16(lpAddend, 1) + 1;
 	}
+#endif
 
 	#ifdef __GNUC__
 
