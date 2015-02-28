@@ -46,8 +46,17 @@ GSRendererSW::GSRendererSW(int threads)
 
 	m_output = (uint8*)_aligned_malloc(1024 * 1024 * sizeof(uint32), 32);
 
+#ifdef _STD_ATOMIC_
+	for (uint32 i = 0; i < countof(m_fzb_pages); i++) {
+		m_fzb_pages[i] = 0;
+	}
+	for (uint32 i = 0; i < countof(m_tex_pages); i++) {
+		m_tex_pages[i] = 0;
+	}
+#else
 	memset(m_fzb_pages, 0, sizeof(m_fzb_pages));
 	memset(m_tex_pages, 0, sizeof(m_tex_pages));
+#endif
 
 	#define InitCVB(P) \
 		m_cvb[P][0][0] = &GSRendererSW::ConvertVertexBuffer<P, 0, 0>; \
@@ -725,6 +734,7 @@ void GSRendererSW::InvalidateLocalMem(const GIFRegBITBLTBUF& BITBLTBUF, const GS
 	}
 }
 
+#ifndef _STD_ATOMIC_
 __forceinline void Increment16(volatile short* lpAddend)
 {
 	// (*lpAddend)++;
@@ -738,9 +748,29 @@ __forceinline void Decrement16(volatile short* lpAddend)
 
 	_InterlockedDecrement16(lpAddend);
 }
+#endif
 	
-void GSRendererSW::UsePages(const uint32* pages, int type)
+void GSRendererSW::UsePages(const uint32* pages, const int type)
 {
+#ifdef _STD_ATOMIC_
+	for(const uint32* p = pages; *p != GSOffset::EOP; p++) {
+		switch (type) {
+			case 0:
+				ASSERT((m_fzb_pages[*p] & 0xFFFF) < SHRT_MAX);
+				m_fzb_pages[*p] += 1;
+				break;
+			case 1:
+				ASSERT((m_fzb_pages[*p] >> 16) < SHRT_MAX);
+				m_fzb_pages[*p] += 0x10000;
+				break;
+			case 2:
+				ASSERT(m_fzb_pages[*p] < SHRT_MAX);
+				m_tex_pages[*p] += 1;
+				break;
+			default:break;
+		}
+	}
+#else
 	if(type < 2)
 	{
 		for(const uint32* p = pages; *p != GSOffset::EOP; p++)
@@ -759,10 +789,31 @@ void GSRendererSW::UsePages(const uint32* pages, int type)
 			Increment16((short*)&m_tex_pages[*p]);
 		}
 	}
+#endif
 }
 
-void GSRendererSW::ReleasePages(const uint32* pages, int type)
+void GSRendererSW::ReleasePages(const uint32* pages, const int type)
 {
+#ifdef _STD_ATOMIC_
+	for(const uint32* p = pages; *p != GSOffset::EOP; p++) {
+		// XXX add assert
+		switch (type) {
+			case 0:
+				ASSERT((m_fzb_pages[*p] & 0xFFFF) > 0);
+				m_fzb_pages[*p] -= 1;
+				break;
+			case 1:
+				ASSERT((m_fzb_pages[*p] >> 16) > 0);
+				m_fzb_pages[*p] -= 0x10000;
+				break;
+			case 2:
+				ASSERT(m_fzb_pages[*p] > 0);
+				m_tex_pages[*p] -= 1;
+				break;
+			default:break;
+		}
+	}
+#else
 	if(type < 2)
 	{
 		for(const uint32* p = pages; *p != GSOffset::EOP; p++)
@@ -781,6 +832,7 @@ void GSRendererSW::ReleasePages(const uint32* pages, int type)
 			Decrement16((short*)&m_tex_pages[*p]);
 		}
 	}
+#endif
 }
 
 bool GSRendererSW::CheckTargetPages(const uint32* fb_pages, const uint32* zb_pages, const GSVector4i& r)
