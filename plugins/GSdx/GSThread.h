@@ -258,8 +258,13 @@ template<class T> class GSJobQueue : private GSThread
 {
 protected:
 	queue<T> m_queue;
+#ifdef _STD_ATOMIC_
+	std::atomic<long> m_count;
+	std::atomic<bool> m_exit;
+#else
 	volatile long m_count; // NOTE: it is the safest to have our own counter because m_queue.pop() might decrement its own before the last item runs out of its scope and gets destroyed (implementation dependent)
 	volatile bool m_exit;
+#endif
 	IGSEvent* m_notempty;
 	IGSEvent* m_empty;
 	IGSLock* m_lock;
