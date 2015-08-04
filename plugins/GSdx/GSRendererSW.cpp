@@ -1647,14 +1647,23 @@ void GSRendererSW::SharedData::SetSource(GSTextureCacheSW::Texture* t, const GSV
 
 void GSRendererSW::SharedData::UpdateSource()
 {
+	int try_harder = 7;
 	for(size_t i = 0; m_tex[i].t != NULL; i++)
 	{
+retry:
 		if(m_tex[i].t->Update(m_tex[i].r))
 		{
 			global.tex[i] = m_tex[i].t->m_buff;
 		}
 		else
 		{
+			if (try_harder) {
+				try_harder--;
+				// out-of-memory, flush old texture of the cache. Give a chance to render correctly
+				m_parent->m_tc->IncAge();
+				goto retry;
+			}
+
 			printf("GSdx: out-of-memory, texturing temporarily disabled\n");
 
 			global.sel.tfx = TFX_NONE;
