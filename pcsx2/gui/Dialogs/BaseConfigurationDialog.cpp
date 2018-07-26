@@ -27,9 +27,9 @@
 #include <wx/listbook.h>
 #include <wx/spinctrl.h>
 
-DEFINE_EVENT_TYPE( pxEvt_ApplySettings )
-DEFINE_EVENT_TYPE( pxEvt_SetSettingsPage )
-DEFINE_EVENT_TYPE( pxEvt_SomethingChanged )
+wxDEFINE_EVENT(pxEvt_ApplySettings, wxCommandEvent);
+wxDEFINE_EVENT(pxEvt_SetSettingsPage, wxCommandEvent);
+wxDEFINE_EVENT(pxEvt_SomethingChanged, wxCommandEvent);
 
 using namespace Panels;
 
@@ -73,7 +73,7 @@ public:
 		m_apply = m_ok = m_cancel = NULL;
 	}
 
-	virtual ~ScopedOkButtonDisabler() throw()
+	virtual ~ScopedOkButtonDisabler()
 	{
 		if (m_apply)	m_apply	->Enable();
 		if (m_ok)		m_ok	->Enable();
@@ -94,7 +94,7 @@ BaseApplicableDialog::BaseApplicableDialog( wxWindow* parent, const wxString& ti
 	Init();
 }
 
-BaseApplicableDialog::~BaseApplicableDialog() throw()
+BaseApplicableDialog::~BaseApplicableDialog()
 {
 	m_ApplyState.DoCleanup();
 }
@@ -108,7 +108,7 @@ wxString BaseApplicableDialog::GetDialogName() const
 
 void BaseApplicableDialog::Init()
 {
-	Connect( pxEvt_ApplySettings,	wxCommandEventHandler	(BaseApplicableDialog::OnSettingsApplied) );
+	Bind(pxEvt_ApplySettings, &BaseApplicableDialog::OnSettingsApplied, this);
 
 	wxCommandEvent applyEvent( pxEvt_ApplySettings );
 	applyEvent.SetId( GetId() );
@@ -135,34 +135,31 @@ Dialogs::BaseConfigurationDialog::BaseConfigurationDialog( wxWindow* parent, con
 	m_listbook = NULL;
 	m_allowApplyActivation = true;
 
-	Connect( wxID_OK,		wxEVT_COMMAND_BUTTON_CLICKED,	wxCommandEventHandler( BaseConfigurationDialog::OnOk_Click ) );
-	Connect( wxID_CANCEL,	wxEVT_COMMAND_BUTTON_CLICKED,	wxCommandEventHandler( BaseConfigurationDialog::OnCancel_Click ) );
-	Connect( wxID_APPLY,	wxEVT_COMMAND_BUTTON_CLICKED,	wxCommandEventHandler( BaseConfigurationDialog::OnApply_Click ) );
-	Connect( wxID_SAVE,		wxEVT_COMMAND_BUTTON_CLICKED,	wxCommandEventHandler( BaseConfigurationDialog::OnScreenshot_Click ) );
+	Bind(wxEVT_BUTTON, &BaseConfigurationDialog::OnOk_Click, this, wxID_OK);
+	Bind(wxEVT_BUTTON, &BaseConfigurationDialog::OnCancel_Click, this, wxID_CANCEL);
+	Bind(wxEVT_BUTTON, &BaseConfigurationDialog::OnApply_Click, this, wxID_APPLY);
+	Bind(wxEVT_BUTTON, &BaseConfigurationDialog::OnScreenshot_Click, this, wxID_SAVE);
 
-	Connect( pxEvt_SetSettingsPage, wxCommandEventHandler( BaseConfigurationDialog::OnSetSettingsPage ) );
+	Bind(pxEvt_SetSettingsPage, &BaseConfigurationDialog::OnSetSettingsPage, this);
 
 	// ----------------------------------------------------------------------------
 	// Bind a variety of standard "something probably changed" events.  If the user invokes
 	// any of these, we'll automatically de-gray the Apply button for this dialog box. :)
 
-	#define ConnectSomethingChanged( command ) \
-		Connect( wxEVT_COMMAND_##command,	wxCommandEventHandler( BaseConfigurationDialog::OnSomethingChanged ) );
+	Bind(wxEVT_TEXT, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_TEXT_ENTER, &BaseConfigurationDialog::OnSomethingChanged, this);
 
-	ConnectSomethingChanged( TEXT_UPDATED );
-	ConnectSomethingChanged( TEXT_ENTER );
+	Bind(wxEVT_RADIOBUTTON, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_COMBOBOX, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_CHECKBOX, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_BUTTON, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_CHOICE, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_LISTBOX, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_SPINCTRL, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_SLIDER, &BaseConfigurationDialog::OnSomethingChanged, this);
+	Bind(wxEVT_DIRPICKER_CHANGED, &BaseConfigurationDialog::OnSomethingChanged, this);
 
-	ConnectSomethingChanged( RADIOBUTTON_SELECTED );
-	ConnectSomethingChanged( COMBOBOX_SELECTED );
-	ConnectSomethingChanged( CHECKBOX_CLICKED );
-	ConnectSomethingChanged( BUTTON_CLICKED );
-	ConnectSomethingChanged( CHOICE_SELECTED );
-	ConnectSomethingChanged( LISTBOX_SELECTED );
-	ConnectSomethingChanged( SPINCTRL_UPDATED );
-	ConnectSomethingChanged( SLIDER_UPDATED );
-	ConnectSomethingChanged( DIRPICKER_CHANGED );
-
-	Connect( pxEvt_SomethingChanged, wxCommandEventHandler( BaseConfigurationDialog::OnSomethingChanged ) );
+	Bind(pxEvt_SomethingChanged, &BaseConfigurationDialog::OnSomethingChanged, this);
 }
 
 void Dialogs::BaseConfigurationDialog::AddListbook( wxSizer* sizer )
@@ -188,10 +185,6 @@ void Dialogs::BaseConfigurationDialog::AddOkCancel( wxSizer* sizer )
 	screenshotButton.SetToolTip( _("Saves a snapshot of this settings panel to a PNG file.") );
 
 	*m_extraButtonSizer += screenshotButton|pxMiddle;
-}
-
-Dialogs::BaseConfigurationDialog::~BaseConfigurationDialog() throw()
-{
 }
 
 void Dialogs::BaseConfigurationDialog::OnSetSettingsPage( wxCommandEvent& evt )

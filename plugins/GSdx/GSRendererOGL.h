@@ -27,7 +27,7 @@
 #include "GSTextureCacheOGL.h"
 #include "GSVertexHW.h"
 
-class GSRendererOGL : public GSRendererHW
+class GSRendererOGL final : public GSRendererHW
 {
 	enum PRIM_OVERLAP {
 		PRIM_OVERLAP_UNKNOW,
@@ -48,20 +48,39 @@ class GSRendererOGL : public GSRendererHW
 		bool m_accurate_date;
 		int m_sw_blending;
 		PRIM_OVERLAP m_prim_overlap;
+		std::vector<size_t> m_drawlist;
 
 		unsigned int UserHacks_TCOffset;
 		float UserHacks_TCO_x, UserHacks_TCO_y;
+		bool UserHacks_unscale_pt_ln;
+		int UserHacks_HPO;
+		TriFiltering UserHacks_tri_filter;
 
 		GSDeviceOGL::VSConstantBuffer vs_cb;
 		GSDeviceOGL::PSConstantBuffer ps_cb;
 
 		GSVector4i ComputeBoundingBox(const GSVector2& rtscale, const GSVector2i& rtsize);
 
-	protected:
-		void EmulateGS();
-		void SetupIA();
-		bool EmulateTextureShuffleAndFbmask(GSDeviceOGL::PSSelector& ps_sel, GSDeviceOGL::OMColorMaskSelector& om_csel);
-		bool EmulateBlending(GSDeviceOGL::PSSelector& ps_sel, bool DATE_GL42);
+		bool m_require_one_barrier;
+		bool m_require_full_barrier;
+
+		GSDeviceOGL::VSSelector m_vs_sel;
+		GSDeviceOGL::GSSelector m_gs_sel;
+		GSDeviceOGL::PSSelector m_ps_sel;
+
+		GSDeviceOGL::PSSamplerSelector		m_ps_ssel;
+		GSDeviceOGL::OMColorMaskSelector	m_om_csel;
+		GSDeviceOGL::OMDepthStencilSelector m_om_dssel;
+
+	private:
+		inline void ResetStates();
+		inline void SetupIA(const float& sx, const float& sy);
+		inline void EmulateTextureShuffleAndFbmask();
+		inline void EmulateChannelShuffle(GSTexture** rt, const GSTextureCache::Source* tex);
+		inline void EmulateBlending(bool DATE_GL42);
+		inline void EmulateTextureSampler(const GSTextureCache::Source* tex);
+		inline void EmulateAtst(const int pass, const GSTextureCache::Source* tex);
+		inline void EmulateZbuffer();
 
 	public:
 		GSRendererOGL();
@@ -69,9 +88,9 @@ class GSRendererOGL : public GSRendererHW
 
 		bool CreateDevice(GSDevice* dev);
 
-		void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex);
+		void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex) final;
 
 		PRIM_OVERLAP PrimitiveOverlap();
 
-		void SendDraw(bool require_barrier);
+		void SendDraw();
 };

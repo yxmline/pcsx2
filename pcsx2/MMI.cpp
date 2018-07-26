@@ -1001,7 +1001,7 @@ void QFSRV() {				// JayteeMaster: changed a bit to avoid screw up
 	GPR_reg Rd;
 	if (!_Rd_) return;
 
-	u32 sa_amt = cpuRegs.sa << 3;
+	u32 sa_amt = cpuRegs.sa;
 	if (sa_amt == 0) {
 		cpuRegs.GPR.r[_Rd_].UD[0] = cpuRegs.GPR.r[_Rt_].UD[0];
 		cpuRegs.GPR.r[_Rd_].UD[1] = cpuRegs.GPR.r[_Rt_].UD[1];
@@ -1032,8 +1032,12 @@ void QFSRV() {				// JayteeMaster: changed a bit to avoid screw up
 			*/
 			Rd.UD[0] = cpuRegs.GPR.r[_Rt_].UD[1] >> (sa_amt - 64);
 			Rd.UD[1] = cpuRegs.GPR.r[_Rs_].UD[0] >> (sa_amt - 64);
-			Rd.UD[0]|= cpuRegs.GPR.r[_Rs_].UD[0] << (128 - sa_amt);
-			Rd.UD[1]|= cpuRegs.GPR.r[_Rs_].UD[1] << (128 - sa_amt);
+			if (sa_amt != 64) {
+				// A 64 bit shift is equivalent to a 0 bit shift because value is masked
+				// on 6 bits
+				Rd.UD[0]|= cpuRegs.GPR.r[_Rs_].UD[0] << (128u - sa_amt);
+				Rd.UD[1]|= cpuRegs.GPR.r[_Rs_].UD[1] << (128u - sa_amt);
+			}
 			cpuRegs.GPR.r[_Rd_] = Rd;
 		}
 	}
@@ -1297,28 +1301,28 @@ void PMSUBH() {			// JayteeMaster: changed a bit to avoid screw up
 }
 
 // JayteeMaster: changed a bit to avoid screw up
-static __fi void _PHMSBH_LO(int dd, int n, int rdd)
+static __fi void _PHMSBH_LO(int dd, int n)
 {
 	s32 firsttemp =        (s32)cpuRegs.GPR.r[_Rs_].SS[n+1] * (s32)cpuRegs.GPR.r[_Rt_].SS[n+1];
 	s32 temp = firsttemp - (s32)cpuRegs.GPR.r[_Rs_].SS[n]   * (s32)cpuRegs.GPR.r[_Rt_].SS[n];
 
 	cpuRegs.LO.UL[dd] = temp;
-	cpuRegs.LO.UL[dd+1] = ~firsttemp;
+	cpuRegs.LO.UL[dd+1] = ~firsttemp;  // undocumented behaviour
 }
-static __fi void _PHMSBH_HI(int dd, int n, int rdd)
+static __fi void _PHMSBH_HI(int dd, int n)
 {
 	s32 firsttemp =        (s32)cpuRegs.GPR.r[_Rs_].SS[n+1] * (s32)cpuRegs.GPR.r[_Rt_].SS[n+1];
 	s32 temp = firsttemp - (s32)cpuRegs.GPR.r[_Rs_].SS[n]   * (s32)cpuRegs.GPR.r[_Rt_].SS[n];
 
 	cpuRegs.HI.UL[dd] = temp;
-	cpuRegs.HI.UL[dd+1] = ~firsttemp;
+	cpuRegs.HI.UL[dd+1] = ~firsttemp;  // undocumented behaviour
 }
 
 void PHMSBH() {		// JayteeMaster: changed a bit to avoid screw up
-	_PHMSBH_LO(0, 0, 0);
-	_PHMSBH_HI(0, 2, 1);
-	_PHMSBH_LO(2, 4, 2);
-	_PHMSBH_HI(2, 6, 3);
+	_PHMSBH_LO(0, 0);
+	_PHMSBH_HI(0, 2);
+	_PHMSBH_LO(2, 4);
+	_PHMSBH_HI(2, 6);
 	if (_Rd_) {
 		cpuRegs.GPR.r[_Rd_].UL[0] = cpuRegs.LO.UL[0];
 		cpuRegs.GPR.r[_Rd_].UL[1] = cpuRegs.HI.UL[0];

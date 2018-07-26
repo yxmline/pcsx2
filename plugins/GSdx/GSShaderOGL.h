@@ -23,29 +23,36 @@
 
 class GSShaderOGL {
 	GLuint m_pipeline;
-	hash_map<uint64, GLuint > m_single_prog;
+	std::unordered_map<uint32, GLuint> m_program;
 	const bool m_debug_shader;
 
-	bool ValidateShader(GLuint p);
+	std::vector<GLuint> m_shad_to_delete;
+	std::vector<GLuint> m_prog_to_delete;
+	std::vector<GLuint> m_pipe_to_delete;
+
+	bool ValidateShader(GLuint s);
 	bool ValidateProgram(GLuint p);
 	bool ValidatePipeline(GLuint p);
 
 	std::string GenGlslHeader(const std::string& entry, GLenum type, const std::string& macro);
-	GLuint LinkNewProgram();
+	std::vector<char> m_common_header;
 
 	public:
 	GSShaderOGL(bool debug);
 	~GSShaderOGL();
 
-	void GS(GLuint s);
-	void PS(GLuint s);
-	void VS(GLuint s);
-
-	void UseProgram();
+	void BindPipeline(GLuint vs, GLuint gs, GLuint ps);
+	void BindPipeline(GLuint pipe);
 
 	GLuint Compile(const std::string& glsl_file, const std::string& entry, GLenum type, const char* glsl_h_code, const std::string& macro_sel = "");
+	GLuint LinkPipeline(const std::string& pretty_print, GLuint vs, GLuint gs, GLuint ps);
+
+	// Same as above but for not separated build
+	void BindProgram(GLuint vs, GLuint gs, GLuint ps);
+	void BindProgram(GLuint p);
+
+	GLuint CompileShader(const std::string& glsl_file, const std::string& entry, GLenum type, const char* glsl_h_code, const std::string& macro_sel = "");
+	GLuint LinkProgram(GLuint vs, GLuint gs, GLuint ps);
 
 	int DumpAsm(const std::string& file, GLuint p);
-
-	void Delete(GLuint s);
 };

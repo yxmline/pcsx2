@@ -24,11 +24,11 @@
 #include "GSDialog.h"
 #include "GSSetting.h"
 
-class GSShadeBostDlg : public GSDialog
+class GSShaderDlg : public GSDialog
 {
-	int saturation;
-	int brightness;
-	int contrast;
+	int m_saturation;
+	int m_brightness;
+	int m_contrast;
 
 	void UpdateControls();
 
@@ -37,7 +37,7 @@ protected:
 	bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);	
 
 public:
-	GSShadeBostDlg();
+	GSShaderDlg();
 };
 
 class GSHacksDlg : public GSDialog
@@ -64,6 +64,20 @@ public:
 	}
 };
 
+class GSOSDDlg : public GSDialog
+{
+	int m_transparency;
+
+	void UpdateControls();
+
+protected:
+	void OnInit();
+	bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
+
+public:
+	GSOSDDlg();
+};
+
 class GSSettingsDlg : public GSDialog
 {
 
@@ -74,10 +88,10 @@ class GSSettingsDlg : public GSDialog
 		D3D_FEATURE_LEVEL level;
 		Adapter(const std::string &n, const std::string &i, const D3D_FEATURE_LEVEL &l) : name(n), id(i), level(l) {}
 	};
-	
+
 	std::vector<Adapter> adapters;
 
-	vector<GSSetting> m_ocl_devs;
+	std::vector<GSSetting> m_ocl_devs;
 	uint32 m_lastValidMsaa; // used to revert to previous dialog value if the user changed to invalid one, or lesser one and canceled
 
 	void UpdateRenderers();
@@ -88,8 +102,9 @@ protected:
 	bool OnCommand(HWND hWnd, UINT id, UINT code);
 
 	// Shade Boost
-	GSShadeBostDlg ShadeBoostDlg;
+	GSShaderDlg ShaderDlg;
 	GSHacksDlg HacksDlg;
+	GSOSDDlg OSDDlg;
 
 public:
 	GSSettingsDlg();

@@ -62,11 +62,14 @@ struct McdSlotItem
 
 	McdSlotItem()
 	{
-		Slot		= -1;
+		Slot = -1;
+		SizeInMB = 0;
+		Type = MemoryCard_None;
 		
 		IsPSX = false;
 		IsPresent = false;
 		IsEnabled = false;
+		IsFormatted = false;
 	}
 
 };
@@ -104,12 +107,12 @@ public:
 	void setExternHandler(void (*f)(void)){m_externHandler=f;};
 	void OnChanged(wxEvent& evt){if (m_externHandler) m_externHandler(); evt.Skip();}
 
-	virtual ~BaseMcdListView() throw() { }
+	virtual ~BaseMcdListView() = default;
 	BaseMcdListView( wxWindow* parent )
 		: _parent( parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_VIRTUAL )
 	{
 		m_externHandler=NULL;
-		Connect( this->GetId(),				wxEVT_LEFT_UP, wxEventHandler(BaseMcdListView::OnChanged));
+		Bind(wxEVT_LEFT_UP, &BaseMcdListView::OnChanged, this, this->GetId());
 
 		m_CardProvider = NULL;
 	}
@@ -131,7 +134,7 @@ class MemoryCardListView_Simple : public BaseMcdListView
 	typedef BaseMcdListView _parent;
 
 public:
-	virtual ~MemoryCardListView_Simple() throw() { }
+	virtual ~MemoryCardListView_Simple() = default;
 	MemoryCardListView_Simple( wxWindow* parent );
 
 	void CreateColumns();
@@ -179,7 +182,7 @@ namespace Panels
 		}
 
 	public:
-		virtual ~BaseMcdListPanel() throw() {}
+		virtual ~BaseMcdListPanel() = default;
 		BaseMcdListPanel( wxWindow* parent );
 
 		void CreateLayout();
@@ -219,7 +222,7 @@ namespace Panels
 
 
 	public:
-		virtual ~MemoryCardListPanel_Simple() throw();
+		virtual ~MemoryCardListPanel_Simple();
 		MemoryCardListPanel_Simple( wxWindow* parent );
 
 		void UpdateUI();
@@ -292,7 +295,7 @@ namespace Panels
 
 	public:
 		McdConfigPanel_Toggles( wxWindow* parent );
-		virtual ~McdConfigPanel_Toggles() throw() { }
+		virtual ~McdConfigPanel_Toggles() = default;
 		void Apply();
 
 	protected:

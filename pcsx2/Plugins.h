@@ -242,7 +242,7 @@ public:
 	void McdEraseBlock( uint port, uint slot, u32 adr );
 	u64  McdGetCRC( uint port, uint slot );
 	void McdNextFrame( uint port, uint slot );
-	void McdReIndex( uint port, uint slot, const wxString& filter );
+	bool McdReIndex( uint port, uint slot, const wxString& filter );
 
 	friend class SysCorePlugins;
 };
@@ -253,6 +253,46 @@ extern SysPluginBindings SysPlugins;
 //  SysCorePlugins Class
 // --------------------------------------------------------------------------------------
 //
+class DynamicStaticLibrary
+{
+	public:
+
+	DynamicStaticLibrary() {};
+	virtual ~DynamicStaticLibrary() {};
+
+	virtual bool Load(const wxString& name) = 0;
+	virtual void* GetSymbol(const wxString &name) = 0;
+	virtual bool HasSymbol(const wxString &name) = 0;
+};
+
+class StaticLibrary : public DynamicStaticLibrary
+{
+	PluginsEnum_t pid;
+
+	public:
+
+	StaticLibrary(PluginsEnum_t _pid);
+	virtual ~StaticLibrary() {};
+
+	bool Load(const wxString& name);
+	void* GetSymbol(const wxString &name);
+	bool HasSymbol(const wxString &name);
+};
+
+class DynamicLibrary : public DynamicStaticLibrary
+{
+	wxDynamicLibrary		Lib;
+
+	public:
+
+	DynamicLibrary();
+	virtual ~DynamicLibrary() {};
+
+	bool Load(const wxString& name);
+	void* GetSymbol(const wxString &name);
+	bool HasSymbol(const wxString &name);
+};
+
 class SysCorePlugins
 {
 	DeclareNoncopyableObject( SysCorePlugins );
@@ -265,24 +305,27 @@ protected:
 
 		bool		IsInitialized;
 		bool		IsOpened;
+		bool		IsStatic;
 
 		wxString	Filename;
 		wxString	Name;
 		wxString	Version;
 
 		LegacyPluginAPI_Common	CommonBindings;
-		wxDynamicLibrary		Lib;
+		DynamicStaticLibrary*	Lib;
 
 	public:
 		PluginStatus_t()
 		{
 			IsInitialized	= false;
 			IsOpened		= false;
+			IsStatic        = false;
+			Lib             = NULL;
 		}
 
 		PluginStatus_t( PluginsEnum_t _pid, const wxString& srcfile );
-		virtual ~PluginStatus_t() throw() { }
-		
+		virtual ~PluginStatus_t() { delete Lib; }
+
 	protected:
 		void BindCommon( PluginsEnum_t pid );
 		void BindRequired( PluginsEnum_t pid );
@@ -295,14 +338,14 @@ protected:
 	Threading::MutexRecursive	m_mtx_PluginStatus;
 
 	// Lovely hack until the new PS2E API is completed.
-	volatile u32				m_mcdOpen;
+	std::atomic<bool>			m_mcdOpen;
 
 public:		// hack until we unsuck plugins...
-	ScopedPtr<PluginStatus_t>	m_info[PluginId_AllocCount];
+	std::unique_ptr<PluginStatus_t>	m_info[PluginId_AllocCount];
 
 public:
 	SysCorePlugins();
-	virtual ~SysCorePlugins() throw();
+	virtual ~SysCorePlugins();
 
 	virtual void Load( PluginsEnum_t pid, const wxString& srcfile );
 	virtual void Load( const wxString (&folders)[PluginId_Count] );

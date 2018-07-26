@@ -32,7 +32,7 @@
 #include "smap.h"
 #include "ata.h"
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #pragma warning(disable:4244)
 
 HINSTANCE hInst=NULL;
@@ -72,7 +72,7 @@ u32 CALLBACK PS2EgetLibType() {
 	return PS2E_LT_DEV9;
 }
 
-char* CALLBACK PS2EgetLibName() {
+const char* CALLBACK PS2EgetLibName() {
 	return libraryName;
 }
 
@@ -246,6 +246,9 @@ void _DEV9irq(int cause, int cycles)
 
 
 u8  CALLBACK DEV9read8(u32 addr) {
+	if (!config.ethEnable & !config.hddEnable)
+		return 0;
+
 	u8 hard;
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
@@ -311,6 +314,9 @@ u8  CALLBACK DEV9read8(u32 addr) {
 
 u16 CALLBACK DEV9read16(u32 addr)
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return 0;
+
 	u16 hard;
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
@@ -373,6 +379,9 @@ u16 CALLBACK DEV9read16(u32 addr)
 
 u32 CALLBACK DEV9read32(u32 addr)
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return 0;
+
 	u32 hard;
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
@@ -387,9 +396,9 @@ u32 CALLBACK DEV9read32(u32 addr)
 		//smap
 		return smap_read32(addr);
 	}
-	switch (addr) {
+//	switch (addr) {
 
-		default:
+//		default:
 			if ((addr >= FLASH_REGBASE) && (addr < (FLASH_REGBASE + FLASH_REGSIZE))) {
 				return (u32)FLASHread32(addr, 4);
 			}
@@ -397,14 +406,17 @@ u32 CALLBACK DEV9read32(u32 addr)
 			hard = dev9Ru32(addr); 
 			DEV9_LOG("*Unknown 32bit read at address %lx value %x\n", addr, hard);
 			return hard;
-	}
+//	}
 
-	DEV9_LOG("*Known 32bit read at address %lx: %lx\n", addr, hard);
-	return hard;
+//	DEV9_LOG("*Known 32bit read at address %lx: %lx\n", addr, hard);
+//	return hard;
 }
 
 void CALLBACK DEV9write8(u32 addr,  u8 value) 
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return;
+
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
 #ifdef ENABLE_ATA
@@ -512,6 +524,9 @@ void CALLBACK DEV9write8(u32 addr,  u8 value)
 
 void CALLBACK DEV9write16(u32 addr, u16 value) 
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return;
+
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
 #ifdef ENABLE_ATA
@@ -552,6 +567,9 @@ void CALLBACK DEV9write16(u32 addr, u16 value)
 
 void CALLBACK DEV9write32(u32 addr, u32 value) 
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return;
+
 	if (addr>=ATA_DEV9_HDD_BASE && addr<ATA_DEV9_HDD_END)
 	{
 #ifdef ENABLE_ATA
@@ -586,6 +604,9 @@ void CALLBACK DEV9write32(u32 addr, u32 value)
 
 void CALLBACK DEV9readDMA8Mem(u32 *pMem, int size) 
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return;
+
 	DEV9_LOG("*DEV9readDMA8Mem: size %x\n", size);
 	emu_printf("rDMA\n");
 	
@@ -597,6 +618,9 @@ void CALLBACK DEV9readDMA8Mem(u32 *pMem, int size)
 
 void CALLBACK DEV9writeDMA8Mem(u32* pMem, int size) 
 {
+	if (!config.ethEnable & !config.hddEnable)
+		return;
+
 	DEV9_LOG("*DEV9writeDMA8Mem: size %x\n", size);
 	emu_printf("wDMA\n");
 	

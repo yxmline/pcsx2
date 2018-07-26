@@ -28,6 +28,7 @@
 #include "GSUniformBufferOGL.h"
 #include "GSShaderOGL.h"
 #include "GLState.h"
+#include "GSOsdManager.h"
 
 // A couple of flag to determine the blending behavior
 #define BLEND_A_MAX		(0x100) // Impossible blending uses coeff bigger than 1
@@ -114,18 +115,24 @@ public:
 	bool IsMaskEnable() { return m_depth_mask != GL_FALSE; }
 };
 
-class GSDeviceOGL : public GSDevice
+class GSDeviceOGL final : public GSDevice
 {
-	public:
-	__aligned(struct, 32) VSConstantBuffer
+public:
+	struct alignas(32) VSConstantBuffer
 	{
 		GSVector4 Vertex_Scale_Offset;
-		GSVector4 TextureScale;
+
+		GSVector4 TextureOffset;
+
+		GSVector2i DepthMask;
+		GSVector2 PointSize;
 
 		VSConstantBuffer()
 		{
 			Vertex_Scale_Offset = GSVector4::zero();
-			TextureScale = GSVector4::zero();
+			TextureOffset       = GSVector4::zero();
+			DepthMask           = GSVector2i(0);
+			PointSize           = GSVector2(0);
 		}
 
 		__forceinline bool Update(const VSConstantBuffer* cb)
@@ -133,7 +140,7 @@ class GSDeviceOGL : public GSDevice
 			GSVector4i* a = (GSVector4i*)this;
 			GSVector4i* b = (GSVector4i*)cb;
 
-			if(!((a[0] == b[0]) & (a[1] == b[1])).alltrue())
+			if(!((a[0] == b[0]) & (a[1] == b[1]) & (a[2] == b[2])).alltrue())
 			{
 				a[0] = b[0];
 				a[1] = b[1];
@@ -151,18 +158,14 @@ class GSDeviceOGL : public GSDevice
 		{
 			struct
 			{
-				uint32 wildhack:1;
-				uint32 bppz:2;
-				uint32 tme:1;
-				uint32 fst:1;
-
-				uint32 _free:27;
+				uint32 int_fst:1;
+				uint32 _free:31;
 			};
 
 			uint32 key;
 		};
 
-		operator uint32() {return key;}
+		operator uint32() const {return key;}
 
 		VSSelector() : key(0) {}
 		VSSelector(uint32 k) : key(k) {}
@@ -176,27 +179,27 @@ class GSDeviceOGL : public GSDevice
 			{
 				uint32 sprite:1;
 				uint32 point:1;
+				uint32 line:1;
 
-				uint32 _free:30;
+				uint32 _free:29;
 			};
 
 			uint32 key;
 		};
 
-		operator uint32() {return key;}
+		operator uint32() const {return key;}
 
 		GSSelector() : key(0) {}
 		GSSelector(uint32 k) : key(k) {}
 	};
 
-	__aligned(struct, 32) PSConstantBuffer
+	struct alignas(32) PSConstantBuffer
 	{
 		GSVector4 FogColor_AREF;
 		GSVector4 WH;
-		GSVector4 MinF_TA;
+		GSVector4 TA_Af;
 		GSVector4i MskFix;
 		GSVector4i FbMask;
-		GSVector4 AlphaCoeff;
 
 		GSVector4 HalfTexel;
 		GSVector4 MinMax;
@@ -207,10 +210,9 @@ class GSDeviceOGL : public GSDevice
 			FogColor_AREF = GSVector4::zero();
 			HalfTexel     = GSVector4::zero();
 			WH            = GSVector4::zero();
+			TA_Af         = GSVector4::zero();
 			MinMax        = GSVector4::zero();
-			MinF_TA       = GSVector4::zero();
 			MskFix        = GSVector4i::zero();
-			AlphaCoeff    = GSVector4::zero();
 			TC_OH_TS      = GSVector4::zero();
 			FbMask        = GSVector4i::zero();
 		}
@@ -222,7 +224,7 @@ class GSDeviceOGL : public GSDevice
 
 			// if WH matches both HalfTexel and TC_OH_TS do too
 			// MinMax depends on WH and MskFix so no need to check it too
-			if(!((a[0] == b[0]) & (a[1] == b[1]) & (a[2] == b[2]) & (a[3] == b[3]) & (a[4] == b[4]) & (a[5] == b[5])).alltrue())
+			if(!((a[0] == b[0]) & (a[1] == b[1]) & (a[2] == b[2]) & (a[3] == b[3]) & (a[4] == b[4])).alltrue())
 			{
 				// Note previous check uses SSE already, a plain copy will be faster than any memcpy
 				a[0] = b[0];
@@ -252,6 +254,7 @@ class GSDeviceOGL : public GSDevice
 				// Format
 				uint32 tex_fmt:4;
 				uint32 dfmt:2;
+				uint32 depth_fmt:2;
 				// Alpha extension/Correction
 				uint32 aem:1;
 				uint32 fba:1;
@@ -275,7 +278,7 @@ class GSDeviceOGL : public GSDevice
 				uint32 write_rg:1;
 				uint32 fbmask:1;
 
-				uint32 _free1:2;
+				//uint32 _free1:0;
 
 				// *** Word 2
 				// Blend and Colclip
@@ -288,17 +291,25 @@ class GSDeviceOGL : public GSDevice
 				uint32 hdr:1;
 				uint32 colclip:1;
 
+				// Others ways to fetch the texture
+				uint32 channel:3;
+
 				// Hack
 				uint32 tcoffsethack:1;
+				uint32 urban_chaos_hle:1;
+				uint32 tales_of_abyss_hle:1;
+				uint32 tex_is_fb:1; // Jak Shadows
+				uint32 automatic_lod:1;
+				uint32 manual_lod:1;
 
-				uint32 _free2:19;
+				uint32 _free2:11;
 			};
 
 			uint64 key;
 		};
 
 		// FIXME is the & useful ?
-		operator uint64() {return key;}
+		operator uint64() const {return key;}
 
 		PSSelector() : key(0) {}
 	};
@@ -311,9 +322,11 @@ class GSDeviceOGL : public GSDevice
 			{
 				uint32 tau:1;
 				uint32 tav:1;
-				uint32 ltf:1;
+				uint32 biln:1;
+				uint32 triln:3;
+				uint32 aniso:1;
 
-				uint32 _free:29;
+				uint32 _free:25;
 			};
 
 			uint32 key;
@@ -334,8 +347,9 @@ class GSDeviceOGL : public GSDevice
 				uint32 ztst:2;
 				uint32 zwe:1;
 				uint32 date:1;
+				uint32 date_one:1;
 
-				uint32 _free:28;
+				uint32 _free:27;
 			};
 
 			uint32 key;
@@ -377,20 +391,37 @@ class GSDeviceOGL : public GSDevice
 		OMColorMaskSelector(uint32 c) { wrgba = c; }
 	};
 
+	struct alignas(32) MiscConstantBuffer
+	{
+		GSVector4i ScalingFactor;
+		GSVector4i ChannelShuffle;
+		GSVector4i EMOD_AC;
+
+		MiscConstantBuffer() {memset(this, 0, sizeof(*this));}
+	};
+
 	struct OGLBlend {uint16 bogus, op, src, dst;};
 	static const OGLBlend m_blendMapOGL[3*3*3*3 + 1];
 	static const int m_NO_BLEND;
 	static const int m_MERGE_BLEND;
 
-	static int s_n;
+	static int m_shader_inst;
+	static int m_shader_reg;
 
 	private:
 	uint32 m_msaa;				// Level of Msaa
+	int m_force_texture_clear;
+	int m_mipmap;
+	TriFiltering m_filter;
 
 	static bool m_debug_gl_call;
 	static FILE* m_debug_gl_file;
 
-	GSWnd* m_window;
+	bool m_disable_hw_gl_draw;
+
+	// Place holder for the GLSL shader code (to avoid useless reload)
+	std::vector<char> m_shader_tfx_vgs;
+	std::vector<char> m_shader_tfx_fs;
 
 	GLuint m_fbo;				// frame buffer container
 	GLuint m_fbo_read;			// frame buffer container only for reading
@@ -409,7 +440,7 @@ class GSDeviceOGL : public GSDevice
 
 	struct {
 		GLuint vs;		// program object
-		GLuint ps[18];	// program object
+		GLuint ps[ShaderConvert_Count];	// program object
 		GLuint ln;		// sampler object
 		GLuint pt;		// sampler object
 		GSDepthStencilOGL* dss;
@@ -434,14 +465,20 @@ class GSDeviceOGL : public GSDevice
 
 	struct {
 		GLuint ps;
-		GSUniformBufferOGL *cb;
 	} m_shadeboost;
 
-	GLuint m_vs[1<<5];
-	GLuint m_gs[1<<2];
-	GLuint m_ps_ss[1<<3];
-	GSDepthStencilOGL* m_om_dss[1<<4];
-	hash_map<uint64, GLuint > m_ps;
+	struct {
+		uint16 last_query;
+		GLuint timer_query[1<<16];
+
+		GLuint timer() { return timer_query[last_query]; }
+	} m_profiler;
+
+	GLuint m_vs[1<<1];
+	GLuint m_gs[1<<3];
+	GLuint m_ps_ss[1<<7];
+	GSDepthStencilOGL* m_om_dss[1<<5];
+	std::unordered_map<uint64, GLuint> m_ps;
 	GLuint m_apitrace;
 
 	GLuint m_palette_ss;
@@ -451,15 +488,19 @@ class GSDeviceOGL : public GSDevice
 
 	VSConstantBuffer m_vs_cb_cache;
 	PSConstantBuffer m_ps_cb_cache;
+	MiscConstantBuffer m_misc_cb_cache;
+
+	GSTextureOGL* m_font;
 
 	GSTexture* CreateSurface(int type, int w, int h, bool msaa, int format);
 	GSTexture* FetchSurface(int type, int w, int h, bool msaa, int format);
 
-	void DoMerge(GSTexture* sTex[2], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, bool slbg, bool mmod, const GSVector4& c);
-	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0);
-	void DoFXAA(GSTexture* sTex, GSTexture* dTex);
-	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex);
-	void DoExternalFX(GSTexture* sTex, GSTexture* dTex);
+	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
+	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
+	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
+	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) final;
+	void DoExternalFX(GSTexture* sTex, GSTexture* dTex) final;
+	void RenderOsd(GSTexture* dt);
 
 	void OMAttachRt(GSTextureOGL* rt = NULL);
 	void OMAttachDs(GSTextureOGL* ds = NULL);
@@ -471,6 +512,8 @@ class GSDeviceOGL : public GSDevice
 	GSDeviceOGL();
 	virtual ~GSDeviceOGL();
 
+	void GenerateProfilerData();
+
 	static void CheckDebugLog();
 	// Used by OpenGL, so the same calling convention is required.
 	static void APIENTRY DebugOutputToFile(GLenum gl_source, GLenum gl_type, GLuint id, GLenum gl_severity, GLsizei gl_length, const GLchar *gl_message, const void* userParam);
@@ -478,73 +521,72 @@ class GSDeviceOGL : public GSDevice
 	bool HasStencil() { return true; }
 	bool HasDepth32() { return true; }
 
-	bool Create(GSWnd* wnd);
+	bool Create(const std::shared_ptr<GSWnd> &wnd);
 	bool Reset(int w, int h);
 	void Flip();
-	void SetVSync(bool enable);
+	void SetVSync(int vsync);
 
-	void DrawPrimitive();
+	void DrawPrimitive() final;
 	void DrawPrimitive(int offset, int count);
-	void DrawIndexedPrimitive();
-	void DrawIndexedPrimitive(int offset, int count);
-	void BeforeDraw();
-	void AfterDraw();
+	void DrawIndexedPrimitive() final;
+	void DrawIndexedPrimitive(int offset, int count) final;
+	inline void BeforeDraw();
+	inline void AfterDraw();
 
-	void ClearRenderTarget(GSTexture* t, const GSVector4& c);
-	void ClearRenderTarget(GSTexture* t, uint32 c);
-	void ClearRenderTarget_i(GSTexture* t, int32 c);
-	void ClearDepth(GSTexture* t, float c);
-	void ClearStencil(GSTexture* t, uint8 c);
+	void ClearRenderTarget(GSTexture* t, const GSVector4& c) final;
+	void ClearRenderTarget(GSTexture* t, uint32 c) final;
+	void ClearDepth(GSTexture* t) final;
+	void ClearStencil(GSTexture* t, uint8 c) final;
 
-	GSTexture* CreateRenderTarget(int w, int h, bool msaa, int format = 0);
-	GSTexture* CreateDepthStencil(int w, int h, bool msaa, int format = 0);
-	GSTexture* CreateTexture(int w, int h, int format = 0);
-	GSTexture* CreateOffscreen(int w, int h, int format = 0);
-	void InitPrimDateTexture(GSTexture* rt);
+	GSTexture* CreateRenderTarget(int w, int h, bool msaa, int format = 0) final;
+	GSTexture* CreateDepthStencil(int w, int h, bool msaa, int format = 0) final;
+	GSTexture* CreateTexture(int w, int h, int format = 0) final;
+	GSTexture* CreateOffscreen(int w, int h, int format = 0) final;
+	void InitPrimDateTexture(GSTexture* rt, const GSVector4i& area);
 	void RecycleDateTexture();
 
-	GSTexture* CopyOffscreen(GSTexture* src, const GSVector4& sRect, int w, int h, int format = 0, int ps_shader = 0);
+	GSTexture* CopyOffscreen(GSTexture* src, const GSVector4& sRect, int w, int h, int format = 0, int ps_shader = 0) final;
 
-	void CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r);
+	void CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r) final;
 	void CopyRectConv(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r, bool at_origin);
-	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, int shader = 0, bool linear = true);
+	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, int shader = 0, bool linear = true) final;
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, bool linear = true);
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, int bs, bool linear = true);
 
 	void SetupDATE(GSTexture* rt, GSTexture* ds, const GSVertexPT1* vertices, bool datm);
 
-	void EndScene();
+	void BeginScene() final {}
+	void EndScene() final;
 
 	void IASetPrimitiveTopology(GLenum topology);
 	void IASetVertexBuffer(const void* vertices, size_t count);
 	void IASetIndexBuffer(const void* index, size_t count);
 
-	void PSSetShaderResource(int i, GSTexture* sr);
-	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1);
+	void PSSetShaderResource(int i, GSTexture* sr) final;
+	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1) final;
 	void PSSetSamplerState(GLuint ss);
 
 	void OMSetDepthStencilState(GSDepthStencilOGL* dss);
-	void OMSetBlendState(uint8 blend_index = 0, uint8 blend_factor = 0, bool is_blend_constant = false);
-	void OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector4i* scissor = NULL);
+	void OMSetBlendState(uint8 blend_index = 0, uint8 blend_factor = 0, bool is_blend_constant = false, bool accumulation_blend = false);
+	void OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector4i* scissor = NULL) final;
 	void OMSetColorMaskState(OMColorMaskSelector sel = OMColorMaskSelector());
 
 
 	void CreateTextureFX();
-	GLuint CompileVS(VSSelector sel, int logz);
+	GLuint CompileVS(VSSelector sel);
 	GLuint CompileGS(GSSelector sel);
 	GLuint CompilePS(PSSelector sel);
-	GLuint CreateSampler(bool bilinear, bool tau, bool tav);
 	GLuint CreateSampler(PSSamplerSelector sel);
 	GSDepthStencilOGL* CreateDepthStencil(OMDepthStencilSelector dssel);
 
+	void SelfShaderTestPrint(const std::string& test, int& nb_shader);
+	void SelfShaderTestRun(const std::string& dir, const std::string& file, const PSSelector& sel, int& nb_shader);
 	void SelfShaderTest();
 
-
 	void SetupIA(const void* vertex, int vertex_count, const uint32* index, int index_count, int prim);
-	void SetupVS(VSSelector sel);
-	void SetupGS(GSSelector sel);
-	void SetupPS(PSSelector sel);
+	void SetupPipeline(const VSSelector& vsel, const GSSelector& gsel, const PSSelector& psel);
 	void SetupCB(const VSConstantBuffer* vs_cb, const PSConstantBuffer* ps_cb);
+	void SetupCBMisc(const GSVector4i& channel);
 	void SetupSampler(PSSamplerSelector ssel);
 	void SetupOM(OMDepthStencilSelector dssel);
 	GLuint GetSamplerID(PSSamplerSelector ssel);

@@ -42,9 +42,6 @@
     <ClCompile Include="HidDevice.cpp">
       <Filter>InputAPIs</Filter>
     </ClCompile>
-    <ClCompile Include="KeyboardHook.cpp">
-      <Filter>InputAPIs</Filter>
-    </ClCompile>
     <ClCompile Include="KeyboardQueue.cpp">
       <Filter>InputAPIs</Filter>
     </ClCompile>
@@ -75,6 +72,9 @@
     <ClCompile Include="XInputEnum.cpp">
       <Filter>InputAPIs</Filter>
     </ClCompile>
+    <ClCompile Include="Tooltips.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -96,9 +96,6 @@
       <Filter>InputAPIs</Filter>
     </ClInclude>
     <ClInclude Include="HidDevice.h">
-      <Filter>InputAPIs</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyboardHook.h">
       <Filter>InputAPIs</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardQueue.h">
@@ -134,12 +131,18 @@
     <ClInclude Include="XInputEnum.h">
       <Filter>InputAPIs</Filter>
     </ClInclude>
+    <ClInclude Include="Tooltips.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="frog.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="LilyPad.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Default.ini">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

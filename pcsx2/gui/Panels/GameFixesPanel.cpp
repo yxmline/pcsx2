@@ -89,11 +89,11 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 			)
 		},
 		{
-			_("Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD & Spy Hunter loading hang."),
+			_("Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."),
 			wxEmptyString
 		},
 		{
-			_("Ignore Bus Direction on Path3 Transfer - Used for Hotwheels"),
+			_("Enable the GIF FIFO (slower but needed for Hotwheels, Wallace and Gromit, DJ Hero)"),
 			wxEmptyString
 		},
 		{
@@ -102,6 +102,10 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 		},
 		{
 			_("Preload TLB hack to avoid tlb miss on Goemon"),
+			wxEmptyString
+		},
+		{
+			_("VU I bit Hack avoid constant recompilation (Scarface The World Is Yours)"),
 			wxEmptyString
 		}
 	};
@@ -123,8 +127,7 @@ Panels::GameFixesPanel::GameFixesPanel( wxWindow* parent )
 	*this	+= m_check_Enable	| StdExpand();
 	*this	+= groupSizer		| pxCenter;
 
-
-	Connect( m_check_Enable->GetId(), wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GameFixesPanel::OnEnable_Toggled ) );
+	Bind(wxEVT_CHECKBOX, &GameFixesPanel::OnEnable_Toggled, this, m_check_Enable->GetId());
 
 	EnableStuff();
 }
@@ -143,9 +146,11 @@ void Panels::GameFixesPanel::Apply()
 
 void Panels::GameFixesPanel::EnableStuff( AppConfig* configToUse )
 {
-	if( !configToUse ) configToUse = g_Conf;
+	if (!configToUse) configToUse = g_Conf.get();
 	for (GamefixId i=GamefixId_FIRST; i < pxEnumEnd; ++i)
 		m_checkbox[i]->Enable(m_check_Enable->GetValue() && !configToUse->EnablePresets);
+
+	Layout();
 }
 
 void Panels::GameFixesPanel::OnEnable_Toggled( wxCommandEvent& evt )

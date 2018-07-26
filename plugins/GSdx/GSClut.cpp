@@ -98,6 +98,13 @@ void GSClut::Invalidate()
 	m_write.dirty = true;
 }
 
+void GSClut::Invalidate(uint32 block)
+{
+	if (block == m_write.TEX0.CBP) {
+		m_write.dirty = true;
+	}
+}
+
 bool GSClut::WriteTest(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 {
 	switch(TEX0.CLD)
@@ -108,8 +115,8 @@ bool GSClut::WriteTest(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 	case 3: m_CBP[1] = TEX0.CBP; break;
 	case 4: if(m_CBP[0] == TEX0.CBP) return false; m_CBP[0] = TEX0.CBP; break;
 	case 5: if(m_CBP[1] == TEX0.CBP) return false; m_CBP[1] = TEX0.CBP; break;
-	case 6: ASSERT(0); return false; // ffx2 menu
-	case 7: ASSERT(0); return false; // ford mustang racing // Bouken Jidai Katsugeki Goemon
+	case 6: return false; // ffx2 menu
+	case 7: return false; // ford mustang racing // Bouken Jidai Katsugeki Goemon
 	default: __assume(0);
 	}
 
@@ -133,8 +140,8 @@ void GSClut::Write(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 	{
 		int size = TEX0.CPSM < PSM_PSMCT16 ? 512 : 256;
 
-		memcpy(m_clut + 512 + offset, m_clut + offset, sizeof(*m_clut) * min(size, 512 - offset));
-		memcpy(m_clut, m_clut + 512, sizeof(*m_clut) * max(0, size + offset - 512));
+		memcpy(m_clut + 512 + offset, m_clut + offset, sizeof(*m_clut) * std::min(size, 512 - offset));
+		memcpy(m_clut, m_clut + 512, sizeof(*m_clut) * std::max(0, size + offset - 512));
 	}
 	else
 	{
@@ -152,7 +159,7 @@ void GSClut::Write(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 void GSClut::WriteCLUT32_I8_CSM1(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 {
 	ALIGN_STACK(32);
-
+	//FIXME: Romance of the Three Kingdoms VIII text doesn't like the offset
 	WriteCLUT_T32_I8_CSM1((uint32*)m_mem->BlockPtr32(0, 0, TEX0.CBP, 1), m_clut + ((TEX0.CSA & 15) << 4));
 }
 
@@ -331,7 +338,7 @@ void GSClut::Read32(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA)
 	}
 }
 
-void GSClut::GetAlphaMinMax32(int& amin, int& amax)
+void GSClut::GetAlphaMinMax32(int& amin_out, int& amax_out)
 {
 	// call only after Read32
 
@@ -394,8 +401,8 @@ void GSClut::GetAlphaMinMax32(int& amin, int& amax)
 		}
 	}
 
-	amin = m_read.amin;
-	amax = m_read.amax;
+	amin_out = m_read.amin;
+	amax_out = m_read.amax;
 }
 
 //
@@ -682,17 +689,24 @@ __forceinline void GSClut::ExpandCLUT64_T16(const GSVector4i& hi, const GSVector
 
 // TODO
 
-static const GSVector4i s_bm(0x00007c00);
-static const GSVector4i s_gm(0x000003e0);
-static const GSVector4i s_rm(0x0000001f);
+GSVector4i GSClut::m_bm;
+GSVector4i GSClut::m_gm;
+GSVector4i GSClut::m_rm;
+
+void GSClut::InitVectors()
+{
+	m_bm = GSVector4i(0x00007c00);
+	m_gm = GSVector4i(0x000003e0);
+	m_rm = GSVector4i(0x0000001f);
+}
 
 void GSClut::Expand16(const uint16* RESTRICT src, uint32* RESTRICT dst, int w, const GIFRegTEXA& TEXA)
 {
 	ASSERT((w & 7) == 0);
 
-	const GSVector4i rm = s_rm;
-	const GSVector4i gm = s_gm;
-	const GSVector4i bm = s_bm;
+	const GSVector4i rm = m_rm;
+	const GSVector4i gm = m_gm;
+	const GSVector4i bm = m_bm;
 
 	GSVector4i TA0(TEXA.TA0 << 24);
 	GSVector4i TA1(TEXA.TA1 << 24);

@@ -34,7 +34,7 @@ class GSDevice11 : public GSDeviceDX
 {
 	GSTexture* CreateSurface(int type, int w, int h, bool msaa, int format);
 
-	void DoMerge(GSTexture* sTex[2], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, bool slbg, bool mmod, const GSVector4& c);
+	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c);
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0);
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex);
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex);
@@ -54,6 +54,11 @@ class GSDevice11 : public GSDeviceDX
 	CComPtr<ID3D11Buffer> m_ib_old;
 
 	bool m_srv_changed, m_ss_changed;
+	int spritehack;
+	bool isNative;
+
+	bool UserHacks_unscale_pt_ln;
+	bool UserHacks_disable_NV_hack;
 
 	struct
 	{
@@ -65,13 +70,11 @@ class GSDevice11 : public GSDeviceDX
 		ID3D11VertexShader* vs;
 		ID3D11Buffer* vs_cb;
 		ID3D11GeometryShader* gs;
+		ID3D11Buffer* gs_cb;
 		ID3D11ShaderResourceView* ps_srv[16];
 		ID3D11PixelShader* ps;
 		ID3D11Buffer* ps_cb;
 		ID3D11SamplerState* ps_ss[3];
-		ID3D11ShaderResourceView* cs_srv[16];
-		ID3D11ComputeShader* cs;
-		ID3D11Buffer* cs_cb;
 		GSVector2i viewport;
 		GSVector4i scissor;
 		ID3D11DepthStencilState* dss;
@@ -140,18 +143,20 @@ public: // TODO
 
 	// Shaders...
 
-	hash_map<uint32, GSVertexShader11 > m_vs;
+	std::unordered_map<uint32, GSVertexShader11> m_vs;
 	CComPtr<ID3D11Buffer> m_vs_cb;
-	hash_map<uint32, CComPtr<ID3D11GeometryShader> > m_gs;
-	hash_map<uint32, CComPtr<ID3D11PixelShader> > m_ps;
+	std::unordered_map<uint32, CComPtr<ID3D11GeometryShader>> m_gs;
+	CComPtr<ID3D11Buffer> m_gs_cb;
+	std::unordered_map<uint64, CComPtr<ID3D11PixelShader>> m_ps;
 	CComPtr<ID3D11Buffer> m_ps_cb;
-	hash_map<uint32, CComPtr<ID3D11SamplerState> > m_ps_ss;
+	std::unordered_map<uint32, CComPtr<ID3D11SamplerState>> m_ps_ss;
 	CComPtr<ID3D11SamplerState> m_palette_ss;
 	CComPtr<ID3D11SamplerState> m_rt_ss;
-	hash_map<uint32, CComPtr<ID3D11DepthStencilState> > m_om_dss;
-	hash_map<uint32, CComPtr<ID3D11BlendState> > m_om_bs;
+	std::unordered_map<uint32, CComPtr<ID3D11DepthStencilState>> m_om_dss;
+	std::unordered_map<uint32, CComPtr<ID3D11BlendState>> m_om_bs;
 
 	VSConstantBuffer m_vs_cb_cache;
+	GSConstantBuffer m_gs_cb_cache;
 	PSConstantBuffer m_ps_cb_cache;
 
 	bool CreateTextureFX();
@@ -160,9 +165,10 @@ public:
 	GSDevice11();
 	virtual ~GSDevice11();
 
-	bool Create(GSWnd* wnd);
+	bool Create(const std::shared_ptr<GSWnd> &wnd);
 	bool Reset(int w, int h);
 	void Flip();
+	void SetVSync(int vsync) final;
 
 	void SetExclusive(bool isExcl);
 
@@ -173,7 +179,7 @@ public:
 
 	void ClearRenderTarget(GSTexture* t, const GSVector4& c);
 	void ClearRenderTarget(GSTexture* t, uint32 c);
-	void ClearDepth(GSTexture* t, float c);
+	void ClearDepth(GSTexture* t);
 	void ClearStencil(GSTexture* t, uint8 c);
 
 	GSTexture* CreateRenderTarget(int w, int h, bool msaa, int format = 0);
@@ -200,22 +206,19 @@ public:
 	void IASetInputLayout(ID3D11InputLayout* layout);
 	void IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology);
 	void VSSetShader(ID3D11VertexShader* vs, ID3D11Buffer* vs_cb);
-	void GSSetShader(ID3D11GeometryShader* gs);
+	void GSSetShader(ID3D11GeometryShader* gs, ID3D11Buffer* gs_cb = NULL);
 	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1);
 	void PSSetShaderResource(int i, GSTexture* sr);
 	void PSSetShaderResourceView(int i, ID3D11ShaderResourceView* srv);
 	void PSSetShader(ID3D11PixelShader* ps, ID3D11Buffer* ps_cb);
 	void PSSetSamplerState(ID3D11SamplerState* ss0, ID3D11SamplerState* ss1, ID3D11SamplerState* ss2 = NULL);
-	void CSSetShaderSRV(int i, ID3D11ShaderResourceView* srv);
-	void CSSetShaderUAV(int i, ID3D11UnorderedAccessView* uav);
-	void CSSetShader(ID3D11ComputeShader* cs, ID3D11Buffer* cs_cb);
 	void OMSetDepthStencilState(ID3D11DepthStencilState* dss, uint8 sref);
 	void OMSetBlendState(ID3D11BlendState* bs, float bf);
 	void OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector4i* scissor = NULL);
 	void OMSetRenderTargets(const GSVector2i& rtsize, int count, ID3D11UnorderedAccessView** uav, uint32* counters, const GSVector4i* scissor = NULL);
 
 	void SetupVS(VSSelector sel, const VSConstantBuffer* cb);
-	void SetupGS(GSSelector sel);
+	void SetupGS(GSSelector sel, const GSConstantBuffer* cb);
 	void SetupPS(PSSelector sel, const PSConstantBuffer* cb, PSSamplerSelector ssel);
 	void SetupOM(OMDepthStencilSelector dssel, OMBlendSelector bsel, uint8 afix);
 
@@ -226,10 +229,9 @@ public:
 	operator ID3D11Device*() {return m_dev;}
 	operator ID3D11DeviceContext*() {return m_ctx;}
 
-	void CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11VertexShader** vs, D3D11_INPUT_ELEMENT_DESC* layout, int count, ID3D11InputLayout** il);
-	void CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11GeometryShader** gs);
-	void CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11GeometryShader** gs, D3D11_SO_DECLARATION_ENTRY* layout, int count);
-	void CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11PixelShader** ps);
-	void CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11ComputeShader** cs);
+	void CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11VertexShader** vs, D3D11_INPUT_ELEMENT_DESC* layout, int count, ID3D11InputLayout** il);
+	void CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11GeometryShader** gs);
+	void CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11GeometryShader** gs, D3D11_SO_DECLARATION_ENTRY* layout, int count);
+	void CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11PixelShader** ps);
 };
 

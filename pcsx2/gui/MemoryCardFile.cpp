@@ -19,6 +19,8 @@
 #include <wx/dir.h>
 #include <wx/stopwatch.h>
 
+#include <chrono>
+
 // IMPORTANT!  If this gets a macro redefinition error it means PluginCallbacks.h is included
 // in a global-scope header, and that's a BAD THING.  Include it only into modules that need
 // it, because some need to be able to alter its behavior using defines.  Like this:
@@ -33,6 +35,8 @@ struct Component_FileMcd;
 #include "AppConfig.h"
 
 #include "svnrev.h"
+
+#include "ConsoleLogger.h"
 
 #include <wx/ffile.h>
 #include <map>
@@ -59,7 +63,7 @@ protected:
 
 public:
 	FileMemoryCard();
-	virtual ~FileMemoryCard() throw() {}
+	virtual ~FileMemoryCard() = default;
 
 	void Lock();
 	void Unlock();
@@ -74,7 +78,7 @@ public:
 	s32  Save		( uint slot, const u8 *src, u32 adr, int size );
 	s32  EraseBlock	( uint slot, u32 adr );
 	u64  GetCRC		( uint slot );
-	
+
 protected:
 	bool Seek( wxFFile& f, u32 adr );
 	bool Create( const wxString& mcdFile, uint sizeInMB );
@@ -143,6 +147,7 @@ wxString FileMcd_GetDefaultName(uint slot)
 FileMemoryCard::FileMemoryCard()
 {
 	memset8<0xff>( m_effeffs );
+	m_chkaddr = 0;
 }
 
 void FileMemoryCard::Open()
@@ -358,7 +363,23 @@ s32 FileMemoryCard::Save( uint slot, const u8 *src, u32 adr, int size )
 	}
 
 	if( !Seek(mcfp, adr) ) return 0;
-	return mcfp.Write( m_currentdata.GetPtr(), size ) != 0;
+
+	int status = mcfp.Write( m_currentdata.GetPtr(), size );
+
+	if( status ) {
+		static auto last = std::chrono::time_point<std::chrono::system_clock>();
+
+		std::chrono::duration<float> elapsed = std::chrono::system_clock::now() - last;
+		if(elapsed > std::chrono::seconds(5)) {
+			wxString name, ext;
+			wxFileName::SplitPath(m_file[slot].GetName(), NULL, NULL, &name, &ext);
+			OSDlog( Color_StrongYellow, false, "Memory Card %s written.", (const char *)(name + "." + ext).c_str() );
+			last = std::chrono::system_clock::now();
+		}
+		return 1;
+	}
+
+	return 0;
 }
 
 s32 FileMemoryCard::EraseBlock( uint slot, u32 adr )
@@ -562,17 +583,17 @@ static void PS2E_CALLBACK FileMcd_NextFrame( PS2E_THISPTR thisptr, uint port, ui
 	}
 }
 
-static void PS2E_CALLBACK FileMcd_ReIndex( PS2E_THISPTR thisptr, uint port, uint slot, const wxString& filter ) {
+static bool PS2E_CALLBACK FileMcd_ReIndex( PS2E_THISPTR thisptr, uint port, uint slot, const wxString& filter ) {
 	const uint combinedSlot = FileMcd_ConvertToSlot( port, slot );
 	switch ( g_Conf->Mcd[combinedSlot].Type ) {
 	//case MemoryCardType::MemoryCard_File:
-	//	thisptr->impl.ReIndex( combinedSlot, filter );
+	//	return thisptr->impl.ReIndex( combinedSlot, filter );
 	//	break;
 	case MemoryCardType::MemoryCard_Folder:
-		thisptr->implFolder.ReIndex( combinedSlot, g_Conf->EmuOptions.McdFolderAutoManage, filter );
+		return thisptr->implFolder.ReIndex( combinedSlot, g_Conf->EmuOptions.McdFolderAutoManage, filter );
 		break;
 	default:
-		return;
+		return false;
 	}
 }
 

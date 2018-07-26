@@ -15,22 +15,18 @@
 
 #include "PrecompiledHeader.h"
 
-bool pxIsEnglish( int id )
+bool pxIsEnglish(int id)
 {
-	return ( id == wxLANGUAGE_ENGLISH || id == wxLANGUAGE_ENGLISH_US );
+    return (id == wxLANGUAGE_ENGLISH || id == wxLANGUAGE_ENGLISH_US);
 }
 
 // --------------------------------------------------------------------------------------
 //  pxExpandMsg  -- an Iconized Text Translator
 //  Was replaced by a standard implementation of wxGetTranslation
 // --------------------------------------------------------------------------------------
-const wxChar* __fastcall pxExpandMsg( const wxChar* englishContent )
+const wxChar *__fastcall pxExpandMsg(const wxChar *englishContent)
 {
-#if _WIN32 || wxMAJOR_VERSION < 3
-	return wxGetTranslation(englishContent);
-#else
-	return wxGetTranslation(englishContent).wc_str();
-#endif
+    return wxGetTranslation(englishContent).wc_str();
 }
 
 // ------------------------------------------------------------------------
@@ -39,19 +35,14 @@ const wxChar* __fastcall pxExpandMsg( const wxChar* englishContent )
 // if the string seems too long for gettext lookups.  Longer complicated strings should
 // usually be implemented used the pxMsgExpand system instead.
 //
-const wxChar* __fastcall pxGetTranslation( const wxChar* message )
+const wxChar *__fastcall pxGetTranslation(const wxChar *message)
 {
-	if( IsDevBuild )
-	{
-		if( wxStrlen( message ) > 128 )
-		{
-			Console.Warning( "pxGetTranslation: Long message detected, maybe use pxE() instead?" );
-			Console.WriteLn( Color_Green, L"Message: %s", message );
-		}
-	}
-#if _WIN32 || wxMAJOR_VERSION < 3
-	return wxGetTranslation(message);
-#else
-	return wxGetTranslation( message ).wc_str();
-#endif
+    if (IsDevBuild) {
+        if (wxStrlen(message) > 128) {
+            Console.Warning("pxGetTranslation: Long message detected, maybe use pxE() instead?");
+            Console.WriteLn(Color_Green, L"Message: %s", message);
+        }
+    }
+
+    return wxGetTranslation(message).wc_str();
 }

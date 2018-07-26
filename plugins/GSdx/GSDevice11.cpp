@@ -30,20 +30,29 @@ GSDevice11::GSDevice11()
 {
 	memset(&m_state, 0, sizeof(m_state));
 	memset(&m_vs_cb_cache, 0, sizeof(m_vs_cb_cache));
+	memset(&m_gs_cb_cache, 0, sizeof(m_gs_cb_cache));
 	memset(&m_ps_cb_cache, 0, sizeof(m_ps_cb_cache));
 
 	FXAA_Compiled = false;
 	ExShader_Compiled = false;
-	
+
 	m_state.topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 	m_state.bf = -1;
+
+	if (theApp.GetConfigB("UserHacks")) {
+		UserHacks_unscale_pt_ln = theApp.GetConfigB("UserHacks_unscale_point_line");
+		UserHacks_disable_NV_hack = theApp.GetConfigB("UserHacks_DisableNVhack");
+	} else {
+		UserHacks_unscale_pt_ln = false;
+		UserHacks_disable_NV_hack = false;
+	}
 }
 
 GSDevice11::~GSDevice11()
 {
 }
 
-bool GSDevice11::Create(GSWnd* wnd)
+bool GSDevice11::Create(const std::shared_ptr<GSWnd> &wnd)
 {
 	if(!__super::Create(wnd))
 	{
@@ -62,7 +71,7 @@ bool GSDevice11::Create(GSWnd* wnd)
 	CComPtr<IDXGIAdapter1> adapter;
 	D3D_DRIVER_TYPE driver_type = D3D_DRIVER_TYPE_HARDWARE;
 
-	std::string adapter_id = theApp.GetConfig("Adapter", "default");
+	std::string adapter_id = theApp.GetConfigS("Adapter");
 
 	if (adapter_id == "default")
 		;
@@ -109,6 +118,10 @@ bool GSDevice11::Create(GSWnd* wnd)
 	// will be issued after all other initializations are complete.
 
 	scd.Windowed = TRUE;
+
+	spritehack = theApp.GetConfigB("UserHacks") ? theApp.GetConfigI("UserHacks_SpriteHack") : 0;
+
+	isNative = theApp.GetConfigI("upscale_multiplier") == 1;
 
 	// NOTE : D3D11_CREATE_DEVICE_SINGLETHREADED
 	//   This flag is safe as long as the DXGI's internal message pump is disabled or is on the
@@ -172,13 +185,13 @@ bool GSDevice11::Create(GSWnd* wnd)
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
-	vector<unsigned char> shader;
+	std::vector<char> shader;
 	theApp.LoadResource(IDR_CONVERT_FX, shader);
-	CompileShader((const char *)shader.data(), shader.size(), "convert.fx", "vs_main", NULL, &m_convert.vs, il_convert, countof(il_convert), &m_convert.il);
+	CompileShader(shader.data(), shader.size(), "convert.fx", nullptr, "vs_main", nullptr, &m_convert.vs, il_convert, countof(il_convert), &m_convert.il);
 
 	for(size_t i = 0; i < countof(m_convert.ps); i++)
 	{
-		CompileShader((const char *)shader.data(), shader.size(), "convert.fx", format("ps_main%d", i).c_str(), NULL, &m_convert.ps[i]);
+		CompileShader(shader.data(), shader.size(), "convert.fx", nullptr, format("ps_main%d", i).c_str(), nullptr, &m_convert.ps[i]);
 	}
 
 	memset(&dsd, 0, sizeof(dsd));
@@ -207,7 +220,7 @@ bool GSDevice11::Create(GSWnd* wnd)
 	theApp.LoadResource(IDR_MERGE_FX, shader);
 	for(size_t i = 0; i < countof(m_merge.ps); i++)
 	{
-		CompileShader((const char *)shader.data(), shader.size(), "merge.fx", format("ps_main%d", i).c_str(), NULL, &m_merge.ps[i]);
+		CompileShader(shader.data(), shader.size(), "merge.fx", nullptr, format("ps_main%d", i).c_str(), nullptr, &m_merge.ps[i]);
 	}
 
 	memset(&bsd, 0, sizeof(bsd));
@@ -236,23 +249,23 @@ bool GSDevice11::Create(GSWnd* wnd)
 	theApp.LoadResource(IDR_INTERLACE_FX, shader);
 	for(size_t i = 0; i < countof(m_interlace.ps); i++)
 	{
-		CompileShader((const char *)shader.data(), shader.size(), "interlace.fx", format("ps_main%d", i).c_str(), NULL, &m_interlace.ps[i]);
+		CompileShader(shader.data(), shader.size(), "interlace.fx", nullptr, format("ps_main%d", i).c_str(), nullptr, &m_interlace.ps[i]);
 	}
 
-	// Shade Boost	
+	// Shade Boos
 
-	int ShadeBoost_Contrast = theApp.GetConfig("ShadeBoost_Contrast", 50);
-	int ShadeBoost_Brightness = theApp.GetConfig("ShadeBoost_Brightness", 50);
-	int ShadeBoost_Saturation = theApp.GetConfig("ShadeBoost_Saturation", 50);
-		
-	string str[3];		
-		
+	int ShadeBoost_Contrast = theApp.GetConfigI("ShadeBoost_Contrast");
+	int ShadeBoost_Brightness = theApp.GetConfigI("ShadeBoost_Brightness");
+	int ShadeBoost_Saturation = theApp.GetConfigI("ShadeBoost_Saturation");
+
+	std::string str[3];
+
 	str[0] = format("%d", ShadeBoost_Saturation);
 	str[1] = format("%d", ShadeBoost_Brightness);
 	str[2] = format("%d", ShadeBoost_Contrast);
 
-	D3D11_SHADER_MACRO macro[] =
-	{			
+	D3D_SHADER_MACRO macro[] =
+	{
 		{"SB_SATURATION", str[0].c_str()},
 		{"SB_BRIGHTNESS", str[1].c_str()},
 		{"SB_CONTRAST", str[2].c_str()},
@@ -268,7 +281,7 @@ bool GSDevice11::Create(GSWnd* wnd)
 	hr = m_dev->CreateBuffer(&bd, NULL, &m_shadeboost.cb);
 
 	theApp.LoadResource(IDR_SHADEBOOST_FX, shader);
-	CompileShader((const char *)shader.data(), shader.size(), "shadeboost.fx", "ps_main", macro, &m_shadeboost.ps);
+	CompileShader(shader.data(), shader.size(), "shadeboost.fx", nullptr, "ps_main", macro, &m_shadeboost.ps);
 
 	// External fx shader
 
@@ -313,18 +326,18 @@ bool GSDevice11::Create(GSWnd* wnd)
 
 	memset(&sd, 0, sizeof(sd));
 
-	sd.Filter = theApp.GetConfig("MaxAnisotropy", 0) && !theApp.GetConfig("paltex", 0) ? D3D11_FILTER_ANISOTROPIC : D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sd.Filter = theApp.GetConfigI("MaxAnisotropy") && !theApp.GetConfigB("paltex") ? D3D11_FILTER_ANISOTROPIC : D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sd.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sd.MinLOD = -FLT_MAX;
 	sd.MaxLOD = FLT_MAX;
-	sd.MaxAnisotropy = theApp.GetConfig("MaxAnisotropy", 0);
+	sd.MaxAnisotropy = theApp.GetConfigI("MaxAnisotropy");
 	sd.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 	hr = m_dev->CreateSamplerState(&sd, &m_convert.ln);
 
-	sd.Filter = theApp.GetConfig("MaxAnisotropy", 0) && !theApp.GetConfig("paltex", 0) ? D3D11_FILTER_ANISOTROPIC : D3D11_FILTER_MIN_MAG_MIP_POINT;
+	sd.Filter = theApp.GetConfigI("MaxAnisotropy") && !theApp.GetConfigB("paltex") ? D3D11_FILTER_ANISOTROPIC : D3D11_FILTER_MIN_MAG_MIP_POINT;
 
 	hr = m_dev->CreateSamplerState(&sd, &m_convert.pt);
 
@@ -366,7 +379,7 @@ bool GSDevice11::Create(GSWnd* wnd)
 
 	if(m_wnd->IsManaged())
 	{
-		SetExclusive(!theApp.GetConfig("windowed", 1));
+		SetExclusive(!theApp.GetConfigB("windowed"));
 	}
 
 	return true;
@@ -421,6 +434,11 @@ void GSDevice11::SetExclusive(bool isExcl)
 	}
 }
 
+void GSDevice11::SetVSync(int vsync)
+{
+	m_vsync = vsync ? 1 : 0;
+}
+
 void GSDevice11::Flip()
 {
 	m_swapchain->Present(m_vsync, 0);
@@ -438,7 +456,7 @@ void GSDevice11::DrawIndexedPrimitive()
 
 void GSDevice11::DrawIndexedPrimitive(int offset, int count)
 {
-	ASSERT(offset + count <= m_index.count);
+	ASSERT(offset + count <= (int)m_index.count);
 
 	m_ctx->DrawIndexed(count, m_index.start + offset, m_vertex.start);
 }
@@ -462,10 +480,10 @@ void GSDevice11::ClearRenderTarget(GSTexture* t, uint32 c)
 	m_ctx->ClearRenderTargetView(*(GSTexture11*)t, color.v);
 }
 
-void GSDevice11::ClearDepth(GSTexture* t, float c)
+void GSDevice11::ClearDepth(GSTexture* t)
 {
 	if (!t) return;
-	m_ctx->ClearDepthStencilView(*(GSTexture11*)t, D3D11_CLEAR_DEPTH, c, 0);
+	m_ctx->ClearDepthStencilView(*(GSTexture11*)t, D3D11_CLEAR_DEPTH, 0.0f, 0);
 }
 
 void GSDevice11::ClearStencil(GSTexture* t, uint8 c)
@@ -529,9 +547,13 @@ GSTexture* GSDevice11::CreateSurface(int type, int w, int h, bool msaa, int form
 			ClearRenderTarget(t, 0);
 			break;
 		case GSTexture::DepthStencil:
-			ClearDepth(t, 0);
+			ClearDepth(t);
 			break;
 		}
+	}
+	else
+	{
+		throw std::bad_alloc();
 	}
 
 	return t;
@@ -621,7 +643,7 @@ void GSDevice11::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r)
 		return;
 	}
 
-	D3D11_BOX box = {r.left, r.top, 0, r.right, r.bottom, 1};
+	D3D11_BOX box = {(UINT)r.left, (UINT)r.top, 0U, (UINT)r.right, (UINT)r.bottom, 1U};
 
 	m_ctx->CopySubresourceRegion(*(GSTexture11*)dTex, 0, 0, 0, 0, *(GSTexture11*)sTex, 0, &box);
 }
@@ -691,7 +713,7 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 	//sel.prim = 2; //Triangle Strip
 	//SetupGS(sel);
 
-	GSSetShader(NULL);
+	GSSetShader(NULL, NULL);
 
 	/*END OF HACK*/
 	
@@ -714,8 +736,11 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 	PSSetShaderResources(NULL, NULL);
 }
 
-void GSDevice11::DoMerge(GSTexture* sTex[2], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, bool slbg, bool mmod, const GSVector4& c)
+void GSDevice11::DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c)
 {
+	bool slbg = PMODE.SLBG;
+	bool mmod = PMODE.MMOD;
+
 	ClearRenderTarget(dTex, c);
 
 	if(sTex[1] && !slbg)
@@ -754,7 +779,7 @@ void GSDevice11::InitExternalFX()
 	if (!ExShader_Compiled)
 	{
 		try {
-			std::string config_name(theApp.GetConfig("shaderfx_conf", "shaders/GSdx_FX_Settings.ini"));
+			std::string config_name(theApp.GetConfigS("shaderfx_conf"));
 			std::ifstream fconfig(config_name);
 			std::stringstream shader;
 			if (fconfig.good())
@@ -762,12 +787,12 @@ void GSDevice11::InitExternalFX()
 			else
 				fprintf(stderr, "GSdx: External shader config '%s' not loaded.\n", config_name.c_str());
 
-			std::string shader_name(theApp.GetConfig("shaderfx_glsl", "shaders/GSdx.fx"));
+			std::string shader_name(theApp.GetConfigS("shaderfx_glsl"));
 			std::ifstream fshader(shader_name);
 			if (fshader.good())
 			{
 				shader << fshader.rdbuf();
-				CompileShader(shader.str().c_str(), shader.str().length(), shader_name.c_str(), "ps_main", NULL, &m_shaderfx.ps);
+				CompileShader(shader.str().c_str(), shader.str().length(), shader_name.c_str(), D3D_COMPILE_STANDARD_FILE_INCLUDE, "ps_main", nullptr, &m_shaderfx.ps);
 			}
 			else
 			{
@@ -792,8 +817,8 @@ void GSDevice11::DoExternalFX(GSTexture* sTex, GSTexture* dTex)
 
 	InitExternalFX();
 
-	cb.xyFrame = GSVector2(s.x, s.y);
-	cb.rcpFrame = GSVector4(1.0f / s.x, 1.0f / s.y, 0.0f, 0.0f);
+	cb.xyFrame = GSVector2((float)s.x, (float)s.y);
+	cb.rcpFrame = GSVector4(1.0f / (float)s.x, 1.0f / (float)s.y, 0.0f, 0.0f);
 	cb.rcpFrameOpt = GSVector4::zero();
 
 	m_ctx->UpdateSubresource(m_shaderfx.cb, 0, NULL, &cb, 0, 0);
@@ -808,9 +833,9 @@ void GSDevice11::InitFXAA()
 	if (!FXAA_Compiled)
 	{
 		try {
-			vector<unsigned char> shader;
+			std::vector<char> shader;
 			theApp.LoadResource(IDR_FXAA_FX, shader);
-			CompileShader((const char *)shader.data(), shader.size(), "fxaa.fx", "ps_main", NULL, &m_fxaa.ps);
+			CompileShader(shader.data(), shader.size(), "fxaa.fx", nullptr, "ps_main", nullptr, &m_fxaa.ps);
 		}
 		catch (GSDXRecoverableError) {
 			printf("GSdx: failed to compile fxaa shader.\n");
@@ -884,7 +909,7 @@ void GSDevice11::SetupDATE(GSTexture* rt, GSTexture* ds, const GSVertexPT1* vert
 
 	// gs
 
-	GSSetShader(NULL);
+	GSSetShader(NULL, NULL);
 
 	// ps
 
@@ -1094,13 +1119,20 @@ void GSDevice11::VSSetShader(ID3D11VertexShader* vs, ID3D11Buffer* vs_cb)
 	}
 }
 
-void GSDevice11::GSSetShader(ID3D11GeometryShader* gs)
+void GSDevice11::GSSetShader(ID3D11GeometryShader* gs, ID3D11Buffer* gs_cb)
 {
 	if(m_state.gs != gs)
 	{
 		m_state.gs = gs;
 
 		m_ctx->GSSetShader(gs, NULL, 0);
+	}
+
+	if (m_state.gs_cb != gs_cb)
+	{
+		m_state.gs_cb = gs_cb;
+
+		m_ctx->GSSetConstantBuffers(0, 1, &gs_cb);
 	}
 }
 
@@ -1179,42 +1211,6 @@ void GSDevice11::PSSetShader(ID3D11PixelShader* ps, ID3D11Buffer* ps_cb)
 	}
 }
 
-void GSDevice11::CSSetShaderSRV(int i, ID3D11ShaderResourceView* srv)
-{
-	if(m_state.cs_srv[i] != srv)
-	{
-		m_state.cs_srv[i] = srv;
-
-		m_ctx->CSSetShaderResources(i, 1, &srv);
-	}
-}
-
-void GSDevice11::CSSetShaderUAV(int i, ID3D11UnorderedAccessView* uav)
-{
-	uint32 counters[8];
-		
-	memset(counters, 0, sizeof(counters));
-
-	m_ctx->CSSetUnorderedAccessViews(i, 1, &uav, counters);
-}
-
-void GSDevice11::CSSetShader(ID3D11ComputeShader* cs, ID3D11Buffer* cs_cb)
-{
-	if(m_state.cs != cs)
-	{
-		m_state.cs = cs;
-
-		m_ctx->CSSetShader(cs, NULL, 0);
-	}
-
-	if(m_state.cs_cb != cs_cb)
-	{
-		m_state.cs_cb = cs_cb;
-
-		m_ctx->CSSetConstantBuffers(0, 1, &cs_cb);
-	}
-}
-
 void GSDevice11::OMSetDepthStencilState(ID3D11DepthStencilState* dss, uint8 sref)
 {
 	if(m_state.dss != dss || m_state.sref != sref)
@@ -1264,11 +1260,10 @@ void GSDevice11::OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector
 		m_state.viewport = size;
 
 		D3D11_VIEWPORT vp;
-
 		memset(&vp, 0, sizeof(vp));
 
-		vp.TopLeftX = -0.01f;
-		vp.TopLeftY = -0.01f;
+		vp.TopLeftX = (UserHacks_disable_NV_hack || spritehack > 0 || isNative) ? 0.0f : -0.01f;
+		vp.TopLeftY = (UserHacks_disable_NV_hack || spritehack > 0 || isNative) ? 0.0f : -0.01f;
 		vp.Width = (float)size.x;
 		vp.Height = (float)size.y;
 		vp.MinDepth = 0.0f;
@@ -1322,17 +1317,17 @@ void GSDevice11::OMSetRenderTargets(const GSVector2i& rtsize, int count, ID3D11U
 	}
 }
 
-void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11VertexShader** vs, D3D11_INPUT_ELEMENT_DESC* layout, int count, ID3D11InputLayout** il)
+void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11VertexShader** vs, D3D11_INPUT_ELEMENT_DESC* layout, int count, ID3D11InputLayout** il)
 {
 	HRESULT hr;
 
-	vector<D3D11_SHADER_MACRO> m;
+	std::vector<D3D_SHADER_MACRO> m;
 
 	PrepareShaderMacro(m, macro);
 
-	CComPtr<ID3D11Blob> shader, error;
+	CComPtr<ID3DBlob> shader, error;
 
-	hr = D3DX11CompileFromMemory(source, size, fn, &m[0], NULL, entry, m_shader.vs.c_str(), 0, 0, NULL, &shader, &error, NULL);
+	hr = s_pD3DCompile(source, size, fn, &m[0], s_old_d3d_compiler_dll? nullptr : include, entry, m_shader.vs.c_str(), 0, 0, &shader, &error);
 
 	if(error)
 	{
@@ -1359,17 +1354,17 @@ void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, 
 	}
 }
 
-void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11GeometryShader** gs)
+void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11GeometryShader** gs)
 {
 	HRESULT hr;
 
-	vector<D3D11_SHADER_MACRO> m;
+	std::vector<D3D_SHADER_MACRO> m;
 
 	PrepareShaderMacro(m, macro);
 
-	CComPtr<ID3D11Blob> shader, error;
+	CComPtr<ID3DBlob> shader, error;
 
-	hr = D3DX11CompileFromMemory(source, size, fn, &m[0], NULL, entry, m_shader.gs.c_str(), 0, 0, NULL, &shader, &error, NULL);
+	hr = s_pD3DCompile(source, size, fn, &m[0], s_old_d3d_compiler_dll ? nullptr : include, entry, m_shader.gs.c_str(), 0, 0, &shader, &error);
 
 	if(error)
 	{
@@ -1389,17 +1384,17 @@ void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, 
 	}
 }
 
-void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11GeometryShader** gs, D3D11_SO_DECLARATION_ENTRY* layout, int count)
+void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11GeometryShader** gs, D3D11_SO_DECLARATION_ENTRY* layout, int count)
 {
 	HRESULT hr;
 
-	vector<D3D11_SHADER_MACRO> m;
+	std::vector<D3D_SHADER_MACRO> m;
 
 	PrepareShaderMacro(m, macro);
 
-	CComPtr<ID3D11Blob> shader, error;
+	CComPtr<ID3DBlob> shader, error;
 
-	hr = D3DX11CompileFromMemory(source, size, fn, &m[0], NULL, entry, m_shader.gs.c_str(), 0, 0, NULL, &shader, &error, NULL);
+	hr = s_pD3DCompile(source, size, fn, &m[0], s_old_d3d_compiler_dll ? nullptr : include, entry, m_shader.gs.c_str(), 0, 0, &shader, &error);
 
 	if(error)
 	{
@@ -1419,17 +1414,17 @@ void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, 
 	}
 }
 
-void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11PixelShader** ps)
+void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, ID3DInclude *include, const char* entry, D3D_SHADER_MACRO* macro, ID3D11PixelShader** ps)
 {
 	HRESULT hr;
 
-	vector<D3D11_SHADER_MACRO> m;
+	std::vector<D3D_SHADER_MACRO> m;
 
 	PrepareShaderMacro(m, macro);
 
-	CComPtr<ID3D11Blob> shader, error;
+	CComPtr<ID3DBlob> shader, error;
 
-	hr = D3DX11CompileFromMemory(source, size, fn, &m[0], NULL, entry, m_shader.ps.c_str(), 0, 0, NULL, &shader, &error, NULL);
+	hr = s_pD3DCompile(source, size, fn, &m[0], s_old_d3d_compiler_dll ? nullptr : include, entry, m_shader.ps.c_str(), 0, 0, &shader, &error);
 
 	if(error)
 	{
@@ -1448,34 +1443,3 @@ void GSDevice11::CompileShader(const char* source, size_t size, const char* fn, 
 		throw GSDXRecoverableError();
 	}
 }
-
-void GSDevice11::CompileShader(const char* source, size_t size, const char *fn, const char* entry, D3D11_SHADER_MACRO* macro, ID3D11ComputeShader** cs)
-{
-	HRESULT hr;
-
-	vector<D3D11_SHADER_MACRO> m;
-
-	PrepareShaderMacro(m, macro);
-
-	CComPtr<ID3D11Blob> shader, error;
-
-	hr = D3DX11CompileFromMemory(source, size, fn, &m[0], NULL, entry, m_shader.cs.c_str(), 0, 0, NULL, &shader, &error, NULL);
-
-	if(error)
-	{
-		printf("%s\n", (const char*)error->GetBufferPointer());
-	}
-
-	if(FAILED(hr))
-	{
-		throw GSDXRecoverableError();
-	}
-
-	hr = m_dev->CreateComputeShader((void*)shader->GetBufferPointer(), shader->GetBufferSize(), NULL, cs);
-
-	if(FAILED(hr))
-	{
-		throw GSDXRecoverableError();
-	}
-}
-

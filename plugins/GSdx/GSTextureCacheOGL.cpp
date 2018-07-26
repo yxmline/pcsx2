@@ -30,7 +30,7 @@ GSTextureCacheOGL::GSTextureCacheOGL(GSRenderer* r)
 
 void GSTextureCacheOGL::Read(Target* t, const GSVector4i& r)
 {
-	if (!t->m_dirty.empty() || (r.width() == 0 && r.height() == 0))
+	if (!t->m_dirty.empty() || r.width() == 0 || r.height() == 0)
 		return;
 
 	const GIFRegTEX0& TEX0 = t->m_TEX0;
@@ -42,29 +42,29 @@ void GSTextureCacheOGL::Read(Target* t, const GSVector4i& r)
 		case PSM_PSMCT32:
 		case PSM_PSMCT24:
 			fmt = GL_RGBA8;
-			ps_shader = 0;
+			ps_shader = ShaderConvert_COPY;
 			break;
 
 		case PSM_PSMCT16:
 		case PSM_PSMCT16S:
 			fmt = GL_R16UI;
-			ps_shader = 1;
+			ps_shader = ShaderConvert_RGBA8_TO_16_BITS;
 			break;
 
 		case PSM_PSMZ32:
 			fmt = GL_R32UI;
-			ps_shader = 10;
+			ps_shader = ShaderConvert_FLOAT32_TO_32_BITS;
 			break;
 
 		case PSM_PSMZ24:
 			fmt = GL_R32UI;
-			ps_shader = 10;
+			ps_shader = ShaderConvert_FLOAT32_TO_32_BITS;
 			break;
 
 		case PSM_PSMZ16:
 		case PSM_PSMZ16S:
 			fmt = GL_R16UI;
-			ps_shader = 10;
+			ps_shader = ShaderConvert_FLOAT32_TO_32_BITS;
 			break;
 
 		default:
@@ -83,8 +83,9 @@ void GSTextureCacheOGL::Read(Target* t, const GSVector4i& r)
 	if(GSTexture* offscreen = m_renderer->m_dev->CopyOffscreen(t->m_texture, src, r.width(), r.height(), fmt, ps_shader))
 	{
 		GSTexture::GSMap m;
+		GSVector4i r_offscreen(0, 0, r.width(), r.height());
 
-		if(offscreen->Map(m))
+		if(offscreen->Map(m, &r_offscreen))
 		{
 			// TODO: block level write
 
@@ -124,7 +125,30 @@ void GSTextureCacheOGL::Read(Target* t, const GSVector4i& r)
 		// FIXME invalidate data
 		m_renderer->m_dev->Recycle(offscreen);
 	}
-
-	GL_POP();
 }
 
+void GSTextureCacheOGL::Read(Source* t, const GSVector4i& r)
+{
+	const GIFRegTEX0& TEX0 = t->m_TEX0;
+
+	// FIXME Create a get function to avoid the useless copy
+	// Note: With openGL 4.5 you can use glGetTextureSubImage
+
+	if (GSTexture* offscreen  = m_renderer->m_dev->CreateOffscreen(r.width(), r.height())) {
+		m_renderer->m_dev->CopyRect(t->m_texture, offscreen, r);
+
+		GSTexture::GSMap m;
+		GSVector4i r_offscreen(0, 0, r.width(), r.height());
+
+		if (offscreen->Map(m, &r_offscreen)) {
+			GSOffset* off = m_renderer->m_mem.GetOffset(TEX0.TBP0, TEX0.TBW, TEX0.PSM);
+
+			m_renderer->m_mem.WritePixel32(m.bits, m.pitch, off, r);
+
+			offscreen->Unmap();
+		}
+
+		// FIXME invalidate data
+		m_renderer->m_dev->Recycle(offscreen);
+	}
+}

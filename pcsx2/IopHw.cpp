@@ -19,6 +19,7 @@
 
 #include "iR5900.h"
 #include "Sio.h"
+#include "Mdec.h"
 
 // NOTE: Any modifications to read/write fns should also go into their const counterparts
 // found in iPsxHw.cpp.
@@ -29,7 +30,7 @@ void psxHwReset() {
 
 	memset(iopHw, 0, 0x10000);
 
-//	mdecInit(); //initialize mdec decoder
+	mdecInit(); //initialize mdec decoder
 	cdrReset();
 	cdvdReset();
 	psxRcntInit();

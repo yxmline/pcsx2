@@ -1,24 +1,11 @@
 //#version 420 // Keep it for editor detection
 
-struct vertex_basic
-{
-    vec4 p;
-    vec2 t;
-};
-
 
 #ifdef VERTEX_SHADER
 
-out gl_PerVertex {
-    vec4 gl_Position;
-    float gl_PointSize;
-#if !pGL_ES
-    float gl_ClipDistance[1];
-#endif
-};
-
 layout(location = 0) in vec2 POSITION;
 layout(location = 1) in vec2 TEXCOORD0;
+layout(location = 7) in vec4 COLOR;
 
 // FIXME set the interpolation (don't know what dx do)
 // flat means that there is no interpolation. The value given to the fragment shader is based on the provoking vertex conventions.
@@ -32,15 +19,14 @@ out SHADER
 {
     vec4 p;
     vec2 t;
+    vec4 c;
 } VSout;
-
-#define VSout_p (VSout.p)
-#define VSout_t (VSout.t)
 
 void vs_main()
 {
-    VSout_p = vec4(POSITION, 0.5f, 1.0f);
-    VSout_t = TEXCOORD0;
+    VSout.p = vec4(POSITION, 0.5f, 1.0f);
+    VSout.t = TEXCOORD0;
+    VSout.c = COLOR;
     gl_Position = vec4(POSITION, 0.5f, 1.0f); // NOTE I don't know if it is possible to merge POSITION_OUT and gl_Position
 }
 
@@ -52,10 +38,8 @@ in SHADER
 {
     vec4 p;
     vec2 t;
+    vec4 c;
 } PSin;
-
-#define PSin_p (PSin.p)
-#define PSin_t (PSin.t)
 
 // Give a different name so I remember there is a special case!
 #if defined(ps_main1) || defined(ps_main10)
@@ -64,16 +48,9 @@ layout(location = 0) out uint SV_Target1;
 layout(location = 0) out vec4 SV_Target0;
 #endif
 
-layout(binding = 0) uniform sampler2D TextureSampler;
-
-layout(std140, binding = 15) uniform cb15
-{
-    ivec4 ScalingFactor;
-};
-
 vec4 sample_c()
 {
-    return texture(TextureSampler, PSin_t);
+    return texture(TextureSampler, PSin.t);
 }
 
 vec4 ps_crt(uint i)
@@ -178,7 +155,7 @@ void ps_main13()
 {
     // Convert a RRGBA texture into a float depth texture
     // FIXME: I'm afraid of the accuracy
-    const vec4 bitSh = vec4(exp2(-32.0f), exp2(-24.0f), exp2(-16.0f), exp(-8.0f)) * vec4(255.0);
+    const vec4 bitSh = vec4(exp2(-32.0f), exp2(-24.0f), exp2(-16.0f), exp2(-8.0f)) * vec4(255.0);
     gl_FragDepth = dot(sample_c(), bitSh);
 }
 #endif
@@ -212,7 +189,7 @@ void ps_main16()
 {
     // Convert a RGB5A1 (saved as RGBA8) color to a 16 bit Z
     // FIXME: I'm afraid of the accuracy
-    const vec4 bitSh = vec4(exp2(-32.0f), exp2(-27.0f), exp2(-22.0f), exp(-17.0f));
+    const vec4 bitSh = vec4(exp2(-32.0f), exp2(-27.0f), exp2(-22.0f), exp2(-17.0f));
     // Trunc color to drop useless lsb
     vec4 color = trunc(sample_c() * vec4(255.0f) / vec4(8.0f, 8.0f, 8.0f, 128.0f));
     gl_FragDepth = dot(vec4(color), bitSh);
@@ -301,6 +278,13 @@ void ps_main17()
 }
 #endif
 
+#ifdef ps_main18
+void ps_main18()
+{
+    SV_Target0 = PSin.c * vec4(1.0, 1.0, 1.0, sample_c().r);
+}
+#endif
+
 #ifdef ps_main7
 void ps_main7()
 {
@@ -326,7 +310,7 @@ vec4 ps_scanlines(uint i)
 
 void ps_main5() // scanlines
 {
-    highp uvec4 p = uvec4(PSin_p);
+    highp uvec4 p = uvec4(gl_FragCoord);
 
     vec4 c = ps_scanlines(p.y % 2u);
 
@@ -337,7 +321,7 @@ void ps_main5() // scanlines
 #ifdef ps_main6
 void ps_main6() // diagonal
 {
-    highp uvec4 p = uvec4(PSin_p);
+    highp uvec4 p = uvec4(gl_FragCoord);
 
     vec4 c = ps_crt((p.x + (p.y % 3u)) % 3u);
 
@@ -348,7 +332,7 @@ void ps_main6() // diagonal
 #ifdef ps_main8
 void ps_main8() // triangular
 {
-    highp uvec4 p = uvec4(PSin_p);
+    highp uvec4 p = uvec4(gl_FragCoord);
 
     vec4 c = ps_crt(((p.x + ((p.y >> 1u) & 1u) * 3u) >> 1u) % 3u);
 
@@ -365,11 +349,11 @@ void ps_main9()
     vec2 texdim = vec2(textureSize(TextureSampler, 0));
 
     vec4 c;
-    if (dFdy(PSin_t.y) * PSin_t.y > 0.5f) {
+    if (dFdy(PSin.t.y) * PSin.t.y > 0.5f) {
         c = sample_c();
     } else {
-        float factor = (0.9f - 0.4f * cos(2.0f * PI * PSin_t.y * texdim.y));
-        c =  factor * texture(TextureSampler, vec2(PSin_t.x, (floor(PSin_t.y * texdim.y) + 0.5f) / texdim.y));
+        float factor = (0.9f - 0.4f * cos(2.0f * PI * PSin.t.y * texdim.y));
+        c =  factor * texture(TextureSampler, vec2(PSin.t.x, (floor(PSin.t.y * texdim.y) + 0.5f) / texdim.y));
     }
 
     SV_Target0 = c;
@@ -400,6 +384,57 @@ void ps_main3()
 void ps_main4()
 {
     SV_Target0 = mod(round(sample_c() * 255.0f), 256.0f) / 255.0f;
+}
+#endif
+
+#ifdef ps_main19
+void ps_main19()
+{
+    vec4 i = sample_c();
+    vec4 o;
+
+    mat3 rgb2yuv; // Value from GS manual
+    rgb2yuv[0] = vec3(0.587, -0.311, -0.419);
+    rgb2yuv[1] = vec3(0.114, 0.500, -0.081);
+    rgb2yuv[2] = vec3(0.299, -0.169, 0.500);
+
+    vec3 yuv = rgb2yuv * i.gbr;
+
+    float Y = float(0xDB)/255.0f * yuv.x + float(0x10)/255.0f;
+    float Cr = float(0xE0)/255.0f * yuv.y + float(0x80)/255.0f;
+    float Cb = float(0xE0)/255.0f * yuv.z + float(0x80)/255.0f;
+
+    switch(EMODA) {
+        case 0:
+            o.a = i.a;
+            break;
+        case 1:
+            o.a = Y;
+            break;
+        case 2:
+            o.a = Y/2.0f;
+            break;
+        case 3:
+            o.a = 0.0f;
+            break;
+    }
+
+    switch(EMODC) {
+        case 0:
+            o.rgb = i.rgb;
+            break;
+        case 1:
+            o.rgb = vec3(Y);
+            break;
+        case 2:
+            o.rgb = vec3(Y, Cb, Cr);
+            break;
+        case 3:
+            o.rgb = vec3(i.a);
+            break;
+    }
+
+    SV_Target0 = o;
 }
 #endif
 

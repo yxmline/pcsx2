@@ -8,55 +8,20 @@ endif(NOT TOP_CMAKE_WAS_SOURCED)
 
 set(Output x86emitter)
 
-set(CommonFlags 
-	-fno-strict-aliasing
+set(CommonFlags
     )
 
-#Clang doesn't support a few common flags that GCC does.
-if(NOT USE_CLANG)
-	set(x86emitterFinalFlags
-		${x86emitterFinalFlags}
-		${CommonFlags} -fno-guess-branch-probability -fno-dse -fno-tree-dse
-	)
-endif(NOT USE_CLANG)
-
-# Debug - Build
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-	# add defines
-	set(x86emitterFinalFlags
-		${x86emitterFinalFlags}
-		${CommonFlags} -DPCSX2_DEBUG -DPCSX2_DEVBUILD
-	)
-endif(CMAKE_BUILD_TYPE STREQUAL Debug)
-
-# Devel - Build
-if(CMAKE_BUILD_TYPE STREQUAL Devel)
-	# add defines
-	set(x86emitterFinalFlags
-		${x86emitterFinalFlags}
-		${CommonFlags} -DPCSX2_DEVBUILD
-	)
-endif(CMAKE_BUILD_TYPE STREQUAL Devel)
-
-# Release - Build
-if(CMAKE_BUILD_TYPE STREQUAL Release)
-	
-	# add defines
-	set(x86emitterFinalFlags
-		${x86emitterFinalFlags}
-		${CommonFlags}
-	)
-endif(CMAKE_BUILD_TYPE STREQUAL Release)
+set(x86emitterFinalFlags ${CommonFlags})
 
 # variable with all sources of this library
 set(x86emitterSources
+	bmi.cpp
 	cpudetect.cpp
 	fpu.cpp
 	groups.cpp
 	jmp.cpp
 	legacy.cpp
 	legacy_sse.cpp
-	LnxCpuDetect.cpp
 	movs.cpp
 	PrecompiledHeader.cpp
 	simd.cpp
@@ -89,7 +54,15 @@ set(x86emitterHeaders
 	../../include/x86emitter/tools.h
 	../../include/x86emitter/x86emitter.h
 	../../include/x86emitter/x86types.h
-	PrecompiledHeader.h)
+	PrecompiledHeader.h
+	cpudetect_internal.h
+	)
+
+if(Windows)
+	LIST(APPEND x86emitterSources WinCpuDetect.cpp)
+else()
+	LIST(APPEND x86emitterSources LnxCpuDetect.cpp)
+endif()
 
 set(x86emitterFinalSources
 	${x86emitterSources}

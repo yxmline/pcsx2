@@ -26,32 +26,48 @@
 
 #ifdef FRAGMENT_SHADER
 
+#if !defined(BROKEN_DRIVER) && defined(GL_ARB_enhanced_layouts) && GL_ARB_enhanced_layouts
+layout(location = 0)
+#endif
 in SHADER
 {
-    vec4 t;
+    vec4 t_float;
+    vec4 t_int;
     vec4 c;
     flat vec4 fc;
 } PSin;
-
-#define PSin_t (PSin.t)
-#define PSin_c (PSin.c)
-#define PSin_fc (PSin.fc)
 
 // Same buffer but 2 colors for dual source blending
 layout(location = 0, index = 0) out vec4 SV_Target0;
 layout(location = 0, index = 1) out vec4 SV_Target1;
 
-layout(binding = 0) uniform sampler2D TextureSampler;
 layout(binding = 1) uniform sampler2D PaletteSampler;
 layout(binding = 3) uniform sampler2D RtSampler; // note 2 already use by the image below
+layout(binding = 4) uniform sampler2D RawTextureSampler;
 
 #ifndef DISABLE_GL42_image
 #if PS_DATE > 0
+// Performance note: images mustn't be declared if they are unused. Otherwise it will
+// require extra shader validation.
+
 // FIXME how to declare memory access
-layout(r32i, binding = 2) coherent uniform iimage2D img_prim_min;
-// Don't enable it. Discard fragment can still write in the depth buffer
-// it breaks shadow in Shin Megami Tensei Nocturne
-//layout(early_fragment_tests) in;
+layout(r32i, binding = 2) uniform iimage2D img_prim_min;
+// WARNING:
+// You can't enable it if you discard the fragment. The depth is still
+// updated (shadow in Shin Megami Tensei Nocturne)
+//
+// early_fragment_tests must still be enabled in the first pass of the 2 passes algo
+// First pass search the first primitive that will write the bad alpha value. Value
+// won't be written if the fragment fails the depth test.
+//
+// In theory the best solution will be do
+// 1/ copy the depth buffer
+// 2/ do the full depth (current depth writes are disabled)
+// 3/ restore the depth buffer for 2nd pass
+// Of course, it is likely too costly.
+#if PS_DATE == 1 || PS_DATE == 2
+layout(early_fragment_tests) in;
+#endif
 
 // I don't remember why I set this parameter but it is surely useless
 //layout(pixel_center_integer) in vec4 gl_FragCoord;
@@ -60,36 +76,32 @@ layout(r32i, binding = 2) coherent uniform iimage2D img_prim_min;
 // use basic stencil
 #endif
 
-
-// Warning duplicated in both GLSL file
-layout(std140, binding = 21) uniform cb21
-{
-    vec3 FogColor;
-    float AREF;
-
-    vec4 WH;
-
-    vec2 _pad0;
-    vec2 TA;
-
-    uvec4 MskFix;
-
-    uvec4 FbMask;
-
-    vec3 _pad1;
-    float Af;
-
-    vec4 HalfTexel;
-
-    vec4 MinMax;
-
-    vec2 TextureScale;
-    vec2 TC_OffsetHack;
-};
-
 vec4 sample_c(vec2 uv)
 {
+#if PS_TEX_IS_FB == 1
+    return texelFetch(RtSampler, ivec2(gl_FragCoord.xy), 0);
+#else
+
+#if PS_AUTOMATIC_LOD == 1
     return texture(TextureSampler, uv);
+#elif PS_MANUAL_LOD == 1
+    // FIXME add LOD: K - ( LOG2(Q) * (1 << L))
+    float K = MinMax.x;
+    float L = MinMax.y;
+    float bias = MinMax.z;
+    float max_lod = MinMax.w;
+
+    float gs_lod = K - log2(abs(PSin.t_float.w)) * L;
+    // FIXME max useful ?
+    //float lod = max(min(gs_lod, max_lod) - bias, 0.0f);
+    float lod = min(gs_lod, max_lod) - bias;
+
+    return textureLod(TextureSampler, uv, lod);
+#else
+    return textureLod(TextureSampler, uv, 0); // No lod
+#endif
+
+#endif
 }
 
 vec4 sample_p(float idx)
@@ -193,13 +205,193 @@ mat4 sample_4p(vec4 u)
     return c;
 }
 
-vec4 sample_color(vec2 st, float q)
+int fetch_raw_depth()
 {
-    //FIXME: maybe we can set gl_Position.w = q in VS
-#if (PS_FST == 0)
-    st /= q;
+    return int(texelFetch(RawTextureSampler, ivec2(gl_FragCoord.xy), 0).r * exp2(32.0f));
+}
+
+vec4 fetch_raw_color()
+{
+    return texelFetch(RawTextureSampler, ivec2(gl_FragCoord.xy), 0);
+}
+
+vec4 fetch_c(ivec2 uv)
+{
+    return texelFetch(TextureSampler, ivec2(uv), 0);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Depth sampling
+//////////////////////////////////////////////////////////////////////
+ivec2 clamp_wrap_uv_depth(ivec2 uv)
+{
+    ivec2 uv_out = uv;
+
+    // Keep the full precision
+    // It allow to multiply the ScalingFactor before the 1/16 coeff
+    ivec4 mask = ivec4(MskFix) << 4;
+
+#if PS_WMS == PS_WMT
+
+#if PS_WMS == 2
+    uv_out = clamp(uv, mask.xy, mask.zw);
+#elif PS_WMS == 3
+    uv_out = (uv & mask.xy) | mask.zw;
 #endif
 
+#else // PS_WMS != PS_WMT
+
+#if PS_WMS == 2
+    uv_out.x = clamp(uv.x, mask.x, mask.z);
+#elif PS_WMS == 3
+    uv_out.x = (uv.x & mask.x) | mask.z;
+#endif
+
+#if PS_WMT == 2
+    uv_out.y = clamp(uv.y, mask.y, mask.w);
+#elif PS_WMT == 3
+    uv_out.y = (uv.y & mask.y) | mask.w;
+#endif
+
+#endif
+
+    return uv_out;
+}
+
+vec4 sample_depth(vec2 st)
+{
+    vec2 uv_f = vec2(clamp_wrap_uv_depth(ivec2(st))) * vec2(ScalingFactor.xy) * vec2(1.0f/16.0f);
+    ivec2 uv = ivec2(uv_f);
+
+    vec4 t = vec4(0.0f);
+#if PS_TALES_OF_ABYSS_HLE == 1
+    // Warning: UV can't be used in channel effect
+    int depth = fetch_raw_depth();
+
+    // Convert msb based on the palette
+    t = texelFetch(PaletteSampler, ivec2((depth >> 8) & 0xFF, 0), 0) * 255.0f;
+
+#elif PS_URBAN_CHAOS_HLE == 1
+    // Depth buffer is read as a RGB5A1 texture. The game try to extract the green channel.
+    // So it will do a first channel trick to extract lsb, value is right-shifted.
+    // Then a new channel trick to extract msb which will shifted to the left.
+    // OpenGL uses a FLOAT32 format for the depth so it requires a couple of conversion.
+    // To be faster both steps (msb&lsb) are done in a single pass.
+
+    // Warning: UV can't be used in channel effect
+    int depth = fetch_raw_depth();
+
+    // Convert lsb based on the palette
+    t = texelFetch(PaletteSampler, ivec2((depth & 0xFF), 0), 0) * 255.0f;
+
+    // Msb is easier
+    float green = float((depth >> 8) & 0xFF) * 36.0f;
+    green = min(green, 255.0f);
+
+    t.g += green;
+
+
+#elif PS_DEPTH_FMT == 1
+    // Based on ps_main11 of convert
+
+    // Convert a GL_FLOAT32 depth texture into a RGBA color texture
+    const vec4 bitSh = vec4(exp2(24.0f), exp2(16.0f), exp2(8.0f), exp2(0.0f));
+    const vec4 bitMsk = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);
+
+    vec4 res = fract(vec4(fetch_c(uv).r) * bitSh);
+
+    t = (res - res.xxyz * bitMsk) * 256.0f;
+
+#elif PS_DEPTH_FMT == 2
+    // Based on ps_main12 of convert
+
+    // Convert a GL_FLOAT32 (only 16 lsb) depth into a RGB5A1 color texture
+    const vec4 bitSh = vec4(exp2(32.0f), exp2(27.0f), exp2(22.0f), exp2(17.0f));
+    const uvec4 bitMsk = uvec4(0x1F, 0x1F, 0x1F, 0x1);
+    uvec4 color = uvec4(vec4(fetch_c(uv).r) * bitSh) & bitMsk;
+
+    t = vec4(color) * vec4(8.0f, 8.0f, 8.0f, 128.0f);
+
+#elif PS_DEPTH_FMT == 3
+    // Convert a RGBA/RGB5A1 color texture into a RGBA/RGB5A1 color texture
+    t = fetch_c(uv) * 255.0f;
+
+#endif
+
+
+    // warning t ranges from 0 to 255
+#if (PS_AEM_FMT == FMT_24)
+    t.a = ( (PS_AEM == 0) || any(bvec3(t.rgb))  ) ? 255.0f * TA.x : 0.0f;
+#elif (PS_AEM_FMT == FMT_16)
+    t.a = t.a >= 128.0f ? 255.0f * TA.y : ( (PS_AEM == 0) || any(bvec3(t.rgb)) ) ? 255.0f * TA.x : 0.0f;
+#endif
+
+
+    return t;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Fetch a Single Channel
+//////////////////////////////////////////////////////////////////////
+vec4 fetch_red()
+{
+#if PS_DEPTH_FMT == 1 || PS_DEPTH_FMT == 2
+    int depth = (fetch_raw_depth()) & 0xFF;
+    vec4 rt = vec4(depth) / 255.0f;
+#else
+    vec4 rt = fetch_raw_color();
+#endif
+    return sample_p(rt.r) * 255.0f;
+}
+
+vec4 fetch_blue()
+{
+#if PS_DEPTH_FMT == 1 || PS_DEPTH_FMT == 2
+    int depth = (fetch_raw_depth() >> 16) & 0xFF;
+    vec4 rt = vec4(depth) / 255.0f;
+#else
+    vec4 rt = fetch_raw_color();
+#endif
+    return sample_p(rt.b) * 255.0f;
+}
+
+vec4 fetch_green()
+{
+    vec4 rt = fetch_raw_color();
+    return sample_p(rt.g) * 255.0f;
+}
+
+vec4 fetch_alpha()
+{
+    vec4 rt = fetch_raw_color();
+    return sample_p(rt.a) * 255.0f;
+}
+
+vec4 fetch_rgb()
+{
+    vec4 rt = fetch_raw_color();
+    vec4 c = vec4(sample_p(rt.r).r, sample_p(rt.g).g, sample_p(rt.b).b, 1.0f);
+    return c * 255.0f;
+}
+
+vec4 fetch_gXbY()
+{
+#if PS_DEPTH_FMT == 1 || PS_DEPTH_FMT == 2
+    int depth = fetch_raw_depth();
+    int bg = (depth >> (8 + ChannelShuffle.w)) & 0xFF;
+    return vec4(bg);
+#else
+    ivec4 rt = ivec4(fetch_raw_color() * 255.0f);
+    int green = (rt.g >> ChannelShuffle.w) & ChannelShuffle.z;
+    int blue  = (rt.b << ChannelShuffle.y) & ChannelShuffle.x;
+    return vec4(green | blue);
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////
+
+vec4 sample_color(vec2 st)
+{
 #if (PS_TCOFFSETHACK == 1)
     st += TC_OffsetHack.xy;
 #endif
@@ -223,6 +415,13 @@ vec4 sample_color(vec2 st, float q)
     {
         uv = st.xyxy + HalfTexel;
         dd = fract(uv.xy * WH.zw);
+#if (PS_FST == 0)
+        // Background in Shin Megami Tensei Lucifers
+        // I suspect that uv isn't a standard number, so fract is outside of the [0;1] range
+        // Note: it is free on GPU but let's do it only for float coordinate
+        // Strangely Dx doesn't suffer from this issue.
+        dd = clamp(dd, vec2(0.0f), vec2(1.0f));
+#endif
     }
     else
     {
@@ -305,32 +504,45 @@ vec4 tfx(vec4 T, vec4 C)
 
 void atst(vec4 C)
 {
-    // FIXME use integer cmp
     float a = C.a;
 
-#if (PS_ATST == 0) // never
-    discard;
-#elif (PS_ATST == 1) // always
-    // nothing to do
-#elif (PS_ATST == 2) // l
-    if ((AREF - a - 0.5f) < 0.0f)
-        discard;
-#elif (PS_ATST == 3 ) // le
-    if ((AREF - a + 0.5f) < 0.0f)
-        discard;
-#elif (PS_ATST == 4) // e
-    if ((0.5f - abs(a - AREF)) < 0.0f)
-        discard;
-#elif (PS_ATST == 5) // ge
-    if ((a-AREF + 0.5f) < 0.0f)
-        discard;
-#elif (PS_ATST == 6) // g
-    if ((a-AREF - 0.5f) < 0.0f)
-        discard;
-#elif (PS_ATST == 7) // ne
-    if ((abs(a - AREF) - 0.5f) < 0.0f)
-        discard;
+#if 0
+    switch(Uber_ATST) {
+        case 0:
+            break;
+        case 1:
+            if (a > AREF) discard;
+            break;
+        case 2:
+            if (a < AREF) discard;
+            break;
+        case 3:
+            if (abs(a - AREF) > 0.5f) discard;
+            break;
+        case 4:
+            if (abs(a - AREF) < 0.5f) discard;
+            break;
+    }
+
+
 #endif
+
+#if 1
+
+#if (PS_ATST == 0)
+    // nothing to do
+#elif (PS_ATST == 1)
+    if (a > AREF) discard;
+#elif (PS_ATST == 2)
+    if (a < AREF) discard;
+#elif (PS_ATST == 3)
+    if (abs(a - AREF) > 0.5f) discard;
+#elif (PS_ATST == 4)
+    if (abs(a - AREF) < 0.5f) discard;
+#endif
+
+#endif
+
 }
 
 void fog(inout vec4 C, float f)
@@ -342,17 +554,44 @@ void fog(inout vec4 C, float f)
 
 vec4 ps_color()
 {
-    vec4 T = sample_color(PSin_t.xy, PSin_t.w);
+    //FIXME: maybe we can set gl_Position.w = q in VS
+#if (PS_FST == 0)
+    vec2 st = PSin.t_float.xy / vec2(PSin.t_float.w);
+    vec2 st_int = PSin.t_int.zw / vec2(PSin.t_float.w);
+#else
+    // Note xy are normalized coordinate
+    vec2 st = PSin.t_int.xy;
+    vec2 st_int = PSin.t_int.zw;
+#endif
+
+#if PS_CHANNEL_FETCH == 1
+    vec4 T = fetch_red();
+#elif PS_CHANNEL_FETCH == 2
+    vec4 T = fetch_green();
+#elif PS_CHANNEL_FETCH == 3
+    vec4 T = fetch_blue();
+#elif PS_CHANNEL_FETCH == 4
+    vec4 T = fetch_alpha();
+#elif PS_CHANNEL_FETCH == 6
+    vec4 T = fetch_gXbY();
+#elif PS_CHANNEL_FETCH == 7
+    vec4 T = fetch_rgb();
+#elif PS_DEPTH_FMT > 0
+    // Integral coordinate
+    vec4 T = sample_depth(st_int);
+#else
+    vec4 T = sample_color(st);
+#endif
 
 #if PS_IIP == 1
-    vec4 C = tfx(T, PSin_c);
+    vec4 C = tfx(T, PSin.c);
 #else
-    vec4 C = tfx(T, PSin_fc);
+    vec4 C = tfx(T, PSin.fc);
 #endif
 
     atst(C);
 
-    fog(C, PSin_t.z);
+    fog(C, PSin.t_float.z);
 
 #if (PS_CLR1 != 0) // needed for Cd * (As/Ad/F + 1) blending modes
     C.rgb = vec3(255.0f);
@@ -452,7 +691,7 @@ void ps_blend(inout vec4 Color, float As)
 
 void ps_main()
 {
-#if ((PS_DATE & 3) == 1 || (PS_DATE & 3) == 2) && !defined(DISABLE_GL42_image)
+#if ((PS_DATE & 3) == 1 || (PS_DATE & 3) == 2)
 
 #if PS_WRITE_RG == 1
     // Pseudo 16 bits access.
@@ -470,7 +709,7 @@ void ps_main()
 #endif
 
     if (bad) {
-#if PS_DATE >= 5
+#if PS_DATE >= 5 || defined(DISABLE_GL42_image)
         discard;
 #else
         imageStore(img_prim_min, ivec2(gl_FragCoord.xy), ivec4(-1));
@@ -564,15 +803,15 @@ void ps_main()
     // Pixel with alpha equal to 1 will failed (128-255)
     if (C.a > 127.5f) {
         imageAtomicMin(img_prim_min, ivec2(gl_FragCoord.xy), gl_PrimitiveID);
-        return;
     }
+    return;
 #elif PS_DATE == 2 && !defined(DISABLE_GL42_image)
     // DATM == 1
     // Pixel with alpha equal to 0 will failed (0-127)
     if (C.a < 127.5f) {
         imageAtomicMin(img_prim_min, ivec2(gl_FragCoord.xy), gl_PrimitiveID);
-        return;
     }
+    return;
 #endif
 
     ps_blend(C, alpha_blend);

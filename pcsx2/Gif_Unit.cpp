@@ -63,7 +63,7 @@ bool Gif_HandlerAD(u8* pMem) {
 		else {
 			GUNIT_WARN("GIF Handler - SIGNAL");
 			GSSIGLBLID.SIGID = (GSSIGLBLID.SIGID&~data[1])|(data[0]&data[1]);
-			if (!(GSIMR&0x100)) gsIrq();
+			if (!GSIMR.SIGMSK) gsIrq();
 			CSRreg.SIGNAL = true;
 		}
 	}
@@ -97,7 +97,7 @@ bool Gif_HandlerAD_Debug(u8* pMem) {
 }
 
 void Gif_FinishIRQ() {
-	if (CSRreg.FINISH && !(GSIMR & 0x200) && gifUnit.gsFINISH.gsFINISHFired == false) {
+	if (CSRreg.FINISH && !GSIMR.FINISHMSK && !gifUnit.gsFINISH.gsFINISHFired) {
 		gsIrq();
 		gifUnit.gsFINISH.gsFINISHFired = true;
 	}
@@ -118,14 +118,14 @@ void Gif_AddCompletedGSPacket(GS_Packet& gsPack, GIF_PATH path) {
 	}
 	else {
 		pxAssertDev(!gsPack.readAmount, "Gif Unit - gsPack.readAmount only valid for MTVU path 1!");
-		AtomicExchangeAdd(gifUnit.gifPath[path].readAmount, gsPack.size);
+		gifUnit.gifPath[path].readAmount.fetch_add(gsPack.size);
 		GetMTGS().SendSimpleGSPacket(GS_RINGTYPE_GSPACKET,  gsPack.offset, gsPack.size, path);
 	}
 }
 
 void Gif_AddBlankGSPacket(u32 size, GIF_PATH path) {
 	//DevCon.WriteLn("Adding Blank Gif Packet [size=%x]", size);
-	AtomicExchangeAdd(gifUnit.gifPath[path].readAmount, size);
+	gifUnit.gifPath[path].readAmount.fetch_add(size);
 	GetMTGS().SendSimpleGSPacket(GS_RINGTYPE_GSPACKET, ~0u, size, path);
 }
 

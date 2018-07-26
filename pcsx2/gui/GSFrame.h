@@ -18,6 +18,7 @@
 
 #include "AppCommon.h"
 #include "CpuUsageProvider.h"
+#include <memory>
 
 
 enum LimiterModeType
@@ -39,7 +40,7 @@ class GSPanel : public wxWindow
 	typedef wxWindow _parent;
 
 protected:
-	ScopedPtr<AcceleratorDictionary>	m_Accels;
+	std::unique_ptr<AcceleratorDictionary> m_Accels;
 
 	wxTimer					m_HideMouseTimer;
 	bool					m_CursorShown;
@@ -48,7 +49,7 @@ protected:
 
 public:
 	GSPanel( wxWindow* parent );
-	virtual ~GSPanel() throw();
+	virtual ~GSPanel();
 
 	void DoResize();
 	void DoShowMouse();
@@ -63,7 +64,7 @@ protected:
 	void OnResize(wxSizeEvent& event);
 	void OnMouseEvent( wxMouseEvent& evt );
 	void OnHideMouseTimeout( wxTimerEvent& evt );
-	void OnKeyDown( wxKeyEvent& evt );
+	void OnKeyDownOrUp( wxKeyEvent& evt );
 	void OnFocus( wxFocusEvent& evt );
 	void OnFocusLost( wxFocusEvent& evt );
 	void CoreThread_OnResumed();
@@ -88,20 +89,17 @@ class GSFrame : public wxFrame
 protected:
 	wxTimer					m_timer_UpdateTitle;
 	wxWindowID				m_id_gspanel;
-	wxWindowID				m_id_OutputDisabled;
-	wxStaticText*			m_label_Disabled;
 	wxStatusBar*			m_statusbar;
 
 	CpuUsageProvider		m_CpuUsage;
 
 public:
 	GSFrame( const wxString& title);
-	virtual ~GSFrame() throw();
+	virtual ~GSFrame() = default;
 
 	GSPanel* GetViewport();
 	void SetFocus();
 	bool Show( bool shown=true );
-	wxStaticText* GetLabel_OutputDisabled() const;
 
 	bool ShowFullScreen(bool show, bool updateConfig = true);
 

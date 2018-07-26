@@ -71,18 +71,6 @@ static const __aligned16 Fnptr_VifUnpackLoop UnpackLoopTable[2][2][2] = {
 };
 // ----------------------------------------------------------------------------
 
-nVifStruct::nVifStruct()
-{
-	vifBlocks	=  NULL;
-	numBlocks	=  0;
-
-	recReserveSizeMB = 8;
-}
-
-void reserveNewVif(int idx)
-{
-}
-
 void resetNewVif(int idx)
 {
 	// Safety Reset : Reassign all VIF structure info, just in case the VU1 pointers have
@@ -111,10 +99,11 @@ _vifT int nVifUnpack(const u8* data) {
 	vifStruct&    vif     = GetVifX;
 	VIFregisters& vifRegs = vifXRegs;
 
-	const uint ret    = aMin(vif.vifpacketsize, vif.tag.size);
-	const bool isFill = (vifRegs.cycle.cl < vifRegs.cycle.wl);
+	const uint wl     = vifRegs.cycle.wl ? vifRegs.cycle.wl : 256;
+	const uint ret    = std::min(vif.vifpacketsize, vif.tag.size);
+	const bool isFill = (vifRegs.cycle.cl < wl);
 	s32		   size   = ret << 2;
-
+	
 	if (ret == vif.tag.size) { // Full Transfer
 		if (v.bSize) { // Last transfer was partial
 			memcpy(&v.buffer[v.bSize], data, size);
@@ -252,7 +241,7 @@ __ri void __fastcall _nVifUnpackLoop(const u8* data) {
 	const UNPACKFUNCTYPE ft = VIFfuncTable[idx][doMode ? vifRegs.mode : 0][ ((usn*2*16) + upkNum) ];
 
 	pxAssume (vif.cl == 0);
-	pxAssume (vifRegs.cycle.wl > 0);
+	//pxAssume (vifRegs.cycle.wl > 0);
 
 	do {
 		u8* dest = getVUptr(idx, vif.tag.addr);
@@ -263,7 +252,7 @@ __ri void __fastcall _nVifUnpackLoop(const u8* data) {
 		}
 		else {
 			//DevCon.WriteLn("SSE Unpack!");
-			uint cl3 = aMin(vif.cl,3);
+			uint cl3 = std::min(vif.cl, 3);
 			fnbase[cl3](dest, data);
 		}
 

@@ -29,6 +29,11 @@ bool RemoveDirectory( const wxString& dirname );
 FolderMemoryCard::FolderMemoryCard() {
 	m_slot = 0;
 	m_isEnabled = false;
+	m_performFileWrites = false;
+	m_framesUntilFlush = 0;
+	m_timeLastWritten = 0;
+	m_filteringEnabled = false;
+	m_filteringString = L"";
 }
 
 void FolderMemoryCard::InitializeInternalData() {
@@ -39,12 +44,14 @@ void FolderMemoryCard::InitializeInternalData() {
 	memset( &m_backupBlock2, 0xFF, sizeof( m_backupBlock2 ) );
 	m_cache.clear();
 	m_oldDataCache.clear();
+	m_lastAccessedFile.CloseAll();
 	m_fileMetadataQuickAccess.clear();
 	m_timeLastWritten = 0;
 	m_isEnabled = false;
 	m_framesUntilFlush = 0;
-	m_lastAccessedFile.CloseAll();
 	m_performFileWrites = true;
+	m_filteringEnabled = false;
+	m_filteringString = L"";
 }
 
 bool FolderMemoryCard::IsFormatted() const {
@@ -91,6 +98,8 @@ void FolderMemoryCard::Open( const wxString& fullPath, const AppConfig::McdOptio
 	if ( disabled ) return;
 
 	m_isEnabled = true;
+	m_filteringEnabled = enableFiltering;
+	m_filteringString = filter;
 	LoadMemoryCardData( sizeInClusters, enableFiltering, filter );
 
 	SetTimeLastWrittenToNow();
@@ -106,8 +115,20 @@ void FolderMemoryCard::Close( bool flush ) {
 
 	m_cache.clear();
 	m_oldDataCache.clear();
-	m_fileMetadataQuickAccess.clear();
 	m_lastAccessedFile.CloseAll();
+	m_fileMetadataQuickAccess.clear();
+}
+
+bool FolderMemoryCard::ReIndex( bool enableFiltering, const wxString& filter ) {
+	if ( !m_isEnabled ) { return false; }
+
+	if ( m_filteringEnabled != enableFiltering || m_filteringString != filter ) {
+		Close();
+		Open( enableFiltering, filter );
+		return true;
+	}
+
+	return false;
 }
 
 void FolderMemoryCard::LoadMemoryCardData( const u32 sizeInClusters, const bool enableFiltering, const wxString& filter ) {
@@ -139,6 +160,10 @@ void FolderMemoryCard::LoadMemoryCardData( const u32 sizeInClusters, const bool 
 		CreateRootDir();
 		MemoryCardFileEntry* const rootDirEntry = &m_fileEntryDict[m_superBlock.data.rootdir_cluster].entries[0];
 		AddFolder( rootDirEntry, m_folderName.GetPath(), nullptr, enableFiltering, filter );
+		
+		#ifdef DEBUG_WRITE_FOLDER_CARD_IN_MEMORY_TO_FILE_ON_CHANGE
+		WriteToFile( m_folderName.GetFullPath().RemoveLast() + L"-debug_" +  wxDateTime::Now().Format( L"%Y-%m-%d-%H-%M-%S" ) + L"_load.ps2" );
+		#endif
 	}
 }
 
@@ -289,8 +314,6 @@ bool FilterMatches( const wxString& fileName, const wxString& filter ) {
 bool FolderMemoryCard::AddFolder( MemoryCardFileEntry* const dirEntry, const wxString& dirPath, MemoryCardFileMetadataReference* parent, const bool enableFiltering, const wxString& filter ) {
 	wxDir dir( dirPath );
 	if ( dir.IsOpened() ) {
-		const u32 dirStartCluster = dirEntry->entry.data.cluster;
-
 		wxString fileName;
 		bool hasNext;
 
@@ -726,10 +749,10 @@ bool FolderMemoryCard::ReadFromFile( u8 *dest, u32 adr, u32 dataLength ) {
 }
 
 s32 FolderMemoryCard::Read( u8 *dest, u32 adr, int size ) {
-	const u32 block = adr / BlockSizeRaw;
+	//const u32 block = adr / BlockSizeRaw;
 	const u32 page = adr / PageSizeRaw;
 	const u32 offset = adr % PageSizeRaw;
-	const u32 cluster = adr / ClusterSizeRaw;
+	//const u32 cluster = adr / ClusterSizeRaw;
 	const u32 end = offset + size;
 
 	if ( end > PageSizeRaw ) {
@@ -742,7 +765,6 @@ s32 FolderMemoryCard::Read( u8 *dest, u32 adr, int size ) {
 
 	if ( offset < PageSize ) {
 		// is trying to read (part of) an actual data block
-		const u32 dataOffset = 0;
 		const u32 dataLength = std::min( (u32)size, (u32)( PageSize - offset ) );
 
 		// if we have a cache for this page, just load from that
@@ -791,8 +813,8 @@ void FolderMemoryCard::ReadDataWithoutCache( u8* const dest, const u32 adr, cons
 }
 
 s32 FolderMemoryCard::Save( const u8 *src, u32 adr, int size ) {
-	const u32 block = adr / BlockSizeRaw;
-	const u32 cluster = adr / ClusterSizeRaw;
+	//const u32 block = adr / BlockSizeRaw;
+	//const u32 cluster = adr / ClusterSizeRaw;
 	const u32 page = adr / PageSizeRaw;
 	const u32 offset = adr % PageSizeRaw;
 	const u32 end = offset + size;
@@ -838,6 +860,10 @@ void FolderMemoryCard::NextFrame() {
 
 void FolderMemoryCard::Flush() {
 	if ( m_cache.empty() ) { return; }
+
+	#ifdef DEBUG_WRITE_FOLDER_CARD_IN_MEMORY_TO_FILE_ON_CHANGE
+	WriteToFile( m_folderName.GetFullPath().RemoveLast() + L"-debug_" + wxDateTime::Now().Format( L"%Y-%m-%d-%H-%M-%S" ) + L"_pre-flush.ps2" );
+	#endif
 
 	Console.WriteLn( L"(FolderMcd) Writing data for slot %u to file system...", m_slot );
 	const u64 timeFlushStart = wxGetLocalTimeMillis().GetValue();
@@ -893,10 +919,15 @@ void FolderMemoryCard::Flush() {
 	}
 
 	m_lastAccessedFile.FlushAll();
+	m_lastAccessedFile.ClearMetadataWriteState();
 	m_oldDataCache.clear();
 
 	const u64 timeFlushEnd = wxGetLocalTimeMillis().GetValue();
 	Console.WriteLn( L"(FolderMcd) Done! Took %u ms.", timeFlushEnd - timeFlushStart );
+
+	#ifdef DEBUG_WRITE_FOLDER_CARD_IN_MEMORY_TO_FILE_ON_CHANGE
+	WriteToFile( m_folderName.GetFullPath().RemoveLast() + L"-debug_" + wxDateTime::Now().Format( L"%Y-%m-%d-%H-%M-%S" ) + L"_post-flush.ps2" );
+	#endif
 }
 
 bool FolderMemoryCard::FlushPage( const u32 page ) {
@@ -993,7 +1024,7 @@ void FolderMemoryCard::FlushFileEntries( const u32 dirCluster, const u32 remaini
 				// empty files need to be explicitly created, as there will be no data cluster referencing it later
 				char cleanName[sizeof( entry->entry.data.name )];
 				memcpy( cleanName, (const char*)entry->entry.data.name, sizeof( cleanName ) );
-				bool filenameCleaned = FileAccessHelper::CleanMemcardFilename( cleanName );
+				FileAccessHelper::CleanMemcardFilename( cleanName );
 				const wxString filePath = dirPath + L"/" + wxString::FromAscii( (const char*)cleanName );
 
 				if ( m_performFileWrites ) {
@@ -1092,9 +1123,9 @@ void FolderMemoryCard::RemoveUnchangedDataFromCache( const MemoryCardFileEntry* 
 }
 
 s32 FolderMemoryCard::WriteWithoutCache( const u8 *src, u32 adr, int size ) {
-	const u32 block = adr / BlockSizeRaw;
-	const u32 cluster = adr / ClusterSizeRaw;
-	const u32 page = adr / PageSizeRaw;
+	//const u32 block = adr / BlockSizeRaw;
+	//const u32 cluster = adr / ClusterSizeRaw;
+	//const u32 page = adr / PageSizeRaw;
 	const u32 offset = adr % PageSizeRaw;
 	const u32 end = offset + size;
 
@@ -1341,6 +1372,20 @@ void FolderMemoryCard::CalculateECC( u8* ecc, const u8* data ) {
 	return;
 }
 
+void FolderMemoryCard::WriteToFile( const wxString& filename ) {
+	wxFFile targetFile( filename, L"wb" );
+
+	u8 buffer[FolderMemoryCard::PageSizeRaw];
+	u32 adr = 0;
+	while ( adr < GetSizeInClusters() * FolderMemoryCard::ClusterSizeRaw ) {
+		Read( buffer, adr, FolderMemoryCard::PageSizeRaw );
+		targetFile.Write( buffer, FolderMemoryCard::PageSizeRaw );
+		adr += FolderMemoryCard::PageSizeRaw;
+	}
+
+	targetFile.Close();
+}
+
 
 FileAccessHelper::FileAccessHelper() {
 	m_files.clear();
@@ -1367,7 +1412,13 @@ wxFFile* FileAccessHelper::Open( const wxFileName& folderName, MemoryCardFileMet
 
 	const MemoryCardFileEntry* const entry = fileRef->entry;
 	wxFFile* file = new wxFFile( filename, L"r+b" );
-	m_files.emplace( entry, file );
+
+	std::string internalPath;
+	fileRef->GetInternalPath( &internalPath );
+	MemoryCardFileHandleStructure handleStruct;
+	handleStruct.fileHandle = file;
+	handleStruct.fileRef = fileRef;
+	m_files.emplace( internalPath, handleStruct );
 
 	if ( writeMetadata ) {
 		fn.AppendDir( L"_pcsx2_meta" );
@@ -1415,7 +1466,9 @@ void FileAccessHelper::WriteMetadata( bool metadataIsNonstandard, wxFileName& me
 }
 
 wxFFile* FileAccessHelper::ReOpen( const wxFileName& folderName, MemoryCardFileMetadataReference* fileRef, bool writeMetadata ) {
-	auto it = m_files.find( fileRef->entry );
+	std::string internalPath;
+	fileRef->GetInternalPath( &internalPath );
+	auto it = m_files.find( internalPath );
 	if ( it != m_files.end() ) {
 		// we already have a handle to this file
 
@@ -1431,7 +1484,10 @@ wxFFile* FileAccessHelper::ReOpen( const wxFileName& folderName, MemoryCardFileM
 			}
 		}
 
-		return it->second;
+		// update the fileRef in the map since it might have been modified or deleted
+		it->second.fileRef = fileRef;
+
+		return it->second.fileHandle;
 	} else {
 		return this->Open( folderName, fileRef, writeMetadata );
 	}
@@ -1455,9 +1511,9 @@ void FileAccessHelper::CloseMatching( const wxString& path ) {
 	fn.Normalize();
 	wxString pathNormalized = fn.GetFullPath();
 	for ( auto it = m_files.begin(); it != m_files.end(); ) {
-		wxString openPath = it->second->GetName();
+		wxString openPath = it->second.fileHandle->GetName();
 		if ( openPath.StartsWith( pathNormalized ) ) {
-			CloseFileHandle( it->second, it->first );
+			CloseFileHandle( it->second.fileHandle, it->second.fileRef->entry );
 			it = m_files.erase( it );
 		} else {
 			++it;
@@ -1467,15 +1523,19 @@ void FileAccessHelper::CloseMatching( const wxString& path ) {
 
 void FileAccessHelper::CloseAll() {
 	for ( auto it = m_files.begin(); it != m_files.end(); ++it ) {
-		CloseFileHandle( it->second, it->first );
+		CloseFileHandle( it->second.fileHandle, it->second.fileRef->entry );
 	}
 	m_files.clear();
 }
 
 void FileAccessHelper::FlushAll() {
 	for ( auto it = m_files.begin(); it != m_files.end(); ++it ) {
-		it->second->Flush();
+		it->second.fileHandle->Flush();
 	}
+}
+
+void FileAccessHelper::ClearMetadataWriteState() {
+	m_lastWrittenFileRef = nullptr;
 }
 
 bool FileAccessHelper::CleanMemcardFilename( char* name ) {
@@ -1485,9 +1545,9 @@ bool FileAccessHelper::CleanMemcardFilename( char* name ) {
 	const char illegalChars[] = { '\\', '%', ':', '|', '"', '<', '>' };
 	bool cleaned = false;
 
+	const size_t filenameLength = strlen( name );
 	for ( size_t i = 0; i < sizeof( illegalChars ); ++i ) {
-		// this sizeof looks really odd but I couldn't get MemoryCardFileEntry::entry.data.name (or variants) working, feel free to replace with something equivalent but nicer looking
-		for ( size_t j = 0; j < sizeof( ( (MemoryCardFileEntry*)0 )->entry.data.name ); ++j ) {
+		for ( size_t j = 0; j < filenameLength; ++j ) {
 			if ( name[j] == illegalChars[i] ) {
 				name[j] = '_';
 				cleaned = true;
@@ -1495,9 +1555,28 @@ bool FileAccessHelper::CleanMemcardFilename( char* name ) {
 		}
 	}
 
+	cleaned = CleanMemcardFilenameEndDotOrSpace( name, filenameLength ) || cleaned;
+
 	return cleaned;
 }
 
+bool FileAccessHelper::CleanMemcardFilenameEndDotOrSpace( char* name, size_t length ) {
+	// Windows truncates dots and spaces at the end of filenames, so make sure that doesn't happen
+	bool cleaned = false;
+	for ( size_t j = length; j > 0; --j ) {
+		switch ( name[j - 1] ) {
+		case ' ':
+		case '.':
+			name[j - 1] = '_';
+			cleaned = true;
+			break;
+		default:
+			return cleaned;
+		}
+	}
+
+	return cleaned;
+}
 
 bool MemoryCardFileMetadataReference::GetPath( wxFileName* fileName ) const {
 	bool parentCleaned = false;
@@ -1518,6 +1597,17 @@ bool MemoryCardFileMetadataReference::GetPath( wxFileName* fileName ) const {
 	return parentCleaned || localCleaned;
 }
 
+void MemoryCardFileMetadataReference::GetInternalPath( std::string* fileName ) const {
+	if ( parent ) {
+		parent->GetInternalPath( fileName );
+	}
+
+	fileName->append( (const char*)entry->entry.data.name );
+
+	if ( entry->IsDir() ) {
+		fileName->append( "/" );
+	}
+}
 
 FolderMemoryCardAggregator::FolderMemoryCardAggregator() {
 	for ( uint i = 0; i < TotalCardSlots; ++i ) {
@@ -1573,11 +1663,13 @@ void FolderMemoryCardAggregator::NextFrame( uint slot ) {
 	m_cards[slot].NextFrame();
 }
 
-void FolderMemoryCardAggregator::ReIndex( uint slot, const bool enableFiltering, const wxString& filter ) {
-	m_cards[slot].Close();
-	m_cards[slot].Open( enableFiltering, filter );
+bool FolderMemoryCardAggregator::ReIndex( uint slot, const bool enableFiltering, const wxString& filter ) {
+	if ( m_cards[slot].ReIndex( enableFiltering, filter ) ) {
+		SetFiltering( enableFiltering );
+		m_lastKnownFilter = filter;
+		return true;
+	}
 
-	SetFiltering( enableFiltering );
-	m_lastKnownFilter = filter;
+	return false;
 }
 

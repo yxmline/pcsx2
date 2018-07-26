@@ -171,7 +171,7 @@ static bool __fastcall _rcntFireInterrupt(int i, bool isOverflow) {
 	bool ret;
 
 	if ((psxCounters[i].mode & 0x400)) { //IRQ fired
-		//DevCon.Warning("Counter %d %s IRQ Fired count %x", i, isOverflow == true ? "Overflow" : "Target", psxCounters[i].count);
+		//DevCon.Warning("Counter %d %s IRQ Fired count %x", i, isOverflow ? "Overflow" : "Target", psxCounters[i].count);
 		psxHu32(0x1070) |= psxCounters[i].interrupt;
 		iopTestIntc();
 		ret = true;
@@ -415,14 +415,14 @@ static void psxCheckEndGate32(int i)
 void psxVBlankStart()
 {
 	cdvdVsync();
-	psxHu32(0x1070) |= 1;
+	iopIntcIrq(0);
 	if(psxvblankgate & (1 << 1)) psxCheckStartGate16(1);
 	if(psxvblankgate & (1 << 3)) psxCheckStartGate32(3);
 }
 
 void psxVBlankEnd()
 {
-	psxHu32(0x1070) |= 0x800;
+	iopIntcIrq(11);
 	if(psxvblankgate & (1 << 1)) psxCheckEndGate16(1);
 	if(psxvblankgate & (1 << 3)) psxCheckEndGate32(3);
 }
@@ -559,7 +559,7 @@ void psxRcntWcount16(int index, u16 value)
 	}
 
 	psxCounters[index].count = value & 0xffff;
-	if ((psxCounters[index].mode & 0x400) == 1 || (psxCounters[index].mode & 0x40)) {
+	if ((psxCounters[index].mode & 0x400) || (psxCounters[index].mode & 0x40)) {
 		psxCounters[index].target &= 0xffff;
 	}
 	if (value > psxCounters[index].target) {//Count already higher than Target
@@ -588,7 +588,7 @@ void psxRcntWcount32(int index, u32 value)
 	}
 
 	psxCounters[index].count = value;
-	if ((psxCounters[index].mode & 0x400) == 1 || (psxCounters[index].mode & 0x40)) { //IRQ not triggered (one shot) or toggle
+	if ((psxCounters[index].mode & 0x400) || (psxCounters[index].mode & 0x40)) { //IRQ not triggered (one shot) or toggle
 		psxCounters[index].target &= 0xffffffff;
 	}
 	if (value > psxCounters[index].target) {//Count already higher than Target

@@ -24,6 +24,8 @@
 #include "PluginCallbacks.h"
 #include "AppConfig.h"
 
+//#define DEBUG_WRITE_FOLDER_CARD_IN_MEMORY_TO_FILE_ON_CHANGE
+
 // --------------------------------------------------------------------------------------
 //  Superblock Header Struct
 // --------------------------------------------------------------------------------------
@@ -195,6 +197,14 @@ struct MemoryCardFileMetadataReference {
 
 	// returns true if filename was modified and metadata containing the actual filename should be written
 	bool GetPath( wxFileName* fileName ) const;
+
+	// gives the internal memory card file system path, not to be used for writes to the host file system
+	void GetInternalPath( std::string* fileName ) const;
+};
+
+struct MemoryCardFileHandleStructure {
+	MemoryCardFileMetadataReference* fileRef;
+	wxFFile* fileHandle;
 };
 
 // --------------------------------------------------------------------------------------
@@ -203,7 +213,7 @@ struct MemoryCardFileMetadataReference {
 // Small helper class to keep memory card files opened between calls to Read()/Save() 
 class FileAccessHelper {
 protected:
-	std::map<const MemoryCardFileEntry* const, wxFFile*> m_files;
+	std::map<std::string, MemoryCardFileHandleStructure> m_files;
 	MemoryCardFileMetadataReference* m_lastWrittenFileRef; // we remember this to reduce redundant metadata checks/writes
 
 public:
@@ -219,11 +229,17 @@ public:
 	// Flush the written data of all open files to the file system
 	void FlushAll();
 
+	// Force metadata to be written on next file access, not sure if this is necessary but it can't hurt.
+	void ClearMetadataWriteState();
+
 	// removes characters from a PS2 file name that would be illegal in a Windows file system
 	// returns true if any changes were made
 	static bool CleanMemcardFilename( char* name );
 
 protected:
+	// helper function for CleanMemcardFilename()
+	static bool CleanMemcardFilenameEndDotOrSpace( char* name, size_t length );
+
 	// Open a new file and remember it for later
 	wxFFile* Open( const wxFileName& folderName, MemoryCardFileMetadataReference* fileRef, bool writeMetadata = false );
 	// Close a file and delete its handle
@@ -311,9 +327,13 @@ protected:
 	// if set to false, nothing is actually written to the file system while flushing, and data is discarded instead
 	bool m_performFileWrites;
 
+	// currently active filter settings
+	bool m_filteringEnabled;
+	wxString m_filteringString;
+
 public:
 	FolderMemoryCard();
-	virtual ~FolderMemoryCard() throw() {}
+	virtual ~FolderMemoryCard() = default;
 
 	void Lock();
 	void Unlock();
@@ -324,6 +344,11 @@ public:
 	void Open( const wxString& fullPath, const AppConfig::McdOptions& mcdOptions, const u32 sizeInClusters, const bool enableFiltering, const wxString& filter, bool simulateFileWrites = false );
 	// Close the memory card and flush changes to the file system. Set flush to false to not store changes.
 	void Close( bool flush = true );
+
+	// Closes and reopens card with given filter options if they differ from the current ones (returns true),
+	// or does nothing if they match already (returns false).
+	// Does nothing and returns false when called on a closed memory card.
+	bool ReIndex( bool enableFiltering, const wxString& filter );
 
 	s32  IsPresent() const;
 	void GetSizeInfo( PS2E_McdSizeInfo& outways ) const;
@@ -347,6 +372,8 @@ public:
 	void NextFrame();
 
 	static void CalculateECC( u8* ecc, const u8* data );
+
+	void WriteToFile( const wxString& filename );
 
 protected:
 	// initializes memory card data, as if it was fresh from the factory
@@ -529,7 +556,7 @@ protected:
 
 public:
 	FolderMemoryCardAggregator();
-	virtual ~FolderMemoryCardAggregator() throw( ) {}
+	virtual ~FolderMemoryCardAggregator() = default;
 
 	void Open();
 	void Close();
@@ -544,5 +571,5 @@ public:
 	s32  EraseBlock( uint slot, u32 adr );
 	u64  GetCRC( uint slot );
 	void NextFrame( uint slot );
-	void ReIndex( uint slot, const bool enableFiltering, const wxString& filter );
+	bool ReIndex( uint slot, const bool enableFiltering, const wxString& filter );
 };

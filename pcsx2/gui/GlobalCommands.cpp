@@ -17,7 +17,7 @@
 #include "MainFrame.h"
 #include "GSFrame.h"
 #include "ApplyState.h"
-
+#include "ConsoleLogger.h"
 
 #include "AppAccelerators.h"
 #include "AppSaveStates.h"
@@ -32,6 +32,8 @@
 
 // renderswitch - tells GSdx to go into dx9 sw if "renderswitch" is set.
 bool renderswitch = false;
+
+extern bool switchAR;
 
 static int g_Pcsx2Recording = 0; // true 1 if recording video and sound
 
@@ -68,61 +70,58 @@ namespace Implementations
 		g_Conf->EmuOptions.GS.FrameSkipEnable = !g_Conf->EmuOptions.GS.FrameSkipEnable;
 		SetGSConfig().FrameSkipEnable = g_Conf->EmuOptions.GS.FrameSkipEnable;
 
-		if( EmuConfig.GS.FrameSkipEnable )
-			Console.WriteLn( "(FrameSkipping) Enabled : FrameDraws=%d, FrameSkips=%d", g_Conf->EmuOptions.GS.FramesToDraw, g_Conf->EmuOptions.GS.FramesToSkip );
-		else
-			Console.WriteLn( "(FrameSkipping) Disabled." );
+		if( EmuConfig.GS.FrameSkipEnable ) {
+			OSDlog( Color_StrongRed, true, "(FrameSkipping) Enabled." );
+			OSDlog( Color_StrongRed, true, "  FrameDraws=%d, FrameSkips=%d", g_Conf->EmuOptions.GS.FramesToDraw, g_Conf->EmuOptions.GS.FramesToSkip );
+		} else {
+			OSDlog( Color_StrongRed, true, "(FrameSkipping) Disabled." );
+		}
 	}
 
 	void Framelimiter_TurboToggle()
 	{
 		ScopedCoreThreadPause pauser;
-		
+
 		if( !g_Conf->EmuOptions.GS.FrameLimitEnable )
 		{
 			g_Conf->EmuOptions.GS.FrameLimitEnable = true;
 			g_LimiterMode = Limit_Turbo;
-			g_Conf->EmuOptions.GS.LimitScalar = g_Conf->Framerate.TurboScalar;
-			Console.WriteLn("(FrameLimiter) Turbo + FrameLimit ENABLED." );
-			if ( g_Conf->Framerate.SkipOnTurbo == true) 
-				g_Conf->EmuOptions.GS.FrameSkipEnable = true;
-			else
-				g_Conf->EmuOptions.GS.FrameSkipEnable = false;
+			OSDlog( Color_StrongRed, true, "(FrameLimiter) Turbo + FrameLimit ENABLED." );
+			g_Conf->EmuOptions.GS.FrameSkipEnable = !!g_Conf->Framerate.SkipOnTurbo;
 		}
 		else if( g_LimiterMode == Limit_Turbo )
 		{
-			GSsetVsync( g_Conf->EmuOptions.GS.VsyncEnable );
 			g_LimiterMode = Limit_Nominal;
-			g_Conf->EmuOptions.GS.LimitScalar = g_Conf->Framerate.NominalScalar;
-			
-			if ( g_Conf->Framerate.SkipOnLimit == true) 
+
+			if ( g_Conf->Framerate.SkipOnLimit)
 			{
-				Console.WriteLn("(FrameLimiter) Turbo DISABLED. Frameskip ENABLED" );
+				OSDlog( Color_StrongRed, true,  "(FrameLimiter) Turbo DISABLED. Frameskip ENABLED" );
 				g_Conf->EmuOptions.GS.FrameSkipEnable = true;
 			}
 			else
 			{
-				Console.WriteLn("(FrameLimiter) Turbo DISABLED." );
+				OSDlog( Color_StrongRed, true, "(FrameLimiter) Turbo DISABLED." );
 				g_Conf->EmuOptions.GS.FrameSkipEnable = false;
 			}
 		}
 		else
 		{
-			GSsetVsync( false );
 			g_LimiterMode = Limit_Turbo;
-			g_Conf->EmuOptions.GS.LimitScalar = g_Conf->Framerate.TurboScalar;
-			
-			if ( g_Conf->Framerate.SkipOnTurbo == true)
+
+			if ( g_Conf->Framerate.SkipOnTurbo)
 			{
-				Console.WriteLn("(FrameLimiter) Turbo + Frameskip ENABLED." );
+				OSDlog( Color_StrongRed, true, "(FrameLimiter) Turbo + Frameskip ENABLED." );
 				g_Conf->EmuOptions.GS.FrameSkipEnable = true;
 			}
 			else
 			{
-				Console.WriteLn("(FrameLimiter) Turbo ENABLED." );
+				OSDlog( Color_StrongRed, true, "(FrameLimiter) Turbo ENABLED." );
 				g_Conf->EmuOptions.GS.FrameSkipEnable = false;
 			}
 		}
+
+		gsUpdateFrequency(g_Conf->EmuOptions);
+
 		pauser.AllowResume();
 	}
 
@@ -135,20 +134,20 @@ namespace Implementations
 		// out a better consistency approach... -air
 
 		ScopedCoreThreadPause pauser;
-		GSsetVsync( g_Conf->EmuOptions.GS.VsyncEnable );
 		if( g_LimiterMode == Limit_Slomo )
 		{
 			g_LimiterMode = Limit_Nominal;
-			g_Conf->EmuOptions.GS.LimitScalar = g_Conf->Framerate.NominalScalar;
-			Console.WriteLn("(FrameLimiter) SlowMotion DISABLED." );
+			OSDlog( Color_StrongRed, true, "(FrameLimiter) SlowMotion DISABLED." );
 		}
 		else
 		{
 			g_LimiterMode = Limit_Slomo;
-			g_Conf->EmuOptions.GS.LimitScalar = g_Conf->Framerate.SlomoScalar;
-			Console.WriteLn("(FrameLimiter) SlowMotion ENABLED." );
+			OSDlog( Color_StrongRed, true, "(FrameLimiter) SlowMotion ENABLED." );
 			g_Conf->EmuOptions.GS.FrameLimitEnable = true;
 		}
+
+		gsUpdateFrequency(g_Conf->EmuOptions);
+
 		pauser.AllowResume();
 	}
 
@@ -156,8 +155,11 @@ namespace Implementations
 	{
 		ScopedCoreThreadPause pauser;
 		g_Conf->EmuOptions.GS.FrameLimitEnable = !g_Conf->EmuOptions.GS.FrameLimitEnable;
-		GSsetVsync( g_Conf->EmuOptions.GS.FrameLimitEnable && g_Conf->EmuOptions.GS.VsyncEnable );
-		Console.WriteLn("(FrameLimiter) %s.", g_Conf->EmuOptions.GS.FrameLimitEnable ? "ENABLED" : "DISABLED" );
+		OSDlog( Color_StrongRed, true, "(FrameLimiter) %s.", g_Conf->EmuOptions.GS.FrameLimitEnable ? "ENABLED" : "DISABLED" );
+
+		// Turbo/Slowmo don't make sense when framelimiter is toggled
+		g_LimiterMode = Limit_Nominal;
+
 		pauser.AllowResume();
 	}
 
@@ -174,16 +176,18 @@ namespace Implementations
 	void GSwindow_CycleAspectRatio()
 	{
 		AspectRatioType& art = g_Conf->GSWindow.AspectRatio;
-		wxString arts(L"Not modified");
+		const char *arts = "Not modified";
+		if (art == AspectRatio_Stretch && switchAR) //avoids a double 4:3 when coming from FMV aspect ratio switch
+			art = AspectRatio_4_3;
 		switch( art )
 		{
-			case AspectRatio_Stretch:	art = AspectRatio_4_3; arts = L"AspectRatio_4_3"; break;
-			case AspectRatio_4_3:		art = AspectRatio_16_9; arts = L"AspectRatio_16:9"; break;
-			case AspectRatio_16_9:		art = AspectRatio_Stretch; arts = L"AspectRatio_Stretch";break;
+			case AspectRatio_Stretch:	art = AspectRatio_4_3; arts = "4:3"; break;
+			case AspectRatio_4_3:		art = AspectRatio_16_9; arts = "16:9"; break;
+			case AspectRatio_16_9:		art = AspectRatio_Stretch; arts = "Stretch"; break;
 			default: break;
 		}
 
-		Console.WriteLn(L"(GSwindow) Aspect ratio: %s.", WX_STR(arts));
+		OSDlog(Color_StrongBlue, true, "(GSwindow) Aspect ratio: %s", arts);
 		UpdateImagePosition();
 	}
 
@@ -191,7 +195,7 @@ namespace Implementations
 	{
 		g_Conf->GSWindow.OffsetX = x;
 		g_Conf->GSWindow.OffsetY = y;
-		Console.WriteLn(L"(GSwindow) Offset: x=%f, y=%f", x,y);
+		OSDlog( Color_StrongBlue, true, "(GSwindow) Offset: x=%f, y=%f", x,y);
 
 		UpdateImagePosition();
 
@@ -222,7 +226,7 @@ namespace Implementations
 		if( zoom <= 0 )
 			return;
 		g_Conf->GSWindow.StretchY = zoom;
-		Console.WriteLn(L"(GSwindow) Vertical stretch: %f", zoom);
+		OSDlog( Color_StrongBlue, true, "(GSwindow) Vertical stretch: %f", zoom);
 
 		UpdateImagePosition();
 	}
@@ -246,10 +250,10 @@ namespace Implementations
 			return;
 		g_Conf->GSWindow.Zoom = zoom;
 		
-		if ( zoom == 0 ) 
-            Console.WriteLn(L"(GSwindow) Zoom: 0 (auto, no black bars)");
-		else 
-            Console.WriteLn(L"(GSwindow) Zoom: %f", zoom);
+		if ( zoom == 0 )
+			OSDlog( Color_StrongBlue, true, "(GSwindow) Zoom: 0 (auto, no black bars)");
+		else
+			OSDlog( Color_StrongBlue, true, "(GSwindow) Zoom: %f", zoom);
 		
 		UpdateImagePosition();
 	}
@@ -327,7 +331,8 @@ namespace Implementations
 			}
 		}
 
-		sMainFrame.SetFocus();
+		if (g_Conf->GSWindow.CloseOnEsc)
+			sMainFrame.SetFocus();
 	}
 
 	void Sys_Resume()
@@ -335,9 +340,20 @@ namespace Implementations
 		CoreThread.Resume();
 	}
 
+	void Sys_SuspendResume()
+	{
+		if (CoreThread.HasPendingStateChangeRequest())
+			return;
+
+		if (CoreThread.IsPaused())
+			Sys_Resume();
+		else
+			Sys_Suspend();
+	}
+
 	void Sys_TakeSnapshot()
 	{
-		GSmakeSnapshot( g_Conf->Folders.Snapshots.ToAscii() );
+		GSmakeSnapshot( g_Conf->Folders.Snapshots.ToUTF8() );
 	}
 
 	void Sys_RenderToggle()
@@ -356,7 +372,7 @@ namespace Implementations
 		// FIXME: Some of the trace logs will require recompiler resets to be activated properly.
 #ifdef PCSX2_DEVBUILD		
 		SetTraceConfig().Enabled = !EmuConfig.Trace.Enabled;
-		GSprintf(10, const_cast<char*>(EmuConfig.Trace.Enabled ? "Logging Enabled." : "Logging Disabled."));
+		Console.WriteLn(EmuConfig.Trace.Enabled ? "Logging Enabled." : "Logging Disabled.");
 #endif
 	}
 
@@ -460,48 +476,56 @@ static const GlobalCommandDescriptor CommandDeclarations[] =
 		States_FreezeCurrentSlot,
 		pxL( "Save state" ),
 		pxL( "Saves the virtual machine state to the current slot." ),
+		false,
 	},
 
 	{	"States_DefrostCurrentSlot",
 		States_DefrostCurrentSlot,
 		pxL( "Load state" ),
 		pxL( "Loads a virtual machine state from the current slot." ),
+		false,
 	},
 
 	{	"States_DefrostCurrentSlotBackup",
 		States_DefrostCurrentSlotBackup,
 		pxL( "Load State Backup" ),
 		pxL( "Loads virtual machine state backup for current slot." ),
+		false,
 	},
 
 	{	"States_CycleSlotForward",
 		States_CycleSlotForward,
 		pxL( "Cycle to next slot" ),
 		pxL( "Cycles the current save slot in +1 fashion!" ),
+		false,
 	},
 
 	{	"States_CycleSlotBackward",
 		States_CycleSlotBackward,
 		pxL( "Cycle to prev slot" ),
 		pxL( "Cycles the current save slot in -1 fashion!" ),
+		false,
 	},
 
 	{	"Frameskip_Toggle",
 		Implementations::Frameskip_Toggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Framelimiter_TurboToggle",
 		Implementations::Framelimiter_TurboToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Framelimiter_SlomoToggle",
 		Implementations::Framelimiter_SlomoToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Framelimiter_MasterToggle",
@@ -522,79 +546,85 @@ static const GlobalCommandDescriptor CommandDeclarations[] =
 		Implementations::GSwindow_ZoomIn,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"GSwindow_ZoomOut",
 		Implementations::GSwindow_ZoomOut,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"GSwindow_ZoomToggle",
 		Implementations::GSwindow_ZoomToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
-	{	"GSwindow_ZoomInY",	Implementations::GSwindow_ZoomInY, NULL, NULL, },
-	{	"GSwindow_ZoomOutY",	Implementations::GSwindow_ZoomOutY, NULL, NULL, },
-	{	"GSwindow_ZoomResetY",	Implementations::GSwindow_ZoomResetY, NULL, NULL, },
+	{	"GSwindow_ZoomInY"     , Implementations::GSwindow_ZoomInY     , NULL, NULL, false},
+	{	"GSwindow_ZoomOutY"    , Implementations::GSwindow_ZoomOutY    , NULL, NULL, false},
+	{	"GSwindow_ZoomResetY"  , Implementations::GSwindow_ZoomResetY  , NULL, NULL, false},
 
-	{	"GSwindow_OffsetYminus",	Implementations::GSwindow_OffsetYminus, NULL, NULL, },
-	{	"GSwindow_OffsetYplus",		Implementations::GSwindow_OffsetYplus, NULL, NULL, },
-	{	"GSwindow_OffsetXminus",	Implementations::GSwindow_OffsetXminus, NULL, NULL, },
-	{	"GSwindow_OffsetXplus",		Implementations::GSwindow_OffsetXplus, NULL, NULL, },
-	{	"GSwindow_OffsetReset",		Implementations::GSwindow_OffsetReset, NULL, NULL, },
+	{	"GSwindow_OffsetYminus", Implementations::GSwindow_OffsetYminus, NULL, NULL, false},
+	{	"GSwindow_OffsetYplus" , Implementations::GSwindow_OffsetYplus , NULL, NULL, false},
+	{	"GSwindow_OffsetXminus", Implementations::GSwindow_OffsetXminus, NULL, NULL, false},
+	{	"GSwindow_OffsetXplus" , Implementations::GSwindow_OffsetXplus , NULL, NULL, false},
+	{	"GSwindow_OffsetReset" , Implementations::GSwindow_OffsetReset , NULL, NULL, false},
 
-	{	"Sys_Suspend",
-		Implementations::Sys_Suspend,
+	{	"Sys_SuspendResume",
+		Implementations::Sys_SuspendResume,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Sys_TakeSnapshot",
 		Implementations::Sys_TakeSnapshot,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Sys_RenderswitchToggle",
 		Implementations::Sys_RenderToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Sys_LoggingToggle",
 		Implementations::Sys_LoggingToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"Sys_FreezeGS",
 		Implementations::Sys_FreezeGS,
 		NULL,
 		NULL,
+		false,
 	},
 	{	"Sys_RecordingToggle",
 		Implementations::Sys_RecordingToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	{	"FullscreenToggle",
 		Implementations::FullscreenToggle,
 		NULL,
 		NULL,
+		false,
 	},
 
 	// Command Declarations terminator:
 	// (must always be last in list!!)
 	{ NULL }
 };
-
-CommandDictionary::~CommandDictionary() throw() {}
-
-AcceleratorDictionary::~AcceleratorDictionary() throw() {}
 
 void AcceleratorDictionary::Map( const KeyAcceleratorCode& _acode, const char *searchfor )
 {
@@ -699,7 +729,7 @@ void AcceleratorDictionary::Map( const KeyAcceleratorCode& _acode, const char *s
 
 void Pcsx2App::BuildCommandHash()
 {
-	if( !GlobalCommands ) GlobalCommands = new CommandDictionary;
+	if( !GlobalCommands ) GlobalCommands = std::unique_ptr<CommandDictionary>(new CommandDictionary);
 
 	const GlobalCommandDescriptor* curcmd = CommandDeclarations;
 	while( curcmd->Invoke != NULL )
@@ -713,7 +743,7 @@ void Pcsx2App::InitDefaultGlobalAccelerators()
 {
 	typedef KeyAcceleratorCode AAC;
 
-	if( !GlobalAccels ) GlobalAccels = new AcceleratorDictionary;
+	if( !GlobalAccels ) GlobalAccels = std::unique_ptr<AcceleratorDictionary>(new AcceleratorDictionary);
 
 	// Why do we even have those here? all of them seem to be overridden
 	// by GSPanel::m_Accels ( GSPanel::InitDefaultAccelerators() )

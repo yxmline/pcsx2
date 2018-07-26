@@ -12,12 +12,10 @@ set(FWnullFinalFlags "")
 
 # FWnull sources
 set(FWnullSources
-	Config.cpp
 	FW.cpp)
 
 # FWnull headers
 set(FWnullHeaders
-	Config.h
 	FW.h)
 
 # FWnull Linux sources
@@ -30,14 +28,12 @@ set(FWnullLinuxHeaders
 
 # FWnull Windows sources
 set(FWnullWindowsSources
-	Windows/Config.cpp
 	Windows/FireWireNull.def
-	Windows/FireWireNul.rc
-	Windows/Win32.cpp)
+)
 
 # FWnull Windows headers
 set(FWnullWindowsHeaders
-	Windows/resource.h)
+)
 
 set(FWnullFinalSources
 	${FWnullSources}
@@ -50,4 +46,8 @@ set(FWnullFinalLibs
 	${GTK2_LIBRARIES}
 )
 
-add_pcsx2_plugin(${Output} "${FWnullFinalSources}" "${FWnullFinalLibs}" "${FWnullFinalFlags}")
+if(BUILTIN_FW)
+    add_pcsx2_lib(${Output} "${FWnullFinalSources}" "${FWnullFinalLibs}" "${FWnullFinalFlags}")
+else()
+    add_pcsx2_plugin(${Output} "${FWnullFinalSources}" "${FWnullFinalLibs}" "${FWnullFinalFlags}")
+endif()

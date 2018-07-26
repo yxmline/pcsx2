@@ -270,7 +270,7 @@ static inline u32 branchAddr(const mV)
 
 static void __fc mVUwaitMTVU() {
 	if (IsDevBuild) DevCon.WriteLn("microVU0: Waiting on VU1 thread to access VU1 regs!");
-	if (THREAD_VU1) vu1Thread.WaitVU();
+	vu1Thread.WaitVU();
 }
 
 // Transforms the Address in gprReg to valid VU0/VU1 Address
@@ -286,17 +286,24 @@ __fi void mVUaddrFix(mV, const x32& gprReg)
 			xAND(gprReg, 0xff); // if !(addr & 0x4000), wrap around
 			xForwardJump32 jmpB;
 		jmpA.SetTarget();
-			if (THREAD_VU1 || (IsDevBuild && !isCOP2)) {
+			if (THREAD_VU1) {
 				mVUbackupRegs(mVU, true);
 				xPUSH(gprT1);
 				xPUSH(gprT2);
 				xPUSH(gprT3);
+				// Align the stackframe (GCC only, since GCC assumes stackframe is always aligned)
+#ifdef __GNUC__
+				xSUB(esp, 4);
+#endif
 				if (IsDevBuild && !isCOP2) {         // Lets see which games do this!
-					xMOV (gprT2, mVU.prog.cur->idx); // Note: Kernel does it via COP2 to initialize VU1!
-					xMOV (gprT3, xPC);               // So we don't spam console, we'll only check micro-mode...
-					xCALL(mVUwarningRegAccess);
+					xMOV(gprT2, mVU.prog.cur->idx); // Note: Kernel does it via COP2 to initialize VU1!
+					xMOV(gprT3, xPC);               // So we don't spam console, we'll only check micro-mode...
+					xCALL((void*)mVUwarningRegAccess);
 				}
-				xCALL(mVUwaitMTVU);
+				xCALL((void*)mVUwaitMTVU);
+#ifdef __GNUC__
+				xADD(esp, 4);
+#endif
 				xPOP (gprT3);
 				xPOP (gprT2);
 				xPOP (gprT1);
@@ -552,13 +559,13 @@ void SSE_DIVSS(mV, const xmm& to, const xmm& from, const xmm& t1 = xEmptyReg, co
 // Micro VU - Custom Quick Search
 //------------------------------------------------------------------
 
-static __pagealigned u8 mVUsearchXMM[__pagesize];
+__pagealigned u8 mVUsearchXMM[__pagesize];
 
 // Generates a custom optimized block-search function
 // Note: Structs must be 16-byte aligned! (GCC doesn't guarantee this)
 void mVUcustomSearch() {
 	HostSys::MemProtectStatic(mVUsearchXMM, PageAccess_ReadWrite());
-	memset_8<0xcc,__pagesize>(mVUsearchXMM);
+	memset(mVUsearchXMM, 0xcc, __pagesize);
 	xSetPtr(mVUsearchXMM);
 
 	xMOVAPS  (xmm0, ptr32[ecx]);
