@@ -1442,13 +1442,8 @@ Serial = SCES-50878
 Name   = Tekken 4
 Region = PAL-M5
 Compat = 5
-[patches = 2251E14D]
-	comment=patches by Shadow Lady
-	// IPU BUSY! fix...
-	patch=0,EE,00292424,word,24200001
-	patch=0,EE,00292624,word,00000000
-[/patches]
-[patches = F48F994A]
+[patches]
+	// CRC 2251E14D, F48F994A
 	comment=patches by Shadow Lady
 	// IPU BUSY! fix...
 	patch=0,EE,00292424,word,24200001
@@ -1485,6 +1480,8 @@ Region = PAL-M5
 Serial = SCES-50928
 Name   = SOCOM - U.S. Navy SEALs [Beta & Full Release]
 Region = PAL-M6
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCES-50934
 Name   = WRC II Extreme
@@ -1700,8 +1697,10 @@ Name   = Monde des Bleus 2004, Le - Nouvelle Generation
 Region = PAL-F
 ---------------------------------------------
 Serial = SCES-51618
-Name   = SOCOM
+Name   = SOCOM - U.S. Navy SEALs
 Region = PAL-Unk
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCES-51635
 Name   = Brave - The Search for Spirit Dancer
@@ -1765,8 +1764,8 @@ Serial = SCES-51904
 Name   = SOCOM II - U.S. Navy SEALs
 Region = PAL-M5
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCES-51910
 Name   = Arc the Lad - Twilight of the Spirits
@@ -1842,8 +1841,8 @@ Serial = SCES-52306
 Name   = SOCOM II - U.S. Navy SEALs
 Region = PAL-Unk
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCES-52327
 Name   = Forbidden Siren
@@ -2696,6 +2695,10 @@ Serial = SCES-55387
 Name   = Buzz! Deutschlands Superquiz
 Region = PAL-G
 ---------------------------------------------
+Serial = SCES-55436
+Name   = SingStar ABBA
+Region = PAL-F
+---------------------------------------------
 Serial = SCES-55437
 Name   = SingStar ABBA
 Region = PAL-G
@@ -2819,8 +2822,8 @@ Serial = SCKA-20020
 Name   = SOCOM II - U.S. Navy SEALs
 Region = NTSC-K
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCKA-20022
 Name   = Gran Turismo 4 Prologue
@@ -2940,8 +2943,8 @@ Serial = SCKA-20053
 Name   = SOCOM II - U.S. Navy SEALs [PlayStation 2 Big Hit Series]
 Region = NTSC-K
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCKA-20054
 Name   = Tales of Destiny 2 [PlayStation 2 Big Hit Series]
@@ -3040,6 +3043,7 @@ Compat = 5
 Serial = SCKA-20092
 Name   = K-1 World Grand Prix 2006
 Region = NTSC-K
+XgKickHack = 1 // Fixes grey fighters problem.
 ---------------------------------------------
 Serial = SCKA-20096
 Name   = Barnyard
@@ -3086,6 +3090,8 @@ VuClipFlagHack = 1
 Serial = SCKA-24008
 Name   = SOCOM - U.S. Navy SEALs
 Region = NTSC-K
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCKA-30001
 Name   = Gran Turismo 4
@@ -3147,7 +3153,7 @@ Name   = Boku to Mao
 Region = NTSC-J
 Compat = 5
 [patches = EE838B5C]
-	comment=patches by Nachbrenner 
+	comment=patches by Nachbrenner
 	// Skip OP.PSS.
 	patch=0,EE,001d6258,word,24020001
 [/patches]
@@ -3460,6 +3466,8 @@ Compat = 4
 Serial = SCPS-15044
 Name   = SOCOM - U.S. Navy SEALs
 Region = NTSC-J
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCPS-15045
 Name   = Ka (Mosquito) - Let's Go Hawaiian
@@ -3560,8 +3568,8 @@ Serial = SCPS-15065
 Name   = SOCOM II - U.S. Navy SEALs
 Region = NTSC-J
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCPS-15066
 Name   = Prince of Persia - The Sands of Time
@@ -4555,6 +4563,8 @@ Serial = SCUS-97134
 Name   = SOCOM - U.S. Navy SEALs
 Region = NTSC-U
 Compat = 5
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCUS-97136
 Name   = NCAA Final Four 2002
@@ -4566,26 +4576,20 @@ Region = NTSC-U
 Compat = 5
 [patches = DBD09DD4]
 	comment=COP2 flag instance patch
-	// pair of vsubs with associated cfc2s
+	// Pair of vsubs with associated cfc2s.
 	patch=0,EE,002EA424,word,48468801
 	patch=0,EE,002EA434,word,4BC311AC
-
-	// bunch of vclips without enough cycles before reading the clip flag
+	// Bunch of vclips without enough cycles before reading the clip flag.
 	patch=0,EE,00329110,word,48489000
 	patch=0,EE,00329124,word,4BDAD1FF
-
 	patch=0,EE,0032916C,word,48459000
 	patch=0,EE,00329180,word,4BDAD1FF
-
 	patch=0,EE,003291DC,word,48459000
 	patch=0,EE,003291F0,word,4BDAD1FF
-
 	patch=0,EE,0032924C,word,48459000
 	patch=0,EE,00329260,word,4BDAD1FF
-
 	patch=0,EE,003292BC,word,48459000
 	patch=0,EE,003292D0,word,4BDAD1FF
-
 	patch=0,EE,0032940C,word,48459000
 	patch=0,EE,00329420,word,4BDAD1FF
 [/patches]
@@ -4825,6 +4829,8 @@ Region = NTSC-U
 Serial = SCUS-97205
 Name   = SOCOM - U.S. Navy SEALs [Demo]
 Region = NTSC-U
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCUS-97206
 Name   = PlayStation Underground Jampack Summer 2002
@@ -4914,6 +4920,8 @@ Region = NTSC-U
 Serial = SCUS-97230
 Name   = SOCOM - U.S. Navy SEALs (Online)
 Region = NTSC-U
+vuClampMode = 2 // Fixes bad shadows.
+GIFFIFOHack = 1 // Resolves random sprite/HUD corruption.
 ---------------------------------------------
 Serial = SCUS-97231
 Name   = Arc the Lad - Twilight of the Spirits
@@ -5093,8 +5101,8 @@ Serial = SCUS-97275
 Name   = SOCOM II - U.S. Navy SEALs
 Region = NTSC-U
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCUS-97276
 Name   = NFL GameDay 2004
@@ -5300,8 +5308,8 @@ Serial = SCUS-97366
 Name   = SOCOM II - U.S. Navy SEALs [Public Beta v1.0]
 Region = NTSC-U
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCUS-97367
 Name   = Neopets - The Darkest Faerie
@@ -5312,8 +5320,8 @@ Serial = SCUS-97368
 Name   = SOCOM II - U.S. Navy SEALs [Regular Demo]
 Region = NTSC-U
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCUS-97369
 Name   = ATV Off-Road Fury 2
@@ -5803,8 +5811,8 @@ Serial = SCUS-97511
 Name   = SOCOM II - U.S. Navy SEALs [Greatest Hits]
 Region = NTSC-U
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1// HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = SCUS-97512
 Name   = Gran Turismo 3 - A-Spec [Greatest Hits]
@@ -7052,7 +7060,7 @@ Serial = SLES-50212
 Name   = Paris-Dakar Rally
 Region = PAL-E
 Compat = 5
-SkipMPEGPatch = 1
+SkipMPEGHack = 1
 ---------------------------------------------
 Serial = SLES-50213
 Name   = NFL Quarterback Club 2002
@@ -8685,6 +8693,7 @@ Compat = 5
 Serial = SLES-50958
 Name   = Warhammer 40,000 - Firewarrior
 Region = PAL-M4
+XgKickHack = 1 // Fixes corrupted graphics.
 ---------------------------------------------
 Serial = SLES-50963
 Name   = Riding Spirits
@@ -9008,7 +9017,7 @@ Name   = Eggo Mania
 Region = PAL-M3
 Compat = 5
 [patches = 30b27954]
-	comment= patches by Nachbrenner
+	comment=Patches by Nachbrenner
 	// Skip IPU synchronisation.
 	patch=0,EE,00111100,word,00000000
 [/patches]
@@ -9185,7 +9194,23 @@ Name   = Harry Potter and the Chamber of Secrets
 Region = PAL-E
 Compat = 3
 [patches = C5473413]
-	// This disc has the same CRC as SLUS-20576, the NTSC-U disc.
+	// This disc has the same CRC as other PAL and NTSC discs.
+	comment=Patch by Prafull
+	// Fixes initial hanging.
+	patch=1,EE,002032bc,word,03e00008
+	// Load game quickly.
+	patch=1,EE,001f704c,word,1000000f
+	// Fixes ingame hang.
+	patch=1,EE,001f70b4,word,1000000f
+	// Fixes flickering graphics (Thanks to Kian Stevens for finding this).
+	patch=1,EE,80000000,word,00000000
+[/patches]
+---------------------------------------------
+Serial = SLES-51193
+Name   = Harry Potter et la Chambre des Secrets
+Region = PAL-F
+[patches = C5473413]
+	// This disc has the same CRC as other PAL and NTSC discs.
 	comment=Patch by Prafull
 	// Fixes initial hanging.
 	patch=1,EE,002032bc,word,03e00008
@@ -9198,16 +9223,52 @@ Compat = 3
 [/patches]
 ---------------------------------------------
 Serial = SLES-51194
-Name   = Harry Potter - Kammer D Schreckens
+Name   = Harry Potter und die Kammer des Schreckens
 Region = PAL-G
+[patches = C5473413]
+	// This disc has the same CRC as other PAL and NTSC discs.
+	comment=Patch by Prafull
+	// Fixes initial hanging.
+	patch=1,EE,002032bc,word,03e00008
+	// Load game quickly.
+	patch=1,EE,001f704c,word,1000000f
+	// Fixes ingame hang.
+	patch=1,EE,001f70b4,word,1000000f
+	// Fixes flickering graphics (Thanks to Kian Stevens for finding this).
+	patch=1,EE,80000000,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLES-51195
 Name   = Harry Potter y La Camara Secreta
 Region = PAL-S
+[patches = C5473413]
+	// This disc has the same CRC as other PAL and NTSC discs.
+	comment=Patch by Prafull
+	// Fixes initial hanging.
+	patch=1,EE,002032bc,word,03e00008
+	// Load game quickly.
+	patch=1,EE,001f704c,word,1000000f
+	// Fixes ingame hang.
+	patch=1,EE,001f70b4,word,1000000f
+	// Fixes flickering graphics (Thanks to Kian Stevens for finding this).
+	patch=1,EE,80000000,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLES-51196
 Name   = Harry Potter e La Camera dei Secreti
 Region = PAL-I
+[patches = C5473413]
+	// This disc has the same CRC as other PAL and NTSC discs.
+	comment=Patch by Prafull
+	// Fixes initial hanging.
+	patch=1,EE,002032bc,word,03e00008
+	// Load game quickly.
+	patch=1,EE,001f704c,word,1000000f
+	// Fixes ingame hang.
+	patch=1,EE,001f70b4,word,1000000f
+	// Fixes flickering graphics (Thanks to Kian Stevens for finding this).
+	patch=1,EE,80000000,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLES-51197
 Name   = FIFA 2003
@@ -9254,6 +9315,14 @@ Compat = 5
 Serial = SLES-51214
 Name   = 18 Wheeler - American Pro Trucker
 Region = PAL-Unk
+---------------------------------------------
+Serial = SLES-51217
+Name   = Harry Potter och Hemligheternas Kammare
+Region = PAL-SE
+---------------------------------------------
+Serial = SLES-51218
+Name   = Harry Potter en de Geheime Kamer
+Region = PAL-DU
 ---------------------------------------------
 Serial = SLES-51220
 Name   = Ty - The Tazmanian Tiger
@@ -9847,7 +9916,7 @@ Compat = 5
 	comment=patches by Nachbrenner
 	// Fix IPU busy!
 	patch=0,EE,003300b0,word,03e00008
-	patch=0,EE,003300b4,word,00000000 
+	patch=0,EE,003300b4,word,00000000
 [/patches]
 ---------------------------------------------
 Serial = SLES-51496
@@ -11299,7 +11368,7 @@ Compat = 5
 Serial = SLES-52230
 Name   = Muppets Party Cruise
 Region = PAL-Unk
-EETimingHack = 1		//Path 3 masking errors
+EETimingHack = 1 // Path 3 masking errors.
 ---------------------------------------------
 Serial = SLES-52237
 Name   = dot Hack - Part 1 - Infection
@@ -11602,7 +11671,7 @@ Serial = SLES-52378
 Name   = Euro Rally Champion
 Region = PAL-M5
 Compat = 5
-EETimingHack = 1		//For dmac errors and so 3d is visible and steady.
+EETimingHack = 1 // For dmac errors and so 3d is visible and steady.
 ---------------------------------------------
 Serial = SLES-52379
 Name   = Shrek 2
@@ -11713,7 +11782,9 @@ Name   = Harry Potter and the Prisoner of Azkaban
 Region = PAL-M7
 Compat = 3
 EETimingHack = 1 // Fixes ingame hangs.
-[patches = 51e019bc]
+[patches = 51E019BC]
+	comment=Patch by Prafull
+	// This disc has the same CRC as SLUS-20926, the NTSC-U disc.
 	// Fixes game hanging on loading screens.
 	patch=1,EE,0016cf8c,word,00000000
 	patch=1,EE,0013cd64,word,00000000
@@ -12071,6 +12142,7 @@ Region = PAL-E
 Serial = SLES-52573
 Name   = Conflict - Global Storm
 Region = PAL-M5
+eeRoundMode = 2 // Fixes abnormal character behaviour.
 ---------------------------------------------
 Serial = SLES-52576
 Name   = Yu-Gi-Oh! - Capsule Monster Colisee
@@ -13043,7 +13115,7 @@ Serial = SLES-52968
 Name   = Burnout 2 - Point of Impact
 Region = PAL-Unk
 Compat = 5
-vuRoundMode = 1		//bright lights in cars
+vuRoundMode = 1 // Bright lights in cars.
 ---------------------------------------------
 Serial = SLES-52973
 Name   = Ski Racing 2005
@@ -13298,7 +13370,7 @@ Compat = 5
 eeRoundMode = 0
 ---------------------------------------------
 Serial = SLES-53039
-Name   = Champions - Return to Arms	// aka "Champions of Norrath 2"
+Name   = Champions - Return to Arms // aka "Champions of Norrath 2"
 Region = PAL-M4
 Compat = 5
 // allows import of characters from first game
@@ -14803,7 +14875,7 @@ Region = PAL-R
 ---------------------------------------------
 Serial = SLES-53743
 Name   = Disney's Chicken Little
-Region = PAL-M3	// Scandinavia
+Region = PAL-M3 // Scandinavia
 ---------------------------------------------
 Serial = SLES-53744
 Name   = Disney's Chicken Little
@@ -15296,6 +15368,12 @@ Region = PAL-E-F
 Serial = SLES-53984
 Name   = Ice Age 2 - The Meltdown
 Region = PAL-M6
+[patches = 2EC49E65]
+	comment=Patch by Kozarovv
+	// Intro screen freeze fix.
+	patch=1,EE,002FF3F0,word,27BDFEE0
+	patch=1,EE,002FF42C,word,27BD0120
+[/patches]
 ---------------------------------------------
 Serial = SLES-53987
 Name   = Over the Hedge
@@ -15370,7 +15448,7 @@ Region = PAL-E
 ---------------------------------------------
 Serial = SLES-54015
 Name   = Disney-Pixar's Cars
-Region = PAL-M3	// DA, FI & NO
+Region = PAL-M3 // DA, FI & NO
 ---------------------------------------------
 Serial = SLES-54016
 Name   = AND 1 Streetball
@@ -15531,7 +15609,7 @@ Serial = SLES-54115
 Name   = Delta Force - Black Hawk Down - Team Sabre
 Region = PAL-M5
 Compat = 5
-EETimingHack = 1	//missing text
+EETimingHack = 1 // Missing text.
 ---------------------------------------------
 Serial = SLES-54116
 Name   = Operation Winback 2 - Project Poseidon
@@ -15737,11 +15815,6 @@ Compat = 5
 	comment=- This gamedisc supports multiple languages.
 	comment=- Language selection is done through the BIOS configuration.
 	comment=- Implementation requires Full boot - "Boot CDVD (full)".
-	//
-	// Override sceScfGetLanguage patches by nachbrenner:
-	//  patch=0,EE,002486d8,word,24020000 // japanese
-	//  patch=0,EE,002486d8,word,24020001 // english
-	//  patch=0,EE,002486d8,word,24020004 // german
 [/patches]
 ---------------------------------------------
 Serial = SLES-54186
@@ -15893,7 +15966,7 @@ Region = PAL-P-S
 ---------------------------------------------
 Serial = SLES-54244
 Name   = FIFA '07
-Region = PAL-M5	// DU & Nordic
+Region = PAL-M5 // DU & Nordic
 ---------------------------------------------
 Serial = SLES-54245
 Name   = NHL '07
@@ -16050,7 +16123,7 @@ Region = PAL-M3
 ---------------------------------------------
 Serial = SLES-54344
 Name   = Bratz - Forever Diamondz
-Region = PAL-M3	// Eng, DA & SE
+Region = PAL-M3 // Eng, DA & SE
 ---------------------------------------------
 Serial = SLES-54346
 Name   = Heatseeker
@@ -16228,15 +16301,15 @@ Region = PAL-M5
 ---------------------------------------------
 Serial = SLES-54424
 Name   = Dr. Dolittle
-Region = PAL-M7	// P, PL & Nordic
+Region = PAL-M7 // P, PL & Nordic
 ---------------------------------------------
 Serial = SLES-54426
 Name   = Casper and The Ghostly Trio
-Region = PAL-M7	// P, PL & Nordic
+Region = PAL-M7 // P, PL & Nordic
 ---------------------------------------------
 Serial = SLES-54427
 Name   = Jumanji
-Region = PAL-M6	// Eng, P & Nordic
+Region = PAL-M6 // Eng, P & Nordic
 ---------------------------------------------
 Serial = SLES-54430
 Name   = Teen Titans
@@ -16456,7 +16529,7 @@ Compat = 5
 ---------------------------------------------
 Serial = SLES-54542
 Name   = Xena - Warrior Princess
-Region = PAL-M6	// Eng, P & Nordic
+Region = PAL-M6 // Eng, P & Nordic
 ---------------------------------------------
 Serial = SLES-54544
 Name   = Gun Club
@@ -17588,7 +17661,7 @@ Region = PAL-E
 ---------------------------------------------
 Serial = SLES-55395
 Name   = Disney TH!NK Fast
-Region = PAL-M3	// DU, FR & GE
+Region = PAL-M3 // DU, FR & GE
 ---------------------------------------------
 Serial = SLES-55398
 Name   = Disney High School Musical 3 - Senior Year Dance!
@@ -17608,7 +17681,7 @@ Region = PAL-M5
 ---------------------------------------------
 Serial = SLES-55430
 Name   = Disney Bolt
-Region = PAL-M3	// DU, FR & GE
+Region = PAL-M3 // DU, FR & GE
 ---------------------------------------------
 Serial = SLES-55431
 Name   = Disney Vol't
@@ -17801,7 +17874,7 @@ Region = PAL-F-G
 ---------------------------------------------
 Serial = SLES-55583
 Name   = FIFA 10
-Region = PAL-M4	// Eng & Scandinavia
+Region = PAL-M4 // Eng & Scandinavia
 Compat = 5
 ---------------------------------------------
 Serial = SLES-55584
@@ -18030,7 +18103,7 @@ Name   = Onimusha - Dawn of Dreams [Disc1]
 Region = PAL-M5
 Compat = 5
 [patches = 812C5A96]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -18040,7 +18113,7 @@ Region = PAL-M5
 Compat = 5
 MemCardFilter = SLES-82038
 [patches = 812C5A96]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -18370,8 +18443,8 @@ eeRoundMode = 0 // Ladder glitch in "Assembly of Nihilo B11" level.
 Serial = SLKA-25165
 Name   = Mobile Suit Gundam - Seed Destiny - Rengou vs. Z.A.F.T. II Plus
 Region = NTSC-K
-eeRoundMode = 1 // Fix camera issue
-FpuNegDivHack = 1 // Fix target loss issue
+eeRoundMode = 1 // Fixes camera issue.
+FpuNegDivHack = 1 // Fixes target loss issue.
 ---------------------------------------------
 Serial = SLKA-25166
 Name   = Sengoku Musou
@@ -18389,6 +18462,22 @@ Serial = SLKA-25171
 Name   = Guon
 Region = NTSC-K
 Compat = 5
+---------------------------------------------
+Serial = SLKA-25172
+Name   = Harry Potter and The Prisoner of Azkaban
+Region = NTSC-K
+[patches = 99A8B4FF]
+	comment=Patch by Prafull and Arapapa
+	// Fixes game hanging on loading screens.
+	// EETimingHack may be needed.
+	patch=1,EE,0016cf8c,word,00000000
+	patch=1,EE,0013cd64,word,00000000
+	patch=1,EE,0013c1a8,word,00000000
+	patch=1,EE,0013c1cc,word,00000000
+	patch=1,EE,80000000,word,00000000
+	patch=1,EE,0013df84,word,00000000
+	patch=1,EE,0013cd3c,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLKA-25175
 Name   = Transformers
@@ -19716,6 +19805,10 @@ Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-62239
 Name   = Supercar Street Challenge
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPM-62241
+Name   = Harry Potter to Himitsu no Heya
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-62244
@@ -21554,6 +21647,10 @@ Name   = Guilty Gear X Plus "By Your Side"
 Region = NTSC-K
 Compat = 5
 ---------------------------------------------
+Serial = SLPM-64528
+Name   = Harry Potter and the Chamber of Secrets
+Region = NTSC-K
+---------------------------------------------
 Serial = SLPM-64549
 Name   = Shikigami no Shiro
 Region = NTSC-K
@@ -21799,7 +21896,7 @@ Region = NTSC-J
 	// Fixes the hang at start of chapter 2.
 	patch=1,EE,002a140c,word,00000000
 	patch=1,EE,002a120c,word,00000000
-[/patches]	
+[/patches]
 ---------------------------------------------
 Serial = SLPM-65072
 Name   = ESPN Winter X-Games Snowboarding 2002
@@ -23668,8 +23765,20 @@ Name   = Pizzicato Polka
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-65612
-Name   = Harry Potter and The Prisoner of Azkaban
+Name   = Harry Potter to Azkaban no Shuujin
 Region = NTSC-J
+[patches = A8901AD6]
+	comment=Patch by Prafull and Arapapa
+	// Fixes game hanging on loading screens.
+	// EETimingHack may be needed.
+	patch=1,EE,0016cf5c,word,00000000
+	patch=1,EE,0013cd34,word,00000000
+	patch=1,EE,0013c178,word,00000000
+	patch=1,EE,0013c19c,word,00000000
+	patch=1,EE,80000000,word,00000000
+	patch=1,EE,0013df54,word,00000000
+	patch=1,EE,0013cd0c,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLPM-65613
 Name   = Yu-Gi-Oh! Capsule Monster Coliseum
@@ -23678,7 +23787,7 @@ Region = NTSC-J
 Serial = SLPM-65614
 Name   = Need for Speed Underground [EA Best Hits]
 Region = NTSC-J
-EETimingHack = 1	//broken textures
+EETimingHack = 1 // Broken textures.
 ---------------------------------------------
 Serial = SLPM-65615
 Name   = Dokapon DX
@@ -26127,7 +26236,7 @@ Name   = Shin Onimusha - Dawn of Dreams [Disc1of2]
 Region = NTSC-J
 Compat = 5
 [patches = BD17248E]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -26137,7 +26246,7 @@ Region = NTSC-J
 Compat = 2
 MemCardFilter = SLPM-66275
 [patches = BD17248E]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -26322,7 +26431,8 @@ Region = NTSC-J
 Serial = SLPM-66329
 Name   = Mahou Sensei Negima! Kagai Jugyou
 Region = NTSC-J
-Compat = 5	// GS Software rendering only. VU XGkick Hack fixes some rendering problem.
+Compat = 5 // GS Software rendering only.
+XgKickHack = 1 // Fixes rendering problems.
 ---------------------------------------------
 Serial = SLPM-66330
 Name   = Tokimeki Memorial - Girl's Side - 2nd Kiss
@@ -29795,7 +29905,7 @@ Name   = Chulip
 Region = NTSC-J
 Compat = 5
 ---------------------------------------------
-Serial = SLPS-20234 
+Serial = SLPS-20234
 Name   = Harry Potter to Himitsu no Heya
 Region = NTSC-J
 [patches = E1963055]
@@ -30941,13 +31051,8 @@ Serial = SLPS-25100
 Name   = Tekken 4
 Region = NTSC-J
 Compat = 5
-[patches = 26173F9A]
-	comment=patches by Shadow Lady
-	// IPU BUSY! fix...
-	patch=0,EE,00291764,word,24200001
-	patch=0,EE,00291964,word,00000000
-[/patches]
-[patches = 7c359c94]
+[patches]
+	// CRC 26173F9A, 7c359c94
 	comment=patches by Shadow Lady
 	// IPU BUSY! fix...
 	patch=0,EE,00291764,word,24200001
@@ -32086,7 +32191,7 @@ Region = NTSC-J
 Serial = SLPS-25425
 Name   = SD Gundam Force Daikessen!
 Region = NTSC-J
-eeClampMode = 2		//Needed for SPS on some characters
+eeClampMode = 2 // Needed for SPS on some characters.
 ---------------------------------------------
 Serial = SLPS-25426
 Name   = Detective Conan - Inheritance of Britain
@@ -33203,6 +33308,7 @@ Serial = SLPS-25710
 Name   = K-1 World Grand Prix 2006
 Region = NTSC-J
 Compat = 4
+XgKickHack = 1 // Fixes grey fighters problem.
 ---------------------------------------------
 Serial = SLPS-25711
 Name   = Kashimashi! Girl Meets Girl [Best Collection]
@@ -33490,6 +33596,8 @@ Region = NTSC-J
 Serial = SLPS-25784
 Name   = Another Century's Episode 3 - The Final
 Region = NTSC-J
+eeClampMode = 3 // The game won't freeze on mission 2 loading.
+vuClampMode = 3 // The game won't freeze on mission 2 loading.
 ---------------------------------------------
 Serial = SLPS-25786
 Name   = Hisshou Pachinko-Pachislot Kouryoku Series Vol.10 - CR Shinseiki Evangelion - Kiseki no Hachi Ha
@@ -33767,7 +33875,7 @@ Region = NTSC-J
 Serial = SLPS-25854
 Name   = Poison Pink
 Region = NTSC-J
-eeClampMode = 0		//in-game background visible
+eeClampMode = 0 // In-game background visible.
 ---------------------------------------------
 Serial = SLPS-25855
 Name   = Battle of Sunrise
@@ -36511,7 +36619,7 @@ Serial = SLUS-20497
 Name   = Burnout 2 - Point of Impact
 Region = NTSC-U
 Compat = 5
-vuRoundMode = 1	// Bright lights in cars.
+vuRoundMode = 1 // Bright lights in cars.
 ---------------------------------------------
 Serial = SLUS-20498
 Name   = Auto Modellista
@@ -36536,7 +36644,7 @@ Serial = SLUS-20504
 Name   = Tony Hawk's Pro Skater 4
 Region = NTSC-U
 Compat = 5
-vuRoundMode = 0	// Crashes without.
+vuRoundMode = 0 // Crashes without.
 ---------------------------------------------
 Serial = SLUS-20505
 Name   = Mace Griffin - Bounty Hunter
@@ -36869,7 +36977,7 @@ Name   = Harry Potter and The Chamber of Secrets
 Region = NTSC-U
 Compat = 2
 [patches = C5473413]
-	// This disc has the same CRC as SLES-51192, the PAL-E disc.
+	// This disc has the same CRC as other PAL and NTSC discs.
 	comment=Patch by Prafull
 	// Fixes initial hanging.
 	patch=1,EE,002032bc,word,03e00008
@@ -36965,6 +37073,7 @@ Compat = 5
 Serial = SLUS-20597
 Name   = Warhammer 40K - Fire Warrior
 Region = NTSC-U
+XgKickHack = 1 // Fixes corrupted graphics.
 Compat = 5
 ---------------------------------------------
 Serial = SLUS-20598
@@ -37133,7 +37242,7 @@ Serial = SLUS-20635
 Name   = Muppets Party Cruise, Jim Henson's
 Region = NTSC-U
 Compat = 5
-EETimingHack = 1		//Path 3 masking errors
+EETimingHack = 1 // Path 3 masking errors.
 ---------------------------------------------
 Serial = SLUS-20636
 Name   = Suffering, The
@@ -37719,11 +37828,8 @@ Serial = SLUS-20759
 Name   = Growlanser Generations [Disc2of2]
 Region = NTSC-U
 Compat = 5
-[patches = 4AD529BB]
-	comment=IPU freeze fix
-	patch=0,EE,00109d04,word,00000000
-[/patches]
-[patches = 4CD3663F]
+[patches]
+	// CRC 4AD529BB, 4CD3663F
 	comment=IPU freeze fix
 	patch=0,EE,00109d04,word,00000000
 [/patches]
@@ -38522,6 +38628,19 @@ Compat = 2
 Serial = SLUS-20926
 Name   = Harry Potter and The Prisoner of Azkaban
 Region = NTSC-U
+[patches = 51E019BC]
+	comment=Patch by Prafull
+	// This disc has the same CRC as SLES-52440, the PAL-M7 disc.
+	// Fixes game hanging on loading screens.
+	// EETimingHack may be needed.
+	patch=1,EE,0016cf8c,word,00000000
+	patch=1,EE,0013cd64,word,00000000
+	patch=1,EE,0013c1a8,word,00000000
+	patch=1,EE,0013c1cc,word,00000000
+	patch=1,EE,80000000,word,00000000
+	patch=1,EE,0013df84,word,00000000
+	patch=1,EE,0013cd3c,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLUS-20927
 Name   = Time Crisis - Crisis Zone
@@ -39729,12 +39848,13 @@ Compat = 5
 	comment=Patch by Prafull
 	// Fix hang at shipping shed.
 	patch=1,EE,002bdb1c,word,00000000
-[/patches]	
+[/patches]
 ---------------------------------------------
 Serial = SLUS-21172
 Name   = Conflict - Global Terror
 Region = NTSC-U
 Compat = 5
+eeRoundMode = 2 // Fixes abnormal character behaviour.
 ---------------------------------------------
 Serial = SLUS-21173
 Name   = Dora the Explorer - To the Purple Planet
@@ -39774,7 +39894,7 @@ Name   = Onimusha - Dawn of Dreams [Disc1]
 Region = NTSC-U
 Compat = 5
 [patches = FE44479E]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -40425,6 +40545,12 @@ Serial = SLUS-21307
 Name   = Ice Age 2 - The Meltdown
 Region = NTSC-U
 Compat = 2
+[patches = EEC195CA]
+	comment=Patch by Kozarovv
+	// Intro screen freeze fix.
+	patch=1,EE,002FEB80,word,27bdfee0
+	patch=1,EE,002FEBBC,word,27bd0120
+[/patches]
 ---------------------------------------------
 Serial = SLUS-21309
 Name   = Let's Ride - Silver Buckle Stables
@@ -40463,7 +40589,7 @@ EETimingHack = 1 // Needed to going ingame.
 	patch=1,EE,00291150,word,00000000
 	patch=1,EE,00291dcc,word,00000000
 	patch=1,EE,00296750,word,00000000
-[/patches]	
+[/patches]
 ---------------------------------------------
 Serial = SLUS-21315
 Name   = 50cent - Bulletproof
@@ -40718,7 +40844,7 @@ Region = NTSC-U
 Compat = 5
 MemCardFilter = SLUS-21180
 [patches = FFDE85E9]
-	comment= patch by Shadow Lady
+	comment=Patch by Shadow Lady
 	patch=0,EE,00104170,word,00000000
 [/patches]
 ---------------------------------------------
@@ -41109,6 +41235,7 @@ Serial = SLUS-21439
 Name   = Destroy All Humans! 2
 Region = NTSC-U
 Compat = 5
+eeClampMode = 3 // Fixes material stretching across screen that appears for a split second.
 ---------------------------------------------
 Serial = SLUS-21440
 Name   = LarryBoy and the Bad Apple
@@ -43585,6 +43712,7 @@ Region = NTSC-U
 Serial = SLUS-29049
 Name   = Warhammer 40,000 - Fire Warrior [Demo]
 Region = NTSC-U
+XgKickHack = 1 // Fixes corrupted graphics.
 ---------------------------------------------
 Serial = SLUS-29050
 Name   = Everquest Online Adventures [Regular Demo]
@@ -43789,7 +43917,7 @@ Name   = Konami Preview Disc
 Region = NTSC-U
 ---------------------------------------------
 Serial = SLUS-29126
-Name   = Champions - Return to Arms [Demo]	// aka "Champions of Norrath 2 [Demo]"
+Name   = Champions - Return to Arms [Demo] // aka "Champions of Norrath 2 [Demo]"
 Region = NTSC-U
 Compat = 4
 ---------------------------------------------
@@ -44000,8 +44128,8 @@ Serial = TCES-51904
 Name   = SOCOM II - U.S. Navy SEALs [Beta]
 Region = PAL-M5
 Compat = 5
-EETimingHack = 1
-VIF1StallHack = 1 // HUD.
+EETimingHack = 1 // Get rids of DMA8/9 non-fatal errors.
+VIF1StallHack = 1 // Fixes broken HUD.
 ---------------------------------------------
 Serial = TCES-53286
 Name   = Jak X Beta Trial Code
