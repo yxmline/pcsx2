@@ -220,9 +220,6 @@ SaveStateBase& SaveStateBase::FreezeInternals()
 	FreezeTag( "IOP-Subsystems" );
 	FreezeMem(iopMem->Sif, sizeof(iopMem->Sif));		// iop's sif memory (not really needed, but oh well)
 
-#ifdef ENABLE_NEW_IOPDMA
-	iopDmacFreeze();
-#endif
 	psxRcntFreeze();
 	sioFreeze();
 	sio2Freeze();
@@ -232,6 +229,8 @@ SaveStateBase& SaveStateBase::FreezeInternals()
 	// technically this is HLE BIOS territory, but we don't have enough such stuff
 	// to merit an HLE Bios sub-section... yet.
 	deci2Freeze();
+
+	InputRecordingFreeze();
 
 	if( IsLoading() )
 		PostLoadPrep();

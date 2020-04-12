@@ -27,7 +27,8 @@ InstallDir "$PROGRAMFILES\PCSX2 ${APP_VERSION}"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
-; RequestExecutionLevel is admin for the full install, so we need to avoid transferring the elevated rights to the child process.
+; RequestExecutionLevel is admin for the full install, so we need to avoid transferring the elevated rights to PCSX2
+; if the user chooses to run from the installer upon completion.
 !define MUI_FINISHPAGE_RUN "$WINDIR\explorer.exe"
 !define MUI_FINISHPAGE_RUN_PARAMETERS "$INSTDIR\pcsx2.exe"
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW ModifyRunCheckbox
@@ -55,13 +56,14 @@ SectionEnd
 
 Section ""
 
- ; Write the installation path into the registry
+; Write the installation path into the registry
   WriteRegStr HKLM Software\PCSX2 "Install_Dir" "$INSTDIR"
   ; Write the uninstall keys for Windows
   WriteRegStr   HKLM "${INSTDIR_REG_KEY}"  "DisplayName"      "PCSX2 - Playstation 2 Emulator"
   WriteRegStr   HKLM "${INSTDIR_REG_KEY}"  "Publisher"        "PCSX2 Team"
   WriteRegStr   HKLM "${INSTDIR_REG_KEY}"  "DisplayIcon"      "$INSTDIR\pcsx2.exe"
   WriteRegStr   HKLM "${INSTDIR_REG_KEY}"  "DisplayVersion"   "${APP_VERSION}"
+  WriteRegStr   HKLM "${INSTDIR_REG_KEY}"  "HelpLink"         "https://forums.pcsx2.net"
   ${GetSize} "$INSTDIR" "/S=0K" $6 $7 $8
   IntFmt $6 "0x%08X" $6
   WriteRegDWORD HKLM "${INSTDIR_REG_KEY}"  "EstimatedSize"    "$6"
@@ -69,11 +71,13 @@ Section ""
   WriteRegDWORD HKLM "${INSTDIR_REG_KEY}"  "NoModify" 1
   WriteRegDWORD HKLM "${INSTDIR_REG_KEY}"  "NoRepair" 1
   WriteUninstaller "${UNINST_EXE}"
+  RMDir /r "$TEMP\PCSX2_installer_temp"
 SectionEnd
 
 Section "" SID_PCSX2
 SectionEnd
 
+; Gives the user a fancy checkbox to run PCSX2 right from the installer!
 Function ModifyRunCheckbox
 ${IfNot} ${SectionIsSelected} ${SID_PCSX2}
     SendMessage $MUI.FINISHPAGE.RUN ${BM_SETCHECK} ${BST_UNCHECKED} 0

@@ -24,9 +24,12 @@
   * Pragmatically, event handing's going in here too.
   */
 
+#include "keyboard.h"
+
+#if defined(__unix__)
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
-#include "keyboard.h"
+#endif
 
 #ifdef _WIN32
 char *KeysymToChar(int keysym)
@@ -218,24 +221,16 @@ void PollForX11KeyboardInput()
     XEvent E = {0};
 
     // Keyboard input send by PCSX2
-    while (!ev_fifo.empty())
-    {
-        AnalyzeKeyEvent(ev_fifo.front());
-        pthread_spin_lock(&mutex_KeyEvent);
-        ev_fifo.pop();
-        pthread_spin_unlock(&mutex_KeyEvent);
-    }
+    g_ev_fifo.consume_all(AnalyzeKeyEvent);
 
     // keyboard input
-    while (XPending(GSdsp) > 0)
-    {
+    while (XPending(GSdsp) > 0) {
         XNextEvent(GSdsp, &E);
 
         // Change the format of the structure to be compatible with GSOpen2
         // mode (event come from pcsx2 not X)
         evt.evt = E.type;
-        switch (E.type)
-        {
+        switch (E.type) {
             case MotionNotify:
                 evt.key = (E.xbutton.x & 0xFFFF) | (E.xbutton.y << 16);
                 break;
@@ -276,7 +271,10 @@ bool PollX11KeyboardMouseEvent(u32 &pkey)
 LRESULT WINAPI PADwndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     static bool lbutton = false, rbutton = false;
-    key_status->keyboard_state_acces(cpad);
+    for (int pad = 0; pad < GAMEPAD_NUMBER; ++pad)
+    {
+        key_status->keyboard_state_acces(pad);
+    }
 
     switch (msg)
     {

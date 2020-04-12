@@ -36,6 +36,8 @@
 //#define SAVESLOT_LOGS
 #endif
 
+extern wxString DiscSerial;
+
 class Saveslot
 {
 public:
@@ -43,6 +45,7 @@ public:
 	bool empty;
 	wxDateTime updated;
 	u32 crc;
+	wxString serialName;
 	bool menu_update, invalid_cache;
 
 	Saveslot()
@@ -50,7 +53,8 @@ public:
 		slot_num = 0;
 		empty = true;
 		updated = wxInvalidDateTime;
-		crc = ElfCRC;
+		crc = 0;
+		serialName = L"";
 		menu_update = false;
 		invalid_cache = true;
 	}
@@ -60,7 +64,8 @@ public:
 		slot_num = i;
 		empty = true;
 		updated = wxInvalidDateTime;
-		crc = ElfCRC;
+		crc = 0;
+		serialName =  L"";
 		menu_update = false;
 		invalid_cache = true;
 	}
@@ -82,6 +87,7 @@ public:
 		empty = !isUsed();
 		updated = GetTimestamp();
 		crc = ElfCRC;
+		serialName = DiscSerial;
 		invalid_cache = false;
 	}
 
