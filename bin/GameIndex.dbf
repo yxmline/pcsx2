@@ -70,8 +70,9 @@
 -- VIF1StallHack     = 1 // SOCOM II HUD and Spy Hunter loading hang.
 -- GIFFIFOHack       = 1 // Enables the GIF FIFO. Needed for Wallace & Grommit, Hot Wheels, DJ Hero.
 -- FMVinSoftwareHack = 1 // Silent Hill 2-3. Fixes FMVs that are obscured when using hardware rendering by switching to software rendering while an FMV plays.
+-- GoemonTlbHack     = 1 // Preload TLB hack to avoid tlb miss on Goemon.
 -- ScarfaceIbitHack  = 1 // VU I bit Hack avoid constant recompilation (Scarface The World Is Yours).
-
+-- CrashTagTeamRacingIbit  = 1 // VU I bit Hack avoid constant recompilation (Crash Tag Team Racing).
 ---------------------------------------------
 -- Speed Hacks (SpeedHackName = <value>)
 ---------------------------------------------
@@ -803,6 +804,7 @@ Region = NTSC-Unk
 Serial = SCAJ-20144
 Name   = Saru Gechu 3 (Ape Escape 3)
 Region = NTSC-Ch-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SCAJ-20145
 Name   = Tales of Legendia
@@ -903,6 +905,7 @@ XgKickHack = 1 // SPS.
 Serial = SCAJ-20168
 Name   = Rule of Rose
 Region = NTSC-Unk
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SCAJ-20169
 Name   = Dirge of Cerberus - Final Fantasy VII
@@ -3767,6 +3770,7 @@ Serial = SCPS-15093
 Name   = Rule of Rose
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SCPS-15094
 Name   = EyeToy - Play 2 [Game Only]
@@ -19461,12 +19465,20 @@ Serial = SLPM-55033
 Name   = J. League Winning Eleven 2008 - Club Championship
 Region = NTSC-J
 ---------------------------------------------
+Serial = SLPM-55041
+Name   = Kanokon - Esuii
+Region = NTSC-J
+---------------------------------------------
 Serial = SLPM-55063
 Name   = Hakuouki [Limited Edition]
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-55064
 Name   = Hakuouki
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPM-55065
+Name   = Kamiyo Gakuen Makorouku Kurunugia
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-55081
@@ -19551,6 +19563,10 @@ Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-55208
 Name   = Hakuouki - Zuisouroku
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPM-55217
+Name   = Shin Hisui no Shizuku - Hiiro no Kakera 2
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-55226
@@ -19935,6 +19951,10 @@ Serial = SLPM-62092
 Name   = XG3 Extreme G Racing
 Region = NTSC-J
 ---------------------------------------------
+Serial = SLPM-62093
+Name   = Simple 2000 Series Ultimate Vol. 1 - Love Smash!
+Region = NTSC-J
+---------------------------------------------
 Serial = SLPM-62094
 Name   = Simple 2000 Series Vol. 2 - The Party Game
 Region = NTSC-J
@@ -20233,6 +20253,7 @@ Region = NTSC-J
 Serial = SLPM-62209
 Name   = Gigantic Drive
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-62211
 Name   = 18 Wheeler
@@ -21013,6 +21034,7 @@ Serial = SLPM-62462
 Name   = Gradius V
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-62463
 Name   = Loop Sequencer - Music Generator
@@ -21322,6 +21344,7 @@ Region = NTSC-J
 Serial = SLPM-62543
 Name   = Simple 2000 Series Vol.65 - The Kyonshi Panic
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-62544
 Name   = Simple 2000 Series Vol.19 - Akagi Yama ni Oritattatensai
@@ -21997,6 +22020,7 @@ Serial = SLPM-62727
 Name   = Spectral vs. Generation
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-62729
 Name   = Oretachi Geasen Zoku Sono Vol.15 - Akumajou Dracula
@@ -22166,6 +22190,7 @@ Compat = 5
 Serial = SLPM-62784
 Name   = Kao no nai Tsuki Select Story
 Region = NTSC-J
+Compat = 5
 ---------------------------------------------
 Serial = SLPM-64502
 Name   = Winback
@@ -22400,6 +22425,7 @@ Serial = SLPM-65053
 Name   = Shin Sangoku Musou 2
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65054
 Name   = Princess Abarenbou
@@ -23026,7 +23052,7 @@ Name   = Galaxy Angel
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-65255
-Name   = Chobits
+Name   = Chobits - Chiidake no Hito
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-65256
@@ -23208,10 +23234,12 @@ MemCardFilter = SLPM-65073/SLPM-65074/SLPM-65305/SLPM-65694/SLPM-86168/SLPM-8638
 Serial = SLPM-65306
 Name   = Sakura Yuki Gekka [Limited Edition]
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65307
 Name   = Sakura Yuki Gekka
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65308
 Name   = Shutokou Battle 01
@@ -23589,6 +23617,7 @@ Serial = SLPM-65411
 Name   = Onimusha Buraiden
 Region = NTSC-J
 Compat = 5
+VIF1StallHack = 1
 MemCardFilter = SLPM-65411/SLPM-65413
 ---------------------------------------------
 Serial = SLPM-65412
@@ -23598,6 +23627,7 @@ Region = NTSC-J
 Serial = SLPM-65413
 Name   = Onimusha 3
 Region = NTSC-J
+FMVinSoftwareHack = 1
 MemCardFilter = SLPM-65411/SLPM-65413
 ---------------------------------------------
 Serial = SLPM-65414
@@ -23644,6 +23674,7 @@ Region = NTSC-J
 Serial = SLPM-65425
 Name   = Moekko Company
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65426
 Name   = Pro Baseball Team Tsukuro! 2003
@@ -23829,6 +23860,7 @@ Serial = SLPM-65478
 Name   = Final Fantasy X-2 International
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65479
 Name   = Sims, The - Bustin' Out
@@ -24301,10 +24333,12 @@ Compat = 5
 Serial = SLPM-65607
 Name   = 3LDK - Shiawase ni Narouyo [Limited Edition]
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65608
 Name   = 3LDK - Shiawase ni Narouyo
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65609
 Name   = Memories Off... - Sorekara [Limited Edition]
@@ -24781,6 +24815,7 @@ Serial = SLPM-65732
 Name   = Akaiito
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65734
 Name   = Kita He - Diamond Dust [Hudson The Best]
@@ -24954,6 +24989,7 @@ Region = NTSC-J
 Serial = SLPM-65778
 Name   = Sega Ages 2500 Series Vol.18 - Dragon Force
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65779
 Name   = Exciting Pro Wrestling 5 [Yuke's the Best]
@@ -25588,6 +25624,7 @@ Region = NTSC-J
 Serial = SLPM-65945
 Name   = Red Ninja - End of Honor
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-65946
 Name   = Beatmania IIDX - 9th Style
@@ -25714,11 +25751,25 @@ Serial = SLPM-65976
 Name   = Grandia III [Disc1of2]
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
+[patches]
+   comment=Disable External Shaders and FXAA before the game starts. 
+   comment=FMVinSoftwareHack doesn't work in dx9/dx10/dx11 with External Shaders and FXAA.
+   comment=They cause the pcsx2 to crash and the process freeze.
+   comment=FMVinSoftwareHack works only in OpenGL with External Shaders and FXAA, only this game.
+[/patches]
 ---------------------------------------------
 Serial = SLPM-65977
 Name   = Grandia III [Disc2of2]
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
+[patches]
+   comment=Disable External Shaders and FXAA before the game starts. 
+   comment=FMVinSoftwareHack doesn't work in dx9/dx10/dx11 with External Shaders and FXAA.
+   comment=They cause the pcsx2 to crash and the process freeze.
+   comment=FMVinSoftwareHack works only in OpenGL with External Shaders and FXAA, only this game.
+[/patches]
 MemCardFilter = SLPM-65976
 ---------------------------------------------
 Serial = SLPM-65978
@@ -27055,6 +27106,7 @@ Region = NTSC-J
 Serial = SLPM-66343
 Name   = Shin Sangoku Musou 4 - Empires
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-66347
 Name   = Harukanaru Jikuu no Kade 3 - Unmei no Meikyuu [Premium Box]
@@ -27097,6 +27149,7 @@ Region = NTSC-J
 Serial = SLPM-66358
 Name   = Shinobido Takumi
 Region = NTSC-J
+eeClampMode = 3
 ---------------------------------------------
 Serial = SLPM-66359
 Name   = Mutsuzaki Hoshi Kikari
@@ -27925,6 +27978,10 @@ Serial = SLPM-66585
 Name   = Elvandia Story
 Region = NTSC-J
 Compat = 5
+eeRoundMode = 0
+vuRoundMode = 0
+eeClampMode = 3
+vuClampMode = 3
 ---------------------------------------------
 Serial = SLPM-66586
 Name   = Karutagura - Tamashii no Kunou [2800 Collection]
@@ -29332,10 +29389,12 @@ Region = NTSC-J
 Serial = SLPM-66958
 Name   = Aoishiro [Limited Edition]
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-66959
 Name   = Aoishiro
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPM-66960
 Name   = Need for Speed - Underground 2 [EA-SY! 1980]
@@ -32078,10 +32137,12 @@ Region = NTSC-J
 Serial = SLPS-25227
 Name   = Super Robot Wars - Alpha 2nd [Limited Edition]
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25228
 Name   = Super Robot Wars - Alpha 2nd
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25230
 Name   = Soul Calibur II
@@ -32230,6 +32291,8 @@ Region = NTSC-J
 Serial = SLPS-25267
 Name   = Summon Night 3
 Region = NTSC-J
+Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25270
 Name   = Sunrise World War
@@ -32651,6 +32714,7 @@ Region = NTSC-J
 Serial = SLPS-25383
 Name   = Digimon Battle Chronicle
 Region = NTSC-J
+FpuCompareHack = 1
 ---------------------------------------------
 Serial = SLPS-25384
 Name   = Tenchu Kurenai
@@ -33245,6 +33309,7 @@ Serial = SLPS-25533
 Name   = Tales of Legendia
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25534
 Name   = Twinkle Star Sprites - La Petite Princesse
@@ -33259,10 +33324,12 @@ Serial = SLPS-25537
 Name   = Super Robot Wars - Alpha 3
 Region = NTSC-J
 Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25538
 Name   = Super Robot Wars - Alpha [Premium Pack]
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25539
 Name   = School Rumble [Limited Edition]
@@ -33937,6 +34004,7 @@ Region = NTSC-J
 Serial = SLPS-25704
 Name   = Summon Night 4
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25708
 Name   = Zero no Tsukaima [Limited Edition]
@@ -34478,6 +34546,10 @@ Region = NTSC-J
 Compat = 5
 FpuMulHack = 1
 MemCardFilter = SLPS-25841/SLPS-25842/SLPS-25715
+[patches = 8409FD51]
+   //Tales of Destiny Director's Cut FMV FIX
+   patch=0,EE,001B4858,word,00000000
+[/patches]
 ---------------------------------------------
 Serial = SLPS-25843
 Name   = Tir-Na-Nog
@@ -34594,6 +34666,7 @@ Compat = 5
 Serial = SLPS-25887
 Name   = Super Robot Taisen Z
 Region = NTSC-J
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25888
 Name   = Star Wars - The Force Unleashed
@@ -34623,6 +34696,10 @@ Region = NTSC-J
 ---------------------------------------------
 Serial = SLPS-25898
 Name   = Zero no Tsukaima - Maigo no Period to Ikusen no Symphony
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPS-25902
+Name   = Junjou Romanchika - Koi no Doki Doki Daisakusen
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPS-25905
@@ -34663,6 +34740,10 @@ Serial = SLPS-25935
 Name   = The King of Fighters '98 Ultimate Match (NeoGeo Online Collection the Best)
 Region = NTSC-J
 ---------------------------------------------
+Serial = SLPS-25941
+Name   = SD Gundam G Generation Wars
+Region = NTSC-J
+---------------------------------------------
 Serial = SLPS-25944
 Name   = Kamen Rider Climax Heroes
 Region = NTSC-J
@@ -34671,6 +34752,13 @@ Compat = 5
 Serial = SLPS-25947
 Name   = Summon Night Gran-These: Horobi no Ken to Yakusoku no Kishi
 Region = NTSC-J
+Compat = 5
+FMVinSoftwareHack = 1
+[patches]
+   comment=mtvu black screen
+   comment=https://github.com/PCSX2/pcsx2/issues/1669 Meta: MTVU compatibility issues
+   comment=http://forums.pcsx2.net/Thread-LIST-Games-that-may-not-work-well-with-MTVU [LIST] Games that may not work well with MTVU
+[/patches]
 ---------------------------------------------
 Serial = SLPS-25948
 Name   = Zero no Tsukaima - Maigo no Period to Ikusen no Symphony [Best Collection]
@@ -34684,6 +34772,8 @@ eeClampMode = 3 // Fixes the inability to take the bottle in the trophy case in 
 Serial = SLPS-25956
 Name   = Moe Moe 2-ji Taisen Ryoku 2
 Region = NTSC-J
+Compat = 5
+FMVinSoftwareHack = 1
 ---------------------------------------------
 Serial = SLPS-25959
 Name   = Kidou Senshi Gundam: Giren no Yabou - Axis no Kyoui V
