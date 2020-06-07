@@ -101,7 +101,6 @@ void GSDevice11::SetupVS(VSSelector sel, const VSConstantBuffer* cb)
 	{
 		ShaderMacro sm(m_shader.model);
 
-		sm.AddMacro("VS_BPPZ", sel.bppz);
 		sm.AddMacro("VS_TME", sel.tme);
 		sm.AddMacro("VS_FST", sel.fst);
 
@@ -220,6 +219,7 @@ void GSDevice11::SetupPS(PSSelector sel, const PSConstantBuffer* cb, PSSamplerSe
 		sm.AddMacro("PS_BLEND_C", sel.blend_c);
 		sm.AddMacro("PS_BLEND_D", sel.blend_d);
 		sm.AddMacro("PS_DITHER", sel.dither);
+		sm.AddMacro("PS_ZCLAMP", sel.zclamp);
 
 		CComPtr<ID3D11PixelShader> ps;
 

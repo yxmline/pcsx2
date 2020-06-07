@@ -4,8 +4,7 @@
 #define FMT_24 1
 #define FMT_16 2
 
-#ifndef VS_BPPZ
-#define VS_BPPZ 0
+#ifndef VS_TME
 #define VS_TME 1
 #define VS_FST 1
 #endif
@@ -50,6 +49,7 @@
 #define PS_BLEND_C 0
 #define PS_BLEND_D 0
 #define PS_DITHER 0
+#define PS_ZCLAMP 0
 #endif
 
 #define SW_BLEND (PS_BLEND_A || PS_BLEND_B || PS_BLEND_D)
@@ -86,6 +86,9 @@ struct PS_OUTPUT
 {
 	float4 c0 : SV_Target0;
 	float4 c1 : SV_Target1;
+#if PS_ZCLAMP
+	float depth : SV_Depth;
+#endif
 };
 
 Texture2D<float4> Texture : register(t0);
@@ -100,6 +103,8 @@ cbuffer cb0
 	float4 VertexScale;
 	float4 VertexOffset;
 	float4 Texture_Scale_Offset;
+	uint MaxDepth;
+	uint3 pad_cb0;
 };
 
 cbuffer cb1
@@ -116,7 +121,8 @@ cbuffer cb1
 	uint4 FbMask;
 	float4 TC_OffsetHack;
 	float Af;
-	float3 _pad;
+	float MaxDepthPS;
+	float2 pad_cb1;
 	float4x4 DitherMatrix;
 };
 
@@ -777,6 +783,10 @@ PS_OUTPUT ps_main(PS_INPUT input)
 	output.c0 = C / 255.0f;
 	output.c1 = (float4)(alpha_blend);
 
+#if PS_ZCLAMP
+	output.depth = min(input.p.z, MaxDepthPS);
+#endif
+
 	return output;
 }
 
@@ -786,14 +796,8 @@ PS_OUTPUT ps_main(PS_INPUT input)
 
 VS_OUTPUT vs_main(VS_INPUT input)
 {
-	if(VS_BPPZ == 1) // 24
-	{
-		input.z = input.z & 0xffffff;
-	}
-	else if(VS_BPPZ == 2) // 16
-	{
-		input.z = input.z & 0xffff;
-	}
+	// Clamp to max depth, gs doesn't wrap
+	input.z = min(input.z, MaxDepth);
 
 	VS_OUTPUT output;
 

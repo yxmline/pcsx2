@@ -41,12 +41,16 @@ public:
 		GSVector4 VertexScale;
 		GSVector4 VertexOffset;
 		GSVector4 Texture_Scale_Offset;
+		GSVector2i MaxDepth;
+		GSVector2i pad_vscb;
 
 		VSConstantBuffer()
 		{
-			VertexScale = GSVector4::zero();
-			VertexOffset = GSVector4::zero();
+			VertexScale          = GSVector4::zero();
+			VertexOffset         = GSVector4::zero();
 			Texture_Scale_Offset = GSVector4::zero();
+			MaxDepth             = GSVector2i(0);
+			pad_vscb             = GSVector2i(0);
 		}
 
 		__forceinline bool Update(const VSConstantBuffer* cb)
@@ -74,11 +78,10 @@ public:
 		{
 			struct
 			{
-				uint32 bppz:2;
 				uint32 tme:1;
 				uint32 fst:1;
 
-				uint32 _free:28;
+				uint32 _free:30;
 			};
 
 			uint32 key;
@@ -102,7 +105,7 @@ public:
 		GSVector4i FbMask;
 
 		GSVector4 TC_OffsetHack;
-		GSVector4 Af;
+		GSVector4 Af_MaxDepth;
 		GSVector4 DitherMatrix[4];
 
 		PSConstantBuffer()
@@ -115,7 +118,7 @@ public:
 			MskFix = GSVector4i::zero();
 			ChannelShuffle = GSVector4i::zero();
 			FbMask = GSVector4i::zero();
-			Af = GSVector4::zero();
+			Af_MaxDepth = GSVector4::zero();
 
 			DitherMatrix[0] = GSVector4::zero();
 			DitherMatrix[1] = GSVector4::zero();
@@ -238,6 +241,9 @@ public:
 				// Dithering
 				uint32 dither:2;
 
+				// Depth clamp
+				uint32 zclamp:1;
+
 				// Hack
 				uint32 tcoffsethack:1;
 				uint32 urban_chaos_hle:1;
@@ -245,7 +251,7 @@ public:
 				uint32 point_sampler:1;
 				uint32 invalid_tex0:1; // Lupin the 3rd
 
-				uint32 _free:16;
+				uint32 _free:15;
 			};
 
 			uint64 key;

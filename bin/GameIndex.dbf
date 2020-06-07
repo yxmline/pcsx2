@@ -179,7 +179,7 @@ Name   = Gran Turismo 4 - Prologue
 Region = NTSC-Unk
 Compat = 5
 //eeClampMode = 3 // Text in races works.
-vuClampMode = 2 // Text in GT mode works.
+//vuClampMode = 2 // Text in GT mode works.
 ---------------------------------------------
 Serial = PCPX-96616
 Name   = PrePre 2 Volume 2
@@ -482,8 +482,8 @@ Serial = SCAJ-20066
 Name   = Gran Turismo 4 - Prologue
 Region = NTSC-Unk
 Compat = 5
-//eeClampMode = 3 // Text in races works
-vuClampMode = 2 // Text in GT mode works
+//eeClampMode = 3 // Text in races works.
+//vuClampMode = 2 // Text in GT mode works.
 MemCardFilter = SCAJ-20066/SCAJ-30006/SCAJ-30007/SCAJ-30008/SCPS-15055/SCPS-17001/SCPS-19252/SCPS-19304/SCPS-15009/SCPS-55007
 ---------------------------------------------
 Serial = SCAJ-20067
@@ -1167,6 +1167,12 @@ Serial = SCED-51540
 Name   = Official PlayStation 2 Magazine Demo 39
 Region = PAL-M5
 ---------------------------------------------
+Serial = SCED-51568
+Name   = Official PlayStation 2 Magazine Demo 33
+Region = PAL-Unk
+vuRoundMode = 0 // Fix SPS (Primal).
+vuClampMode = 2 // Fix other SPS (Primal).
+---------------------------------------------
 Serial = SCED-51657
 Name   = Official Playstation Magazine - Demo Disc 33
 Region = PAL-Unk
@@ -1654,6 +1660,7 @@ Serial = SCES-51135
 Name   = Primal
 Region = PAL-M5
 Compat = 5 // With GSdx, SW-mode only.
+vuRoundMode = 0 // Fix SPS.
 ---------------------------------------------
 Serial = SCES-51159
 Name   = The Getaway
@@ -1799,6 +1806,7 @@ XgKickHack = 1 // SPS.
 Serial = SCES-51685
 Name   = Primal
 Region = PAL-E-R
+vuRoundMode = 0 // Fix SPS.
 ---------------------------------------------
 Serial = SCES-51706
 Name   = Amplitude
@@ -1937,6 +1945,7 @@ Serial = SCES-52389
 Name   = WRC 4
 Region = PAL-M8
 Compat = 1
+XgKickHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SCES-52405
 Name   = DJ - Decks & FX - House Edition
@@ -2002,8 +2011,8 @@ Serial = SCES-52438
 Name   = Gran Turismo 4 - Prologue
 Region = PAL-M5
 Compat = 5
-//eeClampMode = 3 // Text in races works
-vuClampMode = 2 // Text in GT mode works
+//eeClampMode = 3 // Text in races works.
+//vuClampMode = 2 // Text in GT mode works.
 MemCardFilter = SCES-51719/SCES-52438/SCES-50294
 ---------------------------------------------
 Serial = SCES-52456
@@ -2212,6 +2221,7 @@ MemCardFilter = SCES-53286/SCES-53285
 Serial = SCES-53300
 Name   = SOCOM 3 - U.S. Navy SEALs
 Region = PAL-M5
+vuClampMode = 0 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCES-53304
 Name   = Buzz! The Music Quiz
@@ -2612,6 +2622,8 @@ Serial = SCES-54477
 Name   = Socom US Navy Seals - Combined Assault
 Region = PAL-M5
 Compat = 5
+vuRoundMode = 0 // Fixes disappearing characters.
+vuClampMode = 2 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCES-54497
 Name   = Buzz! Le Mega Quiz
@@ -2892,8 +2904,8 @@ VIF1StallHack = 1 // Fixes broken HUD.
 Serial = SCKA-20022
 Name   = Gran Turismo 4 Prologue
 Region = NTSC-K
-//eeClampMode = 3 // Text in races works
-vuClampMode = 2 // Text in GT mode works
+//eeClampMode = 3 // Text in races works.
+//vuClampMode = 2 // Text in GT mode works.
 ---------------------------------------------
 Serial = SCKA-20023
 Name   = Fatal Frame 2
@@ -3056,6 +3068,7 @@ Compat = 5
 Serial = SCKA-20064
 Name   = SOCOM 3 - U.S. Navy SEALs
 Region = NTSC-K
+vuClampMode = 0 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCKA-20069
 Name   = Siren 2
@@ -3594,8 +3607,8 @@ Region = NTSC-J
 Serial = SCPS-15055
 Name   = Gran Turismo 4 - Prologue
 Region = NTSC-J
-//eeClampMode = 3 // Text in races works
-vuClampMode = 2 // Text in GT mode works
+//eeClampMode = 3 // Text in races works.
+//vuClampMode = 2 // Text in GT mode works.
 MemCardFilter = SCAJ-20066/SCAJ-30006/SCAJ-30007/SCAJ-30008/SCPS-15055/SCPS-17001/SCPS-19252/SCPS-19304/SCPS-15009/SCPS-55007
 ---------------------------------------------
 Serial = SCPS-15056
@@ -4043,7 +4056,7 @@ Serial = SCPS-19304
 Name   = Gran Turismo 4 - Prologue [PlayStation 2 The Best]
 Region = NTSC-J
 //eeClampMode = 3 // Text in races works
-vuClampMode = 2 // Text in GT mode works
+//vuClampMode = 2 // Text in GT mode works.
 MemCardFilter = SCAJ-20066/SCAJ-30006/SCAJ-30007/SCAJ-30008/SCPS-15055/SCPS-17001/SCPS-19252/SCPS-19304/SCPS-15009/SCPS-55007
 ---------------------------------------------
 Serial = SCPS-19305
@@ -4677,6 +4690,7 @@ Serial = SCUS-97142
 Name   = Primal - Civilization Is Only Skin Deep
 Region = NTSC-U
 Compat = 5
+vuRoundMode = 0 // Fix SPS.
 [patches = FCD89DC3]
 	author=Raziel I.C.H.I. Znot
 	comment=Performance fix
@@ -5008,6 +5022,8 @@ Region = NTSC-U
 Serial = SCUS-97225
 Name   = Primal [Demo]
 Region = NTSC-U
+vuRoundMode = 0 // Fix SPS.
+vuClampMode = 2 // Fix other SPS.
 ---------------------------------------------
 Serial = SCUS-97226
 Name   = NCAA GameBreaker 2003 [Demo]
@@ -5543,6 +5559,7 @@ Compat = 5
 Serial = SCUS-97409
 Name   = Gretzky NHL 2005
 Region = NTSC-U
+eeRoundMode = 2 // Fix ingame hang.
 ---------------------------------------------
 Serial = SCUS-97410
 Name   = Jampack Demo Disc Vol.10 [T-Rated]
@@ -5786,6 +5803,7 @@ Serial = SCUS-97474
 Name   = SOCOM 3 - U.S. Navy SEALs
 Region = NTSC-U
 Compat = 5
+vuClampMode = 0 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCUS-97475
 Name   = SOCOM 3 - U.S. Navy SEALs [Regular Demo]
@@ -5850,6 +5868,7 @@ Compat = 5
 Serial = SCUS-97489
 Name   = SOCOM 3 - U.S. Navy SEALs [Public Beta v.1]
 Region = NTSC-U
+vuClampMode = 0 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCUS-97490
 Name   = Rogue Galaxy
@@ -6041,6 +6060,8 @@ Serial = SCUS-97545
 Name   = SOCOM - U.S. Navy SEALs - Combined Assault
 Region = NTSC-U
 Compat = 5
+vuRoundMode = 0 // Fixes disappearing characters.
+vuClampMode = 2 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCUS-97548
 Name   = Ape Escape 3 [Demo]
@@ -6070,6 +6091,8 @@ Compat = 5
 Serial = SCUS-97560
 Name   = SOCOM - U.S. Navy SEALs - Combined Assault [Demo]
 Region = NTSC-U
+vuRoundMode = 0 // Fixes disappearing characters.
+vuClampMode = 2 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SCUS-97564
 Name   = Jampack Demo Disc Vol.15 [T-Rated]
@@ -6151,6 +6174,7 @@ Serial = SCUS-97610
 Name   = Hot Shots Tennis
 Region = NTSC-U
 Compat = 5
+vuRoundMode = 1 // Fixes the display of scores and text ingame.
 ---------------------------------------------
 Serial = SCUS-97611
 Name   = SingStar Amped [with Microphone]
@@ -7623,7 +7647,7 @@ Compat = 5
 	// This seems like the only way of patching
 	// them all. The issue here is the PCSX2 IPU
 	// do not support well the EA proprietary IPU
-	// Librairy causing hanging in menus.
+	// Library causing hanging in menus.
 	patch=1,EE,001f4d2c,word,00000000
 [/patches]
 ---------------------------------------------
@@ -8446,7 +8470,7 @@ Name   = Deus Ex
 Region = PAL-S
 ---------------------------------------------
 Serial = SLES-50809
-Name   = Next Generation Tennis 2003
+Name   = Next Generation Tennis
 Region = PAL-M6
 ---------------------------------------------
 Serial = SLES-50812
@@ -10221,6 +10245,7 @@ Region = PAL-Unk
 Serial = SLES-51547
 Name   = Next Generation Tennis 2003
 Region = PAL-M5
+vuClampMode = 3 // Fixes SPS menus, also needed for patch.
 ---------------------------------------------
 Serial = SLES-51548
 Name   = This is Football
@@ -11984,11 +12009,12 @@ Region = PAL-E
 Serial = SLES-52394
 Name   = UFEA Euro 2004
 Region = PAL-E
+vuClampMode = 3 // Fixes disappearing ball and black box issues.
 ---------------------------------------------
 Serial = SLES-52395
 Name   = UFEA Euro 2004
 Region = PAL-F-G
-vuClampMode = 2 // Fixes black box issues everywhere ingame.
+vuClampMode = 3 // Fixes disappearing ball and black box issues.
 ---------------------------------------------
 Serial = SLES-52396
 Name   = Euro 2004
@@ -14116,6 +14142,7 @@ Region = PAL-M5
 Serial = SLES-53300
 Name   = SOCOM 3 - U.S. Navy SEALs
 Region = PAL-Unk
+vuClampMode = 0 // Fixes SPS ingame.
 ---------------------------------------------
 Serial = SLES-53301
 Name   = Bomberman Hardball
@@ -15520,6 +15547,7 @@ Region = PAL-M10
 Serial = SLES-53904
 Name   = DT Racer
 Region = PAL-M5
+GIFFIFOHack = 1 // Fixes corrupted graphics in the menus.
 ---------------------------------------------
 Serial = SLES-53906
 Name   = 50cent - Bulletproof
@@ -16640,6 +16668,7 @@ Compat = 5
 Serial = SLES-54423
 Name   = Justice League Heroes
 Region = PAL-M5
+vuClampMode = 2 // Fixes ingame SPS for the capes.
 ---------------------------------------------
 Serial = SLES-54424
 Name   = Dr. Dolittle
@@ -16915,6 +16944,10 @@ Name   = Shin Megami Tensei: Digital Devil Saga 2
 Region = PAL-E
 // Reads data from DDS1.
 MemCardFilter = SLES-54555/SLES-53458
+---------------------------------------------
+Serial = SLES-54559
+Name   = Free Running
+Region = PAL-E
 ---------------------------------------------
 Serial = SLES-54560
 Name   = Alpine Ski Racing 2007
@@ -19677,6 +19710,10 @@ eeRoundMode = 0
 ---------------------------------------------
 Serial = SLPM-60254
 Name   = Zettai Zetsumei Toshi 2: Itetsuita Kioku-tachi [Trial A]
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPM-60256
+Name   = Dengeki D73 demo
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-60262
@@ -27443,6 +27480,7 @@ Serial = SLPM-66438
 Name   = Melty Blood - Act Cadenza
 Region = NTSC-J
 Compat = 5
+EETimingHack = 1 // Fixes non-working game (BSOD/crash otherwise).
 ---------------------------------------------
 Serial = SLPM-66439
 Name   = Hokenshitsu e Youkoso [Limited Edition]
@@ -36317,7 +36355,7 @@ Region = NTSC-U
 	// This seems like the only way of patching
 	// them all. The issue here is the PCSX2 IPU
 	// do not support well the EA proprietary IPU
-	// Librairy causing hanging in menus.
+	// Library causing hanging in menus.
 	patch=1,EE,001f4d2c,word,00000000
 [/patches]
 ---------------------------------------------
@@ -38757,6 +38795,7 @@ Name   = Metal Arms - Glitch in the System
 Region = NTSC-U
 Compat = 5
 EETimingHack = 1 // Texture flicker.
+mvuFlagSpeedHack = 0 // Fixes SPS.
 ---------------------------------------------
 Serial = SLUS-20787
 Name   = WWE SmackDown! Here Comes the Pain
@@ -40318,6 +40357,7 @@ Serial = SLUS-21095
 Name   = DT Racer
 Region = NTSC-U
 Compat = 5
+GIFFIFOHack = 1 // Fixes corrupted graphics in the menus.
 ---------------------------------------------
 Serial = SLUS-21096
 Name   = Ape Escape - Pumped & Primed
@@ -44711,6 +44751,8 @@ Region = NTSC-U
 Serial = SLUS-29081
 Name   = Metal Arms - Glitch in the System [Demo]
 Region = NTSC-U
+EETimingHack = 1 // Texture flicker.
+mvuFlagSpeedHack = 0 // Fixes SPS.
 ---------------------------------------------
 Serial = SLUS-29082
 Name   = Beyond Good and Evil [Demo]

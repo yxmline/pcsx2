@@ -171,29 +171,21 @@ void GSRendererOGL::EmulateZbuffer()
 		m_om_dssel.ztst = ZTST_ALWAYS;
 	}
 
-	uint32 max_z;
-	if (m_context->ZBUF.PSM == PSM_PSMZ32) {
-		max_z     = 0xFFFFFFFF;
-	} else if (m_context->ZBUF.PSM == PSM_PSMZ24) {
-		max_z     = 0xFFFFFF;
-	} else {
-		max_z     = 0xFFFF;
-	}
+	// On the real GS we appear to do clamping on the max z value the format allows.
+	// Clamping is done after rasterization.
+	const uint32 max_z = 0xFFFFFFFF >> (GSLocalMemory::m_psm[m_context->ZBUF.PSM].fmt * 8);
+	const bool clamp_z = (uint32)(GSVector4i(m_vt.m_max.p).z) > max_z;
 
-	// The real GS appears to do no masking based on the Z buffer format and writing larger Z values
-	// than the buffer supports seems to be an error condition on the real GS, causing it to crash.
-	// We are probably receiving bad coordinates from VU1 in these cases.
-	vs_cb.DepthMask = GSVector2i(0xFFFFFFFF, 0xFFFFFFFF);
+	vs_cb.MaxDepth = GSVector2i(0xFFFFFFFF);
+	ps_cb.MaxDepth = GSVector4(1.0f);
+	m_ps_sel.zclamp = 0;
 
-	if (m_om_dssel.ztst >= ZTST_ALWAYS && m_om_dssel.zwe && (m_context->ZBUF.PSM != PSM_PSMZ32)) {
-		if (m_vt.m_max.p.z > max_z) {
-			ASSERT(m_vt.m_min.p.z > max_z); // sfex capcom logo
-			// Fixme :Following conditional fixes some dialog frame in Wild Arms 3, but may not be what was intended.
-			if (m_vt.m_min.p.z > max_z) {
-				GL_DBG("Bad Z size (%f %f) on %s buffers", m_vt.m_min.p.z, m_vt.m_max.p.z, psm_str(m_context->ZBUF.PSM));
-				vs_cb.DepthMask = GSVector2i(max_z, max_z);
-				m_om_dssel.ztst = ZTST_ALWAYS;
-			}
+	if (clamp_z) {
+		if (m_vt.m_primclass == GS_SPRITE_CLASS || m_vt.m_primclass == GS_POINT_CLASS) {
+			vs_cb.MaxDepth = GSVector2i(max_z);
+		} else {
+			ps_cb.MaxDepth = GSVector4(max_z * ldexpf(1, -32));
+			m_ps_sel.zclamp = 1;
 		}
 	}
 
