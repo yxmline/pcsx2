@@ -23685,7 +23685,6 @@ Serial = SLPM-65411
 Name   = Onimusha Buraiden
 Region = NTSC-J
 Compat = 5
-VIF1StallHack = 1
 MemCardFilter = SLPM-65411/SLPM-65413
 ---------------------------------------------
 Serial = SLPM-65412
