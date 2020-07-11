@@ -21716,6 +21716,10 @@ Serial = SLPM-62618
 Name   = Simple 2000 Series Vol.78 - The Uchuu Daisensou
 Region = NTSC-J
 ---------------------------------------------
+Serial = SLPM-62619
+Name   = Shoujo Yoshitsune Den 2 (Limited Edition)
+Region = NTSC-J
+---------------------------------------------
 Serial = SLPM-62620
 Name   = Pachi-Slot Winning Post
 Region = NTSC-J
@@ -23531,6 +23535,10 @@ Compat = 5
 ---------------------------------------------
 Serial = SLPM-65362
 Name   = NHK Tensai Bit-Kun - Guramon Battle
+Region = NTSC-J
+---------------------------------------------
+Serial = SLPM-65363
+Name   = Shoujo Yoshitsune Den (Special Version)
 Region = NTSC-J
 ---------------------------------------------
 Serial = SLPM-65364
