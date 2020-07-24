@@ -9953,12 +9953,6 @@ Serial = SLES-51390
 Name   = Fightbox
 Region = PAL-E
 vuClampMode = 0 // Fixes missing 3D
-[patches = E7EFA0BF]
-	comment= Gets around GS SIGNAL hang, game expects value other than C in SIGNAL but the PATH2 packet sends double 0xC
-	comment= The SIGNAL value is compared to the value at address 0x34CDF3, if this address contains 0x4 (OR'd with 0x8)
-	commend= the interrupt doesn't get acknoledged and cleared and so the PATH2 packet hangs
-	patch=1,EE,001f5a0c,word,30840008
-[/patches]
 ---------------------------------------------
 Serial = SLES-51391
 Name   = RTL Skispringen 2003
@@ -15213,6 +15207,12 @@ Serial = SLES-53751
 Name   = Shrek Superslam
 Region = PAL-M3
 ---------------------------------------------
+Serial = SLES-53753
+Name   = Test Drive Unlimited
+Region = PAL-M5
+Compat = 5
+VIFFIFOHack = 1 // Needed to load the main game properly.
+---------------------------------------------
 Serial = SLES-53754
 Name   = ATV Off-Road Fury 3
 Region = PAL-M6
@@ -16755,12 +16755,6 @@ Name   = CSI 3 - Dimensions of Murder
 Region = PAL-M5
 ---------------------------------------------
 Serial = SLES-54466
-Name   = Test Drive Unlimited
-Region = PAL-M4
-Compat = 5
-VIFFIFOHack = 1 // Needed to load the main game properly.
----------------------------------------------
-Serial = SLES-53753
 Name   = Test Drive Unlimited
 Region = PAL-M5
 Compat = 5
