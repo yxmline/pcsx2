@@ -29,10 +29,6 @@ struct xImpl_JmpCall
 
     void operator()(const xAddressReg &absreg) const;
     void operator()(const xIndirectNative &src) const;
-#ifdef __M_X86_64
-    [[deprecated]] // Should move to xIndirectNative
-    void operator()(const xIndirect32 &absreg) const;
-#endif
 
     // Special form for calling functions.  This form automatically resolves the
     // correct displacement based on the size of the instruction being generated.
@@ -66,13 +62,12 @@ struct xImpl_FastCall
     void operator()(void *f, u32 a1, const xRegister32 &a2) const;
     void operator()(void *f, const xIndirect32 &a1) const;
     void operator()(void *f, u32 a1, u32 a2) const;
+    void operator()(void *f, void *a1) const;
 
 #ifdef __M_X86_64
     void operator()(void *f, const xRegisterLong &a1, const xRegisterLong &a2 = xEmptyReg) const;
     void operator()(void *f, u32 a1, const xRegisterLong &a2) const;
-    [[deprecated]] // Switch to xIndirect32, as the size of this isn't obvious
 #endif
-    void operator()(void *f, const xIndirectVoid &a1) const;
 
     template <typename T>
     __fi void operator()(T *func, u32 a1, const xRegisterLong &a2 = xEmptyReg) const
@@ -91,11 +86,6 @@ struct xImpl_FastCall
     {
         (*this)((void*)func, a1, a2);
     }
-
-#ifdef __M_X86_64
-    [[deprecated]] // Switch to xIndirectNative
-    void operator()(const xIndirect32 &f, const xRegisterLong &a1 = xEmptyReg, const xRegisterLong &a2 = xEmptyReg) const;
-#endif
 
     void operator()(const xIndirectNative &f, const xRegisterLong &a1 = xEmptyReg, const xRegisterLong &a2 = xEmptyReg) const;
 };
