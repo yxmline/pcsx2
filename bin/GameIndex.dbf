@@ -1073,6 +1073,7 @@ Region = NTSC-Unk
 Serial = SCAJ-25047
 Name   = Dororo
 Region = NTSC-Unk
+VU0KickstartHack = 1
 ---------------------------------------------
 Serial = SCAJ-30001
 Name   = Xenosaga Episode I [PlayStation 2 The Best]
@@ -6475,6 +6476,7 @@ Region = NTSC-Unk
 Serial = SLAJ-25047
 Name   = Dororo
 Region = NTSC-Ch-J
+VU0KickstartHack = 1
 ---------------------------------------------
 Serial = SLAJ-25048
 Name   = Sengoku Musou Mushoden
@@ -19131,6 +19133,7 @@ Serial = SLKA-25225
 Name   = Dororo
 Region = NTSC-K
 Compat = 5
+VU0KickstartHack = 1
 ---------------------------------------------
 Serial = SLKA-25227
 Name   = Neo Contra
@@ -24119,6 +24122,7 @@ Region = NTSC-J
 Serial = SLPM-65526
 Name   = Dororo
 Region = NTSC-J
+VU0KickstartHack = 1
 ---------------------------------------------
 Serial = SLPM-65527
 Name   = FIFA Total Football
@@ -26661,6 +26665,7 @@ Region = NTSC-J
 Serial = SLPM-66207
 Name   = Dororo [Sega the Best 2800]
 Region = NTSC-J
+VU0KickstartHack = 1
 ---------------------------------------------
 Serial = SLPM-66208
 Name   = Sakura Taisen V - Episode 0 - Samurai Girl of Wild [Sega the Best]
