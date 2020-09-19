@@ -24,6 +24,7 @@
 #include "Patch.h"
 #include "SysThreads.h"
 #include "MTVU.h"
+#include "IPC.h"
 
 #include "../DebugTools/MIPSAnalyst.h"
 #include "../DebugTools/SymbolMap.h"
@@ -243,6 +244,13 @@ void SysCoreThread::GameStartingInThread()
 #ifdef USE_SAVESLOT_UI_UPDATES
 	UI_UpdateSysControls();
 #endif
+	if (EmuConfig.EnableIPC && m_IpcState == OFF)
+	{
+		m_IpcState = ON;
+		m_socketIpc = std::make_unique<SocketIPC>(this);
+	}
+	if (m_IpcState == ON && m_socketIpc->m_end)
+		m_socketIpc->Start();
 }
 
 bool SysCoreThread::StateCheckInThread()
@@ -279,11 +287,13 @@ void SysCoreThread::ExecuteTaskInThread()
 void SysCoreThread::OnSuspendInThread()
 {
 	GetCorePlugins().Close();
+	DoCDVDclose();
 }
 
 void SysCoreThread::OnResumeInThread( bool isSuspended )
 {
 	GetCorePlugins().Open();
+	DoCDVDopen();
 }
 
 
@@ -298,6 +308,7 @@ void SysCoreThread::OnCleanupInThread()
 	R3000A::ioman::reset();
 	// FIXME: temporary workaround for deadlock on exit, which actually should be a crash
 	vu1Thread.WaitVU();
+	DoCDVDclose();
 	GetCorePlugins().Close();
 	GetCorePlugins().Shutdown();
 

@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2019  PCSX2 Dev Team
+ *  Copyright (C) 2002-2020  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -59,7 +59,7 @@ public:
 	// Retrieve the input recording's header which contains high-level metadata on the recording
 	InputRecordingFileHeader &GetHeader();
 	// The maximum number of frames, or in other words, the length of the recording
-	unsigned long &GetTotalFrames();
+	long &GetTotalFrames();
 	// The number of times a save-state has been loaded while recording this movie
 	// this is also often referred to as a "re-record"
 	unsigned long &GetUndoCount();
@@ -76,7 +76,7 @@ public:
 	// the current frame's value from the emulator
 	bool ReadKeyBuffer(u8 &result, const uint &frame, const uint port, const uint bufIndex);
 	// Updates the total frame counter and commit it to the recording file
-	void SetTotalFrames(unsigned long frames);
+	void SetTotalFrames(long frames);
 	// Persist the input recording file header's current state to the file
 	bool WriteHeader();
 	// Writes the current frame's input data to the file so it can be replayed
@@ -97,15 +97,16 @@ private:
 
 	InputRecordingFileHeader header;
 	wxString filename = "";
-	FILE * recordingFile = NULL;
+	FILE* recordingFile = nullptr;
 	InputRecordingSavestate savestate;
-	unsigned long totalFrames = 0;
+
+	// An signed 32-bit frame limit is equivalent to 1.13 years of continuous 60fps footage
+	long totalFrames = 0;
 	unsigned long undoCount = 0;
 
 	// Calculates the position of the current frame in the input recording
 	long getRecordingBlockSeekPoint(const long& frame);
 	bool open(const wxString path, bool newRecording);
 	bool verifyRecordingFileHeader();
-	bool writeSaveState();
 };
 #endif
