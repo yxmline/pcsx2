@@ -364,7 +364,7 @@ set(pcsx2GuiHeaders
 	)
 
 # Warning: the declaration of the .h are mandatory in case of resources files. It will ensure the creation
-# from the bin2cpp tools at the good moment (ie .h must be created before the pcsx2 compilation)
+# from the bin2cpp tools at right good moment (ie .h must be created before the pcsx2 compilation)
 # Gui resources headers
 set(res_bin "${CMAKE_BINARY_DIR}/pcsx2/gui/Resources")
 set(res_src "${CMAKE_SOURCE_DIR}/pcsx2/gui/Resources")
@@ -476,25 +476,55 @@ set(pcsx2RDebugHeaders
 	RDebug/deci2_ttyp.h)
 
 # Recording sources
+set(rec_src "Recording")
+set(rec_vp_src "${rec_src}/VirtualPad")
 set(pcsx2RecordingSources
-	Recording/InputRecording.cpp
-	Recording/InputRecordingControls.cpp
-	Recording/InputRecordingFile.cpp
-	Recording/NewRecordingFrame.cpp
-	Recording/PadData.cpp
-	Recording/RecordingInputManager.cpp
-	Recording/VirtualPad.cpp
+	${rec_src}/InputRecording.cpp
+	${rec_src}/InputRecordingControls.cpp
+	${rec_src}/InputRecordingFile.cpp
+	${rec_src}/NewRecordingFrame.cpp
+	${rec_src}/PadData.cpp
+	${rec_vp_src}/VirtualPad.cpp
+	${rec_vp_src}/VirtualPadData.cpp
+	${rec_vp_src}/VirtualPadResources.cpp
 )
 
 # Recording headers
 set(pcsx2RecordingHeaders
-	Recording/InputRecording.h
-	Recording/InputRecordingControls.h
-	Recording/InputRecordingFile.h
-	Recording/NewRecordingFrame.h
-	Recording/PadData.h
-	Recording/RecordingInputManager.h
-	Recording/VirtualPad.h
+	${rec_src}/InputRecording.h
+	${rec_src}/InputRecordingControls.h
+	${rec_src}/InputRecordingFile.h
+	${rec_src}/NewRecordingFrame.h
+	${rec_src}/PadData.h
+	${rec_vp_src}/VirtualPad.h
+	${rec_vp_src}/VirtualPadData.h
+	${rec_vp_src}/VirtualPadResources.h
+)
+
+# Warning: the declaration of the .h are mandatory in case of resources files. It will ensure the creation
+# from the bin2cpp tools at the right moment (ie .h must be created before the pcsx2 compilation)
+# Recording - VirtualPad resources headers
+set(res_rec_vp_src "${CMAKE_SOURCE_DIR}/pcsx2/Recording/VirtualPad/img")
+set(pcsx2RecordingVirtualPadResources
+	${res_rec_vp_src}/circlePressed.h
+	${res_rec_vp_src}/controllerFull.h
+	${res_rec_vp_src}/controllerHalf.h
+	${res_rec_vp_src}/controllerThreeQuarters.h
+	${res_rec_vp_src}/crossPressed.h
+	${res_rec_vp_src}/downPressed.h
+	${res_rec_vp_src}/l1Pressed.h
+	${res_rec_vp_src}/l2Pressed.h
+	${res_rec_vp_src}/l3Pressed.h
+	${res_rec_vp_src}/leftPressed.h
+	${res_rec_vp_src}/r1Pressed.h
+	${res_rec_vp_src}/r2Pressed.h
+	${res_rec_vp_src}/r3Pressed.h
+	${res_rec_vp_src}/rightPressed.h
+	${res_rec_vp_src}/selectPressed.h
+	${res_rec_vp_src}/squarePressed.h
+	${res_rec_vp_src}/startPressed.h
+	${res_rec_vp_src}/trianglePressed.h
+	${res_rec_vp_src}/upPressed.h
 )
 
 # System sources
@@ -630,6 +660,7 @@ set(Common
 	${pcsx2ps2Sources}
 	${pcsx2ps2Headers}
 	${pcsx2RecordingSources}
+	${pcsx2RecordingVirtualPadResources}
 	${pcsx2RecordingHeaders}
 	${pcsx2SystemSources}
 	${pcsx2SystemHeaders}
@@ -726,6 +757,14 @@ foreach(res_file IN ITEMS
         ConfigIcon_Cpu ConfigIcon_Gamefixes ConfigIcon_MemoryCard
         ConfigIcon_Paths ConfigIcon_Plugins ConfigIcon_Speedhacks ConfigIcon_Video Breakpoint_Active Breakpoint_Inactive)
     add_custom_command(OUTPUT  "${res_bin}/${res_file}.h" COMMAND perl ${CMAKE_SOURCE_DIR}/linux_various/hex2h.pl "${res_src}/${res_file}.png" "${res_bin}/${res_file}" )
+endforeach()
+
+### Generate Recording resource files
+### Drop them into the folder alongside the png files
+foreach(res_file IN ITEMS
+				circlePressed controllerFull controllerHalf controllerThreeQuarters crossPressed downPressed l1Pressed l2Pressed l3Pressed leftPressed
+				r1Pressed r2Pressed r3Pressed rightPressed selectPressed squarePressed startPressed trianglePressed upPressed)
+    add_custom_command(OUTPUT  "${res_rec_vp_src}/${res_file}.h" COMMAND perl ${CMAKE_SOURCE_DIR}/linux_various/hex2h.pl "${res_rec_vp_src}/${res_file}.png" "${res_rec_vp_src}/${res_file}" )
 endforeach()
 
 if(USE_VTUNE)
