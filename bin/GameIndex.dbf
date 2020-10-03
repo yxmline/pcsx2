@@ -2305,6 +2305,7 @@ Region = PAL-M11
 Serial = SCES-53358
 Name   = 24: The Game
 Region = PAL-M9
+VU0KickstartHack = 1 // Fixes missing geometry.
 ---------------------------------------------
 Serial = SCES-53372
 Name   = Tourist Trophy - The Real Riding Simulator
@@ -10638,27 +10639,11 @@ vuRoundMode = 0 // Crashes without.
 Serial = SLES-51753
 Name   = True Crime - Streets of L.A.
 Region = PAL-E
-[patches = C96245F4]
-	author=PSI
-	// Due to an edge case with SIF0 DMA that isn't handled properly in PCSX2
-	// the game accidentally resets DVD streams, which causes it to crash.
-	// This patch forces the streaming module to use different buffers
-	// which prevents the DVD streams from being cleared.
-	patch=1,EE,00480640,word,10000000
-[/patches]
 ---------------------------------------------
 Serial = SLES-51754
 Name   = True Crime - Streets of L.A.
 Region = PAL-M5
 Compat = 3
-[patches = 6B9AEA0D]
-	author=PSI
-	// Due to an edge case with SIF0 DMA that isn't handled properly in PCSX2
-	// the game accidentally resets DVD streams, which causes it to crash.
-	// This patch forces the streaming module to use different buffers
-	// which prevents the DVD streams from being cleared.
-	patch=1,EE,00480DB0,word,10000000
-[/patches]
 ---------------------------------------------
 Serial = SLES-51755
 Name   = Disney-Pixar's Finding Nemo
@@ -12915,6 +12900,7 @@ Region = PAL-G
 Serial = SLES-52755
 Name   = Blood Will Tell
 Region = PAL-M5
+VU0KickstartHack = 1 // Fixes main character model SPS.
 ---------------------------------------------
 Serial = SLES-52760
 Name   = Pro Evolution Soccer 4
@@ -20148,6 +20134,7 @@ Region = NTSC-J
 Serial = SLPM-62132
 Name   = 24: The Game
 Region = NTSC-J
+VU0KickstartHack = 1 // Fixes missing geometry.
 ---------------------------------------------
 Serial = SLPM-62133
 Name   = Bloody Roar 3 [Konami The Best]
@@ -37760,14 +37747,6 @@ Serial = SLUS-20550
 Name   = True Crime - Streets of L.A.
 Region = NTSC-U
 Compat = 3
-[patches = eb7854f1]
-	author=PSI
-	// Due to an edge case with SIF0 DMA that isn't handled properly in PCSX2
-	// the game accidentally resets DVD streams, which causes it to crash.
-	// This patch forces the streaming module to use different buffers
-	// which prevents the DVD streams from being cleared.
-	patch=1,EE,00480640,word,10000000
-[/patches]
 ---------------------------------------------
 Serial = SLUS-20552
 Name   = Grand Theft Auto - Vice City
@@ -38831,6 +38810,7 @@ Serial = SLUS-20782
 Name   = Blood Will Tell
 Region = NTSC-U
 Compat = 5
+VU0KickstartHack = 1 // Fixes main character model SPS.
 ---------------------------------------------
 Serial = SLUS-20784
 Name   = Italian Job, The
@@ -41252,6 +41232,7 @@ Serial = SLUS-21268
 Name   = 24: The Game
 Region = NTSC-U
 Compat = 5
+VU0KickstartHack = 1 // Fixes missing geometry.
 ---------------------------------------------
 Serial = SLUS-21269
 Name   = Bully

@@ -276,6 +276,9 @@ void MainEmuFrame::ConnectMenus()
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_New_Click, this, MenuId_Recording_New);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_Play_Click, this, MenuId_Recording_Play);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_Stop_Click, this, MenuId_Recording_Stop);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_TogglePause_Click, this, MenuId_Recording_TogglePause);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_FrameAdvance_Click, this, MenuId_Recording_FrameAdvance);
+	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_ToggleRecordingMode_Click, this, MenuId_Recording_ToggleRecordingMode);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_VirtualPad_Open_Click, this, MenuId_Recording_VirtualPad_Port0);
 	Bind(wxEVT_MENU, &MainEmuFrame::Menu_Recording_VirtualPad_Open_Click, this, MenuId_Recording_VirtualPad_Port1);
 #endif
@@ -467,9 +470,13 @@ void MainEmuFrame::CreateCaptureMenu()
 void MainEmuFrame::CreateRecordMenu()
 {
 #ifndef DISABLE_RECORDING
-	m_menuRecording.Append(MenuId_Recording_New, _("New"));
-	m_menuRecording.Append(MenuId_Recording_Stop, _("Stop"))->Enable(false);
-	m_menuRecording.Append(MenuId_Recording_Play, _("Play"));
+	m_menuRecording.Append(MenuId_Recording_New, _("New"), _("Create a new input recording."));
+	m_menuRecording.Append(MenuId_Recording_Stop, _("Stop"), _("Stop the active input recording."))->Enable(false);
+	m_menuRecording.Append(MenuId_Recording_Play, _("Play"), _("Playback an existing input recording."));
+	m_menuRecording.AppendSeparator();
+	m_menuRecording.Append(MenuId_Recording_TogglePause, _("Toggle Pause"), _("Pause or resume emulation on the fly."))->Enable(false);
+	m_menuRecording.Append(MenuId_Recording_FrameAdvance, _("Frame Advance"), _("Advance emulation forward by a single frame at a time."))->Enable(false);
+	m_menuRecording.Append(MenuId_Recording_ToggleRecordingMode, _("Toggle Recording Mode"), _("Save/playback inputs to/from the recording file."))->Enable(false);
 	m_menuRecording.AppendSeparator();
 	m_menuRecording.Append(MenuId_Recording_VirtualPad_Port0, _("Virtual Pad (Port 1)"));
 	m_menuRecording.Append(MenuId_Recording_VirtualPad_Port1, _("Virtual Pad (Port 2)"));
@@ -776,24 +783,34 @@ void MainEmuFrame::CommitPreset_noTrigger()
 	g_Conf->EmuOptions.EnablePatches = menubar.IsChecked( MenuId_EnablePatches );
 }
 
-static void AppendShortcutToMenuOption( wxMenuItem& item, const char* id ) {
-	// this is NOT how a dictionary works but it has like 30 entries so this should still perform okay
-	auto* dict = &wxGetApp().GlobalAccels;
-	for ( auto it = ( *dict )->begin(); it != ( *dict )->end(); ++it ) {
-		if ( strcmp( it->second->Id, id ) == 0 ) {
-			wxString text = item.GetItemLabel();
-			size_t tabPos = text.rfind( L'\t' );
-			KeyAcceleratorCode keycode( (wxKeyCode)it->first );
-			item.SetItemLabel( text.Mid( 0, tabPos ) + L"\t" + keycode.ToString() );
-		}
-	}
+static void AppendShortcutToMenuOption( wxMenuItem& item, wxString keyCodeStr ) {
+	wxString text = item.GetItemLabel();
+	const size_t tabPos = text.rfind(L'\t');
+	item.SetItemLabel(text.Mid(0, tabPos ) + L"\t" + keyCodeStr);
 }
 
 void MainEmuFrame::AppendKeycodeNamesToMenuOptions() {
-	AppendShortcutToMenuOption( *m_menuSys.FindChildItem( MenuId_Sys_LoadStates ), "States_DefrostCurrentSlot" );
-	AppendShortcutToMenuOption( *m_menuSys.FindChildItem( MenuId_Sys_SaveStates ), "States_FreezeCurrentSlot" );
+	
+	AppendShortcutToMenuOption(*m_menuSys.FindChildItem( MenuId_Sys_LoadStates ), wxGetApp().GlobalAccels->findKeycodeWithCommandId("States_DefrostCurrentSlot").toTitleizedString());
+	AppendShortcutToMenuOption(*m_menuSys.FindChildItem( MenuId_Sys_SaveStates ), wxGetApp().GlobalAccels->findKeycodeWithCommandId("States_FreezeCurrentSlot").toTitleizedString());
 }
 
+#ifndef DISABLE_RECORDING
+void MainEmuFrame::initializeRecordingMenuItem(MenuIdentifiers menuId, wxString keyCodeStr, bool enable)
+{
+	wxMenuItem& item = *m_menuRecording.FindChildItem(menuId);
+	wxString text = item.GetItemLabel();
+	const size_t tabPos = text.rfind(L'\t');
+	item.SetItemLabel(text.Mid(0, tabPos) + L"\t" + keyCodeStr);
+	item.Enable(enable);
+}
+
+void MainEmuFrame::enableRecordingMenuItem(MenuIdentifiers menuId, bool enable)
+{
+	wxMenuItem& item = *m_menuRecording.FindChildItem(menuId);
+	item.Enable(enable);
+}
+#endif
 
 // ------------------------------------------------------------------------
 //   "Extensible" Plugin Menus

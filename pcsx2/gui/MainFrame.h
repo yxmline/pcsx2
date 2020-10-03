@@ -166,6 +166,10 @@ public:
 	void CommitPreset_noTrigger();
 	void AppendKeycodeNamesToMenuOptions();
 	void UpdateStatusBar();
+#ifndef DISABLE_RECORDING
+	void initializeRecordingMenuItem(MenuIdentifiers menuId, wxString keyCodeStr, bool enable = true);
+	void enableRecordingMenuItem(MenuIdentifiers menuId, bool enable);
+#endif
 
 protected:
 	void DoGiveHelp(const wxString& text, bool show);
@@ -244,6 +248,9 @@ protected:
 	void Menu_Recording_New_Click(wxCommandEvent &event);
 	void Menu_Recording_Play_Click(wxCommandEvent &event);
 	void Menu_Recording_Stop_Click(wxCommandEvent &event);
+	void Menu_Recording_TogglePause_Click(wxCommandEvent &event);
+	void Menu_Recording_FrameAdvance_Click(wxCommandEvent &event);
+	void Menu_Recording_ToggleRecordingMode_Click(wxCommandEvent &event);
 	void Menu_Recording_VirtualPad_Open_Click(wxCommandEvent &event);
 #endif
 
