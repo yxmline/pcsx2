@@ -25771,6 +25771,7 @@ Region = NTSC-J
 Serial = SLPM-65945
 Name   = Red Ninja - End of Honor
 Region = NTSC-J
+EETimingHack = 1
 ---------------------------------------------
 Serial = SLPM-65946
 Name   = Beatmania IIDX - 9th Style
