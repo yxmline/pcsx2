@@ -15661,6 +15661,7 @@ Serial = SLES-53904
 Name   = DT Racer
 Region = PAL-M5
 GIFFIFOHack = 1 // Fixes corrupted graphics in the menus.
+VU0KickstartHack = 1 // Fixes TLB misses and collision bugs
 ---------------------------------------------
 Serial = SLES-53906
 Name   = 50cent - Bulletproof
@@ -40548,6 +40549,7 @@ Name   = DT Racer
 Region = NTSC-U
 Compat = 5
 GIFFIFOHack = 1 // Fixes corrupted graphics in the menus.
+VU0KickstartHack = 1 // Fixes TLB misses and collision bugs
 ---------------------------------------------
 Serial = SLUS-21096
 Name   = Ape Escape - Pumped & Primed
