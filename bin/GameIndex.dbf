@@ -26719,12 +26719,6 @@ Region = NTSC-J
 Serial = SLPM-66186
 Name   = Game ni Nattayo! Dokura-chan
 Region = NTSC-J
-[patches = 169099FC]
-	comment=Patch by kozarovv
-	//Game does weird stack manipulation, causing data sent to the IOP to be corrupted unless EE data cache is enabled. 
-	//This patch skips over the stack code, allowing the game to boot.
-	patch=0,EE,00156608,word,10000003
-[/patches]
 ---------------------------------------------
 Serial = SLPM-66187
 Name   = Exciting Pro Wrestling 6 - SmackDown vs. RAW [Yuke's the Best]
