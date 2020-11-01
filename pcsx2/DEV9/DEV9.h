@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2014 David Quintana [gigaherz]
+ *  Copyright (C) 2002-2020  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -18,8 +18,8 @@
 
 #include <stdio.h>
 #include <string>
-#ifndef EXTERN 
-#define EXTERN  extern
+#ifndef EXTERN
+#define EXTERN extern
 #endif
 #define DEV9defs
 //#define WINVER 0x0600
@@ -31,7 +31,7 @@
 
 #ifdef _WIN32
 
-#define usleep(x)	Sleep(x / 1000)
+#define usleep(x) Sleep(x / 1000)
 #include <windows.h>
 #include <windowsx.h>
 #include <winioctl.h>
@@ -53,10 +53,11 @@
 void rx_process(NetPacket* pk);
 bool rx_fifo_can_rx();
 
-#define ETH_DEF		"eth0"
-#define HDD_DEF		"DEV9hdd.raw"
+#define ETH_DEF "eth0"
+#define HDD_DEF "DEV9hdd.raw"
 
- typedef struct {
+typedef struct
+{
 	char Eth[256];
 	char Hdd[256];
 	int HddSize;
@@ -67,21 +68,22 @@ bool rx_fifo_can_rx();
 
 EXTERN Config config;
 
-typedef struct {
+typedef struct
+{
 	s8 dev9R[0x10000];
 	u8 eeprom_state;
 	u8 eeprom_command;
 	u8 eeprom_address;
 	u8 eeprom_bit;
 	u8 eeprom_dir;
-	u16 *eeprom;//[32];
-	
+	u16* eeprom; //[32];
+
 	u32 rxbdi;
-	u8 rxfifo[16*1024];
+	u8 rxfifo[16 * 1024];
 	u16 rxfifo_wr_ptr;
-	
+
 	u32 txbdi;
-	u8 txfifo[16*1024];
+	u8 txfifo[16 * 1024];
 	u16 txfifo_rd_ptr;
 
 	u8 bd_swap;
@@ -90,50 +92,49 @@ typedef struct {
 	u32 atasize;
 	u16 phyregs[32];
 	int irqcause;
-	u8  atacmd;
+	u8 atacmd;
 	u32 atasector;
 	u32 atansector;
 } dev9Struct;
 
 //EEPROM states
 #define EEPROM_READY 0
-#define EEPROM_OPCD0 1  //waiting for first bit of opcode
-#define EEPROM_OPCD1 2  //waiting for second bit of opcode
-#define EEPROM_ADDR0 3	//waiting for address bits
+#define EEPROM_OPCD0 1 //waiting for first bit of opcode
+#define EEPROM_OPCD1 2 //waiting for second bit of opcode
+#define EEPROM_ADDR0 3 //waiting for address bits
 #define EEPROM_ADDR1 4
 #define EEPROM_ADDR2 5
 #define EEPROM_ADDR3 6
 #define EEPROM_ADDR4 7
 #define EEPROM_ADDR5 8
-#define EEPROM_TDATA 9	//ready to send/receive data
+#define EEPROM_TDATA 9 //ready to send/receive data
 
 EXTERN dev9Struct dev9;
 
-#define dev9_rxfifo_write(x) (dev9.rxfifo[dev9.rxfifo_wr_ptr++]=x)
+#define dev9_rxfifo_write(x) (dev9.rxfifo[dev9.rxfifo_wr_ptr++] = x)
 
-#define dev9Rs8(mem)	dev9.dev9R[(mem) & 0xffff]
-#define dev9Rs16(mem)	(*(s16*)&dev9.dev9R[(mem) & 0xffff])
-#define dev9Rs32(mem)	(*(s32*)&dev9.dev9R[(mem) & 0xffff])
-#define dev9Ru8(mem)	(*(u8*) &dev9.dev9R[(mem) & 0xffff])
-#define dev9Ru16(mem)	(*(u16*)&dev9.dev9R[(mem) & 0xffff])
-#define dev9Ru32(mem)	(*(u32*)&dev9.dev9R[(mem) & 0xffff])
+#define dev9Rs8(mem) dev9.dev9R[(mem)&0xffff]
+#define dev9Rs16(mem) (*(s16*)&dev9.dev9R[(mem)&0xffff])
+#define dev9Rs32(mem) (*(s32*)&dev9.dev9R[(mem)&0xffff])
+#define dev9Ru8(mem) (*(u8*)&dev9.dev9R[(mem)&0xffff])
+#define dev9Ru16(mem) (*(u16*)&dev9.dev9R[(mem)&0xffff])
+#define dev9Ru32(mem) (*(u32*)&dev9.dev9R[(mem)&0xffff])
 
-EXTERN  int ThreadRun;
+EXTERN int ThreadRun;
 
-s32  _DEV9open();
+s32 _DEV9open();
 void _DEV9close();
-EXTERN  DEV9callback DEV9irq;
 //void DEV9thread();
 
-EXTERN  PluginLog DEV9Log;
+EXTERN PluginLog DEV9Log;
 //Yes these are meant to be a lowercase extern
-extern  std::string s_strIniPath;
-extern  std::string s_strLogPath;
-void __Log(char *fmt, ...);
+extern std::string s_strIniPath;
+extern std::string s_strLogPath;
+void __Log(char* fmt, ...);
 
-void SysMessage(char *fmt, ...);
+void SysMessage(char* fmt, ...);
 
-#define DEV9_R_REV	0x1f80146e
+#define DEV9_R_REV 0x1f80146e
 
 
 /*
@@ -143,6 +144,8 @@ void SysMessage(char *fmt, ...);
  *
  * * code included from the ps2smap iop driver, modified by linuzappz  *
  */
+
+// clang-format off
 
 #define SPD_REGBASE			0x10000000
 
@@ -548,6 +551,8 @@ typedef struct _smap_bd {
 #define	SMAP_DsPHYTER_10BTSCR		0x1A
 #define	SMAP_DsPHYTER_CDCTRL		0x1B
 
+// clang-format on
+
 /*
  * ATA hardware types and definitions.
  *
@@ -557,22 +562,22 @@ typedef struct _smap_bd {
  */
 
 
-#define ATA_DEV9_HDD_BASE		(SPD_REGBASE + 0x40)
+#define ATA_DEV9_HDD_BASE (SPD_REGBASE + 0x40)
 /* AIF on T10Ks - Not supported yet.  */
-#define ATA_AIF_HDD_BASE		(SPD_REGBASE + 0x4000000 + 0x60)
+#define ATA_AIF_HDD_BASE (SPD_REGBASE + 0x4000000 + 0x60)
 
-#define ATA_R_DATA			(ATA_DEV9_HDD_BASE + 0x00)
-#define ATA_R_ERROR			(ATA_DEV9_HDD_BASE + 0x02)
-#define ATA_R_NSECTOR		(ATA_DEV9_HDD_BASE + 0x04)
-#define ATA_R_SECTOR		(ATA_DEV9_HDD_BASE + 0x06)
-#define ATA_R_LCYL			(ATA_DEV9_HDD_BASE + 0x08)
-#define ATA_R_HCYL			(ATA_DEV9_HDD_BASE + 0x0a)
-#define ATA_R_SELECT		(ATA_DEV9_HDD_BASE + 0x0c)
-#define ATA_R_STATUS		(ATA_DEV9_HDD_BASE + 0x0e)
-#define ATA_R_CONTROL		(ATA_DEV9_HDD_BASE + 0x1c)
-#define ATA_DEV9_INT	(0x01)
+#define ATA_R_DATA (ATA_DEV9_HDD_BASE + 0x00)
+#define ATA_R_ERROR (ATA_DEV9_HDD_BASE + 0x02)
+#define ATA_R_NSECTOR (ATA_DEV9_HDD_BASE + 0x04)
+#define ATA_R_SECTOR (ATA_DEV9_HDD_BASE + 0x06)
+#define ATA_R_LCYL (ATA_DEV9_HDD_BASE + 0x08)
+#define ATA_R_HCYL (ATA_DEV9_HDD_BASE + 0x0a)
+#define ATA_R_SELECT (ATA_DEV9_HDD_BASE + 0x0c)
+#define ATA_R_STATUS (ATA_DEV9_HDD_BASE + 0x0e)
+#define ATA_R_CONTROL (ATA_DEV9_HDD_BASE + 0x1c)
+#define ATA_DEV9_INT (0x01)
 #define ATA_DEV9_INT_DMA (0x02) //not sure rly
-#define ATA_DEV9_HDD_END (ATA_R_CONTROL+4)
+#define ATA_DEV9_HDD_END (ATA_R_CONTROL + 4)
 /*
  * NAND Flash via Dev9 driver definitions
  *
@@ -581,30 +586,31 @@ typedef struct _smap_bd {
  * * code included from the ps2sdk iop driver *
  */
 
-#define FLASH_ID_64MBIT		0xe6
-#define FLASH_ID_128MBIT	0x73
-#define FLASH_ID_256MBIT	0x75
-#define FLASH_ID_512MBIT	0x76
-#define FLASH_ID_1024MBIT	0x79
+#define FLASH_ID_64MBIT 0xe6
+#define FLASH_ID_128MBIT 0x73
+#define FLASH_ID_256MBIT 0x75
+#define FLASH_ID_512MBIT 0x76
+#define FLASH_ID_1024MBIT 0x79
 
 /* SmartMedia commands.  */
-#define SM_CMD_READ1		0x00
-#define SM_CMD_READ2		0x01
-#define SM_CMD_READ3		0x50
-#define SM_CMD_RESET		0xff
-#define SM_CMD_WRITEDATA	0x80
-#define SM_CMD_PROGRAMPAGE	0x10
-#define SM_CMD_ERASEBLOCK	0x60
-#define SM_CMD_ERASECONFIRM	0xd0
-#define SM_CMD_GETSTATUS	0x70
-#define SM_CMD_READID		0x90
+#define SM_CMD_READ1 0x00
+#define SM_CMD_READ2 0x01
+#define SM_CMD_READ3 0x50
+#define SM_CMD_RESET 0xff
+#define SM_CMD_WRITEDATA 0x80
+#define SM_CMD_PROGRAMPAGE 0x10
+#define SM_CMD_ERASEBLOCK 0x60
+#define SM_CMD_ERASECONFIRM 0xd0
+#define SM_CMD_GETSTATUS 0x70
+#define SM_CMD_READID 0x90
 
-typedef struct {
-	u32	id;
-	u32	mbits;
-	u32	page_bytes;	/* bytes/page */
-	u32	block_pages;	/* pages/block */
-	u32	blocks;
+typedef struct
+{
+	u32 id;
+	u32 mbits;
+	u32 page_bytes;  /* bytes/page */
+	u32 block_pages; /* pages/block */
+	u32 blocks;
 } flash_info_t;
 
 /*
@@ -620,33 +626,47 @@ static flash_info_t devices[] = {
 
 // definitions added by Florin
 
-#define FLASH_REGBASE			0x10004800
+#define FLASH_REGBASE 0x10004800
 
-#define FLASH_R_DATA		(FLASH_REGBASE + 0x00)
-#define FLASH_R_CMD			(FLASH_REGBASE + 0x04)
-#define FLASH_R_ADDR		(FLASH_REGBASE + 0x08)
-#define FLASH_R_CTRL		(FLASH_REGBASE + 0x0C)
-#define   FLASH_PP_READY	(1<<0)	// r/w	/BUSY
-#define	  FLASH_PP_WRITE	(1<<7)	// -/w	WRITE data
-#define	  FLASH_PP_CSEL		(1<<8)	// -/w	CS
-#define	  FLASH_PP_READ		(1<<11)	// -/w	READ data
-#define	  FLASH_PP_NOECC	(1<<12)	// -/w	ECC disabled
+#define FLASH_R_DATA (FLASH_REGBASE + 0x00)
+#define FLASH_R_CMD (FLASH_REGBASE + 0x04)
+#define FLASH_R_ADDR (FLASH_REGBASE + 0x08)
+#define FLASH_R_CTRL (FLASH_REGBASE + 0x0C)
+#define FLASH_PP_READY (1 << 0)  // r/w	/BUSY
+#define FLASH_PP_WRITE (1 << 7)  // -/w	WRITE data
+#define FLASH_PP_CSEL (1 << 8)   // -/w	CS
+#define FLASH_PP_READ (1 << 11)  // -/w	READ data
+#define FLASH_PP_NOECC (1 << 12) // -/w	ECC disabled
 //#define FLASH_R_10		(FLASH_REGBASE + 0x10)
-#define FLASH_R_ID			(FLASH_REGBASE + 0x14)
+#define FLASH_R_ID (FLASH_REGBASE + 0x14)
 
-#define FLASH_REGSIZE			0x20
+#define FLASH_REGSIZE 0x20
 
-EXPORT_C_(void)
-FLASHinit();
-EXPORT_C_(u32)
- FLASHread32(u32 addr, int size);
-EXPORT_C_(void)
-FLASHwrite32(u32 addr, u32 value, int size);
+extern void dev9Irq(int cycles);
+extern void DEV9configure();
+
+void FLASHinit();
+s32 DEV9init();
+void DEV9close();
+s32 DEV9open(void* pDsp);
+void DEV9shutdown();
+u32 FLASHread32(u32 addr, int size);
+void FLASHwrite32(u32 addr, u32 value, int size);
 void _DEV9irq(int cause, int cycles);
+int DEV9irqHandler(void);
+void DEV9async(u32 cycles);
+void DEV9writeDMA8Mem(u32* pMem, int size);
+void DEV9readDMA8Mem(u32* pMem, int size);
+u8 DEV9read8(u32 addr);
+u16 DEV9read16(u32 addr);
+u32 DEV9read32(u32 addr);
+void DEV9write8(u32 addr, u8 value);
+void DEV9write16(u32 addr, u16 value);
+void DEV9write32(u32 addr, u32 value);
 
-int emu_printf(const char *fmt, ...);
+int emu_printf(const char* fmt, ...);
 
 #ifdef _WIN32
-#pragma warning(error:4013)
+#pragma warning(error : 4013)
 #endif
 #endif

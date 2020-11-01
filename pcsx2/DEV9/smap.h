@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2014 David Quintana [gigaherz]
+ *  Copyright (C) 2002-2020  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -13,15 +13,26 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOCKS_H__
-#define __SOCKS_H__
+#pragma once
+#include "DEV9.h"
 
-long sockOpen(char *Device);
-void sockClose();
-long sockSendData(void *pData, int Size);
-long sockRecvData(void *pData, int Size);
-long sockGetDevicesNum();
-char *sockGetDevice(int index);
-char *sockGetDeviceDesc(int index);
+EXPORT_C_(u8)
+smap_read8(u32 addr);
+EXPORT_C_(u16)
+smap_read16(u32 addr);
+EXPORT_C_(u32)
+smap_read32(u32 addr);
 
-#endif /* __SOCKS_H__*/
+EXPORT_C_(void)
+smap_write8(u32 addr, u8 value);
+EXPORT_C_(void)
+smap_write16(u32 addr, u16 value);
+EXPORT_C_(void)
+smap_write32(u32 addr, u32 value);
+
+EXPORT_C_(void)
+smap_readDMA8Mem(u32* pMem, int size);
+EXPORT_C_(void)
+smap_writeDMA8Mem(u32* pMem, int size);
+EXPORT_C_(void)
+smap_async(u32 cycles);
