@@ -742,12 +742,12 @@ Region = NTSC-Unk
 Serial = SCAJ-20125
 Name   = Tekken 5
 Region = NTSC-Unk
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCAJ-20126
 Name   = Tekken 5
 Region = NTSC-Unk
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCAJ-20127
 Name   = EyeToy - Play 2 [with Camera]
@@ -1046,7 +1046,7 @@ Region = NTSC-Unk
 Serial = SCAJ-20199
 Name   = Tekken 5 [PlayStation 2 The Best]
 Region = NTSC-Unk
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCAJ-25002
 Name   = Shinobi
@@ -2286,7 +2286,7 @@ Serial = SCES-53202
 Name   = Tekken 5
 Region = PAL-M5
 Compat = 5
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCES-53247
 Name   = WRC Rally Evolved
@@ -3108,7 +3108,7 @@ vuClampMode = 0 // Resolves I Reg Clamping / performance impact and yellow graph
 Serial = SCKA-20049
 Name   = Tekken 5
 Region = NTSC-K
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCKA-20050
 Name   = Tales of Legendia
@@ -3223,7 +3223,7 @@ VU0KickstartHack = 1 // Fixes Character SPS.
 Serial = SCKA-20081
 Name   = Tekken 5 [PlayStation 2 Big Hit Series]
 Region = NTSC-K
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SCKA-20086
 Name   = Shin Onimusha - Dawn of Dreams [Disc1of2]
@@ -35283,7 +35283,7 @@ Serial = SLPS-25510
 Name   = Tekken 5
 Region = NTSC-J
 Compat = 5
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SLPS-25511
 Name   = Rasetsu Alternative
@@ -37036,7 +37036,7 @@ Region = NTSC-J
 Serial = SLPS-73223
 Name   = Tekken 5 [PlayStation 2 The Best]
 Region = NTSC-J
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SLPS-73224
 Name   = Xenosaga Episode II - Jenseits von Gut und Bose [PlayStation 2 The Best] [Disc1of2]
@@ -42280,7 +42280,7 @@ Serial = SLUS-21059
 Name   = Tekken 5
 Region = NTSC-U
 Compat = 5
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SLUS-21060
 Name   = WWE SmackDown! vs. RAW
@@ -42758,7 +42758,7 @@ Compat = 5
 Serial = SLUS-21160
 Name   = Tekken 5 [Demo]
 Region = NTSC-U
-eeClampMode = 1
+eeClampMode = 2 // Fixes camera and stops constant coin noises on Pirates Cove
 ---------------------------------------------
 Serial = SLUS-21161
 Name   = Fight Night - Round 2
