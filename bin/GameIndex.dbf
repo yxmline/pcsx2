@@ -1332,6 +1332,7 @@ Name   = World Rally Championship
 Region = PAL-M7
 Compat = 5
 EETimingHack = 1 // Fix in-game Freeze.
+eeRoundMode = 0 // Fixes crash when using the Subaru
 ---------------------------------------------
 Serial = SCES-50240
 Name   = Extermination
@@ -33793,6 +33794,7 @@ Region = NTSC-J
 Serial = SLPS-25099
 Name   = World Rally Championship
 Region = NTSC-J
+eeRoundMode = 0 // Fixes crash when using the Subaru
 ---------------------------------------------
 Serial = SLPS-25100
 Name   = Tekken 4
@@ -39160,6 +39162,7 @@ XgKickHack = 1 // Fixes SPS while ingame.
 Serial = SLUS-20419
 Name   = World Rally Championship
 Region = NTSC-U
+eeRoundMode = 0 // Fixes crash when using the Subaru
 ---------------------------------------------
 Serial = SLUS-20420
 Name   = Star Wars - Bounty Hunter
