@@ -108,7 +108,6 @@
 Serial = GUST-00009
 Name   = Mana Khemia: Alchemists of Al-Revis [Premium Box]
 Region = NTSC-J
-DMABusyHack = 1
 eeRoundMode = 0 // Fixes jump issue.
 GIFFIFOHack = 1 // Fixes flickering sprites.
 ---------------------------------------------
@@ -20028,7 +20027,6 @@ Serial = SLES-55443
 Name   = Mana Khemia - Alchemists of Al-Revis
 Region = PAL-E
 Compat = 5
-DMABusyHack = 1
 eeRoundMode = 0 // Fixes jump issue.
 GIFFIFOHack = 1 // Fixes flickering sprites.
 ---------------------------------------------
@@ -45532,7 +45530,6 @@ Serial = SLUS-21735
 Name   = Mana Khemia - Alchemists of Al-Revis
 Region = NTSC-U
 Compat = 5
-DMABusyHack = 1
 eeRoundMode = 0 // Fixes jump issue.
 GIFFIFOHack = 1 // Fixes flickering sprites.
 ---------------------------------------------
