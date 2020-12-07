@@ -22,6 +22,7 @@
 #-------------------------------------------------------------------------------
 option(DISABLE_BUILD_DATE "Disable including the binary compile date")
 option(ENABLE_TESTS "Enables building the unit tests" ON)
+option(USE_SYSTEM_YAML "Uses a system version of yaml, if found")
 
 if(DISABLE_BUILD_DATE OR openSUSE)
     message(STATUS "Disabling the inclusion of the binary compile date.")
@@ -439,6 +440,13 @@ string(STRIP "${CMAKE_CXX_FLAGS} ${DEFAULT_CPP_FLAG}" CMAKE_CXX_FLAGS)
 #-------------------------------------------------------------------------------
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+
+if (APPLE AND ${CMAKE_OSX_DEPLOYMENT_TARGET} VERSION_LESS 10.14)
+    # Older versions of the macOS stdlib don't have operator new(size_t, align_val_t)
+    # Disable use of them with this flag
+    # Not great, but also no worse that what we were getting before we turned on C++17
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-aligned-allocation")
+endif()
 
 # CMake defaults the suffix for modules to .so on macOS but wx tells us that the
 # extension is .dylib (so that's what we search for)
