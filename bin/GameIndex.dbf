@@ -77,6 +77,7 @@
 -- Speed Hacks (SpeedHackName = <value>)
 ---------------------------------------------
 -- mvuFlagSpeedHack = 1 or 0 // Katamari Damacy have weird speed bug when this speed hack is enabled (and it is by default)
+-- InstantVU1SpeedHack = 1 or 0 // Games such as Parappa the Rapper 2 need VU1 to sync, so you can force disable the speedhack here
 
 ---------------------------------------------
 -- Memory Card Filter Override (MemCardFilter = s)
@@ -1393,6 +1394,7 @@ Serial = SCES-50408
 Name   = PaRappa the Rapper 2
 Region = PAL-M5
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes noodles.
 ---------------------------------------------
 Serial = SCES-50409
 Name   = MotoGP 2
@@ -3552,6 +3554,7 @@ Region = NTSC-J
 Serial = SCPS-15017
 Name   = PaRappa the Rapper 2
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes noodles.
 ---------------------------------------------
 Serial = SCPS-15018
 Name   = Train Simulator Real, The - Yamanote Sen
@@ -4093,6 +4096,7 @@ Region = NTSC-J
 Serial = SCPS-19201
 Name   = PaRappa the Rapper 2 [PlayStation 2 The Best]
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes noodles.
 ---------------------------------------------
 Serial = SCPS-19202
 Name   = Extermination [PlayStation 2 The Best]
@@ -4926,6 +4930,7 @@ Serial = SCUS-97167
 Name   = PaRappa the Rapper 2
 Region = NTSC-U
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes noodles.
 ---------------------------------------------
 Serial = SCUS-97169
 Name   = Drakan - The Ancients' Gates [Demo]
@@ -5082,6 +5087,7 @@ Region = NTSC-U
 Serial = SCUS-97208
 Name   = Hot Shots Golf 3 & PaRappa the Rapper 2 [Demo]
 Region = NTSC-U
+InstantVU1SpeedHack = 0 // Fixes noodles on Parappa 2.
 ---------------------------------------------
 Serial = SCUS-97209
 Name   = Ratchet & Clank [E3 Demo]
@@ -6775,6 +6781,7 @@ Region = PAL-M5
 Serial = SLED-52488
 Name   = Suffering, The [Demo]
 Region = PAL-E
+InstantVU1SpeedHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLED-52597
 Name   = Burnout 3 - Takedown [Demo]
@@ -7796,6 +7803,7 @@ Serial = SLES-50382
 Name   = Silent Hill 2
 Region = PAL-M6
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLES-50383
 Name   = Metal Gear Solid 2 - Sons of Liberty
@@ -7964,6 +7972,7 @@ Serial = SLES-50446
 Name   = Shadow Man - 2econd Coming
 Region = PAL-M4
 Compat = 4
+InstantVU1SpeedHack = 0 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-50447
 Name   = All-Star Baseball 2003
@@ -8295,6 +8304,7 @@ Region = PAL-M4
 Serial = SLES-50608
 Name   = Shadow Man - 2econd Coming
 Region = PAL-G
+InstantVU1SpeedHack = 0 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-50613
 Name   = Woody Woodpecker
@@ -9617,6 +9627,7 @@ Serial = SLES-51144
 Name   = Shox - Rally Reinvented
 Region = PAL-M7
 Compat = 5
+VU0KickstartHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-51145
 Name   = Monopoly Party
@@ -9645,6 +9656,7 @@ Serial = SLES-51156
 Name   = Silent Hill 2 - Director's Cut
 Region = PAL-M5
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLES-51157
 Name   = Silent Scope 3
@@ -9866,10 +9878,12 @@ Serial = SLES-51250
 Name   = Shox - Rally Reinvented
 Region = PAL-E
 Compat = 5
+VU0KickstartHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-51251
 Name   = Shox - Rally Reinvented
 Region = PAL-E
+VU0KickstartHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-51252
 Name   = Lord of the Rings, The - The Two Towers
@@ -10800,6 +10814,7 @@ Region = PAL-S
 Serial = SLES-51693
 Name   = Suffering, The
 Region = PAL-E-F-G
+InstantVU1SpeedHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-51696
 Name   = Dragon's Lair 3D - Special Edition
@@ -11587,6 +11602,7 @@ Serial = SLES-52001
 Name   = Mission Impossible - Operation Surma
 Region = PAL-M5
 Compat = 5
+VU0KickstartHack = 1 // Fixes crashes and broken graphics.
 ---------------------------------------------
 Serial = SLES-52002
 Name   = Rogue Ops
@@ -12442,6 +12458,7 @@ Serial = SLES-52439
 Name   = Suffering, The
 Region = PAL-E-I-S
 Compat = 5
+InstantVU1SpeedHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-52440
 Name   = Harry Potter and the Prisoner of Azkaban
@@ -12665,6 +12682,7 @@ Region = PAL-M4 // Nordic.
 Serial = SLES-52531
 Name   = Suffering, The
 Region = PAL-G
+InstantVU1SpeedHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLES-52532
 Name   = Aces of War
@@ -15194,16 +15212,19 @@ Region = PAL-G
 Serial = SLES-53526
 Name   = Suffering, The - Ties that Bind
 Region = PAL-E-F
+InstantVU1SpeedHack = 1 // Fixes SPS.
 MemCardFilter = SLES-53526/SLES-53527/SLES-53528/SLES-53626/SLES-51693/SLES-52439/SLES-52531
 ---------------------------------------------
 Serial = SLES-53527
 Name   = Suffering, The - Ties that Bind
 Region = PAL-E-I-S
+InstantVU1SpeedHack = 1 // Fixes SPS.
 MemCardFilter = SLES-53526/SLES-53527/SLES-53528/SLES-53626/SLES-51693/SLES-52439/SLES-52531
 ---------------------------------------------
 Serial = SLES-53528
 Name   = Suffering, The - Ties that Bind
 Region = PAL-G
+InstantVU1SpeedHack = 1 // Fixes SPS.
 MemCardFilter = SLES-53526/SLES-53527/SLES-53528/SLES-53626/SLES-51693/SLES-52439/SLES-52531
 ---------------------------------------------
 Serial = SLES-53529
@@ -15512,6 +15533,7 @@ Compat = 5
 Serial = SLES-53626
 Name   = Suffering, The - Ties that Bind
 Region = PAL-E-G
+InstantVU1SpeedHack = 1 // Fixes SPS.
 MemCardFilter = SLES-53526/SLES-53527/SLES-53528/SLES-53626/SLES-51693/SLES-52439/SLES-52531
 ---------------------------------------------
 Serial = SLES-53632
@@ -21749,6 +21771,7 @@ Region = NTSC-J
 Serial = SLPM-61009
 Name   = Silent Hill 2 (Red Ribbon) [Trial]
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-61010
 Name   = Devil May Cry [Trial Version]
@@ -21757,6 +21780,7 @@ Region = NTSC-J
 Serial = SLPM-61011
 Name   = Silent Hill 2 (Black Ribbon) [Video Trial]
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-61051
 Name   = Dengeki PS2 D61
@@ -24130,6 +24154,7 @@ Region = NTSC-J
 Serial = SLPM-62737
 Name   = Rally Shox & Freestyle Motorcross [EA Best Hits]
 Region = NTSC-J
+VU0KickstartHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLPM-62739
 Name   = Suro Genjin
@@ -24499,6 +24524,7 @@ Serial = SLPM-65051
 Name   = Silent Hill 2
 Region = NTSC-J
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-65052
 Name   = Guitar Freaks 4th Mix & Drummania 3rd Mix
@@ -24660,6 +24686,7 @@ Serial = SLPM-65098
 Name   = Silent Hill 2 - Saigo no Uta
 Region = NTSC-J
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-65100
 Name   = Onimusha 2
@@ -25470,6 +25497,7 @@ Region = NTSC-J
 Serial = SLPM-65341
 Name   = Silent Hill 2 - Saigo No Uta [Konami The Best]
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-65342
 Name   = Kyoufu Shinbun (Heisei) Kaiki! Shinrei File
@@ -26141,6 +26169,7 @@ Region = NTSC-J
 Serial = SLPM-65529
 Name   = Mission Impossible - Operation Surma
 Region = NTSC-J
+VU0KickstartHack = 1 // Fixes crashes and broken graphics.
 ---------------------------------------------
 Serial = SLPM-65530
 Name   = J-League Pro Soccer Club - Tsukuku 2004
@@ -26533,6 +26562,7 @@ Region = NTSC-J
 Serial = SLPM-65631
 Name   = Silent Hill 2 [Konami The Best]
 Region = NTSC-J
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLPM-65632
 Name   = Virtua Fighter Cyber Generation - Ambition of the Judgement Six
@@ -38213,7 +38243,6 @@ Serial = SLUS-20217
 Name   = Arctic Thunder
 Region = NTSC-U
 Compat = 5
-SkipMPEGHack = 1
 ---------------------------------------------
 Serial = SLUS-20218
 Name   = Stunt GP
@@ -38280,6 +38309,7 @@ Serial = SLUS-20228
 Name   = Silent Hill 2
 Region = NTSC-U
 Compat = 5
+InstantVU1SpeedHack = 0 // Fixes hang on FMV's when CDVD timing is accurate.
 ---------------------------------------------
 Serial = SLUS-20229
 Name   = Jonny Moseley - Mad Trix
@@ -39124,6 +39154,7 @@ Serial = SLUS-20400
 Name   = Mission Impossible - Operation Surma
 Region = NTSC-U
 Compat = 5
+VU0KickstartHack = 1 // Fixes crashes and broken graphics.
 ---------------------------------------------
 Serial = SLUS-20402
 Name   = Britney's Dance Beat
@@ -39173,6 +39204,7 @@ Serial = SLUS-20413
 Name   = Shadow Man - 2econd Coming
 Region = NTSC-U
 Compat = 4
+InstantVU1SpeedHack = 0 // Fixes SPS.
 ---------------------------------------------
 Serial = SLUS-20414
 Name   = Legaia 2 - Duel Saga
@@ -39752,6 +39784,7 @@ Serial = SLUS-20533
 Name   = Shox
 Region = NTSC-U
 Compat = 5
+VU0KickstartHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLUS-20534
 Name   = Cabela's Big Game Hunter
@@ -40239,6 +40272,7 @@ Serial = SLUS-20636
 Name   = Suffering, The
 Region = NTSC-U
 Compat = 5
+InstantVU1SpeedHack = 1 // Fixes SPS.
 ---------------------------------------------
 Serial = SLUS-20637
 Name   = Chessmaster (Online)
@@ -42948,6 +42982,7 @@ Serial = SLUS-21189
 Name   = Suffering, The - Ties That Bind
 Region = NTSC-U
 Compat = 5
+InstantVU1SpeedHack = 1 // Fixes SPS.
 MemCardFilter = SLUS-21189/SLUS-20636
 ---------------------------------------------
 Serial = SLUS-21190
