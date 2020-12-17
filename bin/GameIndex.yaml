@@ -941,6 +941,8 @@ SCAJ-25045:
 SCAJ-25047:
   name: "Dororo"
   region: "NTSC-Unk"
+  gameFixes:
+    - VU0KickstartHack
 SCAJ-30001:
   name: "Xenosaga Episode I [PlayStation 2 The Best]"
   region: "NTSC-Unk"
@@ -5771,6 +5773,8 @@ SLAJ-25046:
 SLAJ-25047:
   name: "Dororo"
   region: "NTSC-Ch-J"
+  gameFixes:
+    - VU0KickstartHack
 SLAJ-25048:
   name: "Sengoku Musou Mushoden"
   region: "NTSC-Unk"
@@ -17741,6 +17745,8 @@ SLKA-25225:
   name: "Dororo"
   region: "NTSC-K"
   compat: 5
+  gameFixes:
+    - VU0KickstartHack
 SLKA-25227:
   name: "Neo Contra"
   region: "NTSC-K"
@@ -18073,11 +18079,20 @@ SLPM-55008:
 SLPM-55033:
   name: "J. League Winning Eleven 2008 - Club Championship"
   region: "NTSC-J"
+SLPM-55041:
+  name: "Kanokon - Esuii"
+  region: "NTSC-J"
 SLPM-55063:
   name: "Hakuouki - Shinsengumi Kitan [Limited Edition]"
   region: "NTSC-J"
 SLPM-55064:
   name: "Hakuouki"
+  region: "NTSC-J"
+SLPM-55065:
+  name: "Kamiyo Gakuen Makorouku Kurunugia"
+  region: "NTSC-J"
+SLPM-55068:
+  name: "Koihime Musou"
   region: "NTSC-J"
 SLPM-55081:
   name: "Drag-on Dragoon 2 - Fuuin no Kurenai (Ultimate Hits)"
@@ -18167,6 +18182,9 @@ SLPM-55207:
 SLPM-55208:
   name: "Hakuouki - Zuisouroku"
   region: "NTSC-J"
+SLPM-55217:
+  name: "Shin Hisui no Shizuku - Hiiro no Kakera 2"
+  region: "NTSC-J"
 SLPM-55226:
   name: "FIFA 10: World Class Soccer"
   region: "NTSC-J"
@@ -18202,6 +18220,9 @@ SLPM-55283:
   region: "NTSC-J"
 SLPM-55285:
   name: "Crimson Empire"
+  region: "NTSC-J"
+SLPM-55294:
+  name: "World Soccer Winning Eleven 2012"
   region: "NTSC-J"
 SLPM-60101:
   name: "0 Story"
@@ -18473,6 +18494,9 @@ SLPM-62091:
   region: "NTSC-J"
 SLPM-62092:
   name: "XG3 Extreme G Racing"
+  region: "NTSC-J"
+SLPM-62093:
+  name: "Simple 2000 Series Ultimate Vol. 1 - Love Smash!"
   region: "NTSC-J"
 SLPM-62094:
   name: "Simple 2000 Series Vol. 2 - The Party Game"
@@ -19761,6 +19785,9 @@ SLPM-62617:
 SLPM-62618:
   name: "Simple 2000 Series Vol.78 - The Uchuu Daisensou"
   region: "NTSC-J"
+SLPM-62619:
+  name: "Shoujo Yoshitsune Den 2 (Limited Edition)"
+  region: "NTSC-J"
 SLPM-62620:
   name: "Pachi-Slot Winning Post"
   region: "NTSC-J"
@@ -20942,7 +20969,7 @@ SLPM-65254:
   name: "Galaxy Angel"
   region: "NTSC-J"
 SLPM-65255:
-  name: "Chobits"
+  name: "Chobits - Chiidake no Hito"
   region: "NTSC-J"
 SLPM-65256:
   name: "First Kiss Story 1&2 [Limited Edition]"
@@ -21265,8 +21292,11 @@ SLPM-65361:
 SLPM-65362:
   name: "NHK Tensai Bit-Kun - Guramon Battle"
   region: "NTSC-J"
+SLPM-65363:
+ name: "Shoujo Yoshitsune Den (Special Version)"
+ region: "NTSC-J"
 SLPM-65364:
-  name: "School Heaven - Boy's Love Scramble!"
+  name: "Shoujo Yoshitsune Den"
   region: "NTSC-J"
 SLPM-65365:
   name: "Tokimeki Memorial - Girl's Side [Konami The Best]"
@@ -21742,6 +21772,8 @@ SLPM-65525:
 SLPM-65526:
   name: "Dororo"
   region: "NTSC-J"
+  gameFixes:
+    - VU0KickstartHack
 SLPM-65527:
   name: "FIFA Total Football"
   region: "NTSC-J"
@@ -23013,6 +23045,8 @@ SLPM-65944:
 SLPM-65945:
   name: "Red Ninja - End of Honor"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack
 SLPM-65946:
   name: "Beatmania IIDX - 9th Style"
   region: "NTSC-J"
@@ -23798,6 +23832,8 @@ SLPM-66206:
 SLPM-66207:
   name: "Dororo [Sega the Best 2800]"
   region: "NTSC-J"
+  gameFixes:
+    - VU0KickstartHack
 SLPM-66208:
   name: "Sakura Taisen V - Episode 0 - Samurai Girl of Wild [Sega the Best]"
   region: "NTSC-J"
@@ -24286,6 +24322,8 @@ SLPM-66356:
 SLPM-66358:
   name: "Shinobido Takumi"
   region: "NTSC-J"
+  clampModes:
+    eeClampMode: 3
 SLPM-66359:
   name: "Mutsuzaki Hoshi Kikari"
   region: "NTSC-J"
@@ -24986,6 +25024,12 @@ SLPM-66585:
   name: "Elvandia Story"
   region: "NTSC-J"
   compat: 5
+  roundModes:
+    eeRoundMode: 0
+    vuRoundMode: 0
+  clampModes:
+    eeClampMode: 3
+    vuClampMode: 3
 SLPM-66586:
   name: "Karutagura - Tamashii no Kunou [2800 Collection]"
   region: "NTSC-J"
@@ -28841,6 +28885,8 @@ SLPS-25382:
 SLPS-25383:
   name: "Digimon Battle Chronicle"
   region: "NTSC-J"
+  gameFixes:
+    - FpuCompareHack
 SLPS-25384:
   name: "Tenchu Kurenai"
   region: "NTSC-J"
@@ -30357,6 +30403,11 @@ SLPS-25842:
     - "SLPS-25841"
     - "SLPS-25842"
     - "SLPS-25715"
+  patches:
+    8409FD51:
+      content: |-
+        //Tales of Destiny Director's Cut FMV FIX
+        patch=0,EE,001B4858,word,00000000
 SLPS-25843:
   name: "Tir-Na-Nog"
   region: "NTSC-J"
@@ -30480,6 +30531,9 @@ SLPS-25897:
 SLPS-25898:
   name: "Zero no Tsukaima - Maigo no Period to Ikusen no Symphony"
   region: "NTSC-J"
+SLPS-25902:
+  name: "Junjou Romanchika - Koi no Doki Doki Daisakusen"
+  region: "NTSC-J"
 SLPS-25905:
   name: "Dragon Ball Z: Infinite World"
   region: "NTSC-J"
@@ -30509,6 +30563,9 @@ SLPS-25934:
   region: "NTSC-J"
 SLPS-25935:
   name: "The King of Fighters '98 Ultimate Match (NeoGeo Online Collection the Best)"
+  region: "NTSC-J"
+SLPS-25941:
+  name: "SD Gundam G Generation Wars"
   region: "NTSC-J"
 SLPS-25944:
   name: "Kamen Rider Climax Heroes"
