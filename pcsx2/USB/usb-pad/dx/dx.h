@@ -40,9 +40,6 @@ namespace usb_pad
 {
 	namespace dx
 	{
-
-		extern int32_t BYPASSCAL;
-
 		//dinput control mappings
 
 		static const DWORD PRECMULTI = 100; //floating point precision multiplier, 100 - two digit precision after comma
@@ -196,6 +193,7 @@ namespace usb_pad
 		extern std::vector<JoystickDevice*> g_pJoysticks;
 		extern std::map<int, InputMapped> g_Controls[2];
 
+		void ApplySettings(int port);
 		void LoadDInputConfig(int port, const char* dev_type);
 		void SaveDInputConfig(int port, const char* dev_type);
 
@@ -213,6 +211,7 @@ namespace usb_pad
 		float GetAxisControl(int port, ControlID id);
 		void CreateFFB(int port, LPDIRECTINPUTDEVICE8 device, DWORD axis);
 		bool FindFFDevice(int port);
+		void UpdateFFBSettings(int port, LPDIRECTINPUTDEVICE8 device);
 
 		void AddInputMap(int port, int cid, const InputMapped& im);
 		void RemoveInputMap(int port, int cid);
