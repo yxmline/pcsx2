@@ -6876,18 +6876,6 @@ SLES-50423:
   name: "F1 2001"
   region: "PAL-M4"
   compat: 5
-  patches:
-    063FF7DB:
-      content: |-
-        author=prafull
-        // Skips IPU videos.
-        // Each videos can be called separately
-        // on this game.
-        // This seems like the only way of patching
-        // them all. The issue here is the PCSX2 IPU
-        // do not support well the EA proprietary IPU
-        // Library causing hanging in menus.
-        patch=1,EE,001f4d2c,word,00000000
 SLES-50424:
   name: "Cricket 2002"
   region: "PAL-E"
@@ -7786,13 +7774,6 @@ SLES-50874:
   name: "F1 2002"
   region: "PAL-M4"
   compat: 5
-  patches:
-    A0ED2D23:
-      content: |-
-        comment=Patch by Prafull
-        // Fixes controller issue but skips videos.
-        patch=0,EE,002d8568,word,03e00008
-        patch=0,EE,002d856c,word,00000000
 SLES-50875:
   name: "F1 2002"
   region: "PAL-I"
@@ -13428,15 +13409,6 @@ SLES-53744:
 SLES-53746:
   name: "Superman Returns"
   region: "PAL-E"
-  patches:
-    E8F7BAB6:
-      content: |-
-        author=kozarovv
-        // Fix sps and various graphical issues by Using iaddiu instead of FSAND
-        // require preload frame data and crc hack atleast minimum for GSDX HW
-        patch=1,EE,00639Ef0,word,10050208
-        patch=1,EE,0063a068,word,10080208
-        patch=1,EE,0063D488,word,10020208
 SLES-53747:
   name: "Ed, Edd, 'n Eddy - The Misadventure"
   region: "PAL-E"
@@ -14610,28 +14582,12 @@ SLES-54348:
 SLES-54349:
   name: "Superman Returns"
   region: "PAL-I"
-  patches:
-    E7F7B6BD:
-      content: |-
-        author=kozarovv
-        // Use iaddiu instead of FSAND.
-        patch=1,EE,00639ef0,word,10050208
-        patch=1,EE,0063a068,word,10080208
 SLES-54350:
   name: "Superman Returns"
   region: "PAL-G"
 SLES-54351:
   name: "Superman Returns"
   region: "PAL-S"
-  patches:
-    EDF0A0A7:
-      content: |-
-        author=kozarovv
-        // Fix sps and various graphical issues by Using iaddiu instead of FSAND
-        // require preload frame data and crc hack atleast minimum for GSDX HW
-        patch=1,EE,00639Ef0,word,10050208
-        patch=1,EE,0063a068,word,10080208
-        patch=1,EE,0063D488,word,10020208
 SLES-54354:
   name: "Final Fantasy XII"
   region: "PAL-E"
@@ -19526,14 +19482,6 @@ SLPM-62524:
   name: "Simple 2000 Series Vol.59 - The Uchyujin to Hanashi Sou!"
   region: "NTSC-J"
   compat: 5
-  patches:
-    85E92C92:
-      content: |-
-        // Skip videos (custom).
-        patch=0,EE,001b4cd8,word,00000000
-        // Skip videos (custom).
-        patch=0,EE,001b4c90,word,03e00008
-        patch=0,EE,001b4c94,word,00000000
 SLPM-62525:
   name: "Simple 2000 Series Vol.61 - The O-Ane-Chan-Bara"
   region: "NTSC-J"
@@ -22493,8 +22441,6 @@ SLPM-65752:
     A70549D6:
       content: |-
         comment=Patch by Prafull, Jelta
-        // New patch fixes most issues.
-        patch=0,EE,003A95B8,word,00000000
         // Fix hang at Level 4.
         patch=0,EE,0037B264,word,03e00008
         patch=0,EE,0037B268,word,00000000
@@ -32064,18 +32010,6 @@ SLUS-20263:
 SLUS-20264:
   name: "F1 2001"
   region: "NTSC-U"
-  patches:
-    2870c248:
-      content: |-
-        author=Prafull
-        // Skips IPU videos.
-        // Each video can be called separately
-        // on this game.
-        // This seems like the only way of patching
-        // them all. The issue here is the PCSX2 IPU
-        // do not support well the EA proprietary IPU
-        // Library causing hanging in menus.
-        patch=1,EE,001f4d2c,word,00000000
 SLUS-20265:
   name: "James Bond 007 - Agent Under Fire"
   region: "NTSC-U"
@@ -32864,13 +32798,6 @@ SLUS-20454:
 SLUS-20455:
   name: "F1 2002"
   region: "NTSC-U"
-  patches:
-    8FF059A1:
-      content: |-
-        comment=Patch by Prafull
-        // Fixes controller issue but skips videos.
-        patch=0,EE,002d8c58,word,03e00008
-        patch=0,EE,002d8c5c,word,00000000
 SLUS-20456:
   name: "Soccer Mania"
   region: "NTSC-U"
@@ -34961,8 +34888,6 @@ SLUS-20961:
     08901101:
       content: |-
         comment=Patch by Prafull
-        // New patch fixes most issues.
-        patch=0,EE,003a94f8,word,00000000
         // Fix hang at Level 4.
         patch=0,EE,0037b1a4,word,03e00008
         patch=0,EE,0037b1a8,word,00000000
@@ -37076,15 +37001,6 @@ SLUS-21434:
   name: "Superman Returns - The Video Game"
   region: "NTSC-U"
   compat: 4
-  patches:
-    E1BF5DCA:
-      content: |-
-        author=kozarovv
-        // Fix sps and various graphical issues by Using iaddiu instead of FSAND
-        // require preload frame data and crc hack atleast minimum for GSDX HW
-        patch=1,EE,00639E70,word,10050208
-        patch=1,EE,00639FE8,word,10080208
-        patch=1,EE,0063D408,word,10020208
 SLUS-21435:
   name: "One Piece - Grand Adventure"
   region: "NTSC-U"
