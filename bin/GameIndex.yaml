@@ -1926,6 +1926,8 @@ SCES-52677:
   name: "Network Access Disc & Hardware - Online Arena"
   region: "PAL-M7"
   compat: 5
+  speedHacks:
+    InstantVU1SpeedHack: 1  # Fixes not rendering most the screen
   patches:
     default:
       content: |-
@@ -20193,6 +20195,9 @@ SLPM-64502:
     vuClampMode: 3  # Fixes missing 3D polygons when going ingame.
 SLPM-64504:
   name: "Maximo"
+  region: "NTSC-K"
+SLPM-64513:
+  name: "Crash Bandicoot: Return of the Demon King"
   region: "NTSC-K"
 SLPM-64522:
   name: "La Pucelle"
