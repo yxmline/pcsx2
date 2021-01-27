@@ -97,10 +97,19 @@ void V_Core::LogAutoDMA(FILE* fp)
 
 void V_Core::AutoDMAReadBuffer(int mode) //mode: 0= split stereo; 1 = do not split stereo
 {
-	int spos = ((InputPosRead + 0xff) & 0x100); //starting position of the free buffer
+	int spos = InputPosWrite & 0x100; // Starting position passed by TSA
+	bool leftbuffer = !(InputPosWrite & 0x80);
 
+	if (InputPosWrite == 0xFFFF) // Data request not made yet
+		return;
+
+	AutoDMACtrl &= 0x3;
+
+	int size = std::min(InputDataLeft, (u32)0x200);
+	if (!leftbuffer)
+		size = 0x100;
 	LogAutoDMA(Index ? ADMA7LogFile : ADMA4LogFile);
-
+	//ConLog("Refilling ADMA buffer at %x OutPos %x with %x\n", spos, OutPos, size);
 	// HACKFIX!! DMAPtr can be invalid after a savestate load, so the savestate just forces it
 	// to nullptr and we ignore it here.  (used to work in old VM editions of PCSX2 with fixed
 	// addressing, but new PCSX2s have dynamic memory addressing).
@@ -108,54 +117,57 @@ void V_Core::AutoDMAReadBuffer(int mode) //mode: 0= split stereo; 1 = do not spl
 	if (mode)
 	{
 		if (DMAPtr != nullptr)
-			//memcpy((ADMATempBuffer+(spos<<1)),DMAPtr+InputDataProgress,0x400);
-			memcpy(GetMemPtr(0x2000 + (Index << 10) + spos), DMAPtr + InputDataProgress, 0x400);
-		MADR += 0x400;
+			memcpy(GetMemPtr(0x2000 + (Index << 10) + spos), DMAPtr + InputDataProgress, size);
+		MADR += size;
 		InputDataLeft -= 0x200;
 		InputDataProgress += 0x200;
 	}
 	else
 	{
-		if (DMAPtr != nullptr)
-			//memcpy((ADMATempBuffer+spos),DMAPtr+InputDataProgress,0x200);
-			memcpy(GetMemPtr(0x2000 + (Index << 10) + spos), DMAPtr + InputDataProgress, 0x200);
-		MADR += 0x200;
-		InputDataLeft -= 0x100;
-		InputDataProgress += 0x100;
+		while (size)
+		{
+			if (!leftbuffer)
+				spos |= 0x200;
+			else
+				spos &= ~0x200;
 
-		if (DMAPtr != nullptr)
-			//memcpy((ADMATempBuffer+spos+0x200),DMAPtr+InputDataProgress,0x200);
-			memcpy(GetMemPtr(0x2200 + (Index << 10) + spos), DMAPtr + InputDataProgress, 0x200);
-		MADR += 0x200;
-		InputDataLeft -= 0x100;
-		InputDataProgress += 0x100;
+			if (DMAPtr != nullptr)
+				memcpy(GetMemPtr(0x2000 + (Index << 10) + spos), DMAPtr + InputDataProgress, 0x200);
+			InputDataTransferred += 0x200;
+			InputDataLeft -= 0x100;
+			InputDataProgress += 0x100;
+			leftbuffer = !leftbuffer;
+			size -= 0x100;
+			InputPosWrite += 0x80;
+		}
 	}
-	// See ReadInput at mixer.cpp for explanation on the commented out lines
-	//
+	if (!(InputPosWrite & 0x80))
+		InputPosWrite = 0xFFFF;
 }
 
 void V_Core::StartADMAWrite(u16* pMem, u32 sz)
 {
-	int size = (sz) & (~511);
+	int size = sz;
 
 	if (cyclePtr != nullptr)
 		TimeUpdate(*cyclePtr);
 
 	if (MsgAutoDMA())
-		ConLog("* SPU2: DMA%c AutoDMA Transfer of %d bytes to %x (%02x %x %04x).\n",
-			   GetDmaIndexChar(), size << 1, ActiveTSA, DMABits, AutoDMACtrl, (~Regs.ATTR) & 0xffff);
+		ConLog("* SPU2: DMA%c AutoDMA Transfer of %d bytes to %x (%02x %x %04x).OutPos %x\n",
+			   GetDmaIndexChar(), size << 1, ActiveTSA, DMABits, AutoDMACtrl, (~Regs.ATTR) & 0xffff, OutPos);
 
 	InputDataProgress = 0;
+	TADR = MADR + (size << 1);
 	if ((AutoDMACtrl & (Index + 1)) == 0)
 	{
 		ActiveTSA = 0x2000 + (Index << 10);
 		DMAICounter = size * 4;
 		LastClock = *cyclePtr;
 	}
-	else if (size >= 512)
+	else if (size >= 256)
 	{
 		InputDataLeft = size;
-		if (AdmaInProgress == 0)
+		if (InputPosWrite != 0xFFFF)
 		{
 #ifdef PCM24_S1_INTERLEAVE
 			if ((Index == 1) && ((PlayMode & 8) == 8))
@@ -167,29 +179,26 @@ void V_Core::StartADMAWrite(u16* pMem, u32 sz)
 				AutoDMAReadBuffer(Index, 0);
 			}
 #else
-			if (((PlayMode & 4) == 4) && (Index == 0))
-				Cores[0].InputPosRead = 0;
-
 			AutoDMAReadBuffer(0);
 #endif
-			// Klonoa 2
-			if (size == 512)
+
+
+			if (!InputDataLeft)
 			{
 				DMAICounter = size * 4;
 				LastClock = *cyclePtr;
+				AutoDMACtrl |= ~3;
 			}
 		}
-
 		AdmaInProgress = 1;
 	}
 	else
 	{
-		size = sz;
+		ConLog("ADMA%c Error Size of %x too small\n", GetDmaIndexChar(), size);
 		InputDataLeft = 0;
 		DMAICounter = size * 4;
 		LastClock = *cyclePtr;
 	}
-	TADR = MADR + (size << 1);
 }
 
 void V_Core::PlainDMAWrite(u16* pMem, u32 size)
@@ -232,8 +241,6 @@ void V_Core::PlainDMAWrite(u16* pMem, u32 size)
 
 void V_Core::FinishDMAwrite()
 {
-	if (ActiveTSA != TSA)
-		ConLog("Write WTF TSA %x Active %x\n", TSA, ActiveTSA);
 	if (Index == 0)
 		DMA4LogWrite(DMAPtr, ReadSize << 1);
 	else
@@ -357,8 +364,6 @@ void V_Core::FinishDMAwrite()
 
 void V_Core::FinishDMAread()
 {
-	if (ActiveTSA != TSA)
-		ConLog("Read WTF TSA %x Active %x\n", TSA, ActiveTSA);
 	u32 buff1end = ActiveTSA + std::min(ReadSize, (u32)0x100 + std::abs(DMAICounter / 4));
 	u32 start = ActiveTSA;
 	u32 buff2end = 0;
@@ -520,7 +525,7 @@ void V_Core::DoDMAwrite(u16* pMem, u32 size)
 	else
 	{
 		PlainDMAWrite(pMem, size);
+		Regs.STATX &= ~0x80;
+		Regs.STATX |= 0x400;
 	}
-	Regs.STATX &= ~0x80;
-	Regs.STATX |= 0x400;
 }

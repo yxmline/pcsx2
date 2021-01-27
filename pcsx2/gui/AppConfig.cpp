@@ -152,7 +152,7 @@ namespace PathDefs
 	{
 		switch( mode )
 		{
-#ifdef XDG_STD
+#if defined(XDG_STD) || defined(__APPLE__) // Expected location for this kind of stuff on macOS
 			// Move all user data file into central configuration directory (XDG_CONFIG_DIR)
 			case DocsFolder_User:	return GetUserLocalDataDir();
 #else
@@ -173,7 +173,9 @@ namespace PathDefs
 
 	wxDirName GetProgramDataDir()
 	{
-#ifndef GAMEINDEX_DIR_COMPILATION
+#ifdef __APPLE__
+		return wxDirName(wxStandardPaths::Get().GetResourcesDir());
+#elif !defined(GAMEINDEX_DIR_COMPILATION)
 		return AppRoot();
 #else
 		// Each linux distributions have his rules for path so we give them the possibility to
@@ -244,7 +246,11 @@ namespace PathDefs
 
 	wxDirName GetLangs()
 	{
+#ifdef __APPLE__
+		return wxDirName(wxStandardPaths::Get().GetResourcesDir());
+#else
 		return AppRoot() + Base::Langs();
+#endif
 	}
 
 	wxDirName Get( FoldersEnum_t folderidx )
