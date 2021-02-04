@@ -154,6 +154,22 @@ static __forceinline s32 GetNextDataBuffered(V_Core& thiscore, uint voiceidx)
 
 	if ((vc.SCurrent & 3) == 0)
 	{
+		if (vc.PendingLoopStart)
+		{
+			if ((Cycles - vc.PlayCycle) >= 4 )
+			{
+				if (vc.LoopCycle < vc.PlayCycle)
+				{
+					vc.LoopStartA = vc.PendingLoopStartA;
+					ConLog("Core %d Voice %d Loop Written by HW within 4T of Key On, Now Applying\n", thiscore.Index, voiceidx);
+					vc.LoopMode = 1;
+				}
+				else
+					ConLog("Loop point from waveform set within 4T's, ignoring HW write\n");
+
+				vc.PendingLoopStart = false;
+			}
+		}
 		IncrementNextA(thiscore, voiceidx);
 
 		if ((vc.NextA & 7) == 0) // vc.SCurrent == 24 equivalent
@@ -192,13 +208,16 @@ static __forceinline s32 GetNextDataBuffered(V_Core& thiscore, uint voiceidx)
 		vc.LoopFlags = *memptr >> 8; // grab loop flags from the upper byte.
 
 		if ((vc.LoopFlags & XAFLAG_LOOP_START) && !vc.LoopMode)
+		{
 			vc.LoopStartA = vc.NextA & 0xFFFF8;
+			vc.LoopCycle = Cycles;
+		}
 
 		const int cacheIdx = vc.NextA / pcm_WordsPerBlock;
 		PcmCacheEntry& cacheLine = pcm_cache_data[cacheIdx];
 		vc.SBuffer = cacheLine.Sampledata;
 
-		if (cacheLine.Validated)
+		if (cacheLine.Validated && vc.Prev1 == cacheLine.Prev1 && vc.Prev2 == cacheLine.Prev2)
 		{
 			// Cached block!  Read from the cache directly.
 			// Make sure to propagate the prev1/prev2 ADPCM:
@@ -215,7 +234,11 @@ static __forceinline s32 GetNextDataBuffered(V_Core& thiscore, uint voiceidx)
 		{
 			// Only flag the cache if it's a non-dynamic memory range.
 			if (vc.NextA >= SPU2_DYN_MEMLINE)
+			{
 				cacheLine.Validated = true;
+				cacheLine.Prev1 = vc.Prev1;
+				cacheLine.Prev2 = vc.Prev2;
+			}
 
 			if (IsDevBuild)
 			{

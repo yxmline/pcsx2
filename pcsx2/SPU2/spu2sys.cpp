@@ -336,30 +336,11 @@ void V_Core::UpdateEffectsBufferSize()
 	RevBuffers.APF2_R_SRC = EffectsBufferIndexer(Revb.APF2_R_DST - Revb.APF2_SIZE);
 }
 
-bool V_Voice::Start()
+void V_Voice::Start()
 {
-	if (StartA & 7)
-	{
-		fprintf(stderr, " *** Misaligned StartA %05x!\n", StartA);
-		StartA = (StartA + 0xFFFF8) + 0x8;
-	}
-
-	ADSR.Releasing = false;
-	ADSR.Value = 1;
-	ADSR.Phase = 1;
-	SCurrent = 28;
-	LoopMode = 0;
-	SP = 0;
-	LoopFlags = 0;
-	NextA = StartA | 1;
-	Prev1 = 0;
-	Prev2 = 0;
-
-	PV1 = PV2 = 0;
-	PV3 = PV4 = 0;
-	NextCrest = -0x8000;
 	PlayCycle = Cycles;
-	return true;
+	LoopCycle = Cycles - 1; // Get it out of the start range as to not confuse it
+	PendingLoopStart = false;
 }
 
 void V_Voice::Stop()
@@ -371,6 +352,37 @@ void V_Voice::Stop()
 uint TickInterval = 768;
 static const int SanityInterval = 4800;
 extern void UpdateDebugDialog();
+
+__forceinline bool StartQueuedVoice(uint coreidx, uint voiceidx)
+{
+	V_Voice& vc(Cores[coreidx].Voices[voiceidx]);
+
+	if ((Cycles - vc.PlayCycle) < 2)
+		return false;
+
+	if (vc.StartA & 7)
+	{
+		fprintf(stderr, " *** Misaligned StartA %05x!\n", vc.StartA);
+		vc.StartA = (vc.StartA + 0xFFFF8) + 0x8;
+	}
+
+	vc.ADSR.Releasing = false;
+	vc.ADSR.Value = 1;
+	vc.ADSR.Phase = 1;
+	vc.SCurrent = 28;
+	vc.LoopMode = 0;
+	vc.SP = 0;
+	vc.LoopFlags = 0;
+	vc.NextA = vc.StartA | 1;
+	vc.Prev1 = 0;
+	vc.Prev2 = 0;
+
+	vc.PV1 = vc.PV2 = 0;
+	vc.PV3 = vc.PV4 = 0;
+	vc.NextCrest = -0x8000;
+
+	return true;
+}
 
 __forceinline void TimeUpdate(u32 cClocks)
 {
@@ -427,6 +439,12 @@ __forceinline void TimeUpdate(u32 cClocks)
 		lClocks += TickInterval;
 		Cycles++;
 
+		// Start Queued Voices, they start after 2T (Tested on real HW)
+		for(int c = 0; c < 2; c++)
+			for (int v = 0; v < 24; v++)
+				if(Cores[c].KeyOn & (1 << v))
+					if(StartQueuedVoice(c, v))
+						Cores[c].KeyOn &= ~(1 << v);
 		// Note: IOP does not use MMX regs, so no need to save them.
 		//SaveMMXRegs();
 		Mix();
@@ -1201,13 +1219,39 @@ static void __fastcall RegWrite_VoiceAddr(u16 value)
 			break;
 
 		case 2:
-			thisvoice.LoopStartA = ((u32)(value & 0x0F) << 16) | (thisvoice.LoopStartA & 0xFFF8);
-			thisvoice.LoopMode = 1;
+			{
+				u32* LoopReg;
+				if ((Cycles - thisvoice.PlayCycle) < 4)
+				{
+					LoopReg = &thisvoice.PendingLoopStartA;
+					thisvoice.PendingLoopStart = true;
+				}
+				else
+				{
+					LoopReg = &thisvoice.LoopStartA;
+					thisvoice.LoopMode = 1;
+				}
+
+				*LoopReg = ((u32)(value & 0x0F) << 16) | (*LoopReg & 0xFFF8);
+			}
 			break;
 
 		case 3:
-			thisvoice.LoopStartA = (thisvoice.LoopStartA & 0x0F0000) | (value & 0xFFF8);
-			thisvoice.LoopMode = 1;
+			{
+				u32* LoopReg;
+				if ((Cycles - thisvoice.PlayCycle) < 4)
+				{
+					LoopReg = &thisvoice.PendingLoopStartA;
+					thisvoice.PendingLoopStart = true;
+				}
+				else
+				{
+					LoopReg = &thisvoice.LoopStartA;
+					thisvoice.LoopMode = 1;
+				}
+				
+				*LoopReg = (*LoopReg & 0x0F0000) | (value & 0xFFF8);
+			}
 			break;
 
 			// Note that there's no proof that I know of that writing to NextA is
@@ -1927,12 +1971,12 @@ void SPU2_FastWrite(u32 rmem, u16 value)
 
 void StartVoices(int core, u32 value)
 {
-	ConLog("KeyOn Write %x\n", value);
-
 	// Optimization: Games like to write zero to the KeyOn reg a lot, so shortcut
 	// this loop if value is zero.
 	if (value == 0)
 		return;
+
+	ConLog("KeyOn Write %x\n", value);
 
 	Cores[core].KeyOn |= value;
 	Cores[core].Regs.ENDX &= ~value;
@@ -1942,8 +1986,7 @@ void StartVoices(int core, u32 value)
 		if (!((value >> vc) & 1))
 			continue;
 
-		if (Cores[core].Voices[vc].Start())
-			Cores[core].KeyOn &= ~(1 << vc);
+		Cores[core].Voices[vc].Start();
 
 		if (IsDevBuild)
 		{
@@ -1964,10 +2007,10 @@ void StartVoices(int core, u32 value)
 
 void StopVoices(int core, u32 value)
 {
-	ConLog("KeyOff Write %x\n", value);
-
 	if (value == 0)
 		return;
+
+	ConLog("KeyOff Write %x\n", value);
 
 	for (u8 vc = 0; vc < V_Core::NumVoices; vc++)
 	{
