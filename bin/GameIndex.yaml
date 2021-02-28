@@ -3246,17 +3246,6 @@ SCPS-15050:
   name: "Flipnic"
   region: "NTSC-J"
   compat: 5
-  patches:
-    25433CBD:
-      content: |-
-        comment=Patches by Nachbrenner
-        // Fix D3_CHCR (might be redundant).
-        patch=0,EE,0011c1b8,word,00000000
-        // Skip sceIpuSync.
-        patch=0,EE,00208eb0,word,03e00008
-        patch=0,EE,00208eb4,word,00000000
-        // Fix sceIpuRestartDMA.
-        patch=0,EE,00208e04,word,00000000
 SCPS-15051:
   name: "MLB 2003"
   region: "NTSC-J"
@@ -6166,23 +6155,10 @@ SLES-50046:
   name: "F1 Racing Championship"
   region: "PAL-F-G"
   compat: 2
-  patches:
-    EDD7E0FF:
-      content: |-
-        author=Nachbrenner
-        // Skip Videos.
-        patch=0,EE,0024ddc0,word,24020001
 SLES-50047:
   name: "F1 Racing Championship"
   region: "PAL-M3"
   compat: 5
-  patches:
-    3063bd41:
-      content: |-
-        author=Prafull
-        // Fixes IPU issues causing a hang at loading menu.
-        patch=1,EE,00258e34,word,00000000
-        patch=1,EE,00217484,word,00000000
 SLES-50048:
   name: "Donald Duck - Quack Attack"
   region: "PAL-M5"
@@ -6533,8 +6509,6 @@ SLES-50212:
   name: "Paris-Dakar Rally"
   region: "PAL-E"
   compat: 5
-  gameFixes:
-    - SkipMPEGHack
 SLES-50213:
   name: "NFL Quarterback Club 2002"
   region: "PAL-E"
@@ -7100,6 +7074,8 @@ SLES-50539:
 SLES-50540:
   name: "Simpsons Road Rage"
   region: "PAL-E"
+  gameFixes:
+    - VU0KickstartHack # Fixes Bad Character Models.
 SLES-50541:
   name: "Capcom vs. SNK 2 - Mark of the Millennium"
   region: "PAL-E"
@@ -7223,6 +7199,8 @@ SLES-50620:
 SLES-50628:
   name: "Simpsons Road Rage"
   region: "PAL-M5"
+  gameFixes:
+    - VU0KickstartHack # Fixes Bad Character Models.
 SLES-50630:
   name: "Dragon Rage"
   region: "PAL-E"
@@ -8047,13 +8025,6 @@ SLES-51023:
   name: "LMA Manager 2003"
   region: "PAL-E"
   compat: 5
-  patches:
-    5C313124:
-      content: |-
-        comment=Patches by Shadow Lady
-        // IPU menus.
-        patch=0,EE,002328a8,word,00000000
-        patch=0,EE,00338570,word,00000000
 SLES-51024:
   name: "Roger Lemerre: La Sélection des Champions 2003"
   region: "PAL-F"
@@ -11199,8 +11170,6 @@ SLES-52693:
 SLES-52694:
   name: "BDFL Manager 2005"
   region: "PAL-G"
-  gameFixes:
-    - SkipMPEGHack
 SLES-52695:
   name: "Roger Lemerre - La Selection des Champions"
   region: "PAL-F"
@@ -26906,13 +26875,6 @@ SLPS-20041:
 SLPS-20042:
   name: "F1 Racing Championship"
   region: "NTSC-J"
-  patches:
-    32F1FA12:
-      content: |-
-        author=Prafull
-        // Fixes IPU issues causing a hang at loading menu.
-        patch=1,EE,00251f94,word,00000000 //0440fffa
-        patch=1,EE,0020e7a4,word,00000000 //1440fffa
 SLPS-20043:
   name: "Lake Masters Fishing EX"
   region: "NTSC-J"
@@ -31690,6 +31652,8 @@ SLUS-20138:
 SLUS-20139:
   name: "Simpsons, The - Road Rage"
   region: "NTSC-U"
+  gameFixes:
+    - VU0KickstartHack # Fixes Bad Character Models.
 SLUS-20140:
   name: "NHL Hitz 2002"
   region: "NTSC-U"
@@ -32365,6 +32329,8 @@ SLUS-20305:
   name: "Simpsons, The - Road Rage"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - VU0KickstartHack # Fixes Bad Character Models.
 SLUS-20306:
   name: "Contra - Shattered Soldier"
   region: "NTSC-U"
