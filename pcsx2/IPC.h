@@ -92,6 +92,11 @@ protected:
 		MsgWrite32 = 6,         /**< Write 32 bit value to memory. */
 		MsgWrite64 = 7,         /**< Write 64 bit value to memory. */
 		MsgVersion = 8,         /**< Returns PCSX2 version. */
+		MsgSaveState = 9,       /**< Saves a savestate. */
+		MsgLoadState = 0xA,     /**< Loads a savestate. */
+		MsgTitle = 0xB,         /**< Returns the game title. */
+		MsgID = 0xC,            /**< Returns the game ID. */
+		MsgUUID = 0xD,          /**< Returns the game UUID. */
 		MsgUnimplemented = 0xFF /**< Unimplemented IPC message. */
 	};
 

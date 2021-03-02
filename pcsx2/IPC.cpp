@@ -36,6 +36,8 @@
 
 #include "Common.h"
 #include "Memory.h"
+#include "gui/AppSaveStates.h"
+#include "gui/AppCoreThread.h"
 #include "System/SysThreads.h"
 #include "svnrev.h"
 #include "IPC.h"
@@ -136,19 +138,7 @@ char* SocketIPC::MakeFailIPC(char* ret_buffer, uint32_t size = 5)
 
 int SocketIPC::StartSocket()
 {
-#ifdef _WIN32
-	// socket timeout
-	DWORD tv = 10 * 1000; // 10 seconds
-#else
-	// socket timeout
-	struct timeval tv;
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-#endif
-
 	m_msgsock = accept(m_sock, 0, 0);
-	setsockopt(m_msgsock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
-	setsockopt(m_msgsock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
 
 	if (m_msgsock == -1)
 	{
@@ -223,17 +213,20 @@ void SocketIPC::ExecuteTaskInThread()
 		SocketIPC::IPCBuffer res;
 
 		// we remove 4 bytes to get the message size out of the IPC command
-		// size in ParseCommand
-		if (receive_length == 0)
-			res = IPCBuffer{5, MakeFailIPC(m_ret_buffer)};
-		else
+		// size in ParseCommand.
+		// also, if we got a failed command, let's reset the state so we don't
+		// end up deadlocking by getting out of sync, eg when a client
+		// disconnects
+		if (receive_length != 0)
+		{
 			res = ParseCommand(&m_ipc_buffer[4], m_ret_buffer, (u32)end_length - 4);
 
-		// if we cannot send back our answer restart the socket
-		if (write_portable(m_msgsock, res.buffer, res.size) < 0)
-		{
-			if (StartSocket() < 0)
-				return;
+			// if we cannot send back our answer restart the socket
+			if (write_portable(m_msgsock, res.buffer, res.size) < 0)
+			{
+				if (StartSocket() < 0)
+					return;
+			}
 		}
 	}
 	return;
@@ -387,6 +380,65 @@ SocketIPC::IPCBuffer SocketIPC::ParseCommand(char* buf, char* ret_buffer, u32 bu
 				if (!SafetyChecks(buf_cnt, 0, ret_cnt, 256, buf_size))
 					goto error;
 				memcpy(&ret_buffer[ret_cnt], version, 256);
+				ret_cnt += 256;
+				break;
+			}
+			case MsgSaveState:
+			{
+				if (!m_vm->HasActiveMachine())
+					goto error;
+				if (!SafetyChecks(buf_cnt, 1, ret_cnt, 0, buf_size))
+					goto error;
+				StateCopy_SaveToSlot(FromArray<u8>(&buf[buf_cnt], 0));
+				buf_cnt += 1;
+				break;
+			}
+			case MsgLoadState:
+			{
+				if (!m_vm->HasActiveMachine())
+					goto error;
+				if (!SafetyChecks(buf_cnt, 1, ret_cnt, 0, buf_size))
+					goto error;
+				StateCopy_LoadFromSlot(FromArray<u8>(&buf[buf_cnt], 0), false);
+				buf_cnt += 1;
+				break;
+			}
+			case MsgTitle:
+			{
+				if (!m_vm->HasActiveMachine())
+					goto error;
+				if (!SafetyChecks(buf_cnt, 0, ret_cnt, 256, buf_size))
+					goto error;
+				char title[256] = {};
+				sprintf(title, "%s", GameInfo::gameName.ToUTF8().data());
+				title[255] = 0x00;
+				memcpy(&ret_buffer[ret_cnt], title, 256);
+				ret_cnt += 256;
+				break;
+			}
+			case MsgID:
+			{
+				if (!m_vm->HasActiveMachine())
+					goto error;
+				if (!SafetyChecks(buf_cnt, 0, ret_cnt, 256, buf_size))
+					goto error;
+				char id[256] = {};
+				sprintf(id, "%s", GameInfo::gameSerial.ToUTF8().data());
+				id[255] = 0x00;
+				memcpy(&ret_buffer[ret_cnt], id, 256);
+				ret_cnt += 256;
+				break;
+			}
+			case MsgUUID:
+			{
+				if (!m_vm->HasActiveMachine())
+					goto error;
+				if (!SafetyChecks(buf_cnt, 0, ret_cnt, 256, buf_size))
+					goto error;
+				char uuid[256] = {};
+				sprintf(uuid, "%s", GameInfo::gameCRC.ToUTF8().data());
+				uuid[255] = 0x00;
+				memcpy(&ret_buffer[ret_cnt], uuid, 256);
 				ret_cnt += 256;
 				break;
 			}
