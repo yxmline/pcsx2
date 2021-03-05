@@ -42,7 +42,7 @@
 #include "svnrev.h"
 #include "IPC.h"
 
-SocketIPC::SocketIPC(SysCoreThread* vm)
+SocketIPC::SocketIPC(SysCoreThread* vm, unsigned int slot)
 	: pxThread("IPC_Socket")
 {
 #ifdef _WIN32
@@ -56,7 +56,8 @@ SocketIPC::SocketIPC(SysCoreThread* vm)
 		return;
 	}
 
-	if ((m_sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+	m_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if ((m_sock == INVALID_SOCKET) || slot > 65536)
 	{
 		Console.WriteLn(Color_Red, "IPC: Cannot open socket! Shutting down...");
 		return;
@@ -66,7 +67,7 @@ SocketIPC::SocketIPC(SysCoreThread* vm)
 	server.sin_family = AF_INET;
 	// localhost only
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
-	server.sin_port = htons(PORT);
+	server.sin_port = htons(slot);
 
 	if (bind(m_sock, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR)
 	{
@@ -75,8 +76,6 @@ SocketIPC::SocketIPC(SysCoreThread* vm)
 	}
 
 #else
-	// XXX: go back whenever we want to have multiple IPC instances with
-	// multiple emulators running and make this a folder
 #ifdef __APPLE__
 	char* runtime_dir = std::getenv("TMPDIR");
 #else
@@ -85,9 +84,17 @@ SocketIPC::SocketIPC(SysCoreThread* vm)
 	// fallback in case macOS or other OSes don't implement the XDG base
 	// spec
 	if (runtime_dir == NULL)
-		m_socket_name = (char*)"/tmp/pcsx2.sock";
+		m_socket_name = (char*)"/tmp/" IPC_EMULATOR_NAME ".sock";
 	else
-		m_socket_name = strcat(runtime_dir, "/pcsx2.sock");
+		m_socket_name = strcat(runtime_dir, "/" IPC_EMULATOR_NAME ".sock");
+
+	if (slot != IPC_DEFAULT_SLOT)
+	{
+		// maximum size of .%u
+		char slot_ending[34];
+		sprintf(slot_ending, ".%u", slot);
+		m_socket_name = strcat(m_socket_name, slot_ending);
+	}
 
 	struct sockaddr_un server;
 
