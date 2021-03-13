@@ -677,7 +677,11 @@ EXPORT_C_(uint32) GSmakeSnapshot(char* path)
 		{
 			// Allows for providing a complete path
 			std::string extension = s.substr(s.size() - 4, 4);
-			std::transform(extension.begin(), extension.end(), extension.begin(), tolower); 
+#ifdef _WIN32
+			std::transform(extension.begin(), extension.end(), extension.begin(), (char(_cdecl*)(int))tolower);
+#else
+			std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
+#endif
 			if (extension == ".png")
 				return s_gs->MakeSnapshot(s);
 			else if (s[s.length() - 1] != DIRECTORY_SEPARATOR)
@@ -807,41 +811,36 @@ void pt(const char* str){
 	printf("%02i:%02i:%02i%s", current->tm_hour, current->tm_min, current->tm_sec, str);
 }
 
-EXPORT_C_(std::wstring*) GSsetupRecording(int start)
+EXPORT_C_(bool) GSsetupRecording(std::string& filename)
 {
 	if (s_gs == NULL) {
 		printf("GSdx: no s_gs for recording\n");
-		return nullptr;
+		return false;
 	}
 #if defined(__unix__) || defined(__APPLE__)
 	if (!theApp.GetConfigB("capture_enabled")) {
 		printf("GSdx: Recording is disabled\n");
-		return nullptr;
+		return false;
 	}
 #endif
-	std::wstring* filename = nullptr;
-	if(start & 1)
+	printf("GSdx: Recording start command\n");
+	if (s_gs->BeginCapture(filename))
 	{
-		printf("GSdx: Recording start command\n");
-		filename = s_gs->BeginCapture();
-		if (filename)
-		{
-			pt(" - Capture started\n");
-		}
-		else
-		{
-			pt(" - Capture cancelled\n");
-			return nullptr;
-		}
+		pt(" - Capture started\n");
+		return true;
 	}
 	else
 	{
-		printf("GSdx: Recording end command\n");
-		s_gs->EndCapture();
-		pt(" - Capture ended\n");
+		pt(" - Capture cancelled\n");
+		return false;
 	}
+}
 
-	return filename;
+EXPORT_C_(void) GSendRecording()
+{
+	printf("GSdx: Recording end command\n");
+	s_gs->EndCapture();
+	pt(" - Capture ended\n");
 }
 
 EXPORT_C GSsetGameCRC(uint32 crc, int options)
