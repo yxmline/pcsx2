@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-03-30 17:32+0800\n"
-"PO-Revision-Date: 2021-04-02 08:04+0800\n"
+"POT-Creation-Date: 2021-04-02 08:14+0800\n"
+"PO-Revision-Date: 2021-04-06 11:38+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -1654,15 +1654,15 @@ msgstr "视频"
 
 #: pcsx2/gui/MainFrame.cpp:515
 msgid "Start Video Capture"
-msgstr ""
+msgstr "开始录制屏幕"
 
 #: pcsx2/gui/MainFrame.cpp:517
 msgid "Stop Video Capture"
-msgstr ""
+msgstr "停止录制屏幕"
 
 #: pcsx2/gui/MainFrame.cpp:521
 msgid "Include Audio"
-msgstr ""
+msgstr "包含音频"
 
 #: pcsx2/gui/MainFrame.cpp:522
 msgid ""
@@ -1676,15 +1676,15 @@ msgstr "截图"
 
 #: pcsx2/gui/MainFrame.cpp:527
 msgid "Take Screenshot"
-msgstr ""
+msgstr "获取截图"
 
 #: pcsx2/gui/MainFrame.cpp:535
 msgid "Screenshot As..."
-msgstr ""
+msgstr "截图另存为"
 
 #: pcsx2/gui/MainFrame.cpp:541
 msgid "Create a new input recording."
-msgstr ""
+msgstr "创建一个新的输入录制。"
 
 #: pcsx2/gui/MainFrame.cpp:541
 msgid "New"
@@ -1712,7 +1712,7 @@ msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:545
 msgid "Toggle Pause"
-msgstr ""
+msgstr "切换暂停"
 
 #: pcsx2/gui/MainFrame.cpp:546
 msgid "Advance emulation forward by a single frame at a time."
@@ -1720,7 +1720,7 @@ msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:546
 msgid "Frame Advance"
-msgstr ""
+msgstr "帧步进"
 
 #: pcsx2/gui/MainFrame.cpp:547
 msgid "Save/playback inputs to/from the recording file."
@@ -1728,7 +1728,7 @@ msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:547
 msgid "Toggle Recording Mode"
-msgstr ""
+msgstr "切换录制模式"
 
 #: pcsx2/gui/MainFrame.cpp:549
 msgid "Virtual Pad (Port 1)"
@@ -1792,7 +1792,7 @@ msgstr "捕获(&C)"
 
 #: pcsx2/gui/MainFrame.cpp:622 pcsx2/gui/MainMenuClicks.cpp:651
 msgid "&Input Record"
-msgstr ""
+msgstr "录制输入(&I)"
 
 #: pcsx2/gui/MainFrame.cpp:771
 msgid "Paus&e"
@@ -2359,11 +2359,11 @@ msgstr ""
 msgid ""
 "Enable the GIF FIFO (slower but needed for Hotwheels, Wallace and Gromit, DJ "
 "Hero)"
-msgstr "启用 GIF FIFO (较慢，用于风火轮小汽车、超级无敌掌门狗和 DJ 英雄)"
+msgstr "启用 GIF FIFO (较慢，用于风火轮赛车、超级无敌掌门狗和 DJ 英雄)"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:96
 msgid "Preload TLB hack to avoid tlb miss on Goemon"
-msgstr "预加载 TLB Hack 以避免 Goemon 中 tlb miss"
+msgstr "预加载 TLB Hack 以避免大盗五右卫门中的TLB丢失"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:100
 msgid ""
@@ -2372,11 +2372,11 @@ msgstr "VU I 位 Hack 避免无休止的重编译 (疤面煞星:掌握世界)"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:104
 msgid "VU I bit Hack avoid constant recompilation (Crash Tag Team Racing)"
-msgstr "VU I 位 Hack 避免无休止的重编译 (Crash Tag Team Racing)"
+msgstr "VU I 位 Hack 避免无休止的重编译 (古惑狼赛车)"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:108
 msgid "VU0 Kickstart to avoid sync problems with VU1"
-msgstr ""
+msgstr "VU0 快速重启用来防止与 VU1 的同步问题"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:119
 msgid "Enable manual game fixes [Not recommended]"
@@ -2813,7 +2813,7 @@ msgstr "提速效果较好，兼容性较高；可能导致模拟器没有响应
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:175
 msgid "Instant VU1 (Without MTVU Only)"
-msgstr ""
+msgstr "即时 VU1 (仅无 MTVU )"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:176
 msgid "Good Speedup and High Compatibility; may cause some graphical errors"
@@ -2991,17 +2991,17 @@ msgstr "此即时存档无法加载。关键组件缺失。请参看日志文件
 msgid " (default)"
 msgstr " (默认)"
 
-#: pcsx2/ps2/BiosTools.cpp:136 pcsx2/ps2/BiosTools.cpp:204
+#: pcsx2/ps2/BiosTools.cpp:135 pcsx2/ps2/BiosTools.cpp:203
 msgid "The selected BIOS file is not a valid PS2 BIOS.  Please re-configure."
 msgstr "选择的 BIOS 文件不是一个合法的 PS2 BIOS。请重新配置。"
 
-#: pcsx2/ps2/BiosTools.cpp:317
+#: pcsx2/ps2/BiosTools.cpp:316
 msgid ""
 "The PS2 BIOS could not be loaded.  The BIOS has not been configured, or the "
 "configuration has been corrupted.  Please re-configure."
 msgstr "PS2 BIOS 无法加载。BIOS 未被配置，或配置已被破坏。请重新配置。"
 
-#: pcsx2/ps2/BiosTools.cpp:324
+#: pcsx2/ps2/BiosTools.cpp:323
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr "配置的 BIOS 文件不存在。请重新配置。"
 
