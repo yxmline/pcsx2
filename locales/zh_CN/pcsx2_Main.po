@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-02 08:14+0800\n"
-"PO-Revision-Date: 2021-04-06 11:38+0800\n"
+"POT-Creation-Date: 2021-04-11 19:26+0800\n"
+"PO-Revision-Date: 2021-04-11 19:44+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -96,11 +96,11 @@ msgstr "无法识别的 ISO 镜像文件格式"
 msgid "All Files (*.*)"
 msgstr "全部文件 (*.*)"
 
-#: pcsx2/Elfheader.cpp:163
+#: pcsx2/Elfheader.cpp:164
 msgid "Cannot load ELF binary image.  The file may be corrupt or incomplete."
 msgstr "无法加载 ELF 二进制映像。文件可能已损坏或不完整。"
 
-#: pcsx2/Elfheader.cpp:165
+#: pcsx2/Elfheader.cpp:166
 msgid ""
 "If loading from an ISO image, this error may be caused by an unsupported ISO "
 "image type or a bug in PCSX2 ISO image support."
@@ -422,9 +422,9 @@ msgstr "正在加载 PS2 系统插件..."
 
 #: pcsx2/gui/AppInit.cpp:55
 msgid ""
-"SSE2 extensions are not available.  PCSX2 requires a cpu that supports the "
-"SSE2 instruction set."
-msgstr "SSE2 扩展不可用。PCSX2 需要一个支持 SSE2 指令集的 CPU。"
+"SSE4 extensions are not available.  PCSX2 requires a cpu that supports the "
+"SSE4.1 instruction set."
+msgstr "SSE4 扩展不可用。PCSX2 需要一个支持 SSE4.1 指令集的 CPU。"
 
 #: pcsx2/gui/AppInit.cpp:156
 msgid "PCSX2 Recompiler Error(s)"
@@ -1680,7 +1680,7 @@ msgstr "获取截图"
 
 #: pcsx2/gui/MainFrame.cpp:535
 msgid "Screenshot As..."
-msgstr "截图另存为"
+msgstr "截图另存为..."
 
 #: pcsx2/gui/MainFrame.cpp:541
 msgid "Create a new input recording."
@@ -2767,7 +2767,7 @@ msgstr ""
 "理由: %s\n"
 "\n"
 
-#: pcsx2/gui/Panels/PluginSelectorPanel.cpp:743
+#: pcsx2/gui/Panels/PluginSelectorPanel.cpp:740
 msgid "Completing tasks..."
 msgstr "正在完成任务..."
 
@@ -2807,12 +2807,12 @@ msgstr "MTVU (多线程 microVU1)"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:173
 msgid ""
-"Good Speedup and High Compatibility; may cause hanging... [Recommended if 3+ "
+"Good Speedup and High Compatibility; may cause hanging... [Recommended on 3+ "
 "cores]"
 msgstr "提速效果较好，兼容性较高；可能导致模拟器没有响应等。[三核以上用户推荐]"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:175
-msgid "Instant VU1 (Without MTVU Only)"
+msgid "Instant VU1 (without MTVU only)"
 msgstr "即时 VU1 (仅无 MTVU )"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:176
@@ -2856,7 +2856,7 @@ msgstr "禁用限帧"
 
 #: pcsx2/gui/Panels/VideoPanel.cpp:36
 msgid "Uncaps FPS. Useful for running benchmarks."
-msgstr ""
+msgstr "取消 FPS 上限。对性能测试来说很有用。"
 
 #: pcsx2/gui/Panels/VideoPanel.cpp:60
 msgid "Base Framerate Adjust:"
