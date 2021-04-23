@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-11 19:26+0800\n"
+"POT-Creation-Date: 2021-04-24 00:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -569,7 +569,7 @@ msgstr ""
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:730 pcsx2/gui/MainFrame.cpp:625
+#: pcsx2/gui/AppInit.cpp:730 pcsx2/gui/MainFrame.cpp:623
 msgid "&Help"
 msgstr ""
 
@@ -577,7 +577,7 @@ msgstr ""
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:732 pcsx2/gui/MainFrame.cpp:613
+#: pcsx2/gui/AppInit.cpp:732
 msgid "&Window"
 msgstr ""
 
@@ -1450,338 +1450,342 @@ msgstr ""
 msgid "Enable &Host Filesystem"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:434
-msgid "Create &Blockdump"
-msgstr ""
-
-#: pcsx2/gui/MainFrame.cpp:434
-msgid "Creates a block dump for debugging purposes."
-msgstr ""
-
-#: pcsx2/gui/MainFrame.cpp:438
+#: pcsx2/gui/MainFrame.cpp:435
 msgid "&Load state"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:441
+#: pcsx2/gui/MainFrame.cpp:438
 msgid "&Save state"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:444
+#: pcsx2/gui/MainFrame.cpp:441
 msgid "&Backup before save"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:448
+#: pcsx2/gui/MainFrame.cpp:445
 msgid "E&xit"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:449
+#: pcsx2/gui/MainFrame.cpp:446
 #, c-format
 msgid "Closing %s may be hazardous to your health."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:458
+#: pcsx2/gui/MainFrame.cpp:455
 msgid "ISO &Selector"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:459
+#: pcsx2/gui/MainFrame.cpp:456
 msgid "D&rive Selector"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:462
+#: pcsx2/gui/MainFrame.cpp:459
 msgid "&ISO"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:462
+#: pcsx2/gui/MainFrame.cpp:459
 msgid "Makes the specified ISO image the CDVD source."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:463
+#: pcsx2/gui/MainFrame.cpp:460
 msgid "&Disc"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:463
+#: pcsx2/gui/MainFrame.cpp:460
 msgid "Uses a disc drive as the CDVD source."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:464
+#: pcsx2/gui/MainFrame.cpp:461
 msgid "&No disc"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:464
+#: pcsx2/gui/MainFrame.cpp:461
 msgid "Use this to boot into your virtual PS2's BIOS configuration."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:475
+#: pcsx2/gui/MainFrame.cpp:472
 msgid "Emulation &Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:476
+#: pcsx2/gui/MainFrame.cpp:473
 msgid "&Memory Cards..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:477
+#: pcsx2/gui/MainFrame.cpp:474
 msgid "&Plugin/BIOS Selector..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:478
+#: pcsx2/gui/MainFrame.cpp:475
 msgid "&Audio Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:479
+#: pcsx2/gui/MainFrame.cpp:476
 msgid "&Network and HDD Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:480
+#: pcsx2/gui/MainFrame.cpp:477
 msgid "&USB Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:481
+#: pcsx2/gui/MainFrame.cpp:478
 msgid "&GamePad Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:484
+#: pcsx2/gui/MainFrame.cpp:481
 msgid "&Video (GS)"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:487
+#: pcsx2/gui/MainFrame.cpp:484
 msgid "Multitap &1"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:488
+#: pcsx2/gui/MainFrame.cpp:485
 msgid "Multitap &2"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:493
+#: pcsx2/gui/MainFrame.cpp:490
 msgid "C&lear All Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:494
+#: pcsx2/gui/MainFrame.cpp:491
 #, c-format
 msgid "Clears all %s settings and re-runs the startup wizard."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:499
-msgid "&Show Debug"
+#: pcsx2/gui/MainFrame.cpp:496
+msgid "Create &Blockdump"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:501
+#: pcsx2/gui/MainFrame.cpp:496
+msgid "Creates a block dump for debugging purposes."
+msgstr ""
+
+#: pcsx2/gui/MainFrame.cpp:497
+msgid "&Show Debugger"
+msgstr ""
+
+#: pcsx2/gui/MainFrame.cpp:499
 msgid "Show &GS Debugger"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:513
+#: pcsx2/gui/MainFrame.cpp:511
 msgid "Video"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:515
+#: pcsx2/gui/MainFrame.cpp:513
 msgid "Start Video Capture"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:517
+#: pcsx2/gui/MainFrame.cpp:515
 msgid "Stop Video Capture"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:521
+#: pcsx2/gui/MainFrame.cpp:519
 msgid "Include Audio"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:522
+#: pcsx2/gui/MainFrame.cpp:520
 msgid "Enables/disables the creation of a synchronized wav audio file when capturing video footage."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:526
+#: pcsx2/gui/MainFrame.cpp:524
 msgid "Screenshot"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:527
+#: pcsx2/gui/MainFrame.cpp:525
 msgid "Take Screenshot"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:535
+#: pcsx2/gui/MainFrame.cpp:533
 msgid "Screenshot As..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:541
+#: pcsx2/gui/MainFrame.cpp:539
 msgid "Create a new input recording."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:541
+#: pcsx2/gui/MainFrame.cpp:539
 msgid "New"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:542
+#: pcsx2/gui/MainFrame.cpp:540
 msgid "Stop"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:542
+#: pcsx2/gui/MainFrame.cpp:540
 msgid "Stop the active input recording."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:543
+#: pcsx2/gui/MainFrame.cpp:541
 msgid "Play"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:543
+#: pcsx2/gui/MainFrame.cpp:541
 msgid "Playback an existing input recording."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:545
+#: pcsx2/gui/MainFrame.cpp:543
 msgid "Pause or resume emulation on the fly."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:545
+#: pcsx2/gui/MainFrame.cpp:543
 msgid "Toggle Pause"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:546
+#: pcsx2/gui/MainFrame.cpp:544
 msgid "Advance emulation forward by a single frame at a time."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:546
+#: pcsx2/gui/MainFrame.cpp:544
 msgid "Frame Advance"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:547
+#: pcsx2/gui/MainFrame.cpp:545
 msgid "Save/playback inputs to/from the recording file."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:547
+#: pcsx2/gui/MainFrame.cpp:545
 msgid "Toggle Recording Mode"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:549
+#: pcsx2/gui/MainFrame.cpp:547
 msgid "Virtual Pad (Port 1)"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:550
+#: pcsx2/gui/MainFrame.cpp:548
 msgid "Virtual Pad (Port 2)"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:556
+#: pcsx2/gui/MainFrame.cpp:554
 msgid "&Getting Started"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:557
+#: pcsx2/gui/MainFrame.cpp:555
 msgid "&Compatibility"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:559
+#: pcsx2/gui/MainFrame.cpp:557
 msgid "&Website"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:560
+#: pcsx2/gui/MainFrame.cpp:558
 msgid "&Wiki"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:561
+#: pcsx2/gui/MainFrame.cpp:559
 msgid "&Support Forums"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:562
+#: pcsx2/gui/MainFrame.cpp:560
 msgid "&GitHub Repository"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:564
+#: pcsx2/gui/MainFrame.cpp:562
 msgid "&About..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:594
+#: pcsx2/gui/MainFrame.cpp:592
 msgid "&Show Console"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:596
+#: pcsx2/gui/MainFrame.cpp:594
 msgid "&Console to Stdio"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:610
+#: pcsx2/gui/MainFrame.cpp:608
 msgid "&PCSX2"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:611
+#: pcsx2/gui/MainFrame.cpp:609
 msgid "CD&VD"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:612
+#: pcsx2/gui/MainFrame.cpp:610
 msgid "&Config"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:614
+#: pcsx2/gui/MainFrame.cpp:611
+msgid "&Debug"
+msgstr ""
+
+#: pcsx2/gui/MainFrame.cpp:612
 msgid "&Capture"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:622 pcsx2/gui/MainMenuClicks.cpp:651
+#: pcsx2/gui/MainFrame.cpp:620 pcsx2/gui/MainMenuClicks.cpp:651
 msgid "&Input Record"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:771
+#: pcsx2/gui/MainFrame.cpp:769
 msgid "Paus&e"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:772
+#: pcsx2/gui/MainFrame.cpp:770
 msgid "Safely pauses emulation and preserves the PS2 state."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:780
+#: pcsx2/gui/MainFrame.cpp:778
 msgid "R&esume"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:781
+#: pcsx2/gui/MainFrame.cpp:779
 msgid "Resumes the suspended emulation state."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:785
+#: pcsx2/gui/MainFrame.cpp:783
 msgid "Pause/Resume"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:786
+#: pcsx2/gui/MainFrame.cpp:784
 msgid "No emulation state is active; cannot suspend or resume."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:801
+#: pcsx2/gui/MainFrame.cpp:799
 msgid "Use fast boot to skip PS2 startup and splash screens."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:806
+#: pcsx2/gui/MainFrame.cpp:804
 msgid "Boot ISO"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:809
+#: pcsx2/gui/MainFrame.cpp:807
 msgid "Boot CDVD"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:812 pcsx2/gui/MainFrame.cpp:815
+#: pcsx2/gui/MainFrame.cpp:810 pcsx2/gui/MainFrame.cpp:813
 msgid "Boot BIOS"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:905
+#: pcsx2/gui/MainFrame.cpp:903
 msgid "No plugins loaded."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:910
+#: pcsx2/gui/MainFrame.cpp:908
 msgid "&Core GS Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:911
+#: pcsx2/gui/MainFrame.cpp:909
 msgid "Modify hardware emulation settings regulated by the PCSX2 core virtual machine."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:913
+#: pcsx2/gui/MainFrame.cpp:911
 msgid "&Window Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:914
+#: pcsx2/gui/MainFrame.cpp:912
 msgid "Modify window and appearance options, including aspect ratio."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:921
+#: pcsx2/gui/MainFrame.cpp:919
 msgid "&Plugin Settings..."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:922
+#: pcsx2/gui/MainFrame.cpp:920
 #, c-format
 msgid "Opens the %s plugin's advanced settings dialog."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:939
+#: pcsx2/gui/MainFrame.cpp:937
 msgid "No plugin loaded"
 msgstr ""
 
