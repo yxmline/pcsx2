@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-24 00:26+0800\n"
-"PO-Revision-Date: 2021-04-24 00:31+0800\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2021-04-25 10:51+0800\n"
+"PO-Revision-Date: 2021-04-25 10:55+0800\n"
+"Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -1775,8 +1775,8 @@ msgid "&Console to Stdio"
 msgstr "将标准输入输出用于控制台(&C)"
 
 #: pcsx2/gui/MainFrame.cpp:608
-msgid "&PCSX2"
-msgstr "PCSX2(&P)"
+msgid "&System"
+msgstr "系统(&S)"
 
 #: pcsx2/gui/MainFrame.cpp:609
 msgid "CD&VD"
@@ -3021,6 +3021,9 @@ msgstr "%s 扩展未找到。R5900-32 重编译器需要一个带有 SSE2 扩展
 msgid ""
 "%s Extensions not found.  microVU requires a host CPU with SSE2 extensions."
 msgstr "%s 扩展未找到。microVU 需要一个带有 SSE2 扩展的主机 CPU。"
+
+#~ msgid "&PCSX2"
+#~ msgstr "PCSX2(&P)"
 
 #~ msgid "Start Screenrecorder"
 #~ msgstr "开始录像"
