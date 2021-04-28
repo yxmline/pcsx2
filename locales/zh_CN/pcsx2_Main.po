@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
 "POT-Creation-Date: 2021-04-25 10:51+0800\n"
-"PO-Revision-Date: 2021-04-25 10:55+0800\n"
+"PO-Revision-Date: 2021-04-28 13:28+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -985,6 +985,8 @@ msgid ""
 "for saving and is not compatible with other PS2 emulators. Allows direct "
 "access to the saves which makes it easy to view and back-up per game."
 msgstr ""
+"将此记忆卡转换为独立存档的文件夹。不限制容量但是与其他 PS2 模拟器不兼容。允许"
+"直接访问存档将使得查看和备份每个游戏都变得很容易。"
 
 #: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:125
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:179

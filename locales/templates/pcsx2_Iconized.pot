@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-25 10:51+0800\n"
+"POT-Creation-Date: 2021-04-28 12:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -163,14 +163,14 @@ msgid ""
 "(note: settings for plugins are unaffected)"
 msgstr ""
 
-#: pcsx2/gui/MemoryCardFile.cpp:195 pcsx2/gui/MemoryCardFolder.h:534
+#: pcsx2/gui/MemoryCardFile.cpp:195 pcsx2/gui/MemoryCardFolder.h:582
 #, c-format
 msgid ""
 "The PS2-slot %d has been automatically disabled.  You can correct the problem\n"
 "and re-enable it at any time using Config:Memory cards from the main menu."
 msgstr ""
 
-#: pcsx2/gui/MemoryCardFolder.h:539
+#: pcsx2/gui/MemoryCardFolder.h:587
 #, c-format
 msgid "(FolderMcd) Memory Card is full, could not add: %s"
 msgstr ""

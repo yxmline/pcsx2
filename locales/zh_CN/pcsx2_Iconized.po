@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-11 19:26+0800\n"
-"PO-Revision-Date: 2021-04-25 10:54+0800\n"
+"POT-Creation-Date: 2021-04-28 12:52+0800\n"
+"PO-Revision-Date: 2021-04-28 12:54+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -277,7 +277,7 @@ msgstr ""
 "\n"
 "(注: 插件设置将不受影响)"
 
-#: pcsx2/gui/MemoryCardFile.cpp:195 pcsx2/gui/MemoryCardFolder.h:534
+#: pcsx2/gui/MemoryCardFile.cpp:195 pcsx2/gui/MemoryCardFolder.h:582
 #, c-format
 msgid ""
 "The PS2-slot %d has been automatically disabled.  You can correct the "
@@ -287,7 +287,7 @@ msgstr ""
 "%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题并"
 "重新启用记忆卡。"
 
-#: pcsx2/gui/MemoryCardFolder.h:539
+#: pcsx2/gui/MemoryCardFolder.h:587
 #, c-format
 msgid "(FolderMcd) Memory Card is full, could not add: %s"
 msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
