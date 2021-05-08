@@ -29000,8 +29000,8 @@ SLPS-25382:
 SLPS-25383:
   name: "Digimon Battle Chronicle"
   region: "NTSC-J"
-  gameFixes:
-    - FpuCompareHack
+  clampModes:
+    eeClampMode: 3
 SLPS-25384:
   name: "Tenchu Kurenai"
   region: "NTSC-J"
