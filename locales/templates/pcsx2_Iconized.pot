@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-04-28 12:52+0800\n"
+"POT-Creation-Date: 2021-05-10 21:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -233,7 +233,7 @@ msgstr ""
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:65
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -241,7 +241,7 @@ msgid ""
 " * Resident Evil: Dead Aim (Causes garbled textures)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:74
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:70
 msgid ""
 "Known to affect following games:\n"
 " * Bleach Blade Battler\n"
@@ -249,24 +249,24 @@ msgid ""
 " * Wizardry"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:79
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
 msgid ""
 "Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down Behind Enemy Lines\n"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
 " * Transformers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:120
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:116
 msgid "It's better to enable 'Automatic game fixes' at the main menu instead, and leave this page empty ('Automatic' means: selectively use specific tested fixes for specific games). Manual game fixes will NOT increase your performance. In fact they may decrease it."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:124
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:120
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
