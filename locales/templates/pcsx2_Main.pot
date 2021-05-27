@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-05-10 21:56+0800\n"
+"POT-Creation-Date: 2021-05-27 11:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,11 +86,11 @@ msgstr ""
 msgid "Unrecognized ISO image file format"
 msgstr ""
 
-#: pcsx2/DEV9/Linux/Linux.cpp:106
+#: pcsx2/DEV9/Linux/Linux.cpp:206
 msgid "HDD Image File"
 msgstr ""
 
-#: pcsx2/DEV9/Linux/Linux.cpp:107 pcsx2/gui/MainMenuClicks.cpp:389
+#: pcsx2/DEV9/Linux/Linux.cpp:207 pcsx2/gui/MainMenuClicks.cpp:389
 #: pcsx2/gui/MainMenuClicks.cpp:410
 msgid "All Files (*.*)"
 msgstr ""
@@ -187,7 +187,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr ""
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:40 pcsx2/gui/AppInit.cpp:718
+#: pcsx2/Recording/NewRecordingFrame.cpp:40 pcsx2/gui/AppInit.cpp:716
 msgid "Cancel"
 msgstr ""
 
@@ -396,192 +396,192 @@ msgstr ""
 msgid "PCSX2 Recompiler Error(s)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:209
+#: pcsx2/gui/AppInit.cpp:207
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:219 pcsx2/gui/AppMain.cpp:372
+#: pcsx2/gui/AppInit.cpp:217 pcsx2/gui/AppMain.cpp:372
 msgid "IsoFile"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:220
+#: pcsx2/gui/AppInit.cpp:218
 msgid "displays this list of command line options"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:221
+#: pcsx2/gui/AppInit.cpp:219
 msgid "forces the program log/console to be visible"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:222
+#: pcsx2/gui/AppInit.cpp:220
 msgid "use fullscreen GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:223
+#: pcsx2/gui/AppInit.cpp:221
 msgid "use windowed GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:225
+#: pcsx2/gui/AppInit.cpp:223
 msgid "disables display of the gui while running games"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:226
+#: pcsx2/gui/AppInit.cpp:224
 msgid "when nogui - prompt before exiting on suspend"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:228
+#: pcsx2/gui/AppInit.cpp:226
 msgid "executes an ELF image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:229
+#: pcsx2/gui/AppInit.cpp:227
 msgid "executes an IRX image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:230
+#: pcsx2/gui/AppInit.cpp:228
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:231
+#: pcsx2/gui/AppInit.cpp:229
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:233
+#: pcsx2/gui/AppInit.cpp:231
 msgid "disables all speedhacks"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:234
+#: pcsx2/gui/AppInit.cpp:232
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:235
+#: pcsx2/gui/AppInit.cpp:233
 msgid "disables fast booting"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:236
+#: pcsx2/gui/AppInit.cpp:234
 msgid "passes the specified space-delimited string of launch arguments to the game"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:238
+#: pcsx2/gui/AppInit.cpp:236
 msgid "changes the configuration file path"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:239
+#: pcsx2/gui/AppInit.cpp:237
 msgid "specifies the PCSX2 configuration file to use"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:240
+#: pcsx2/gui/AppInit.cpp:238
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:241
+#: pcsx2/gui/AppInit.cpp:239
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:243
+#: pcsx2/gui/AppInit.cpp:241
 msgid "update options to ease profiling (debug)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:247
+#: pcsx2/gui/AppInit.cpp:245
 #, c-format
 msgid "specify the file to use as the %s plugin"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:298
+#: pcsx2/gui/AppInit.cpp:296
 #, c-format
 msgid "Plugin Override Error - %s"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:301
+#: pcsx2/gui/AppInit.cpp:299
 #, c-format
 msgid ""
 "%s Plugin Override Error!  The following file does not exist or is not a valid %s plugin:\n"
 "\n"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:307
+#: pcsx2/gui/AppInit.cpp:305
 #, c-format
 msgid "Press OK to use the default configured plugin, or Cancel to close %s."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:538
+#: pcsx2/gui/AppInit.cpp:536
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:538 pcsx2/gui/AppInit.cpp:550
+#: pcsx2/gui/AppInit.cpp:536 pcsx2/gui/AppInit.cpp:548
 #, c-format
 msgid "Press OK to close %s."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:551
+#: pcsx2/gui/AppInit.cpp:549
 #, c-format
 msgid "%s Critical Error"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:716
+#: pcsx2/gui/AppInit.cpp:714
 msgid "OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:717
+#: pcsx2/gui/AppInit.cpp:715
 msgid "&OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:719
+#: pcsx2/gui/AppInit.cpp:717
 msgid "&Cancel"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:720
+#: pcsx2/gui/AppInit.cpp:718
 msgid "&Apply"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:721
+#: pcsx2/gui/AppInit.cpp:719
 msgid "&Next >"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:722
+#: pcsx2/gui/AppInit.cpp:720
 msgid "< &Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:723
+#: pcsx2/gui/AppInit.cpp:721
 msgid "&Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:724
+#: pcsx2/gui/AppInit.cpp:722
 msgid "&Finish"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:725
+#: pcsx2/gui/AppInit.cpp:723
 msgid "&Yes"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:726
+#: pcsx2/gui/AppInit.cpp:724
 msgid "&No"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:727
+#: pcsx2/gui/AppInit.cpp:725
 msgid "Browse"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:728
+#: pcsx2/gui/AppInit.cpp:726
 msgid "&Save"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:729
+#: pcsx2/gui/AppInit.cpp:727
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:730 pcsx2/gui/MainFrame.cpp:623
+#: pcsx2/gui/AppInit.cpp:728 pcsx2/gui/MainFrame.cpp:623
 msgid "&Help"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:731
+#: pcsx2/gui/AppInit.cpp:729
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:732
+#: pcsx2/gui/AppInit.cpp:730
 msgid "&Window"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:734
+#: pcsx2/gui/AppInit.cpp:732
 msgid "Show about dialog."
 msgstr ""
 
@@ -1053,15 +1053,15 @@ msgid ""
 msgstr ""
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:264
-msgid "128 KiB (PSX)"
+msgid "128 KiB (PS1)"
 msgstr ""
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:264
-msgid "This is the standard Sony-provisioned size PSX memory card, only compatible with PSX games."
+msgid "This is the standard Sony-provisioned size PS1 memory card, only compatible with PS1 games."
 msgstr ""
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:265
-msgid "This memory card is required by PSX games. It is not compatible with PS2 games."
+msgid "This memory card is required by PS1 games. It is not compatible with PS2 games."
 msgstr ""
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:48
@@ -1446,7 +1446,7 @@ msgstr ""
 msgid "Input Recording for controller/keyboard presses, tools for automation and playback."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:431
+#: pcsx2/gui/MainFrame.cpp:430
 msgid "Enable &Host Filesystem"
 msgstr ""
 
@@ -1685,11 +1685,11 @@ msgid "&About..."
 msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:592
-msgid "&Show Console"
+msgid "&Show Program Log"
 msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:594
-msgid "&Console to Stdio"
+msgid "&Program Log to Stdio"
 msgstr ""
 
 #: pcsx2/gui/MainFrame.cpp:608
@@ -2493,11 +2493,11 @@ msgid "Yes"
 msgstr ""
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:152
-msgid "PS2"
+msgid "PS1"
 msgstr ""
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:152
-msgid "PSX"
+msgid "PS2"
 msgstr ""
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:165

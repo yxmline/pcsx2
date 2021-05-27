@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-05-10 21:56+0800\n"
-"PO-Revision-Date: 2021-05-10 21:59+0800\n"
+"POT-Creation-Date: 2021-05-27 11:14+0800\n"
+"PO-Revision-Date: 2021-05-27 11:20+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -87,11 +87,11 @@ msgstr "包含空闲事件处理及一些其它的非常见事件使用。"
 msgid "Unrecognized ISO image file format"
 msgstr "无法识别的 ISO 镜像文件格式"
 
-#: pcsx2/DEV9/Linux/Linux.cpp:106
+#: pcsx2/DEV9/Linux/Linux.cpp:206
 msgid "HDD Image File"
 msgstr "无法识别的 ISO 镜像文件格式"
 
-#: pcsx2/DEV9/Linux/Linux.cpp:107 pcsx2/gui/MainMenuClicks.cpp:389
+#: pcsx2/DEV9/Linux/Linux.cpp:207 pcsx2/gui/MainMenuClicks.cpp:389
 #: pcsx2/gui/MainMenuClicks.cpp:410
 msgid "All Files (*.*)"
 msgstr "全部文件 (*.*)"
@@ -212,7 +212,7 @@ msgstr "记录来自"
 msgid "Browse Required"
 msgstr "需要浏览"
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:40 pcsx2/gui/AppInit.cpp:718
+#: pcsx2/Recording/NewRecordingFrame.cpp:40 pcsx2/gui/AppInit.cpp:716
 msgid "Cancel"
 msgstr "取消"
 
@@ -430,103 +430,103 @@ msgstr "SSE4 扩展不可用。PCSX2 需要一个支持 SSE4.1 指令集的 CPU�
 msgid "PCSX2 Recompiler Error(s)"
 msgstr "PCSX2 重编译器错误"
 
-#: pcsx2/gui/AppInit.cpp:209
+#: pcsx2/gui/AppInit.cpp:207
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr "全部选项仅对当前会话有效，不会被保存。\n"
 
-#: pcsx2/gui/AppInit.cpp:219 pcsx2/gui/AppMain.cpp:372
+#: pcsx2/gui/AppInit.cpp:217 pcsx2/gui/AppMain.cpp:372
 msgid "IsoFile"
 msgstr "ISO 文件"
 
-#: pcsx2/gui/AppInit.cpp:220
+#: pcsx2/gui/AppInit.cpp:218
 msgid "displays this list of command line options"
 msgstr "显示此命令行选项列表"
 
-#: pcsx2/gui/AppInit.cpp:221
+#: pcsx2/gui/AppInit.cpp:219
 msgid "forces the program log/console to be visible"
 msgstr "强制程序日志/控制台为可见状态"
 
-#: pcsx2/gui/AppInit.cpp:222
+#: pcsx2/gui/AppInit.cpp:220
 msgid "use fullscreen GS mode"
 msgstr "使用全屏幕 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:223
+#: pcsx2/gui/AppInit.cpp:221
 msgid "use windowed GS mode"
 msgstr "使用窗口化 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:225
+#: pcsx2/gui/AppInit.cpp:223
 msgid "disables display of the gui while running games"
 msgstr "运行游戏时不显示图形界面"
 
-#: pcsx2/gui/AppInit.cpp:226
+#: pcsx2/gui/AppInit.cpp:224
 msgid "when nogui - prompt before exiting on suspend"
 msgstr "当关闭图形界面时，在退出前暂停并提示"
 
-#: pcsx2/gui/AppInit.cpp:228
+#: pcsx2/gui/AppInit.cpp:226
 msgid "executes an ELF image"
 msgstr "执行一个 ELF 映像"
 
-#: pcsx2/gui/AppInit.cpp:229
+#: pcsx2/gui/AppInit.cpp:227
 msgid "executes an IRX image"
 msgstr "执行一个 IRX 映像"
 
-#: pcsx2/gui/AppInit.cpp:230
+#: pcsx2/gui/AppInit.cpp:228
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr "使用空白的 DVD 盘启动；用于进入 PS2 系统菜单"
 
-#: pcsx2/gui/AppInit.cpp:231
+#: pcsx2/gui/AppInit.cpp:229
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr "从 CDVD 插件启动 (将覆盖 IsoFile 参数)"
 
-#: pcsx2/gui/AppInit.cpp:233
+#: pcsx2/gui/AppInit.cpp:231
 msgid "disables all speedhacks"
 msgstr "取消所有速度 Hack"
 
-#: pcsx2/gui/AppInit.cpp:234
+#: pcsx2/gui/AppInit.cpp:232
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr "使用指定的逗号或管道符隔开的游戏特殊修正列表。"
 
-#: pcsx2/gui/AppInit.cpp:235
+#: pcsx2/gui/AppInit.cpp:233
 msgid "disables fast booting"
 msgstr "禁用快速启动"
 
-#: pcsx2/gui/AppInit.cpp:236
+#: pcsx2/gui/AppInit.cpp:234
 msgid ""
 "passes the specified space-delimited string of launch arguments to the game"
 msgstr "传送指定的以空白分隔的执行选项字串至游戏"
 
-#: pcsx2/gui/AppInit.cpp:238
+#: pcsx2/gui/AppInit.cpp:236
 msgid "changes the configuration file path"
 msgstr "更改配置文件路径"
 
-#: pcsx2/gui/AppInit.cpp:239
+#: pcsx2/gui/AppInit.cpp:237
 msgid "specifies the PCSX2 configuration file to use"
 msgstr "指定使用的 PCSX2 配置文件"
 
-#: pcsx2/gui/AppInit.cpp:240
+#: pcsx2/gui/AppInit.cpp:238
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr "强制 %s 启动首次运行向导"
 
-#: pcsx2/gui/AppInit.cpp:241
+#: pcsx2/gui/AppInit.cpp:239
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr "启用绿色模式 (需要管理员权限)"
 
-#: pcsx2/gui/AppInit.cpp:243
+#: pcsx2/gui/AppInit.cpp:241
 msgid "update options to ease profiling (debug)"
 msgstr "更新选项以简化分析 (调试)"
 
-#: pcsx2/gui/AppInit.cpp:247
+#: pcsx2/gui/AppInit.cpp:245
 #, c-format
 msgid "specify the file to use as the %s plugin"
 msgstr "指定用于 %s 插件的文件"
 
-#: pcsx2/gui/AppInit.cpp:298
+#: pcsx2/gui/AppInit.cpp:296
 #, c-format
 msgid "Plugin Override Error - %s"
 msgstr "插件覆盖错误 - %s"
 
-#: pcsx2/gui/AppInit.cpp:301
+#: pcsx2/gui/AppInit.cpp:299
 #, c-format
 msgid ""
 "%s Plugin Override Error!  The following file does not exist or is not a "
@@ -536,90 +536,90 @@ msgstr ""
 "%s 插件覆盖错误! 以下文件不存在或不是一个合法的 %s 插件:\n"
 "\n"
 
-#: pcsx2/gui/AppInit.cpp:307
+#: pcsx2/gui/AppInit.cpp:305
 #, c-format
 msgid "Press OK to use the default configured plugin, or Cancel to close %s."
 msgstr "单击确定使用默认配置的插件，或取消关闭 %s。"
 
-#: pcsx2/gui/AppInit.cpp:538
+#: pcsx2/gui/AppInit.cpp:536
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr "PCSX2 错误: 硬件缺陷。"
 
-#: pcsx2/gui/AppInit.cpp:538 pcsx2/gui/AppInit.cpp:550
+#: pcsx2/gui/AppInit.cpp:536 pcsx2/gui/AppInit.cpp:548
 #, c-format
 msgid "Press OK to close %s."
 msgstr "请单击 \"确定\" 来关闭 %s。"
 
-#: pcsx2/gui/AppInit.cpp:551
+#: pcsx2/gui/AppInit.cpp:549
 #, c-format
 msgid "%s Critical Error"
 msgstr "%s 严重错误"
 
-#: pcsx2/gui/AppInit.cpp:716
+#: pcsx2/gui/AppInit.cpp:714
 msgid "OK"
 msgstr "确定"
 
-#: pcsx2/gui/AppInit.cpp:717
+#: pcsx2/gui/AppInit.cpp:715
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: pcsx2/gui/AppInit.cpp:719
+#: pcsx2/gui/AppInit.cpp:717
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: pcsx2/gui/AppInit.cpp:720
+#: pcsx2/gui/AppInit.cpp:718
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: pcsx2/gui/AppInit.cpp:721
+#: pcsx2/gui/AppInit.cpp:719
 msgid "&Next >"
 msgstr "下一步(&N) >"
 
-#: pcsx2/gui/AppInit.cpp:722
+#: pcsx2/gui/AppInit.cpp:720
 msgid "< &Back"
 msgstr "< 上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:723
+#: pcsx2/gui/AppInit.cpp:721
 msgid "&Back"
 msgstr "上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:724
+#: pcsx2/gui/AppInit.cpp:722
 msgid "&Finish"
 msgstr "完成(&F)"
 
-#: pcsx2/gui/AppInit.cpp:725
+#: pcsx2/gui/AppInit.cpp:723
 msgid "&Yes"
 msgstr "是(&Y)"
 
-#: pcsx2/gui/AppInit.cpp:726
+#: pcsx2/gui/AppInit.cpp:724
 msgid "&No"
 msgstr "不(&N)"
 
-#: pcsx2/gui/AppInit.cpp:727
+#: pcsx2/gui/AppInit.cpp:725
 msgid "Browse"
 msgstr "浏览"
 
-#: pcsx2/gui/AppInit.cpp:728
+#: pcsx2/gui/AppInit.cpp:726
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: pcsx2/gui/AppInit.cpp:729
+#: pcsx2/gui/AppInit.cpp:727
 msgid "Save &As..."
 msgstr "另存为(&A)..."
 
-#: pcsx2/gui/AppInit.cpp:730 pcsx2/gui/MainFrame.cpp:623
+#: pcsx2/gui/AppInit.cpp:728 pcsx2/gui/MainFrame.cpp:623
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: pcsx2/gui/AppInit.cpp:731
+#: pcsx2/gui/AppInit.cpp:729
 msgid "&Home"
 msgstr "首页(&H)"
 
-#: pcsx2/gui/AppInit.cpp:732
+#: pcsx2/gui/AppInit.cpp:730
 msgid "&Window"
 msgstr "窗口(&W)"
 
-#: pcsx2/gui/AppInit.cpp:734
+#: pcsx2/gui/AppInit.cpp:732
 msgid "Show about dialog."
 msgstr "显示关于对话框。"
 
@@ -1121,20 +1121,20 @@ msgid ""
 msgstr ""
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:264
-msgid "128 KiB (PSX)"
-msgstr "128 KiB (PSX)"
+msgid "128 KiB (PS1)"
+msgstr "128 KiB (PS1)"
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:264
 msgid ""
-"This is the standard Sony-provisioned size PSX memory card, only compatible "
-"with PSX games."
-msgstr "索尼的标准大小，只兼容PSX游戏。"
+"This is the standard Sony-provisioned size PS1 memory card, only compatible "
+"with PS1 games."
+msgstr "索尼的标准大小，只兼容PS1游戏。"
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:265
 msgid ""
-"This memory card is required by PSX games. It is not compatible with PS2 "
+"This memory card is required by PS1 games. It is not compatible with PS2 "
 "games."
-msgstr "PSX游戏记忆卡。不兼容PS2游戏。"
+msgstr "PS1游戏记忆卡。不兼容PS2游戏。"
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:48
 #, c-format
@@ -1528,7 +1528,7 @@ msgid ""
 "playback."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:431
+#: pcsx2/gui/MainFrame.cpp:430
 msgid "Enable &Host Filesystem"
 msgstr "启用主机文件系统(&H)"
 
@@ -1769,12 +1769,12 @@ msgid "&About..."
 msgstr "关于(&A)..."
 
 #: pcsx2/gui/MainFrame.cpp:592
-msgid "&Show Console"
-msgstr "显示控制台(&S)"
+msgid "&Show Program Log"
+msgstr "显示程序日志(&S)"
 
 #: pcsx2/gui/MainFrame.cpp:594
-msgid "&Console to Stdio"
-msgstr "将标准输入输出用于控制台(&C)"
+msgid "&Program Log to Stdio"
+msgstr "将标准输入输出用于程序日志(&P)"
 
 #: pcsx2/gui/MainFrame.cpp:608
 msgid "&System"
@@ -2637,12 +2637,12 @@ msgid "Yes"
 msgstr "是"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:152
-msgid "PS2"
-msgstr "PS2"
+msgid "PS1"
+msgstr "PS1"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:152
-msgid "PSX"
-msgstr "PS1"
+msgid "PS2"
+msgstr "PS2"
 
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:165
 msgid "[-- Disabled cards --]"
@@ -3019,6 +3019,15 @@ msgstr "%s 扩展未找到。R5900-32 重编译器需要一个带有 SSE2 扩展
 msgid ""
 "%s Extensions not found.  microVU requires a host CPU with SSE2 extensions."
 msgstr "%s 扩展未找到。microVU 需要一个带有 SSE2 扩展的主机 CPU。"
+
+#~ msgid "&Console to Stdio"
+#~ msgstr "将标准输入输出用于控制台(&C)"
+
+#~ msgid "PSX"
+#~ msgstr "PS1"
+
+#~ msgid "&Show Console"
+#~ msgstr "显示控制台(&S)"
 
 #~ msgid "FPU Compare Hack - For Digimon Rumble Arena 2."
 #~ msgstr "FPU 比较 Hack - 修正 Digimon Rumble Arena 2 (数码宝贝竞技场 2)。"
