@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-05-27 11:14+0800\n"
+"POT-Creation-Date: 2021-06-07 09:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,7 @@ msgstr ""
 msgid "This action will reset the existing PS2 virtual machine state; all current progress will be lost.  Are you sure?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:150
+#: pcsx2/gui/MainMenuClicks.cpp:153
 #, c-format
 msgid ""
 "This command clears %s settings and allows you to re-run the First-Time Wizard.  You will need to manually restart %s after this operation.\n"
