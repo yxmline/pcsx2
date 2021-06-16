@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
 "POT-Creation-Date: 2021-06-07 09:33+0800\n"
-"PO-Revision-Date: 2021-06-07 09:37+0800\n"
+"PO-Revision-Date: 2021-06-17 00:02+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.3\n"
+"X-Generator: Poedit 3.0\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -189,6 +189,10 @@ msgstr ""
 #: pcsx2/Recording/InputRecording.cpp:423
 msgid "Select a savestate to accompany the recording with"
 msgstr ""
+
+#: pcsx2/Recording/NewRecordingFrame.cpp:25
+msgid "New Input Recording"
+msgstr "新建输入录像"
 
 #: pcsx2/Recording/NewRecordingFrame.cpp:27
 #: pcsx2/gui/Debugger/DisassemblyDialog.cpp:240
@@ -1127,6 +1131,12 @@ msgid ""
 "as MyMC, MyMCPlus).\n"
 "You can always convert back between folder type and single memcard file.\n"
 msgstr ""
+"动态分配并保存记忆卡中的内容到一个文件夹中。\n"
+"只显示正在运行的游戏的存档文件,而不是整个存储卡。\n"
+"您可以使用您的文件浏览器查看结构和存档。\n"
+"可用于备份单存档而不是一张记忆卡上的所有存档。\n"
+"与 PS2 记忆卡编辑工具或游戏存档管理器 (例如 MyMC, MyMCPlus) 不兼容。\n"
+"您始终可以在文件夹类型和单个记忆卡文件之间进行转换。\n"
 
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:264
 msgid "128 KiB (PS1)"
@@ -1247,7 +1257,7 @@ msgstr "IPC 设置"
 
 #: pcsx2/gui/Dialogs/IPCDialog.cpp:46
 msgid "IPC Slot"
-msgstr "IPC 端口"
+msgstr "IPC 槽位"
 
 #: pcsx2/gui/Dialogs/ImportSettingsDialog.cpp:25
 msgid "Import Existing Settings?"
@@ -1484,7 +1494,7 @@ msgstr "快速启动"
 
 #: pcsx2/gui/MainFrame.cpp:407
 msgid "Skips PS2 splash screens when booting from ISO or DVD media"
-msgstr ""
+msgstr "从 ISO 或 DVD 介质引导时跳过 PS2 启动画面"
 
 #: pcsx2/gui/MainFrame.cpp:409
 msgid "&Game Settings"
@@ -1504,7 +1514,7 @@ msgstr "启用作弊码(&C)"
 
 #: pcsx2/gui/MainFrame.cpp:415
 msgid "Use cheats otherwise known as pnachs from the cheats folder."
-msgstr ""
+msgstr "使用作弊文件夹中的作弊码也就是所谓的 pnach。"
 
 #: pcsx2/gui/MainFrame.cpp:417
 msgid "Configure &IPC"
@@ -1534,7 +1544,7 @@ msgstr "启用输入录制(&I)"
 msgid ""
 "Input Recording for controller/keyboard presses, tools for automation and "
 "playback."
-msgstr ""
+msgstr "用于控制器/键盘按下操作的输入录制以及自动化回放的工具。"
 
 #: pcsx2/gui/MainFrame.cpp:432
 msgid "Enable &Host Filesystem"
@@ -1678,7 +1688,7 @@ msgstr "包含音频"
 msgid ""
 "Enables/disables the creation of a synchronized wav audio file when "
 "capturing video footage."
-msgstr ""
+msgstr "启用/禁用在捕获视频素材时创建同步的 wav 音频文件。"
 
 #: pcsx2/gui/MainFrame.cpp:526
 msgid "Screenshot"
@@ -1706,7 +1716,7 @@ msgstr "停止"
 
 #: pcsx2/gui/MainFrame.cpp:542
 msgid "Stop the active input recording."
-msgstr ""
+msgstr "停止已激活的输入录制。"
 
 #: pcsx2/gui/MainFrame.cpp:543
 msgid "Play"
@@ -1714,7 +1724,7 @@ msgstr "播放"
 
 #: pcsx2/gui/MainFrame.cpp:543
 msgid "Playback an existing input recording."
-msgstr ""
+msgstr "播放一个现存的输入录制。"
 
 #: pcsx2/gui/MainFrame.cpp:547 pcsx2/gui/MainFrame.cpp:856
 #: pcsx2/gui/MainMenuClicks.cpp:1128 pcsx2/gui/MainMenuClicks.cpp:1133
@@ -1723,11 +1733,11 @@ msgstr "配置帧步进"
 
 #: pcsx2/gui/MainFrame.cpp:549
 msgid "Change the amount of frames advanced each time"
-msgstr ""
+msgstr "更改每次前进的帧数"
 
 #: pcsx2/gui/MainFrame.cpp:552
 msgid "Pause or resume emulation on the fly."
-msgstr ""
+msgstr "即时暂停或恢复模拟。"
 
 #: pcsx2/gui/MainFrame.cpp:552
 msgid "Toggle Pause"
@@ -1735,7 +1745,7 @@ msgstr "切换暂停"
 
 #: pcsx2/gui/MainFrame.cpp:553
 msgid "Advance emulation forward by a single frame at a time."
-msgstr ""
+msgstr "一次向前推进一帧模拟。"
 
 #: pcsx2/gui/MainFrame.cpp:553
 msgid "Frame Advance"
@@ -1743,7 +1753,7 @@ msgstr "帧步进"
 
 #: pcsx2/gui/MainFrame.cpp:554
 msgid "Save/playback inputs to/from the recording file."
-msgstr ""
+msgstr "将输入保存到录制文件/从录制文件重新输入。"
 
 #: pcsx2/gui/MainFrame.cpp:554
 msgid "Toggle Recording Mode"
@@ -2035,7 +2045,7 @@ msgstr "选择P2M2记录文件..."
 
 #: pcsx2/gui/MainMenuClicks.cpp:1128
 msgid "Enter the number of frames to advance per advance"
-msgstr ""
+msgstr "输入每步帧数"
 
 #: pcsx2/gui/MainMenuClicks.cpp:1128
 msgid "Number of Frames"
