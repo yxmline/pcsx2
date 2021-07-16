@@ -379,9 +379,6 @@
     <ClCompile Include="SPU2\Timestretcher.cpp" />
     <ClCompile Include="SPU2\Windows\SndOut_waveOut.cpp" />
     <ClCompile Include="SPU2\Windows\SndOut_XAudio2.cpp" />
-    <ClCompile Include="SPU2\Linux\Alsa.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="SPU2\dma.cpp" />
     <ClCompile Include="SPU2\RegTable.cpp" />
     <ClCompile Include="SPU2\spu2freeze.cpp" />
@@ -450,8 +447,6 @@
     <ClCompile Include="USB\usb-eyetoy\api_init_win32_eyetoy.cpp" />
     <ClCompile Include="USB\usb-eyetoy\cam-windows.cpp" />
     <ClCompile Include="USB\usb-eyetoy\jo_mpeg.cpp" />
-    <ClCompile Include="..\3rdparty\jpgd\jpgd.cpp" />
-    <ClCompile Include="..\3rdparty\jpgd\jpge.cpp" />
     <ClCompile Include="USB\usb-eyetoy\usb-eyetoy-webcam.cpp" />
     <ClCompile Include="USB\usb-hid\api_init_win32_hid.cpp" />
     <ClCompile Include="USB\usb-hid\raw\rawinput.cpp" />
@@ -814,7 +809,6 @@
     <ClInclude Include="SPU2\interpolate_table.h" />
     <ClInclude Include="SPU2\Lowpass.h" />
     <ClInclude Include="SPU2\SndOut.h" />
-    <ClInclude Include="SPU2\Linux\Alsa.h" />
     <ClInclude Include="SPU2\spdif.h" />
     <ClInclude Include="SPU2\defs.h" />
     <ClInclude Include="SPU2\Dma.h" />
@@ -936,8 +930,6 @@
     <ClInclude Include="USB\shared\shared_usb.h" />
     <ClInclude Include="USB\usb-eyetoy\cam-windows.h" />
     <ClInclude Include="USB\usb-eyetoy\jo_mpeg.h" />
-    <ClInclude Include="..\3rdparty\jpgd\jpgd.h" />
-    <ClInclude Include="..\3rdparty\jpgd\jpge.h" />
     <ClInclude Include="USB\usb-eyetoy\ov519.h" />
     <ClInclude Include="USB\usb-eyetoy\usb-eyetoy-webcam.h" />
     <ClInclude Include="USB\usb-eyetoy\videodev.h" />
@@ -1171,6 +1163,9 @@
     <ProjectReference Include="$(SolutionDir)tools\bin2cpp\bin2c.vcxproj">
       <Project>{677b7d11-d5e1-40b3-88b1-9a4df83d2213}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)3rdparty\jpgd\jpgd.vcxproj">
+      <Project>{ed2f21fd-0a36-4a8f-9b90-e7d92a2acb63}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
