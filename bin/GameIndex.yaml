@@ -952,7 +952,7 @@ SCAJ-25047:
   name: "Dororo"
   region: "NTSC-Unk"
   gameFixes:
-    - VU0KickstartHack
+    - VUKickstartHack
 SCAJ-30001:
   name: "Xenosaga Episode I [PlayStation 2 The Best]"
   region: "NTSC-Unk"
@@ -6600,7 +6600,7 @@ SLAJ-25047:
   name: "Dororo"
   region: "NTSC-Ch-J"
   gameFixes:
-    - VU0KickstartHack
+    - VUKickstartHack
 SLAJ-25048:
   name: "Sengoku Musou Mushoden"
   region: "NTSC-Unk"
@@ -18603,7 +18603,7 @@ SLKA-25225:
   region: "NTSC-K"
   compat: 5
   gameFixes:
-    - VU0KickstartHack
+    - VUKickstartHack
 SLKA-25227:
   name: "Neo Contra"
   region: "NTSC-K"
@@ -22669,7 +22669,7 @@ SLPM-65526:
   name: "Dororo"
   region: "NTSC-J"
   gameFixes:
-    - VU0KickstartHack
+    - VUKickstartHack
 SLPM-65527:
   name: "FIFA Total Football"
   region: "NTSC-J"
@@ -24746,7 +24746,7 @@ SLPM-66207:
   name: "Dororo [Sega the Best 2800]"
   region: "NTSC-J"
   gameFixes:
-    - VU0KickstartHack
+    - VUKickstartHack
 SLPM-66208:
   name: "Sakura Taisen V - Episode 0 - Samurai Girl of Wild [Sega the Best]"
   region: "NTSC-J"
