@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-07-06 15:37+0800\n"
-"PO-Revision-Date: 2021-07-06 15:42+0800\n"
+"POT-Creation-Date: 2021-08-14 18:52+0800\n"
+"PO-Revision-Date: 2021-08-14 18:58+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保留。"
 
-#: pcsx2/CDVD/CDVD.cpp:2136
+#: pcsx2/CDVD/CDVD.cpp:2152
 msgid ""
 "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr "读写 NMV/MEC 文件失败，请检查你的 BIOS 与权限设置。"
@@ -36,7 +36,7 @@ msgstr ""
 "重编译器无法保留内部缓存所需的连续内存空间。此错误可能是由虚拟内存资源不足引"
 "起，如交换文件过小或未使用交换文件、某个其它程序正占用过大内存。"
 
-#: pcsx2/System.cpp:350
+#: pcsx2/System.cpp:354
 msgid ""
 "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close "
 "out some memory hogging background tasks and try again."
@@ -58,7 +58,7 @@ msgstr ""
 "注意: 重编译器对 PCSX2 非必需，但是它们通常可大大提升模拟速度。如错误已解决，"
 "您可能要手动重新启用以上列出的重编译器。"
 
-#: pcsx2/gui/AppMain.cpp:84
+#: pcsx2/gui/AppMain.cpp:81
 msgid ""
 "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* "
 "obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't "
@@ -67,7 +67,7 @@ msgstr ""
 "PCSX2 需要一个 PS2 BIOS 才可以运行。由于法律问题，您必须从一台属于您的 PS2 实"
 "机中取得一个 BIOS 文件。请参考常见问题及教程以获取进一步的说明。"
 
-#: pcsx2/gui/AppMain.cpp:607
+#: pcsx2/gui/AppMain.cpp:589
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -367,7 +367,7 @@ msgid ""
 "pausing the emulator."
 msgstr "在按 ESC 或挂起模拟器时彻底关闭 GS 窗口。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -379,7 +379,7 @@ msgstr ""
 " * 极限滑雪 (修正图像错误及崩溃问题)\n"
 " * 生化危机: 死亡目标 (导致纹理混乱)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:70
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
 msgid ""
 "Known to affect following games:\n"
 " * Bleach Blade Battler\n"
@@ -391,7 +391,7 @@ msgstr ""
 " * 梦幻骑士 II 和 III\n"
 " * 巫术"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
 msgid ""
 "Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down "
@@ -402,7 +402,7 @@ msgstr ""
 "* 重装机兵(介绍 FMV)\n"
 "* 敌后阵线\n"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
@@ -412,7 +412,7 @@ msgstr ""
 " * Test Drive Unlimited (无限试驾 2)\n"
 " * Transformers (变形金刚)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
 msgid ""
 "It's better to enable 'Automatic game fixes' at the main menu instead, and "
 "leave this page empty ('Automatic' means: selectively use specific tested "
@@ -422,7 +422,7 @@ msgstr ""
 "建议在主菜单启用 '自动应用游戏特殊修正'，而不建议在此手动设置 ('自动' 即针对"
 "特定游戏自动应用对应修正)。事实上，手动设置并不能提升性能，反而会降低性能。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:116
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -470,11 +470,11 @@ msgstr ""
 "您可以在此更改 PCSX2 用户文档的默认位置 (包括记忆卡、截图、设置选项及即时存"
 "档)。此选项仅对由安装时的默认值设定的标准路径有效。"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:40
+#: pcsx2/gui/Panels/PathsPanel.cpp:35
 msgid "This folder is where PCSX2 loads cheats from."
 msgstr "PCSX2 会从此文件夹读取金手指。"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:48
+#: pcsx2/gui/Panels/PathsPanel.cpp:43
 msgid ""
 "This folder is where PCSX2 records savestates; which are recorded either by "
 "using menus/toolbars, or by pressing F1/F3 (save/load)."
@@ -482,11 +482,11 @@ msgstr ""
 "此文件夹是 PCSX2 保存即时存档的位置；即时存档可使用菜单/工具栏或 F1/F3 (保存/"
 "读取) 使用。"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:56
+#: pcsx2/gui/Panels/PathsPanel.cpp:51
 msgid "This folder is where PCSX2 saves screenshots."
 msgstr "此文件夹是 PCSX2 保存截图位置。"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:64
+#: pcsx2/gui/Panels/PathsPanel.cpp:59
 msgid "This folder is where PCSX2 saves its logfiles and diagnostic dumps."
 msgstr "此文件夹是 PCSX2 保存日志和诊断转储位置。"
 

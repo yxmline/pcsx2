@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-07-06 15:37+0800\n"
-"PO-Revision-Date: 2021-07-06 15:44+0800\n"
+"POT-Creation-Date: 2021-08-14 18:52+0800\n"
+"PO-Revision-Date: 2021-08-14 18:59+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -198,130 +198,134 @@ msgstr "显示 DECI2 调试日志记录 (EE 处理器)"
 msgid "Shows strings printed to the system output stream."
 msgstr "显示输出至系統输出流的字串。"
 
-#: pcsx2/SourceLog.cpp:111
+#: pcsx2/SourceLog.cpp:109
+msgid "Shows output from pgif the emulated ps1 gpu"
+msgstr ""
+
+#: pcsx2/SourceLog.cpp:112
 msgid "Shows recording related logs and information."
 msgstr "显示与录制有关的日志和信息。"
 
-#: pcsx2/SourceLog.cpp:113
+#: pcsx2/SourceLog.cpp:114
 msgid "Shows detailed controller input values for port 1, every frame."
 msgstr "在控制器端口1显示详细输入值,每帧。"
 
-#: pcsx2/SourceLog.cpp:147
+#: pcsx2/SourceLog.cpp:149
 msgid "SYSCALL and DECI2 activity."
 msgstr "SYSCALL 及 DECI2 活动。"
 
-#: pcsx2/SourceLog.cpp:150
+#: pcsx2/SourceLog.cpp:152
 msgid "Direct memory accesses to unknown or unmapped EE memory space."
 msgstr "到未知或未映射的内存空间的直接内存访问。"
 
-#: pcsx2/SourceLog.cpp:152 pcsx2/SourceLog.cpp:198
+#: pcsx2/SourceLog.cpp:154 pcsx2/SourceLog.cpp:200
 msgid "Disasm of executing core instructions (excluding COPs and CACHE)."
 msgstr "反汇编执行核心指令 (除了 COP 指令及 CACHE 指令)。"
 
-#: pcsx2/SourceLog.cpp:154
+#: pcsx2/SourceLog.cpp:156
 msgid "Disasm of COP0 instructions (MMU, cpu and dma status, etc)."
 msgstr "反汇编 COP0 指令 (MMU，CPU/DMA 状态，等等)。"
 
-#: pcsx2/SourceLog.cpp:156
+#: pcsx2/SourceLog.cpp:158
 msgid "Disasm of the EE's floating point unit (FPU) only."
 msgstr "仅反汇编 EE 浮点运算单元 (FPU)。"
 
-#: pcsx2/SourceLog.cpp:158
+#: pcsx2/SourceLog.cpp:160
 msgid "Disasm of the EE's VU0macro co-processor instructions."
 msgstr "反汇编 EE VU0macro 协处理器指令。"
 
-#: pcsx2/SourceLog.cpp:160
+#: pcsx2/SourceLog.cpp:162
 msgid "Execution of EE cache instructions."
 msgstr "EE 缓存指令的执行。"
 
-#: pcsx2/SourceLog.cpp:162
+#: pcsx2/SourceLog.cpp:164
 msgid ""
 "All known hardware register accesses (very slow!); not including sub filter "
 "options below."
 msgstr "全部已知硬件寄存器访问 (很慢!)；不包括以下子过滤器选项。"
 
-#: pcsx2/SourceLog.cpp:164 pcsx2/SourceLog.cpp:204
+#: pcsx2/SourceLog.cpp:166 pcsx2/SourceLog.cpp:206
 msgid "Logs only unknown, unmapped, or unimplemented register accesses."
 msgstr "仅记录未知、未映射或未实现的寄存器访问。"
 
-#: pcsx2/SourceLog.cpp:166 pcsx2/SourceLog.cpp:206
+#: pcsx2/SourceLog.cpp:168 pcsx2/SourceLog.cpp:208
 msgid "Logs only DMA-related registers."
 msgstr "仅记录 DMA 相关寄存器。"
 
-#: pcsx2/SourceLog.cpp:168
+#: pcsx2/SourceLog.cpp:170
 msgid "IPU activity: hardware registers, decoding operations, DMA status, etc."
 msgstr "IPU 活动: 硬件寄存器、解码操作、DMA 状态等等。"
 
-#: pcsx2/SourceLog.cpp:170
+#: pcsx2/SourceLog.cpp:172
 msgid "All GIFtag parse activity; path index, tag type, etc."
 msgstr "全部 GIF 标签解析活动；路径索引、标签类型，等等。"
 
-#: pcsx2/SourceLog.cpp:172
+#: pcsx2/SourceLog.cpp:174
 msgid "All VIFcode processing; command, tag style, interrupts."
 msgstr "全部 VIF 代码处理；命令、标签风格、中断。"
 
-#: pcsx2/SourceLog.cpp:174
+#: pcsx2/SourceLog.cpp:176
 msgid "All processing involved in Path3 Masking."
 msgstr "全部与 Path3 标志有关的处理。"
 
-#: pcsx2/SourceLog.cpp:176
+#: pcsx2/SourceLog.cpp:178
 msgid "Scratchpad's MFIFO activity."
 msgstr "暂存器的 MFIFO 活动。"
 
-#: pcsx2/SourceLog.cpp:178
+#: pcsx2/SourceLog.cpp:180
 msgid "Actual data transfer logs, bus right arbitration, stalls, etc."
 msgstr "实际的数据传输日志、总线权限仲裁、总线阻塞等等。"
 
-#: pcsx2/SourceLog.cpp:180
+#: pcsx2/SourceLog.cpp:182
 msgid "Tracks all EE counters events and some counter register activity."
 msgstr "跟踪所有的 EE 计数器事件和一些计数器寄存器活动。"
 
-#: pcsx2/SourceLog.cpp:182
+#: pcsx2/SourceLog.cpp:184
 msgid "Dumps various VIF and VIFcode processing data."
 msgstr "转储各种 VIF 和 VIF 代码处理数据。"
 
-#: pcsx2/SourceLog.cpp:184
+#: pcsx2/SourceLog.cpp:186
 msgid "Dumps various GIF and GIFtag parsing data."
 msgstr "转储各种 GIF 和 GIF 标签解析数据。"
 
-#: pcsx2/SourceLog.cpp:193
+#: pcsx2/SourceLog.cpp:195
 msgid "SYSCALL and IRX activity."
 msgstr "SYSCALL 及 IRX 活动。"
 
-#: pcsx2/SourceLog.cpp:196
+#: pcsx2/SourceLog.cpp:198
 msgid "Direct memory accesses to unknown or unmapped IOP memory space."
 msgstr "到未知或未映射的内存空间的直接内存访问。"
 
-#: pcsx2/SourceLog.cpp:200
+#: pcsx2/SourceLog.cpp:202
 msgid "Disasm of the IOP's GPU co-processor instructions."
 msgstr "反汇编 IOP GPU 协处理器指令。"
 
-#: pcsx2/SourceLog.cpp:202
+#: pcsx2/SourceLog.cpp:204
 msgid ""
 "All known hardware register accesses, not including the sub-filters below."
 msgstr "全部已知硬件寄存器访问，不包括以下子过滤器。"
 
-#: pcsx2/SourceLog.cpp:208
+#: pcsx2/SourceLog.cpp:210
 msgid "Memorycard reads, writes, erases, terminators, and other processing."
 msgstr "记忆卡读取、写入、擦除、终止符，及其它操作。"
 
-#: pcsx2/SourceLog.cpp:210
+#: pcsx2/SourceLog.cpp:212
 msgid "Gamepad activity on the SIO."
 msgstr "SIO 上的手柄活动。"
 
-#: pcsx2/SourceLog.cpp:212
+#: pcsx2/SourceLog.cpp:214
 msgid "Actual DMA event processing and data transfer logs."
 msgstr "实际的 DMA 事件处理及数据传输日志。"
 
-#: pcsx2/SourceLog.cpp:214
+#: pcsx2/SourceLog.cpp:216
 msgid "Tracks all IOP counters events and some counter register activity."
 msgstr "跟踪所有 IOP 计数器事件和一些计数器寄存器活动。"
 
-#: pcsx2/SourceLog.cpp:216
+#: pcsx2/SourceLog.cpp:218
 msgid "Detailed logging of CDVD hardware."
 msgstr "详细记录 CDVD 硬件信息。"
 
-#: pcsx2/SourceLog.cpp:218
+#: pcsx2/SourceLog.cpp:220
 msgid "Detailed logging of the Motion (FMV) Decoder hardware unit."
 msgstr "详细记录 CG 动画 (FMV) 解码硬件信息。"
 
@@ -377,7 +381,7 @@ msgstr "PCSX2 重编译器错误"
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr "全部选项仅对当前会话有效，不会被保存。\n"
 
-#: pcsx2/gui/AppInit.cpp:210 pcsx2/gui/AppMain.cpp:293
+#: pcsx2/gui/AppInit.cpp:210 pcsx2/gui/AppMain.cpp:290
 msgid "IsoFile"
 msgstr "ISO 文件"
 
@@ -525,7 +529,7 @@ msgstr "保存(&S)"
 msgid "Save &As..."
 msgstr "另存为(&A)..."
 
-#: pcsx2/gui/AppInit.cpp:685 pcsx2/gui/MainFrame.cpp:605
+#: pcsx2/gui/AppInit.cpp:685 pcsx2/gui/MainFrame.cpp:604
 msgid "&Help"
 msgstr "帮助(&H)"
 
@@ -541,32 +545,32 @@ msgstr "窗口(&W)"
 msgid "Show about dialog."
 msgstr "显示关于对话框。"
 
-#: pcsx2/gui/AppMain.cpp:109 pcsx2/gui/AppMain.cpp:114
+#: pcsx2/gui/AppMain.cpp:106 pcsx2/gui/AppMain.cpp:111
 msgid "PS2 BIOS Error"
 msgstr "PS2 BIOS 错误"
 
-#: pcsx2/gui/AppMain.cpp:109
+#: pcsx2/gui/AppMain.cpp:106
 msgid "Press Ok to go to the BIOS Configuration Panel."
 msgstr "单击确定进入 BIOS 设置面板。"
 
-#: pcsx2/gui/AppMain.cpp:132
+#: pcsx2/gui/AppMain.cpp:129
 msgid "Warning! Valid BIOS has not been selected. PCSX2 may be inoperable."
 msgstr "警告! 没有加载合法的BIOS。PCSX2 可能无法使用。"
 
-#: pcsx2/gui/AppMain.cpp:305
+#: pcsx2/gui/AppMain.cpp:302
 #, c-format
 msgid "%s Commandline Options"
 msgstr "%s 命令行选项"
 
-#: pcsx2/gui/AppMain.cpp:604
+#: pcsx2/gui/AppMain.cpp:586
 msgid "PCSX2 Unresponsive Thread"
 msgstr "PCSX2 线程没有响应"
 
-#: pcsx2/gui/AppMain.cpp:611
+#: pcsx2/gui/AppMain.cpp:593
 msgid "Terminate"
 msgstr "终止"
 
-#: pcsx2/gui/AppMain.cpp:993
+#: pcsx2/gui/AppMain.cpp:975
 msgid "Executing PS2 Virtual Machine..."
 msgstr "正在执行 PS2 虚拟机..."
 
@@ -629,143 +633,143 @@ msgstr "无法应用新的设置选项，某一个设置选项非法。"
 msgid "Save log question."
 msgstr "保存日志问题。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:422
+#: pcsx2/gui/ConsoleLogger.cpp:423
 msgid "&Small"
 msgstr "小(&S)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:422
+#: pcsx2/gui/ConsoleLogger.cpp:423
 msgid "7px font size."
 msgstr "7px 字体大小。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:424
+#: pcsx2/gui/ConsoleLogger.cpp:425
 msgid "&Normal Font"
 msgstr "正常字号(&N)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:424
+#: pcsx2/gui/ConsoleLogger.cpp:425
 msgid "8px font size."
 msgstr "8px 字体大小。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:426
+#: pcsx2/gui/ConsoleLogger.cpp:427
 msgid "&Large"
 msgstr "大(&L)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:426
+#: pcsx2/gui/ConsoleLogger.cpp:427
 msgid "10px font size."
 msgstr "10px 字体大小。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:428
+#: pcsx2/gui/ConsoleLogger.cpp:429
 msgid "&Huge"
 msgstr "最大(&H)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:428
+#: pcsx2/gui/ConsoleLogger.cpp:429
 msgid "12px font size."
 msgstr "12px 字体大小。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:432
+#: pcsx2/gui/ConsoleLogger.cpp:433
 msgid "&Light Theme"
 msgstr "亮色主题(&L)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:432
+#: pcsx2/gui/ConsoleLogger.cpp:433
 msgid "Default soft-tone color scheme."
 msgstr "默认柔色调色彩主题。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:433
+#: pcsx2/gui/ConsoleLogger.cpp:434
 msgid "&Dark Theme"
 msgstr "暗色主题(&D)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:433
+#: pcsx2/gui/ConsoleLogger.cpp:434
 msgid "Modern dark color scheme."
 msgstr "默认柔色调色彩主题。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:440
+#: pcsx2/gui/ConsoleLogger.cpp:441
 msgid "&Save..."
 msgstr "保存(&S)..."
 
-#: pcsx2/gui/ConsoleLogger.cpp:440
+#: pcsx2/gui/ConsoleLogger.cpp:441
 msgid "Save log contents to file."
 msgstr "将日志内容保存至文件。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:442
+#: pcsx2/gui/ConsoleLogger.cpp:443
 msgid "&Settings..."
 msgstr "设置(&S)..."
 
-#: pcsx2/gui/ConsoleLogger.cpp:442
+#: pcsx2/gui/ConsoleLogger.cpp:443
 msgid "Open the logging settings dialog."
 msgstr "打开日志设置对话框。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:444
+#: pcsx2/gui/ConsoleLogger.cpp:445
 msgid "C&lear"
 msgstr "清除(&L)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:444
+#: pcsx2/gui/ConsoleLogger.cpp:445
 msgid "Clear the log window contents."
 msgstr "清除日志窗口内容。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:446
+#: pcsx2/gui/ConsoleLogger.cpp:447
 msgid "Auto&dock"
 msgstr "自动停靠(D)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:446
+#: pcsx2/gui/ConsoleLogger.cpp:447
 msgid "Dock log window to main PCSX2 window."
 msgstr "将日志窗口停靠在主 PCSX2 窗口旁。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:447
+#: pcsx2/gui/ConsoleLogger.cpp:448
 msgid "&Appearance"
 msgstr "外观(&A)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:449
+#: pcsx2/gui/ConsoleLogger.cpp:450
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:449
+#: pcsx2/gui/ConsoleLogger.cpp:450
 msgid "Close this log window; contents are preserved."
 msgstr "关闭此日志窗口；内容将被保留。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:453
+#: pcsx2/gui/ConsoleLogger.cpp:454
 msgid "Dev/&Verbose"
 msgstr "开发者/冗余(&V)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:453
+#: pcsx2/gui/ConsoleLogger.cpp:454
 msgid "Shows PCSX2 developer logs."
 msgstr "显示 PCSX2 开发者日志记录。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:454
+#: pcsx2/gui/ConsoleLogger.cpp:455
 msgid "&CDVD reads"
 msgstr "CDVD 读取(&C)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:454
+#: pcsx2/gui/ConsoleLogger.cpp:455
 msgid "Shows disk read activity."
 msgstr "显示光盘读取活动。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:471
+#: pcsx2/gui/ConsoleLogger.cpp:472
 msgid "&Enable All"
 msgstr "全部启用(&E)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:471
+#: pcsx2/gui/ConsoleLogger.cpp:472
 msgid "Enables all log source filters."
 msgstr "启用全部日志来源过滤器。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:472
+#: pcsx2/gui/ConsoleLogger.cpp:473
 msgid "&Disable All"
 msgstr "全部禁用(&D)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:472
+#: pcsx2/gui/ConsoleLogger.cpp:473
 msgid "Disables all log source filters."
 msgstr "禁用全部日志来源过滤器。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:473
+#: pcsx2/gui/ConsoleLogger.cpp:474
 msgid "&Restore Default"
 msgstr "恢复默认值(&R)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:473
+#: pcsx2/gui/ConsoleLogger.cpp:474
 msgid "Restore default source filters."
 msgstr "恢复默认的来源过滤器。"
 
-#: pcsx2/gui/ConsoleLogger.cpp:475
+#: pcsx2/gui/ConsoleLogger.cpp:476
 msgid "&Log"
 msgstr "日志(&L)"
 
-#: pcsx2/gui/ConsoleLogger.cpp:476
+#: pcsx2/gui/ConsoleLogger.cpp:477
 msgid "&Sources"
 msgstr "来源(&S)"
 
@@ -1050,7 +1054,7 @@ msgstr "PS1游戏记忆卡。不兼容PS2游戏。"
 msgid "Select a folder for %s settings"
 msgstr "选择一个 %s 设置的文件夹"
 
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:47 pcsx2/gui/MainFrame.cpp:520
+#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:47 pcsx2/gui/MainFrame.cpp:519
 msgid "Settings"
 msgstr "设置"
 
@@ -1083,9 +1087,9 @@ msgstr "自述文件 / 常见问题 (离线/PDF)"
 msgid "%s First Time Configuration"
 msgstr "%s 首次运行向导"
 
-#: pcsx2/gui/Dialogs/GSDumpDialog.cpp:59 pcsx2/gui/MainMenuClicks.cpp:194
-#: pcsx2/gui/MainMenuClicks.cpp:256 pcsx2/gui/MainMenuClicks.cpp:309
-#: pcsx2/gui/MainMenuClicks.cpp:450
+#: pcsx2/gui/Dialogs/GSDumpDialog.cpp:59 pcsx2/gui/Dialogs/GSDumpDialog.cpp:215
+#: pcsx2/gui/MainMenuClicks.cpp:194 pcsx2/gui/MainMenuClicks.cpp:256
+#: pcsx2/gui/MainMenuClicks.cpp:309 pcsx2/gui/MainMenuClicks.cpp:450
 msgid "GS Debugger"
 msgstr "GS调试"
 
@@ -1138,10 +1142,6 @@ msgstr "预览"
 msgid "Failed to load the dump %s !"
 msgstr "未能加载转储 %s !"
 
-#: pcsx2/gui/Dialogs/GSDumpDialog.cpp:215
-msgid "GSDumpGov"
-msgstr "GS转储组"
-
 #: pcsx2/gui/Dialogs/IPCDialog.cpp:41
 msgid "IPC Settings"
 msgstr "IPC 设置"
@@ -1178,11 +1178,11 @@ msgstr "根据运行的游戏自动管理存档"
 msgid "MemoryCard Manager"
 msgstr "记忆卡管理器"
 
-#: pcsx2/gui/Dialogs/McdConfigDialog.cpp:116
+#: pcsx2/gui/Dialogs/McdConfigDialog.cpp:117
 msgid "Drag cards to or from PS2-ports"
 msgstr "将记忆卡拖到到 PS2 端口上，或从 PS2 端口拖放出去"
 
-#: pcsx2/gui/Dialogs/McdConfigDialog.cpp:117
+#: pcsx2/gui/Dialogs/McdConfigDialog.cpp:118
 msgid ""
 "\n"
 "Note: Duplicate/Rename/Create/Delete will NOT be reverted with 'Cancel'."
@@ -1209,47 +1209,42 @@ msgstr "预置:"
 
 #: pcsx2/gui/Dialogs/SysConfigDialog.cpp:195
 #, c-format
-msgid "Emulation Settings - %s"
-msgstr "模拟设置 - %s"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:204
-msgid "EE/IOP"
-msgstr "EE/IOP"
+msgid "General Settings - %s"
+msgstr "常规设置 - %s"
 
 #: pcsx2/gui/Dialogs/SysConfigDialog.cpp:205
-msgid "VUs"
-msgstr "VU"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:206
-msgid "GS"
-msgstr "GS"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:207
-msgid "GS Window"
-msgstr "GS 窗口"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:208
-msgid "Speedhacks"
-msgstr "速度 Hack"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:209
-msgid "Game Fixes"
-msgstr "游戏特殊修正"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:222
-#, c-format
-msgid "Components Selectors - %s"
-msgstr "组件选择器 - %s"
-
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:229
 msgid "BIOS"
 msgstr "BIOS"
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:230
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:206
 msgid "Folders"
 msgstr "文件夹"
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:239
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:207
+msgid "EE/IOP"
+msgstr "EE/IOP"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:208
+msgid "VUs"
+msgstr "VU"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:209
+msgid "GS"
+msgstr "GS"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:210
+msgid "GS Window"
+msgstr "GS 窗口"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:211
+msgid "Speedhacks"
+msgstr "速度 Hack"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:212
+msgid "Game Fixes"
+msgstr "游戏特殊修正"
+
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:225
 msgid "Language Selector"
 msgstr "语言选择器"
 
@@ -1261,47 +1256,47 @@ msgstr "刷新列表"
 msgid "Logs events as they are passed to the PS2 virtual machine."
 msgstr "在事件被传递至 PS2 虚拟机时记录到日志中。"
 
-#: pcsx2/gui/GlobalCommands.cpp:341
+#: pcsx2/gui/GlobalCommands.cpp:325
 msgid "Exit PCSX2?"
 msgstr "退出 PCSX2 ?"
 
-#: pcsx2/gui/GlobalCommands.cpp:678
+#: pcsx2/gui/GlobalCommands.cpp:662
 msgid "Save state"
 msgstr "即时存档"
 
-#: pcsx2/gui/GlobalCommands.cpp:679
+#: pcsx2/gui/GlobalCommands.cpp:663
 msgid "Saves the virtual machine state to the current slot."
 msgstr "将虚拟机的状态保存至当前存档位置。"
 
-#: pcsx2/gui/GlobalCommands.cpp:686
+#: pcsx2/gui/GlobalCommands.cpp:670
 msgid "Load state"
 msgstr "即时读档"
 
-#: pcsx2/gui/GlobalCommands.cpp:687
+#: pcsx2/gui/GlobalCommands.cpp:671
 msgid "Loads a virtual machine state from the current slot."
 msgstr "从当前存档位置读取虚拟机状态。"
 
-#: pcsx2/gui/GlobalCommands.cpp:694
+#: pcsx2/gui/GlobalCommands.cpp:678
 msgid "Load State Backup"
 msgstr "读取即时存档备份"
 
-#: pcsx2/gui/GlobalCommands.cpp:695
+#: pcsx2/gui/GlobalCommands.cpp:679
 msgid "Loads virtual machine state backup for current slot."
 msgstr "从当前存档位置读取虚拟机状态的备份。"
 
-#: pcsx2/gui/GlobalCommands.cpp:702 pcsx2/gui/MainFrame.cpp:65
+#: pcsx2/gui/GlobalCommands.cpp:686 pcsx2/gui/MainFrame.cpp:65
 msgid "Cycle to next slot"
 msgstr "切换至下一插槽"
 
-#: pcsx2/gui/GlobalCommands.cpp:703
+#: pcsx2/gui/GlobalCommands.cpp:687
 msgid "Cycles the current save slot in +1 fashion!"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:710
+#: pcsx2/gui/GlobalCommands.cpp:694
 msgid "Cycle to prev slot"
 msgstr "切换至上一插槽"
 
-#: pcsx2/gui/GlobalCommands.cpp:711
+#: pcsx2/gui/GlobalCommands.cpp:695
 msgid "Cycles the current save slot in -1 fashion!"
 msgstr ""
 
@@ -1351,402 +1346,398 @@ msgstr "文件..."
 msgid "Cycle to previous slot"
 msgstr "切换至上一插槽"
 
-#: pcsx2/gui/MainFrame.cpp:369 pcsx2/gui/MainFrame.cpp:371
+#: pcsx2/gui/MainFrame.cpp:368 pcsx2/gui/MainFrame.cpp:370
 msgid "Initializing..."
 msgstr "正在初始化..."
 
-#: pcsx2/gui/MainFrame.cpp:373
+#: pcsx2/gui/MainFrame.cpp:372
 msgid "Shut&down"
 msgstr "关闭(&D)"
 
-#: pcsx2/gui/MainFrame.cpp:374
+#: pcsx2/gui/MainFrame.cpp:373
 msgid "Wipes all internal VM states."
 msgstr "消除所有内部 VM 状态。"
 
-#: pcsx2/gui/MainFrame.cpp:377
+#: pcsx2/gui/MainFrame.cpp:376
 msgid "&Run ELF..."
 msgstr "运行 ELF...(&R)"
 
-#: pcsx2/gui/MainFrame.cpp:378
+#: pcsx2/gui/MainFrame.cpp:377
 msgid "For running raw PS2 binaries directly."
 msgstr "直接运行 PS2 二进制文件。"
 
-#: pcsx2/gui/MainFrame.cpp:382
+#: pcsx2/gui/MainFrame.cpp:381
 msgid "Fast Boot"
 msgstr "快速启动"
 
-#: pcsx2/gui/MainFrame.cpp:383
+#: pcsx2/gui/MainFrame.cpp:382
 msgid "Skips PS2 splash screens when booting from ISO or DVD media"
 msgstr "从 ISO 或 DVD 介质引导时跳过 PS2 启动画面"
 
-#: pcsx2/gui/MainFrame.cpp:385
+#: pcsx2/gui/MainFrame.cpp:384
 msgid "&Game Settings"
 msgstr "游戏设置(&G)"
 
-#: pcsx2/gui/MainFrame.cpp:387
+#: pcsx2/gui/MainFrame.cpp:386
 msgid "Automatic &Gamefixes"
 msgstr "自动应用游戏特殊修正(&G)"
 
-#: pcsx2/gui/MainFrame.cpp:388
+#: pcsx2/gui/MainFrame.cpp:387
 msgid "Automatically applies needed Gamefixes to known problematic games."
 msgstr "自动对已知有问题的游戏应用对应的特殊修正。"
 
-#: pcsx2/gui/MainFrame.cpp:390
+#: pcsx2/gui/MainFrame.cpp:389
 msgid "Enable &Cheats"
 msgstr "启用作弊码(&C)"
 
-#: pcsx2/gui/MainFrame.cpp:391
+#: pcsx2/gui/MainFrame.cpp:390
 msgid "Use cheats otherwise known as pnachs from the cheats folder."
 msgstr "使用作弊文件夹中的作弊码也就是所谓的 pnach。"
 
-#: pcsx2/gui/MainFrame.cpp:393
+#: pcsx2/gui/MainFrame.cpp:392
 msgid "Configure &IPC"
 msgstr "配置IPC(&I)"
 
-#: pcsx2/gui/MainFrame.cpp:395
+#: pcsx2/gui/MainFrame.cpp:394
 msgid "&Enable IPC"
 msgstr "启用IPC(&E)"
 
-#: pcsx2/gui/MainFrame.cpp:398
+#: pcsx2/gui/MainFrame.cpp:397
 msgid "IPC &Settings"
 msgstr "IPC 设置(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:400
+#: pcsx2/gui/MainFrame.cpp:399
 msgid "Enable &Widescreen Patches"
 msgstr "启用宽屏补丁(&W)"
 
-#: pcsx2/gui/MainFrame.cpp:401
+#: pcsx2/gui/MainFrame.cpp:400
 msgid "Enabling Widescreen Patches may occasionally cause issues."
 msgstr "启用宽屏补丁可能偶尔会导致奇怪问题。"
 
-#: pcsx2/gui/MainFrame.cpp:404
+#: pcsx2/gui/MainFrame.cpp:403
 msgid "Enable &Input Recording"
 msgstr "启用输入录制(&I)"
 
-#: pcsx2/gui/MainFrame.cpp:405
+#: pcsx2/gui/MainFrame.cpp:404
 msgid ""
 "Input Recording for controller/keyboard presses, tools for automation and "
 "playback."
 msgstr "用于控制器/键盘按下操作的输入录制以及自动化回放的工具。"
 
-#: pcsx2/gui/MainFrame.cpp:408
+#: pcsx2/gui/MainFrame.cpp:407
 msgid "Enable &Host Filesystem"
 msgstr "启用主机文件系统(&H)"
 
-#: pcsx2/gui/MainFrame.cpp:413
+#: pcsx2/gui/MainFrame.cpp:412
 msgid "&Load state"
 msgstr "即时读档(&L)"
 
-#: pcsx2/gui/MainFrame.cpp:416
+#: pcsx2/gui/MainFrame.cpp:415
 msgid "&Save state"
 msgstr "即时存档(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:419
+#: pcsx2/gui/MainFrame.cpp:418
 msgid "&Backup before save"
 msgstr "存档前备份(&B)"
 
-#: pcsx2/gui/MainFrame.cpp:423
+#: pcsx2/gui/MainFrame.cpp:422
 msgid "E&xit"
 msgstr "退出(&X)"
 
-#: pcsx2/gui/MainFrame.cpp:424
+#: pcsx2/gui/MainFrame.cpp:423
 #, c-format
 msgid "Closing %s may be hazardous to your health."
 msgstr "关闭 %s 可能有害您的健康。"
 
-#: pcsx2/gui/MainFrame.cpp:433
+#: pcsx2/gui/MainFrame.cpp:432
 msgid "ISO &Selector"
 msgstr "ISO 选择器(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:434
+#: pcsx2/gui/MainFrame.cpp:433
 msgid "D&rive Selector"
 msgstr "驱动器选择器(&R)"
 
-#: pcsx2/gui/MainFrame.cpp:437
+#: pcsx2/gui/MainFrame.cpp:436
 msgid "&ISO"
 msgstr "&ISO"
 
-#: pcsx2/gui/MainFrame.cpp:437
+#: pcsx2/gui/MainFrame.cpp:436
 msgid "Makes the specified ISO image the CDVD source."
 msgstr "将指定的 ISO 镜像指定为 CDVD 源。"
 
-#: pcsx2/gui/MainFrame.cpp:438
+#: pcsx2/gui/MainFrame.cpp:437
 msgid "&Disc"
 msgstr "光盘(&D)"
 
-#: pcsx2/gui/MainFrame.cpp:438
+#: pcsx2/gui/MainFrame.cpp:437
 msgid "Uses a disc drive as the CDVD source."
 msgstr "使用一个外部插件做为 CDVD 源。"
 
-#: pcsx2/gui/MainFrame.cpp:439
+#: pcsx2/gui/MainFrame.cpp:438
 msgid "&No disc"
 msgstr "无光盘(&N)"
 
-#: pcsx2/gui/MainFrame.cpp:439
+#: pcsx2/gui/MainFrame.cpp:438
 msgid "Use this to boot into your virtual PS2's BIOS configuration."
 msgstr "使用此项启动至虚拟 PS2 的配置屏幕。"
 
-#: pcsx2/gui/MainFrame.cpp:450
-msgid "Emulation &Settings..."
-msgstr "模拟设置(&S)..."
+#: pcsx2/gui/MainFrame.cpp:449
+msgid "General &Settings"
+msgstr "常规设置(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:451
-msgid "&Memory Cards..."
-msgstr "记忆卡(&M)..."
+#: pcsx2/gui/MainFrame.cpp:450
+msgid "&Memory Cards"
+msgstr "记忆卡(&M)"
 
 #: pcsx2/gui/MainFrame.cpp:452
-msgid "&BIOS Selector..."
-msgstr "BIOS 选择器(&B)..."
+msgid "&Graphics Settings"
+msgstr "图形设置(&G)"
 
 #: pcsx2/gui/MainFrame.cpp:453
-msgid "&Audio Settings..."
-msgstr "音频设置(&A)..."
+msgid "&Audio Settings"
+msgstr "音频设置(&A)"
 
 #: pcsx2/gui/MainFrame.cpp:454
-msgid "&Network and HDD Settings..."
-msgstr "网络和硬盘设置(&N)..."
+msgid "Game&pad Settings"
+msgstr "游戏手柄设置(&P)"
 
 #: pcsx2/gui/MainFrame.cpp:455
-msgid "&USB Settings..."
-msgstr "USB设置(&U)..."
+msgid "&Network and HDD Settings"
+msgstr "网络和硬盘设置(&N)"
 
 #: pcsx2/gui/MainFrame.cpp:456
-msgid "&GamePad Settings..."
-msgstr "手柄设置(&G)..."
+msgid "&USB Settings"
+msgstr "USB设置(&U)"
 
-#: pcsx2/gui/MainFrame.cpp:457
-msgid "&Graphical Settings..."
-msgstr "图形设置(&G)..."
-
-#: pcsx2/gui/MainFrame.cpp:460
+#: pcsx2/gui/MainFrame.cpp:459
 msgid "Multitap &1"
 msgstr "多分插 &1"
 
-#: pcsx2/gui/MainFrame.cpp:461
+#: pcsx2/gui/MainFrame.cpp:460
 msgid "Multitap &2"
 msgstr "多分插 &2"
 
-#: pcsx2/gui/MainFrame.cpp:466
-msgid "C&lear All Settings..."
-msgstr "清除所有设置(&L)..."
+#: pcsx2/gui/MainFrame.cpp:465
+msgid "&Clear All Settings"
+msgstr "清除所有设置(&L)"
 
-#: pcsx2/gui/MainFrame.cpp:467
+#: pcsx2/gui/MainFrame.cpp:466
 #, c-format
 msgid "Clears all %s settings and re-runs the startup wizard."
 msgstr "清除所有的 %s 设置并重新运行启动向导。"
 
-#: pcsx2/gui/MainFrame.cpp:472
+#: pcsx2/gui/MainFrame.cpp:471
 msgid "Create &Blockdump"
 msgstr "创建块转储(&B)"
 
-#: pcsx2/gui/MainFrame.cpp:472
+#: pcsx2/gui/MainFrame.cpp:471
 msgid "Creates a block dump for debugging purposes."
 msgstr "建立用于除错的块转存。"
 
-#: pcsx2/gui/MainFrame.cpp:473
+#: pcsx2/gui/MainFrame.cpp:472
 msgid "&Show Debugger"
 msgstr "显示调试(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:475
+#: pcsx2/gui/MainFrame.cpp:474
 msgid "Show &GS Debugger"
 msgstr "显示GS调试(&G)"
 
-#: pcsx2/gui/MainFrame.cpp:487
+#: pcsx2/gui/MainFrame.cpp:486
 msgid "Video"
 msgstr "视频"
 
-#: pcsx2/gui/MainFrame.cpp:489
+#: pcsx2/gui/MainFrame.cpp:488
 msgid "Start Video Capture"
 msgstr "开始录制屏幕"
 
-#: pcsx2/gui/MainFrame.cpp:491
+#: pcsx2/gui/MainFrame.cpp:490
 msgid "Stop Video Capture"
 msgstr "停止录制屏幕"
 
-#: pcsx2/gui/MainFrame.cpp:495
+#: pcsx2/gui/MainFrame.cpp:494
 msgid "Include Audio"
 msgstr "包含音频"
 
-#: pcsx2/gui/MainFrame.cpp:496
+#: pcsx2/gui/MainFrame.cpp:495
 msgid ""
 "Enables/disables the creation of a synchronized wav audio file when "
 "capturing video footage."
 msgstr "启用/禁用在捕获视频素材时创建同步的 wav 音频文件。"
 
-#: pcsx2/gui/MainFrame.cpp:500
+#: pcsx2/gui/MainFrame.cpp:499
 msgid "Screenshot"
 msgstr "截图"
 
-#: pcsx2/gui/MainFrame.cpp:501
+#: pcsx2/gui/MainFrame.cpp:500
 msgid "Take Screenshot"
 msgstr "获取截图"
 
-#: pcsx2/gui/MainFrame.cpp:509
-msgid "Screenshot As..."
+#: pcsx2/gui/MainFrame.cpp:508
+msgid "Save Screenshot As..."
 msgstr "截图另存为..."
 
-#: pcsx2/gui/MainFrame.cpp:515
+#: pcsx2/gui/MainFrame.cpp:514
 msgid "Create a new input recording."
 msgstr "创建一个新的输入录制。"
 
-#: pcsx2/gui/MainFrame.cpp:515
+#: pcsx2/gui/MainFrame.cpp:514
 msgid "New"
 msgstr "新建"
 
-#: pcsx2/gui/MainFrame.cpp:516
+#: pcsx2/gui/MainFrame.cpp:515
 msgid "Stop"
 msgstr "停止"
 
-#: pcsx2/gui/MainFrame.cpp:516
+#: pcsx2/gui/MainFrame.cpp:515
 msgid "Stop the active input recording."
 msgstr "停止已激活的输入录制。"
 
-#: pcsx2/gui/MainFrame.cpp:517
+#: pcsx2/gui/MainFrame.cpp:516
 msgid "Play"
 msgstr "播放"
 
-#: pcsx2/gui/MainFrame.cpp:517
+#: pcsx2/gui/MainFrame.cpp:516
 msgid "Playback an existing input recording."
 msgstr "播放一个现存的输入录制。"
 
-#: pcsx2/gui/MainFrame.cpp:521 pcsx2/gui/MainFrame.cpp:827
+#: pcsx2/gui/MainFrame.cpp:520 pcsx2/gui/MainFrame.cpp:826
 #: pcsx2/gui/MainMenuClicks.cpp:1111 pcsx2/gui/MainMenuClicks.cpp:1116
 msgid "Configure Frame Advance"
 msgstr "配置帧步进"
 
-#: pcsx2/gui/MainFrame.cpp:523
+#: pcsx2/gui/MainFrame.cpp:522
 msgid "Change the amount of frames advanced each time"
 msgstr "更改每次前进的帧数"
 
-#: pcsx2/gui/MainFrame.cpp:526
+#: pcsx2/gui/MainFrame.cpp:525
 msgid "Pause or resume emulation on the fly."
 msgstr "即时暂停或恢复模拟。"
 
-#: pcsx2/gui/MainFrame.cpp:526
+#: pcsx2/gui/MainFrame.cpp:525
 msgid "Toggle Pause"
 msgstr "切换暂停"
 
-#: pcsx2/gui/MainFrame.cpp:527
+#: pcsx2/gui/MainFrame.cpp:526
 msgid "Advance emulation forward by a single frame at a time."
 msgstr "一次向前推进一帧模拟。"
 
-#: pcsx2/gui/MainFrame.cpp:527
+#: pcsx2/gui/MainFrame.cpp:526
 msgid "Frame Advance"
 msgstr "帧步进"
 
-#: pcsx2/gui/MainFrame.cpp:528
+#: pcsx2/gui/MainFrame.cpp:527
 msgid "Save/playback inputs to/from the recording file."
 msgstr "将输入保存到录制文件/从录制文件重新输入。"
 
-#: pcsx2/gui/MainFrame.cpp:528
+#: pcsx2/gui/MainFrame.cpp:527
 msgid "Toggle Recording Mode"
 msgstr "切换录制模式"
 
-#: pcsx2/gui/MainFrame.cpp:531
+#: pcsx2/gui/MainFrame.cpp:530
 msgid "Virtual Pad (Port 1)"
 msgstr "虚拟控制器 (端口1)"
 
-#: pcsx2/gui/MainFrame.cpp:532
+#: pcsx2/gui/MainFrame.cpp:531
 msgid "Virtual Pad (Port 2)"
 msgstr "虚拟控制器 (端口2)"
 
-#: pcsx2/gui/MainFrame.cpp:538
+#: pcsx2/gui/MainFrame.cpp:537
 msgid "&Getting Started"
 msgstr "入门手册(&G)"
 
-#: pcsx2/gui/MainFrame.cpp:539
+#: pcsx2/gui/MainFrame.cpp:538
 msgid "&Compatibility"
 msgstr "兼容性(&C)"
 
-#: pcsx2/gui/MainFrame.cpp:541
+#: pcsx2/gui/MainFrame.cpp:540
 msgid "&Website"
 msgstr "官方网站(&W)"
 
-#: pcsx2/gui/MainFrame.cpp:542
+#: pcsx2/gui/MainFrame.cpp:541
 msgid "&Wiki"
 msgstr "维基百科(&W)"
 
-#: pcsx2/gui/MainFrame.cpp:543
+#: pcsx2/gui/MainFrame.cpp:542
 msgid "&Support Forums"
 msgstr "官方论坛(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:544
+#: pcsx2/gui/MainFrame.cpp:543
 msgid "&GitHub Repository"
 msgstr "Github代码库(&G)"
 
-#: pcsx2/gui/MainFrame.cpp:546
-msgid "&About..."
-msgstr "关于(&A)..."
+#: pcsx2/gui/MainFrame.cpp:545
+msgid "&About"
+msgstr "关于(&A)"
 
-#: pcsx2/gui/MainFrame.cpp:577
+#: pcsx2/gui/MainFrame.cpp:576
 msgid "&Show Program Log"
 msgstr "显示程序日志(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:579
+#: pcsx2/gui/MainFrame.cpp:578
 msgid "&Program Log to Stdio"
 msgstr "将标准输入输出用于程序日志(&P)"
 
-#: pcsx2/gui/MainFrame.cpp:590
+#: pcsx2/gui/MainFrame.cpp:589
 msgid "&System"
 msgstr "系统(&S)"
 
-#: pcsx2/gui/MainFrame.cpp:591
+#: pcsx2/gui/MainFrame.cpp:590
 msgid "CD&VD"
 msgstr "CDVD(&V)"
 
-#: pcsx2/gui/MainFrame.cpp:592
+#: pcsx2/gui/MainFrame.cpp:591
 msgid "&Config"
 msgstr "配置(&C)"
 
-#: pcsx2/gui/MainFrame.cpp:593
+#: pcsx2/gui/MainFrame.cpp:592
 msgid "&Debug"
 msgstr "调试(&D)"
 
-#: pcsx2/gui/MainFrame.cpp:594
-msgid "&Capture"
-msgstr "捕获(&C)"
+#: pcsx2/gui/MainFrame.cpp:593
+msgid "Captu&re"
+msgstr "捕获(&R)"
 
-#: pcsx2/gui/MainFrame.cpp:602 pcsx2/gui/MainMenuClicks.cpp:675
+#: pcsx2/gui/MainFrame.cpp:601 pcsx2/gui/MainMenuClicks.cpp:675
 msgid "&Input Record"
 msgstr "录制输入(&I)"
 
-#: pcsx2/gui/MainFrame.cpp:751
+#: pcsx2/gui/MainFrame.cpp:750
 msgid "Paus&e"
 msgstr "暂停(&E)"
 
-#: pcsx2/gui/MainFrame.cpp:752
+#: pcsx2/gui/MainFrame.cpp:751
 msgid "Safely pauses emulation and preserves the PS2 state."
 msgstr "安全地暂停模拟并保留 PS2 状态。"
 
-#: pcsx2/gui/MainFrame.cpp:760
+#: pcsx2/gui/MainFrame.cpp:759
 msgid "R&esume"
 msgstr "恢复(&E)"
 
-#: pcsx2/gui/MainFrame.cpp:761
+#: pcsx2/gui/MainFrame.cpp:760
 msgid "Resumes the suspended emulation state."
 msgstr "从挂起的模拟状态中恢复。"
 
-#: pcsx2/gui/MainFrame.cpp:765
+#: pcsx2/gui/MainFrame.cpp:764
 msgid "Pause/Resume"
 msgstr "暂停/恢复"
 
-#: pcsx2/gui/MainFrame.cpp:766
+#: pcsx2/gui/MainFrame.cpp:765
 msgid "No emulation state is active; cannot suspend or resume."
 msgstr "模拟器未运行；无法挂起或恢复。"
 
-#: pcsx2/gui/MainFrame.cpp:781
+#: pcsx2/gui/MainFrame.cpp:780
 msgid "Use fast boot to skip PS2 startup and splash screens."
 msgstr "使用快速启动模式来跳过 PS2 启动画面。"
 
-#: pcsx2/gui/MainFrame.cpp:786
+#: pcsx2/gui/MainFrame.cpp:785
 msgid "Boot ISO"
 msgstr "启动 ISO"
 
-#: pcsx2/gui/MainFrame.cpp:789
+#: pcsx2/gui/MainFrame.cpp:788
 msgid "Boot CDVD"
 msgstr "启动 CDVD"
 
-#: pcsx2/gui/MainFrame.cpp:792 pcsx2/gui/MainFrame.cpp:795
+#: pcsx2/gui/MainFrame.cpp:791 pcsx2/gui/MainFrame.cpp:794
 msgid "Boot BIOS"
 msgstr "启动 BIOS"
 
@@ -2209,58 +2200,54 @@ msgid "VU XGkick Hack - For Erementar Gerad."
 msgstr "VU XGkick Hack - 修正 Erementar Gerad (武器种族传说)。"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:56
-msgid "FFX videos fix - Fixes bad graphics overlay in FFX videos."
-msgstr "FFX CG 修正 - 修正 FFX CG 中的图像错误。"
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:60
 msgid "EE timing hack - Multi purpose hack. Try if all else fails."
 msgstr "EE 定时 Hack - 有多种用途。如以上皆失败请尝试。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:65
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
 msgid ""
 "Skip MPEG hack - Skips videos/FMVs in games to avoid game hanging/freezes."
 msgstr "跳过 MPEG hack - 跳过游戏中的 CG 以避免游戏挂起或失去响应。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:69
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:65
 msgid "OPH Flag hack - Try if your game freezes showing the same frame."
 msgstr "OPH 标志 hack - 如游戏在显示同一帧时失去响应，请尝试。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:74
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:70
 msgid "Handle DMAC writes when it is busy."
 msgstr "在 DMAC 处于忙状态时忽略写入操作。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:79
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
 msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
 msgstr "仿真 VIF1 FIFO 提前读取。修正游戏加载缓慢的问题。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
 msgid ""
 "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
 msgstr ""
 "延迟 VIF1 停顿 (VIF1 FIFO) - 解决 SOCOM 2 的 HUD 以及 Spy Hunter 加载时挂起的"
 "问题。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
-msgid ""
-"Enable the GIF FIFO (slower but needed for Hotwheels, Wallace and Gromit, DJ "
-"Hero)"
-msgstr "启用 GIF FIFO (较慢，用于风火轮赛车、超级无敌掌门狗和 DJ 英雄)"
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
+msgstr "强制 FIFO 使用GIF PATH3 传输数据 (街头足球2)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
 msgid "Preload TLB hack to avoid tlb miss on Goemon"
 msgstr "预加载 TLB Hack 以避免大盗五右卫门中的TLB丢失"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
 msgid ""
 "VU I bit Hack avoid constant recompilation in some games (Scarface The World "
 "Is Yours, Crash Tag Team Racing)"
 msgstr "VU I 位 Hack 避免无休止的重编译 (疤面煞星:掌握世界,古惑狼赛车)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:100
-msgid "VU0 Kickstart to avoid sync problems with VU1"
-msgstr "VU0 快速重启用来防止与 VU1 的同步问题"
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+msgid ""
+"VU Kickstart (Run ahead) to avoid sync problems when reading or writing VU "
+"registers"
+msgstr "VU 快速重启用来防止与 VU1 的同步问题"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:111
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:107
 msgid "Enable manual game fixes [Not recommended]"
 msgstr "手动设置游戏特殊修正 [不推荐]"
 
@@ -2567,35 +2554,35 @@ msgstr "应用"
 msgid "Make this language my default right now!"
 msgstr "立即将此语言设为默认语言!"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:38
+#: pcsx2/gui/Panels/PathsPanel.cpp:33
 msgid "Cheats:"
 msgstr "金手指:"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:39
+#: pcsx2/gui/Panels/PathsPanel.cpp:34
 msgid "Select folder for Cheats"
 msgstr "选择存放金手指的文件夹"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:46
+#: pcsx2/gui/Panels/PathsPanel.cpp:41
 msgid "Savestates:"
 msgstr "即时存档:"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:47
+#: pcsx2/gui/Panels/PathsPanel.cpp:42
 msgid "Select folder for Savestates"
 msgstr "选择存放即时存档的文件夹"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:54
+#: pcsx2/gui/Panels/PathsPanel.cpp:49
 msgid "Snapshots:"
 msgstr "截图:"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:55
+#: pcsx2/gui/Panels/PathsPanel.cpp:50
 msgid "Select a folder for Snapshots"
 msgstr "选择存放截图的文件夹"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:62
+#: pcsx2/gui/Panels/PathsPanel.cpp:57
 msgid "Logs/Dumps:"
 msgstr "日志/转储:"
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:63
+#: pcsx2/gui/Panels/PathsPanel.cpp:58
 msgid "Select a folder for logs/dumps"
 msgstr "选择存放日志及转储文件的文件夹"
 
@@ -2845,6 +2832,35 @@ msgstr "%s 扩展未找到。R5900-32 重编译器需要一个带有 SSE2 扩展
 msgid ""
 "%s Extensions not found.  microVU requires a host CPU with SSE2 extensions."
 msgstr "%s 扩展未找到。microVU 需要一个带有 SSE2 扩展的主机 CPU。"
+
+#~ msgid "Emulation Settings - %s"
+#~ msgstr "模拟设置 - %s"
+
+#~ msgid "Components Selectors - %s"
+#~ msgstr "组件选择器 - %s"
+
+#~ msgid "&BIOS / Folder Selector"
+#~ msgstr "BIOS 选择器(&B)"
+
+#~ msgid ""
+#~ "Enable the GIF FIFO (slower but needed for Hotwheels, Wallace and Gromit, "
+#~ "DJ Hero)"
+#~ msgstr "启用 GIF FIFO (较慢，用于风火轮赛车、超级无敌掌门狗和 DJ 英雄)"
+
+#~ msgid "GSDumpGov"
+#~ msgstr "GS转储组"
+
+#~ msgid "Emulation &Settings..."
+#~ msgstr "模拟设置(&S)..."
+
+#~ msgid "&GamePad Settings..."
+#~ msgstr "手柄设置(&G)..."
+
+#~ msgid "Dynamically patch bad COP2 timing with Ratchet && Clank games"
+#~ msgstr "动态修补用与修正瑞奇与叮当糟糕的 COP2 计时"
+
+#~ msgid "FFX videos fix - Fixes bad graphics overlay in FFX videos."
+#~ msgstr "FFX CG 修正 - 修正 FFX CG 中的图像错误。"
 
 #~ msgid "VU I bit Hack avoid constant recompilation (Crash Tag Team Racing)"
 #~ msgstr "VU I 位 Hack 避免无休止的重编译 (古惑狼赛车)"

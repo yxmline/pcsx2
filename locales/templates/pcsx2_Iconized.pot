@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-07-06 15:37+0800\n"
+"POT-Creation-Date: 2021-08-14 18:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "There is not enough virtual memory available, or necessary virtual memory mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 
-#: pcsx2/CDVD/CDVD.cpp:2136
+#: pcsx2/CDVD/CDVD.cpp:2152
 msgid "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr ""
 
@@ -34,7 +34,7 @@ msgstr ""
 msgid "This recompiler was unable to reserve contiguous memory required for internal caches.  This error can be caused by low virtual memory resources, such as a small or disabled swapfile, or by another program that is hogging a lot of memory."
 msgstr ""
 
-#: pcsx2/System.cpp:350
+#: pcsx2/System.cpp:354
 msgid "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close out some memory hogging background tasks and try again."
 msgstr ""
 
@@ -46,11 +46,11 @@ msgstr ""
 msgid "Note: Recompilers are not necessary for PCSX2 to run, however they typically improve emulation speed substantially. You may have to manually re-enable the recompilers listed above, if you resolve the errors."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:84
+#: pcsx2/gui/AppMain.cpp:81
 msgid "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't count).  Please consult the FAQs and Guides for further instructions."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:607
+#: pcsx2/gui/AppMain.cpp:589
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -227,7 +227,7 @@ msgstr ""
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -235,7 +235,7 @@ msgid ""
 " * Resident Evil: Dead Aim (Causes garbled textures)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:70
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
 msgid ""
 "Known to affect following games:\n"
 " * Bleach Blade Battler\n"
@@ -243,24 +243,24 @@ msgid ""
 " * Wizardry"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
 msgid ""
 "Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down Behind Enemy Lines\n"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
 " * Transformers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
 msgid "It's better to enable 'Automatic game fixes' at the main menu instead, and leave this page empty ('Automatic' means: selectively use specific tested fixes for specific games). Manual game fixes will NOT increase your performance. In fact they may decrease it."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:116
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -290,19 +290,19 @@ msgstr ""
 msgid "You can change the preferred default location for PCSX2 user-level documents here (includes memory cards, screenshots, settings, and savestates).  This option only affects Standard Paths which are set to use the installation default value."
 msgstr ""
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:40
+#: pcsx2/gui/Panels/PathsPanel.cpp:35
 msgid "This folder is where PCSX2 loads cheats from."
 msgstr ""
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:48
+#: pcsx2/gui/Panels/PathsPanel.cpp:43
 msgid "This folder is where PCSX2 records savestates; which are recorded either by using menus/toolbars, or by pressing F1/F3 (save/load)."
 msgstr ""
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:56
+#: pcsx2/gui/Panels/PathsPanel.cpp:51
 msgid "This folder is where PCSX2 saves screenshots."
 msgstr ""
 
-#: pcsx2/gui/Panels/PathsPanel.cpp:64
+#: pcsx2/gui/Panels/PathsPanel.cpp:59
 msgid "This folder is where PCSX2 saves its logfiles and diagnostic dumps."
 msgstr ""
 
