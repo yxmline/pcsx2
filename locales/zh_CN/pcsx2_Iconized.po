@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-08-14 18:52+0800\n"
-"PO-Revision-Date: 2021-08-14 18:58+0800\n"
+"POT-Creation-Date: 2021-09-06 00:40+0800\n"
+"PO-Revision-Date: 2021-09-06 00:43+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: common/src/Utilities/Exceptions.cpp:239
+#: common/Exceptions.cpp:241
 msgid ""
 "There is not enough virtual memory available, or necessary virtual memory "
 "mappings have already been reserved by other processes, services, or DLLs."
@@ -671,21 +671,21 @@ msgid ""
 "not be available either."
 msgstr "注意: 如限帧被禁用，快速模式和慢动作模式将不可用。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:226
+#: pcsx2/gui/Panels/VideoPanel.cpp:217
 msgid ""
 "Notice: Due to PS2 hardware design, precise frame skipping is impossible. "
 "Enabling it will cause severe graphical errors in some games."
 msgstr ""
 "注意: 由于 PS2 硬件设计，不可能准确跳帧。启用此选项可能在游戏中导致图像错误。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:306
+#: pcsx2/gui/Panels/VideoPanel.cpp:297
 msgid ""
 "Setting this to a lower value improves input lag, a value around 2 or 3 will "
 "slightly improve framerates. (Default is 2)"
 msgstr ""
 "将其设置为较低的值会改善输入延迟,2 或 3 左右的值会略微提高帧率。(默认值为 2)"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:307
+#: pcsx2/gui/Panels/VideoPanel.cpp:298
 msgid ""
 "Enable this if you think MTGS thread sync is causing crashes or graphical "
 "errors. For debugging to see if GS is running at the correct speed."

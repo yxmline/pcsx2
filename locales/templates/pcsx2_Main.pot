@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-08-14 18:52+0800\n"
+"POT-Creation-Date: 2021-09-06 00:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,63 +22,63 @@ msgstr ""
 "X-Poedit-SearchPath-0: pcsx2\n"
 "X-Poedit-SearchPath-1: common\n"
 
-#: common/include/Utilities/Exceptions.h:216
-msgid "No reason given."
-msgstr ""
-
-#: common/include/Utilities/Exceptions.h:255
-msgid "Parse error"
-msgstr ""
-
-#: common/include/Utilities/Exceptions.h:279
-msgid "Your machine's hardware is incapable of running PCSX2.  Sorry dood."
-msgstr ""
-
-#: common/src/Utilities/Exceptions.cpp:204
+#: common/Exceptions.cpp:206
 msgid "Oh noes! Out of memory!"
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:219
+#: common/Exceptions.cpp:221
 msgid "Virtual memory mapping failure!  Your system may have conflicting device drivers, services, or may simply have insufficient memory or resources to meet PCSX2's lofty needs."
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:290
+#: common/Exceptions.cpp:292
 msgid "Path: "
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:294
+#: common/Exceptions.cpp:296
 msgid "[Unnamed or unknown]"
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:314
+#: common/Exceptions.cpp:316
 msgid "A file could not be created."
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:334
+#: common/Exceptions.cpp:336
 msgid "File not found."
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:354
+#: common/Exceptions.cpp:356
 msgid "Permission denied while trying to open file, likely due to insufficient user account rights."
 msgstr ""
 
-#: common/src/Utilities/Exceptions.cpp:374
+#: common/Exceptions.cpp:376
 msgid "Unexpected end of file or stream encountered.  File is probably truncated or corrupted."
 msgstr ""
 
-#: common/src/Utilities/ThreadTools.cpp:41
+#: common/Exceptions.h:220
+msgid "No reason given."
+msgstr ""
+
+#: common/Exceptions.h:259
+msgid "Parse error"
+msgstr ""
+
+#: common/Exceptions.h:283
+msgid "Your machine's hardware is incapable of running PCSX2.  Sorry dood."
+msgstr ""
+
+#: common/ThreadTools.cpp:39
 msgid "Threading activity: start, detach, sync, deletion, etc."
 msgstr ""
 
-#: common/src/Utilities/ThreadingDialogs.cpp:30
+#: common/ThreadingDialogs.cpp:29
 msgid "Waiting for tasks..."
 msgstr ""
 
-#: common/src/Utilities/ThreadingDialogs.cpp:42
+#: common/ThreadingDialogs.cpp:41
 msgid "Waiting for task..."
 msgstr ""
 
-#: common/src/Utilities/wxAppWithHelpers.cpp:35
+#: common/wxAppWithHelpers.cpp:33
 msgid "Includes idle event processing and some other uncommon event usages."
 msgstr ""
 
@@ -103,7 +103,7 @@ msgstr ""
 msgid "If loading from an ISO image, this error may be caused by an unsupported ISO image type or a bug in PCSX2 ISO image support."
 msgstr ""
 
-#: pcsx2/MTGS.cpp:923
+#: pcsx2/MTGS.cpp:919
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
 msgstr ""
 
@@ -145,7 +145,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr ""
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:673
+#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:689
 msgid "Cancel"
 msgstr ""
 
@@ -322,31 +322,31 @@ msgstr ""
 msgid "The savestate was not properly saved. The temporary file was created successfully but could not be moved to its final resting place."
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:951
+#: pcsx2/gui/AppConfig.cpp:942
 msgid "Safest (No hacks)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:952
+#: pcsx2/gui/AppConfig.cpp:943
 msgid "Safe (Default)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:953
+#: pcsx2/gui/AppConfig.cpp:944
 msgid "Balanced"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:954
+#: pcsx2/gui/AppConfig.cpp:945
 msgid "Aggressive"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:955
+#: pcsx2/gui/AppConfig.cpp:946
 msgid "Very Aggressive"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:956
+#: pcsx2/gui/AppConfig.cpp:947
 msgid "Mostly Harmful"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1122 pcsx2/gui/AppConfig.cpp:1128
+#: pcsx2/gui/AppConfig.cpp:1113 pcsx2/gui/AppConfig.cpp:1119
 msgid "Failed to overwrite existing settings file; permission was denied."
 msgstr ""
 
@@ -443,85 +443,90 @@ msgstr ""
 msgid "update options to ease profiling (debug)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:497
+#: pcsx2/gui/AppInit.cpp:486
+#, c-format
+msgid "Specified elf file %s does not exist!"
+msgstr ""
+
+#: pcsx2/gui/AppInit.cpp:513
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:497 pcsx2/gui/AppInit.cpp:509
+#: pcsx2/gui/AppInit.cpp:513 pcsx2/gui/AppInit.cpp:525
 #, c-format
 msgid "Press OK to close %s."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:510
+#: pcsx2/gui/AppInit.cpp:526
 #, c-format
 msgid "%s Critical Error"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:671
+#: pcsx2/gui/AppInit.cpp:687
 msgid "OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:672
+#: pcsx2/gui/AppInit.cpp:688
 msgid "&OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:674
+#: pcsx2/gui/AppInit.cpp:690
 msgid "&Cancel"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:675
+#: pcsx2/gui/AppInit.cpp:691
 msgid "&Apply"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:676
+#: pcsx2/gui/AppInit.cpp:692
 msgid "&Next >"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:677
+#: pcsx2/gui/AppInit.cpp:693
 msgid "< &Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:678
+#: pcsx2/gui/AppInit.cpp:694
 msgid "&Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:679
+#: pcsx2/gui/AppInit.cpp:695
 msgid "&Finish"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:680
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&Yes"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:681
+#: pcsx2/gui/AppInit.cpp:697
 msgid "&No"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:682
+#: pcsx2/gui/AppInit.cpp:698
 msgid "Browse"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:683
+#: pcsx2/gui/AppInit.cpp:699
 msgid "&Save"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:684
+#: pcsx2/gui/AppInit.cpp:700
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:685 pcsx2/gui/MainFrame.cpp:604
+#: pcsx2/gui/AppInit.cpp:701 pcsx2/gui/MainFrame.cpp:604
 msgid "&Help"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:686
+#: pcsx2/gui/AppInit.cpp:702
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:687
+#: pcsx2/gui/AppInit.cpp:703
 msgid "&Window"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:689
+#: pcsx2/gui/AppInit.cpp:705
 msgid "Show about dialog."
 msgstr ""
 
@@ -1954,7 +1959,7 @@ msgid "Interpreter only; provided for diagnostic"
 msgstr ""
 
 #: pcsx2/gui/Panels/CpuPanel.cpp:170 pcsx2/gui/Panels/CpuPanel.cpp:221
-#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:304
+#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:295
 msgid "Restore Defaults"
 msgstr ""
 
@@ -2063,7 +2068,7 @@ msgstr ""
 msgid "Wait for Vsync on refresh:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:200
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:203
 msgid "Invalid window dimensions specified: Size cannot contain non-numeric digits! >_<"
 msgstr ""
 
@@ -2561,51 +2566,47 @@ msgstr ""
 msgid "PAL Framerate:"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:163
-msgid "Error while parsing either NTSC or PAL framerate settings.  Settings must be valid floating point numerics."
-msgstr ""
-
-#: pcsx2/gui/Panels/VideoPanel.cpp:183
+#: pcsx2/gui/Panels/VideoPanel.cpp:174
 msgid "Disabled [default]"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:187
+#: pcsx2/gui/Panels/VideoPanel.cpp:178
 msgid "Skip only on Turbo, to enable press"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:191
+#: pcsx2/gui/Panels/VideoPanel.cpp:182
 msgid "Constant skipping"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:193
+#: pcsx2/gui/Panels/VideoPanel.cpp:184
 msgid "Normal and Turbo limit rates skip frames.  Slow motion mode will still disable frameskipping."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:216
+#: pcsx2/gui/Panels/VideoPanel.cpp:207
 msgid "Frames to Draw"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:221
+#: pcsx2/gui/Panels/VideoPanel.cpp:212
 msgid "Frames to Skip"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:297
+#: pcsx2/gui/Panels/VideoPanel.cpp:288
 msgid "Use Synchronized MTGS"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:298
+#: pcsx2/gui/Panels/VideoPanel.cpp:289
 msgid "For troubleshooting potential bugs in the MTGS only, as it is potentially very slow."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:313
+#: pcsx2/gui/Panels/VideoPanel.cpp:304
 msgid "Frame Skipping"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:316
+#: pcsx2/gui/Panels/VideoPanel.cpp:307
 msgid "Framelimiter"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:330
+#: pcsx2/gui/Panels/VideoPanel.cpp:321
 msgid "Vsyncs in MTGS Queue:"
 msgstr ""
 
@@ -2669,12 +2670,12 @@ msgstr ""
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr ""
 
-#: pcsx2/x86/ix86-32/iR5900-32.cpp:487
+#: pcsx2/x86/ix86-32/iR5900-32.cpp:506
 #, c-format
 msgid "%s Extensions not found.  The R5900-32 recompiler requires a host CPU with SSE2 extensions."
 msgstr ""
 
-#: pcsx2/x86/microVU.cpp:32
+#: pcsx2/x86/microVU.cpp:33
 #, c-format
 msgid "%s Extensions not found.  microVU requires a host CPU with SSE2 extensions."
 msgstr ""

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-08-14 18:52+0800\n"
-"PO-Revision-Date: 2021-08-14 18:59+0800\n"
+"POT-Creation-Date: 2021-09-06 00:40+0800\n"
+"PO-Revision-Date: 2021-09-06 00:43+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,23 +14,11 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: common/include/Utilities/Exceptions.h:216
-msgid "No reason given."
-msgstr "无理由给出。"
-
-#: common/include/Utilities/Exceptions.h:255
-msgid "Parse error"
-msgstr "解析错误"
-
-#: common/include/Utilities/Exceptions.h:279
-msgid "Your machine's hardware is incapable of running PCSX2.  Sorry dood."
-msgstr "您的硬件不可以运行 PCSX2。抱歉。"
-
-#: common/src/Utilities/Exceptions.cpp:204
+#: common/Exceptions.cpp:206
 msgid "Oh noes! Out of memory!"
 msgstr "不好! 内存不够!"
 
-#: common/src/Utilities/Exceptions.cpp:219
+#: common/Exceptions.cpp:221
 msgid ""
 "Virtual memory mapping failure!  Your system may have conflicting device "
 "drivers, services, or may simply have insufficient memory or resources to "
@@ -39,47 +27,59 @@ msgstr ""
 "虚拟内存映射错误! 您的系统可能有冲突的硬件驱动程序、服务，或者没有足够的内存"
 "或资源来满足 PCSX2 的要求。"
 
-#: common/src/Utilities/Exceptions.cpp:290
+#: common/Exceptions.cpp:292
 msgid "Path: "
 msgstr "路径: "
 
-#: common/src/Utilities/Exceptions.cpp:294
+#: common/Exceptions.cpp:296
 msgid "[Unnamed or unknown]"
 msgstr "[未命名或未知]"
 
-#: common/src/Utilities/Exceptions.cpp:314
+#: common/Exceptions.cpp:316
 msgid "A file could not be created."
 msgstr "文件无法建立。"
 
-#: common/src/Utilities/Exceptions.cpp:334
+#: common/Exceptions.cpp:336
 msgid "File not found."
 msgstr "文件未找到。"
 
-#: common/src/Utilities/Exceptions.cpp:354
+#: common/Exceptions.cpp:356
 msgid ""
 "Permission denied while trying to open file, likely due to insufficient user "
 "account rights."
 msgstr "打开文件时拒绝访问，可能是由于用户账户权限限制。"
 
-#: common/src/Utilities/Exceptions.cpp:374
+#: common/Exceptions.cpp:376
 msgid ""
 "Unexpected end of file or stream encountered.  File is probably truncated or "
 "corrupted."
 msgstr "遇到非预期的文件或串流结尾。文件可能被截断或被破坏。"
 
-#: common/src/Utilities/ThreadTools.cpp:41
+#: common/Exceptions.h:220
+msgid "No reason given."
+msgstr "无理由给出。"
+
+#: common/Exceptions.h:259
+msgid "Parse error"
+msgstr "解析错误"
+
+#: common/Exceptions.h:283
+msgid "Your machine's hardware is incapable of running PCSX2.  Sorry dood."
+msgstr "您的硬件不可以运行 PCSX2。抱歉。"
+
+#: common/ThreadTools.cpp:39
 msgid "Threading activity: start, detach, sync, deletion, etc."
 msgstr "线程活动: 开始、分离、同步、删除等等。"
 
-#: common/src/Utilities/ThreadingDialogs.cpp:30
+#: common/ThreadingDialogs.cpp:29
 msgid "Waiting for tasks..."
 msgstr "正在等待任务..."
 
-#: common/src/Utilities/ThreadingDialogs.cpp:42
+#: common/ThreadingDialogs.cpp:41
 msgid "Waiting for task..."
 msgstr "正在等待任务..."
 
-#: common/src/Utilities/wxAppWithHelpers.cpp:35
+#: common/wxAppWithHelpers.cpp:33
 msgid "Includes idle event processing and some other uncommon event usages."
 msgstr "包含空闲事件处理及一些其它的非常见事件使用。"
 
@@ -108,7 +108,7 @@ msgstr ""
 "如从一个 ISO 镜像加载，此错误可能由一个不被支持的 ISO 镜像类型或 PCSX2 ISO 镜"
 "像支持的 bug 引起。"
 
-#: pcsx2/MTGS.cpp:923
+#: pcsx2/MTGS.cpp:919
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
 msgstr "MTGS 线程在等待 GS 打开时失去响应。"
 
@@ -154,7 +154,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr "需要浏览"
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:673
+#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:689
 msgid "Cancel"
 msgstr "取消"
 
@@ -200,7 +200,7 @@ msgstr "显示输出至系統输出流的字串。"
 
 #: pcsx2/SourceLog.cpp:109
 msgid "Shows output from pgif the emulated ps1 gpu"
-msgstr ""
+msgstr "显示模拟PS1 GPU的PGIF输出"
 
 #: pcsx2/SourceLog.cpp:112
 msgid "Shows recording related logs and information."
@@ -339,31 +339,31 @@ msgid ""
 "successfully but could not be moved to its final resting place."
 msgstr "即时存档未正确保存。临时文件建立成功但无法移至存档位置。"
 
-#: pcsx2/gui/AppConfig.cpp:951
+#: pcsx2/gui/AppConfig.cpp:942
 msgid "Safest (No hacks)"
 msgstr "安全(无修正)"
 
-#: pcsx2/gui/AppConfig.cpp:952
+#: pcsx2/gui/AppConfig.cpp:943
 msgid "Safe (Default)"
 msgstr "安全(默认)"
 
-#: pcsx2/gui/AppConfig.cpp:953
+#: pcsx2/gui/AppConfig.cpp:944
 msgid "Balanced"
 msgstr "平衡"
 
-#: pcsx2/gui/AppConfig.cpp:954
+#: pcsx2/gui/AppConfig.cpp:945
 msgid "Aggressive"
 msgstr "较激进"
 
-#: pcsx2/gui/AppConfig.cpp:955
+#: pcsx2/gui/AppConfig.cpp:946
 msgid "Very Aggressive"
 msgstr "非常激进"
 
-#: pcsx2/gui/AppConfig.cpp:956
+#: pcsx2/gui/AppConfig.cpp:947
 msgid "Mostly Harmful"
 msgstr "不稳定"
 
-#: pcsx2/gui/AppConfig.cpp:1122 pcsx2/gui/AppConfig.cpp:1128
+#: pcsx2/gui/AppConfig.cpp:1113 pcsx2/gui/AppConfig.cpp:1119
 msgid "Failed to overwrite existing settings file; permission was denied."
 msgstr "覆盖已存在文件失败；权限被拒绝。"
 
@@ -463,85 +463,90 @@ msgstr "启用绿色模式 (需要管理员权限)"
 msgid "update options to ease profiling (debug)"
 msgstr "更新选项以简化分析 (调试)"
 
-#: pcsx2/gui/AppInit.cpp:497
+#: pcsx2/gui/AppInit.cpp:486
+#, c-format
+msgid "Specified elf file %s does not exist!"
+msgstr "指定的 elf 文件 %s 不存在！"
+
+#: pcsx2/gui/AppInit.cpp:513
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr "PCSX2 错误: 硬件缺陷。"
 
-#: pcsx2/gui/AppInit.cpp:497 pcsx2/gui/AppInit.cpp:509
+#: pcsx2/gui/AppInit.cpp:513 pcsx2/gui/AppInit.cpp:525
 #, c-format
 msgid "Press OK to close %s."
 msgstr "请单击 \"确定\" 来关闭 %s。"
 
-#: pcsx2/gui/AppInit.cpp:510
+#: pcsx2/gui/AppInit.cpp:526
 #, c-format
 msgid "%s Critical Error"
 msgstr "%s 严重错误"
 
-#: pcsx2/gui/AppInit.cpp:671
+#: pcsx2/gui/AppInit.cpp:687
 msgid "OK"
 msgstr "确定"
 
-#: pcsx2/gui/AppInit.cpp:672
+#: pcsx2/gui/AppInit.cpp:688
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: pcsx2/gui/AppInit.cpp:674
+#: pcsx2/gui/AppInit.cpp:690
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: pcsx2/gui/AppInit.cpp:675
+#: pcsx2/gui/AppInit.cpp:691
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: pcsx2/gui/AppInit.cpp:676
+#: pcsx2/gui/AppInit.cpp:692
 msgid "&Next >"
 msgstr "下一步(&N) >"
 
-#: pcsx2/gui/AppInit.cpp:677
+#: pcsx2/gui/AppInit.cpp:693
 msgid "< &Back"
 msgstr "< 上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:678
+#: pcsx2/gui/AppInit.cpp:694
 msgid "&Back"
 msgstr "上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:679
+#: pcsx2/gui/AppInit.cpp:695
 msgid "&Finish"
 msgstr "完成(&F)"
 
-#: pcsx2/gui/AppInit.cpp:680
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&Yes"
 msgstr "是(&Y)"
 
-#: pcsx2/gui/AppInit.cpp:681
+#: pcsx2/gui/AppInit.cpp:697
 msgid "&No"
 msgstr "不(&N)"
 
-#: pcsx2/gui/AppInit.cpp:682
+#: pcsx2/gui/AppInit.cpp:698
 msgid "Browse"
 msgstr "浏览"
 
-#: pcsx2/gui/AppInit.cpp:683
+#: pcsx2/gui/AppInit.cpp:699
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: pcsx2/gui/AppInit.cpp:684
+#: pcsx2/gui/AppInit.cpp:700
 msgid "Save &As..."
 msgstr "另存为(&A)..."
 
-#: pcsx2/gui/AppInit.cpp:685 pcsx2/gui/MainFrame.cpp:604
+#: pcsx2/gui/AppInit.cpp:701 pcsx2/gui/MainFrame.cpp:604
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: pcsx2/gui/AppInit.cpp:686
+#: pcsx2/gui/AppInit.cpp:702
 msgid "&Home"
 msgstr "首页(&H)"
 
-#: pcsx2/gui/AppInit.cpp:687
+#: pcsx2/gui/AppInit.cpp:703
 msgid "&Window"
 msgstr "窗口(&W)"
 
-#: pcsx2/gui/AppInit.cpp:689
+#: pcsx2/gui/AppInit.cpp:705
 msgid "Show about dialog."
 msgstr "显示关于对话框。"
 
@@ -2049,7 +2054,7 @@ msgid "Interpreter only; provided for diagnostic"
 msgstr "很慢；仅供诊断用途"
 
 #: pcsx2/gui/Panels/CpuPanel.cpp:170 pcsx2/gui/Panels/CpuPanel.cpp:221
-#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:304
+#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:295
 msgid "Restore Defaults"
 msgstr "恢复默认值"
 
@@ -2161,7 +2166,7 @@ msgstr "缩放:"
 msgid "Wait for Vsync on refresh:"
 msgstr "等待垂直同步刷新:"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:200
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:203
 msgid ""
 "Invalid window dimensions specified: Size cannot contain non-numeric digits! "
 ">_<"
@@ -2697,57 +2702,51 @@ msgstr "FPS"
 msgid "PAL Framerate:"
 msgstr "PAL 帧率:"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:163
-msgid ""
-"Error while parsing either NTSC or PAL framerate settings.  Settings must be "
-"valid floating point numerics."
-msgstr "解析 NTSC 或 PAL 帧率时出错。设定值必须是一个合法的浮点数值。"
-
-#: pcsx2/gui/Panels/VideoPanel.cpp:183
+#: pcsx2/gui/Panels/VideoPanel.cpp:174
 msgid "Disabled [default]"
 msgstr "禁用 [默认]"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:187
+#: pcsx2/gui/Panels/VideoPanel.cpp:178
 msgid "Skip only on Turbo, to enable press"
 msgstr "仅在快速模式中跳帧 (按 TAB 键启用)"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:191
+#: pcsx2/gui/Panels/VideoPanel.cpp:182
 msgid "Constant skipping"
 msgstr "常数跳帧"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:193
+#: pcsx2/gui/Panels/VideoPanel.cpp:184
 msgid ""
 "Normal and Turbo limit rates skip frames.  Slow motion mode will still "
 "disable frameskipping."
 msgstr "正常及加速模式帧率跳帧。慢动作模式仍将禁用跳帧。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:216
+#: pcsx2/gui/Panels/VideoPanel.cpp:207
 msgid "Frames to Draw"
 msgstr "绘制帧数"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:221
+#: pcsx2/gui/Panels/VideoPanel.cpp:212
 msgid "Frames to Skip"
 msgstr "跳过帧数"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:297
+#: pcsx2/gui/Panels/VideoPanel.cpp:288
 msgid "Use Synchronized MTGS"
 msgstr "使用同步 MTGS"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:298
+#: pcsx2/gui/Panels/VideoPanel.cpp:289
 msgid ""
 "For troubleshooting potential bugs in the MTGS only, as it is potentially "
 "very slow."
 msgstr "仅供诊断 MTGS 中可能的错误，可能会非常慢。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:313
+#: pcsx2/gui/Panels/VideoPanel.cpp:304
 msgid "Frame Skipping"
 msgstr "跳帧"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:316
+#: pcsx2/gui/Panels/VideoPanel.cpp:307
 msgid "Framelimiter"
 msgstr "限帧"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:330
+#: pcsx2/gui/Panels/VideoPanel.cpp:321
 msgid "Vsyncs in MTGS Queue:"
 msgstr "使用同步 MTGS:"
 
@@ -2820,18 +2819,23 @@ msgstr "PS2 BIOS 无法加载。BIOS 未被配置，或配置已被破坏。请�
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr "配置的 BIOS 文件不存在。请重新配置。"
 
-#: pcsx2/x86/ix86-32/iR5900-32.cpp:487
+#: pcsx2/x86/ix86-32/iR5900-32.cpp:506
 #, c-format
 msgid ""
 "%s Extensions not found.  The R5900-32 recompiler requires a host CPU with "
 "SSE2 extensions."
 msgstr "%s 扩展未找到。R5900-32 重编译器需要一个带有 SSE2 扩展的主机 CPU。"
 
-#: pcsx2/x86/microVU.cpp:32
+#: pcsx2/x86/microVU.cpp:33
 #, c-format
 msgid ""
 "%s Extensions not found.  microVU requires a host CPU with SSE2 extensions."
 msgstr "%s 扩展未找到。microVU 需要一个带有 SSE2 扩展的主机 CPU。"
+
+#~ msgid ""
+#~ "Error while parsing either NTSC or PAL framerate settings.  Settings must "
+#~ "be valid floating point numerics."
+#~ msgstr "解析 NTSC 或 PAL 帧率时出错。设定值必须是一个合法的浮点数值。"
 
 #~ msgid "Emulation Settings - %s"
 #~ msgstr "模拟设置 - %s"
