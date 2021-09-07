@@ -1028,14 +1028,8 @@ SCCS-40005:
   name: "ICO"
   region: "NTSC-C"
   clampModes:
-    eeClampMode: 2  # Game require EE clamping set to Extra + Preserve Sign to not freeze.
-  patches:
-    BF3A46DA:
-      content: |-
-        author=kozarovv
-        // Game expect sceCdStatPause at some point, but for some reason value is never set.
-        // So instead, set expected value to be sceCdStatSpin, to allow further modules loading.
-        patch=0,EE,0010EDD4,word,24100002
+    eeClampMode: 2  # Otherwise freezes in various spots, check full intro.
+    vuClampMode: 1  # Otherwise camera gets stuck off the player in various spots.
 SCCS-40006:
   name: "Shin Sangoku Musou 2"
   region: "NTSC-C"
@@ -2039,6 +2033,8 @@ SCES-50459:
   name: "Dropship - United Peace Force"
   region: "PAL-M5"
   compat: 2
+  speedHacks:
+    InstantVU1SpeedHack: 0
 SCES-50490:
   name: "Final Fantasy X"
   region: "PAL-E"
@@ -3797,12 +3793,6 @@ SCPS-11021:
 SCPS-11022:
   name: "Yoake no Mariko 2nd Act"
   region: "NTSC-J"
-  patches:
-    0cf7e6ff:
-      content: |-
-        comment=Patch by Prafull
-        // Fixes initial hang.
-        patch=1,EE,00176000,word,00000000
 SCPS-11023:
   name: "Bravo Music - Chou-Meikyokuban"
   region: "NTSC-J"
@@ -20342,6 +20332,9 @@ SLPM-62482:
 SLPM-62483:
   name: "Simple 2000 Series Vol.48 - The Taxi"
   region: "NTSC-J"
+  roundModes:
+     eeRoundMode: 2
+     vuRoundMode: 2
 SLPM-62484:
   name: "Simple 2000 Series Vol.50 - The Daibijin"
   region: "NTSC-J"
@@ -33988,6 +33981,8 @@ SLUS-20463:
   name: "Dropship - United Peace Force"
   region: "NTSC-U"
   compat: 2
+  speedHacks:
+    InstantVU1SpeedHack: 0
 SLUS-20464:
   name: "Fugitive Hunter - War on Terror"
   region: "NTSC-U"
