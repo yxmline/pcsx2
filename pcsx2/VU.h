@@ -108,9 +108,11 @@ struct efuPipe
 
 struct fmacPipe
 {
-	int enable;
-	int reg;
-	int xyzw;
+	u32 regupper;
+	u32 reglower;
+	int flagreg;
+	u32 xyzwupper;
+	u32 xyzwlower;
 	u32 sCycle;
 	u32 Cycle;
 	u32 macflag;
@@ -120,7 +122,6 @@ struct fmacPipe
 
 struct ialuPipe
 {
-	int enable;
 	int reg;
 	u32 sCycle;
 	u32 Cycle;
@@ -153,8 +154,10 @@ struct __aligned16 VURegs
 	u32 branchpc;
 	u32 delaybranchpc;
 	bool takedelaybranch;
+	u32 ebit;
 	u32 pending_q;
 	u32 pending_p;
+	u32 blockhasmbit;
 
 	__aligned16 u32 micro_macflags[4];
 	__aligned16 u32 micro_clipflags[4];
@@ -171,16 +174,28 @@ struct __aligned16 VURegs
 	u8* Mem;
 	u8* Micro;
 
-	u32 ebit;
+	bool xgkickenable;
+	bool xgkickendpacket;
+	u32 xgkickaddr;
+	u32 xgkickdiff;
+	u32 xgkicksizeremaining;
+	u32 xgkicklastcycle;
+	u32 xgkickcyclecount;
 
 	u8 VIBackupCycles;
 	u32 VIOldValue;
 	u32 VIRegNumber;
 
-	fmacPipe fmac[8];
+	fmacPipe fmac[4];
+	u32 fmacreadpos;
+	u32 fmacwritepos;
+	u32 fmaccount;
 	fdivPipe fdiv;
 	efuPipe efu;
-	ialuPipe ialu[8];
+	ialuPipe ialu[4];
+	u32 ialureadpos;
+	u32 ialuwritepos;
+	u32 ialucount;
 
 	VURegs()
 	{
