@@ -457,8 +457,10 @@ SCAJ-20078:
 SCAJ-20079:
   name: "Katamari Damacy"
   region: "NTSC-Unk"
-  speedHacks:
-    mvuFlagSpeedHack: 0
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SCAJ-20080:
   name: "Kaena"
   region: "NTSC-Unk"
@@ -673,10 +675,10 @@ SCAJ-20134:
 SCAJ-20135:
   name: "Minna Daisuki Katamari Damacy"
   region: "NTSC-Unk"
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -3425,8 +3427,10 @@ SCKA-20023:
 SCKA-20025:
   name: "Katamari Damacy"
   region: "NTSC-K"
-  speedHacks:
-    mvuFlagSpeedHack: 0
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SCKA-20026:
   name: "Gungrave O.D."
   region: "NTSC-K"
@@ -3517,10 +3521,10 @@ SCKA-20050:
 SCKA-20051:
   name: "Minna Daisuki Katamari Damacy"
   region: "NTSC-K"
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
   memcardFilters:
     - "SCKA-20051"
     - "SCKA-20025"
@@ -9680,6 +9684,8 @@ SLES-51390:
 SLES-51391:
   name: "RTL Skispringen 2003"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-51392:
   name: "Evolution Snowboarding"
   region: "PAL-M3"
@@ -10443,6 +10449,8 @@ SLES-51860:
   name: "Tennis Court Smash"
   region: "PAL-E"
   compat: 3
+  gameFixes:
+    - XGKickHack # Fixes bad Geometry.
 SLES-51861:
   name: "Bowling Xciting"
   region: "PAL-E"
@@ -10521,7 +10529,7 @@ SLES-51888:
   name: "RTL Ski Jumping 2004"
   region: "PAL-E-G"
   clampModes:
-    vuClampMode: 3 # Fixes SPS 
+    vuClampMode: 3 # Fixes SPS.
 SLES-51890:
   name: "Buffy the Vampire Slayer - Chaos Bleeds"
   region: "PAL-M4"
@@ -11409,6 +11417,8 @@ SLES-52392:
 SLES-52393:
   name: "Pinball Fun"
   region: "PAL-E"
+  gameFixes:
+    - XGKickHack # Fixes SPS and console spam (The Tennis).
 SLES-52394:
   name: "UFEA Euro 2004"
   region: "PAL-E"
@@ -12758,6 +12768,8 @@ SLES-53022:
 SLES-53023:
   name: "RTL Ski Jump 2005"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-53024:
   name: "Altered Beast"
   region: "PAL-M5"
@@ -12825,6 +12837,8 @@ SLES-53039:
 SLES-53041:
   name: "RTL Ski Alpine 2005"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-53044:
   name: "Juiced"
   region: "PAL-M4"
@@ -12969,6 +12983,8 @@ SLES-53114:
   region: "PAL-M5"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLES-53119:
   name: "Kessen III"
   region: "PAL-E"
@@ -13001,6 +13017,8 @@ SLES-53131:
   region: "PAL-E"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLES-53138:
   name: "Outlaw Volleyball - Remixed"
   region: "PAL-M4"
@@ -13229,10 +13247,10 @@ SLES-53301:
   region: "PAL-E"
   compat: 5
 SLES-53303:
-  name: "Ski Jumping 2006"
+  name: "RTL Ski Jumping 2006"
   region: "PAL-E-G"
   clampModes:
-    vuClampMode: 3 # Fixes SPS 
+    vuClampMode: 3 # Fixes SPS.
 SLES-53309:
   name: "Transformers [Director's Cut]"
   region: "PAL-M5"
@@ -13349,6 +13367,8 @@ SLES-53361:
 SLES-53362:
   name: "Alpine Skiing 2005"
   region: "PAL-E"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-53363:
   name: "Shin Megami Tensei: Lucifer's Call"
   region: "PAL-M3"
@@ -14106,6 +14126,8 @@ SLES-53656:
   region: "PAL-M4"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLES-53657:
   name: "Shrek - Super Slam"
   region: "PAL-E"
@@ -14499,10 +14521,10 @@ SLES-53827:
 SLES-53828:
   name: "We Love Katamari"
   region: "PAL-M4"
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
 SLES-53829:
   name: "Raiden III"
   region: "PAL-E"
@@ -14659,6 +14681,8 @@ SLES-53909:
   region: "PAL-G"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLES-53910:
   name: "Agent Hugo"
   region: "PAL-R"
@@ -15167,6 +15191,8 @@ SLES-54169:
 SLES-54170:
   name: "Jaws Unleashed"
   region: "PAL-M5"
+  gameFixes:
+    - XGKickHack # Fixes GS packet errors (and potential crash).
 SLES-54171:
   name: "Yakuza"
   region: "PAL-M5"
@@ -15564,15 +15590,23 @@ SLES-54366:
 SLES-54368:
   name: "RTL Ski Jumping 2007"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54370:
   name: "Alpine Ski Racing"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54372:
   name: "RTL Biathlon 2007"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54374:
   name: "RTL Wintergames 2007"
   region: "PAL-E-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54376:
   name: "Barnyard"
   region: "PAL-E"
@@ -16015,7 +16049,7 @@ SLES-54560:
   name: "Alpine Ski Racing 2007"
   region: "PAL-M3"
   clampModes:
-    vuClampMode: 3
+    vuClampMode: 3 # Fixes SPS.
   gameFixes:
     - VUKickstartHack
 SLES-54561:
@@ -16806,15 +16840,23 @@ SLES-54933:
 SLES-54937:
   name: "RTL Biathlon 2008"
   region: "PAL-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54938:
   name: "RTL Biathlon 2008"
   region: "PAL-E"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54939:
   name: "RTL Winter Sports 2008 - The Ultimate Challenge"
   region: "PAL-G"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54940:
-  name: "Winter Sports 2008 - The Ultimate Challenge"
+  name: "RTL Winter Sports 2008 - The Ultimate Challenge"
   region: "PAL-E"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-54942:
   name: "Disney Princess - Enchanted Journey"
   region: "PAL-F-G-I"
@@ -17762,12 +17804,16 @@ SLES-55406:
 SLES-55408:
   name: "RTL Biathlon 2009"
   region: "PAL-E-F"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-55409:
   name: "TT SuperBikes - Legends"
   region: "PAL-M5"
 SLES-55411:
-  name: "Winter Sports 2009 - The Next Challenge"
+  name: "RTL Winter Sports 2009 - The Next Challenge"
   region: "PAL-E-F"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLES-55415:
   name: "Disney TH!NK Fast"
   region: "PAL-I-S"
@@ -18791,6 +18837,8 @@ SLKA-25264:
   region: "NTSC-K"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLKA-25265:
   name: "Devil May Cry 3"
   region: "NTSC-K"
@@ -19770,6 +19818,8 @@ SLPM-62218:
 SLPM-62219:
   name: "Simple 2000 Series Vol.08 - The Tennis"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes SPS and console spam.
 SLPM-62221:
   name: "Winning Post 5 - Max 2002"
   region: "NTSC-J"
@@ -19838,6 +19888,8 @@ SLPM-62247:
 SLPM-62248:
   name: "Simple 2000 Series Vol.05 - The Love Mahjong"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes SPS.
 SLPM-62249:
   name: "Hello Kitty Star Light - Isogasi Cube"
   region: "NTSC-J"
@@ -19981,8 +20033,10 @@ SLPM-62305:
   name: "Othello [SuperLite 2000]"
   region: "NTSC-J"
 SLPM-62307:
-  name: "Simple 2000 Series Vol.26 - The Paintball X 3"
+  name: "Simple 2000 Series Vol.26 - The Pinball X 3"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes SPS and console spam.
 SLPM-62308:
   name: "Simple 2000 Series Vol.24 - The Bowling"
   region: "NTSC-J"
@@ -20854,9 +20908,13 @@ SLPM-62634:
 SLPM-62635:
   name: "Simple 2000 Series Vol.26 - The Love Smash! 5.1"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes bad Geometry.
 SLPM-62636:
   name: "Simple 2000 Series 2-in-1 Vol.1 - The Tennis & The Snowboard [Disc1of2]"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes SPS and console spam (The Tennis).
 SLPM-62637:
   name: "Simple 2000 Series 2-in-1 Vol.1 - The Tennis & The Snowboard [Disc2of2]"
   region: "NTSC-J"
@@ -22409,6 +22467,8 @@ SLPM-65393:
 SLPM-65394:
   name: "Love Smash! 5"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes bad Geometry.
 SLPM-65395:
   name: "Digi-Charat Fantasy"
   region: "NTSC-J"
@@ -25062,6 +25122,8 @@ SLPM-66263:
   region: "NTSC-J"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLPM-66264:
   name: "Canvas 2 - Niji-iro no Sketch [Deluxe Pack]"
   region: "NTSC-J"
@@ -25568,6 +25630,8 @@ SLPM-66427:
   region: "NTSC-J"
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLPM-66429:
   name: "Special Forces - Fire for Effect"
   region: "NTSC-J"
@@ -28602,6 +28666,8 @@ SLPS-20453:
   name: "Simple 2000 Series Ultimate Vol.29 - K-1 Premium 2005 Dynamite!!"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - XGKickHack # Fixes black and white fighters.
 SLPS-20454:
   name: "Simple 2000 Series Vol.93 - The Right Brain Drill"
   region: "NTSC-J"
@@ -29852,8 +29918,10 @@ SLPS-25360:
   name: "Katamari Damacy"
   region: "NTSC-J"
   compat: 5
-  speedHacks:
-    mvuFlagSpeedHack: 0
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLPS-25361:
   name: "Smash Court Professional Tournament 2"
   region: "NTSC-J"
@@ -30246,10 +30314,10 @@ SLPS-25467:
   name: "Minna Daisuki Katamari Damacy"
   region: "NTSC-J"
   compat: 5
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -31925,8 +31993,10 @@ SLPS-73209:
 SLPS-73210:
   name: "Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
-  speedHacks:
-    mvuFlagSpeedHack: 0
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLPS-73211:
   name: "Summon Night 3 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -32081,15 +32151,17 @@ SLPS-73239:
 SLPS-73240:
   name: "Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
-  speedHacks:
-    mvuFlagSpeedHack: 0
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLPS-73241:
   name: "Minna Daisuki Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -33870,18 +33942,7 @@ SLUS-20419:
   roundModes:
     eeRoundMode: 0  # Fixes crash when using the Subaru.
   gameFixes:
-    - XGKickHack # Fixes SPS while ingame (with following patch)
-  patches:
-    5838E074:
-      content: |-
-        author=kozarovv
-        // Rearrange XGKick timing to fix SPS
-        patch=1,EE,0020efa0,word,8000033c
-        patch=1,EE,0020efd8,word,80004efc
-        patch=1,EE,0020f040,word,8000033c
-        patch=1,EE,0020f0b0,word,80004efc
-        patch=1,EE,0020f118,word,8000033c
-        patch=1,EE,0020f188,word,80004efc     
+    - XGKickHack # Fixes SPS while ingame     
 SLUS-20420:
   name: "Star Wars - Bounty Hunter"
   region: "NTSC-U"
@@ -36419,10 +36480,10 @@ SLUS-21008:
   name: "Katamari Damacy"
   region: "NTSC-U"
   compat: 5
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
 SLUS-21009:
   name: "Sega Classics Collection"
   region: "NTSC-U"
@@ -36642,6 +36703,8 @@ SLUS-21062:
   name: "Jaws Unleashed"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - XGKickHack # Fixes GS packet errors (and potential crash).
 SLUS-21063:
   name: "Shining Tears"
   region: "NTSC-U"
@@ -36973,6 +37036,8 @@ SLUS-21145:
   compat: 5
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLUS-21146:
   name: "Far East of Eden"
   region: "NTSC-U"
@@ -37336,10 +37401,10 @@ SLUS-21230:
   name: "We Love Katamari"
   region: "NTSC-U"
   compat: 5
+  roundModes:
+    vuRoundMode: 0 # Fixes SPS.
   clampModes:
-    vuClampMode: 3
-  speedHacks:
-    mvuFlagSpeedHack: 0
+    vuClampMode: 3 # Fixes SPS.
   memcardFilters: # Allows import of constellations from Katamari Damacy.
     - "SLUS-21230"
     - "SLUS-21008"
@@ -37459,6 +37524,8 @@ SLUS-21250:
   compat: 5
   speedHacks:
     mvuFlagSpeedHack: 0  # Fixes bad graphics.
+  gameFixes:
+  - VUKickstartHack
 SLUS-21251:
   name: "FlatOut 2"
   region: "NTSC-U"
@@ -39400,6 +39467,8 @@ SLUS-21710:
 SLUS-21711:
   name: "RTL Biathlon 2008"
   region: "NTSC-U"
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLUS-21712:
   name: "History Channel - Battle for the Pacific"
   region: "NTSC-U"
@@ -39966,6 +40035,8 @@ SLUS-21849:
   name: "Winter Sports 2: The Next Challenge"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vuClampMode: 3 # Fixes SPS.
 SLUS-21850:
   name: "Score International Baja 1000: The Official Game"
   region: "NTSC-U"
