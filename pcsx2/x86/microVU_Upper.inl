@@ -179,7 +179,7 @@ static bool doSafeSub(microVU& mVU, int opCase, int opType, bool isACC)
 {
 	opCase1
 	{
-		if ((opType == 1) && (_Ft_ == _Fs_))
+		if ((opType == 1) && (_Ft_ == _Fs_) && (opCase == 1)) // Don't do this with BC's!
 		{
 			const xmm& Fs = mVU.regAlloc->allocReg(-1, isACC ? 32 : _Fd_, _X_Y_Z_W);
 			xPXOR(Fs, Fs); // Set to Positive 0
@@ -270,7 +270,7 @@ static void mVU_FMACa(microVU& mVU, int recPass, int opCase, int opType, bool is
 				xPSHUF.D(ACC, ACC, shuffleSS(_X_Y_Z_W));
 			mVU.regAlloc->clearNeeded(ACC);
 		}
-		else
+		else if (opType < 3)
 			mVUupdateFlags(mVU, Fs, tempFt);
 
 		mVU.regAlloc->clearNeeded(Fs); // Always Clear Written Reg First

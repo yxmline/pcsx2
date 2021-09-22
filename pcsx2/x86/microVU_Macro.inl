@@ -31,13 +31,32 @@ using namespace R5900::Dynarec;
 
 void setupMacroOp(int mode, const char* opName)
 {
+	// Set up reg allocation
+	microVU0.regAlloc->reset();
+
+	if (mode & 0x110) // X86 regs are modified, or flags modified
+	{
+		_freeX86reg(eax);
+		_freeX86reg(ecx);
+		_freeX86reg(edx);
+	}
+
+	if (mode & 0x03) // Q will be read/written
+		_freeXMMreg(xmmPQ.Id);
+
+	if (mode & 0xF000) // Number of XMM regs needed for op
+	{
+		u16 regs = _freeXMMregsCOP2(mode >> 12);
+		microVU0.regAlloc->reserveCOP2(regs);
+	}
+
+	// Set up MicroVU ready for new op
 	printCOP2(opName);
 	microVU0.cop2 = 1;
 	microVU0.prog.IRinfo.curPC = 0;
 	microVU0.code = cpuRegs.code;
 	memset(&microVU0.prog.IRinfo.info[0], 0, sizeof(microVU0.prog.IRinfo.info[0]));
-	iFlushCall(FLUSH_EVERYTHING);
-	microVU0.regAlloc->reset();
+	
 	if (mode & 0x01) // Q-Reg will be Read
 	{
 		xMOVSSZX(xmmPQ, ptr32[&vu0Regs.VI[REG_Q].UL]);
@@ -55,9 +74,10 @@ void setupMacroOp(int mode, const char* opName)
 		microVU0.prog.IRinfo.info[0].sFlag.lastWrite   = 0;
 		microVU0.prog.IRinfo.info[0].mFlag.doFlag      = true;
 		microVU0.prog.IRinfo.info[0].mFlag.write       = 0xff;
+		_freeX86reg(ebx);
 		//Denormalize
 		mVUallocSFLAGd(&vu0Regs.VI[REG_STATUS_FLAG].UL);
-
+		
 		xMOV(gprF0, eax);
 	}
 }
@@ -74,18 +94,21 @@ void endMacroOp(int mode)
 		mVUallocSFLAGc(eax, gprF0, 0);
 		xMOV(ptr32[&vu0Regs.VI[REG_STATUS_FLAG].UL], eax);
 	}
+
 	microVU0.regAlloc->flushAll();
 
 	if (mode & 0x10) // Update VU0 Status/Mac instances after flush to avoid corrupting anything
 	{
+		int t0reg = _allocTempXMMreg(XMMT_INT, -1);
 		mVUallocSFLAGd(&vu0Regs.VI[REG_STATUS_FLAG].UL);
-		xMOVDZX(xmmT1, eax);
-		xSHUF.PS(xmmT1, xmmT1, 0);
-		xMOVAPS(ptr128[&microVU0.regs().micro_statusflags], xmmT1);
+		xMOVDZX(xRegisterSSE(t0reg), eax);
+		xSHUF.PS(xRegisterSSE(t0reg), xRegisterSSE(t0reg), 0);
+		xMOVAPS(ptr128[&microVU0.regs().micro_statusflags], xRegisterSSE(t0reg));
 
-		xMOVDZX(xmmT1, ptr32[&vu0Regs.VI[REG_MAC_FLAG].UL]);
-		xSHUF.PS(xmmT1, xmmT1, 0);
-		xMOVAPS(ptr128[&microVU0.regs().micro_macflags], xmmT1);
+		xMOVDZX(xRegisterSSE(t0reg), ptr32[&vu0Regs.VI[REG_MAC_FLAG].UL]);
+		xSHUF.PS(xRegisterSSE(t0reg), xRegisterSSE(t0reg), 0);
+		xMOVAPS(ptr128[&microVU0.regs().micro_macflags], xRegisterSSE(t0reg));
+		_freeXMMreg(t0reg);
 	}
 	microVU0.cop2 = 0;
 }
@@ -112,11 +135,13 @@ void endMacroOp(int mode)
 #define INTERPRETATE_COP2_FUNC(f) \
 	void recV##f() \
 	{ \
+		_freeX86reg(eax); \
 		xMOV(eax, ptr32[&cpuRegs.cycle]); \
 		xADD(eax, scaleblockcycles_clear()); \
 		xMOV(ptr32[&cpuRegs.cycle], eax); \
+		_cop2BackupRegs(); \
 		recCall(V##f); \
-		_freeX86regs(); \
+		_cop2RestoreRegs(); \
 	}
 
 //------------------------------------------------------------------
@@ -127,127 +152,136 @@ void endMacroOp(int mode)
 // Macro VU - Redirect Upper Instructions
 //------------------------------------------------------------------
 
-REC_COP2_mVU0(ABS,    "ABS",    0x00);
-REC_COP2_mVU0(ITOF0,  "ITOF0",  0x00);
-REC_COP2_mVU0(ITOF4,  "ITOF4",  0x00);
-REC_COP2_mVU0(ITOF12, "ITOF12", 0x00);
-REC_COP2_mVU0(ITOF15, "ITOF15", 0x00);
-REC_COP2_mVU0(FTOI0,  "FTOI0",  0x00);
-REC_COP2_mVU0(FTOI4,  "FTOI4",  0x00);
-REC_COP2_mVU0(FTOI12, "FTOI12", 0x00);
-REC_COP2_mVU0(FTOI15, "FTOI15", 0x00);
-REC_COP2_mVU0(ADD,    "ADD",    0x10);
-REC_COP2_mVU0(ADDi,   "ADDi",   0x10);
-REC_COP2_mVU0(ADDq,   "ADDq",   0x11);
-REC_COP2_mVU0(ADDx,   "ADDx",   0x10);
-REC_COP2_mVU0(ADDy,   "ADDy",   0x10);
-REC_COP2_mVU0(ADDz,   "ADDz",   0x10);
-REC_COP2_mVU0(ADDw,   "ADDw",   0x10);
-REC_COP2_mVU0(ADDA,   "ADDA",   0x10);
-REC_COP2_mVU0(ADDAi,  "ADDAi",  0x10);
-REC_COP2_mVU0(ADDAq,  "ADDAq",  0x11);
-REC_COP2_mVU0(ADDAx,  "ADDAx",  0x10);
-REC_COP2_mVU0(ADDAy,  "ADDAy",  0x10);
-REC_COP2_mVU0(ADDAz,  "ADDAz",  0x10);
-REC_COP2_mVU0(ADDAw,  "ADDAw",  0x10);
-REC_COP2_mVU0(SUB,    "SUB",    0x10);
-REC_COP2_mVU0(SUBi,   "SUBi",   0x10);
-REC_COP2_mVU0(SUBq,   "SUBq",   0x11);
-REC_COP2_mVU0(SUBx,   "SUBx",   0x10);
-REC_COP2_mVU0(SUBy,   "SUBy",   0x10);
-REC_COP2_mVU0(SUBz,   "SUBz",   0x10);
-REC_COP2_mVU0(SUBw,   "SUBw",   0x10);
-REC_COP2_mVU0(SUBA,   "SUBA",   0x10);
-REC_COP2_mVU0(SUBAi,  "SUBAi",  0x10);
-REC_COP2_mVU0(SUBAq,  "SUBAq",  0x11);
-REC_COP2_mVU0(SUBAx,  "SUBAx",  0x10);
-REC_COP2_mVU0(SUBAy,  "SUBAy",  0x10);
-REC_COP2_mVU0(SUBAz,  "SUBAz",  0x10);
-REC_COP2_mVU0(SUBAw,  "SUBAw",  0x10);
-REC_COP2_mVU0(MUL,    "MUL",    0x10);
-REC_COP2_mVU0(MULi,   "MULi",   0x10);
-REC_COP2_mVU0(MULq,   "MULq",   0x11);
-REC_COP2_mVU0(MULx,   "MULx",   0x10);
-REC_COP2_mVU0(MULy,   "MULy",   0x10);
-REC_COP2_mVU0(MULz,   "MULz",   0x10);
-REC_COP2_mVU0(MULw,   "MULw",   0x10);
-REC_COP2_mVU0(MULA,   "MULA",   0x10);
-REC_COP2_mVU0(MULAi,  "MULAi",  0x10);
-REC_COP2_mVU0(MULAq,  "MULAq",  0x11);
-REC_COP2_mVU0(MULAx,  "MULAx",  0x10);
-REC_COP2_mVU0(MULAy,  "MULAy",  0x10);
-REC_COP2_mVU0(MULAz,  "MULAz",  0x10);
-REC_COP2_mVU0(MULAw,  "MULAw",  0x10);
-REC_COP2_mVU0(MAX,    "MAX",    0x00);
-REC_COP2_mVU0(MAXi,   "MAXi",   0x00);
-REC_COP2_mVU0(MAXx,   "MAXx",   0x00);
-REC_COP2_mVU0(MAXy,   "MAXy",   0x00);
-REC_COP2_mVU0(MAXz,   "MAXz",   0x00);
-REC_COP2_mVU0(MAXw,   "MAXw",   0x00);
-REC_COP2_mVU0(MINI,   "MINI",   0x00);
-REC_COP2_mVU0(MINIi,  "MINIi",  0x00);
-REC_COP2_mVU0(MINIx,  "MINIx",  0x00);
-REC_COP2_mVU0(MINIy,  "MINIy",  0x00);
-REC_COP2_mVU0(MINIz,  "MINIz",  0x00);
-REC_COP2_mVU0(MINIw,  "MINIw",  0x00);
-REC_COP2_mVU0(MADD,   "MADD",   0x10);
-REC_COP2_mVU0(MADDi,  "MADDi",  0x10);
-REC_COP2_mVU0(MADDq,  "MADDq",  0x11);
-REC_COP2_mVU0(MADDx,  "MADDx",  0x10);
-REC_COP2_mVU0(MADDy,  "MADDy",  0x10);
-REC_COP2_mVU0(MADDz,  "MADDz",  0x10);
-REC_COP2_mVU0(MADDw,  "MADDw",  0x10);
-REC_COP2_mVU0(MADDA,  "MADDA",  0x10);
-REC_COP2_mVU0(MADDAi, "MADDAi", 0x10);
-REC_COP2_mVU0(MADDAq, "MADDAq", 0x11);
-REC_COP2_mVU0(MADDAx, "MADDAx", 0x10);
-REC_COP2_mVU0(MADDAy, "MADDAy", 0x10);
-REC_COP2_mVU0(MADDAz, "MADDAz", 0x10);
-REC_COP2_mVU0(MADDAw, "MADDAw", 0x10);
-REC_COP2_mVU0(MSUB,   "MSUB",   0x10);
-REC_COP2_mVU0(MSUBi,  "MSUBi",  0x10);
-REC_COP2_mVU0(MSUBq,  "MSUBq",  0x11);
-REC_COP2_mVU0(MSUBx,  "MSUBx",  0x10);
-REC_COP2_mVU0(MSUBy,  "MSUBy",  0x10);
-REC_COP2_mVU0(MSUBz,  "MSUBz",  0x10);
-REC_COP2_mVU0(MSUBw,  "MSUBw",  0x10);
-REC_COP2_mVU0(MSUBA,  "MSUBA",  0x10);
-REC_COP2_mVU0(MSUBAi, "MSUBAi", 0x10);
-REC_COP2_mVU0(MSUBAq, "MSUBAq", 0x11);
-REC_COP2_mVU0(MSUBAx, "MSUBAx", 0x10);
-REC_COP2_mVU0(MSUBAy, "MSUBAy", 0x10);
-REC_COP2_mVU0(MSUBAz, "MSUBAz", 0x10);
-REC_COP2_mVU0(MSUBAw, "MSUBAw", 0x10);
-REC_COP2_mVU0(OPMULA, "OPMULA", 0x10);
-REC_COP2_mVU0(OPMSUB, "OPMSUB", 0x10);
-REC_COP2_mVU0(CLIP,   "CLIP",   0x08);
+/* Mode information
+0x1  reads Q reg
+0x2  writes Q reg
+0x4  requires analysis pass
+0x8  write CLIP
+0x10 writes status/mac
+0x100 requires x86 regs
+0xF000 number of required XMMs (0-15)
+*/
+REC_COP2_mVU0(ABS,    "ABS",    0x1000);
+REC_COP2_mVU0(ITOF0,  "ITOF0",  0x1000);
+REC_COP2_mVU0(ITOF4,  "ITOF4",  0x1000);
+REC_COP2_mVU0(ITOF12, "ITOF12", 0x1000);
+REC_COP2_mVU0(ITOF15, "ITOF15", 0x1000);
+REC_COP2_mVU0(FTOI0,  "FTOI0",  0x3000);
+REC_COP2_mVU0(FTOI4,  "FTOI4",  0x3000);
+REC_COP2_mVU0(FTOI12, "FTOI12", 0x3000);
+REC_COP2_mVU0(FTOI15, "FTOI15", 0x3000);
+REC_COP2_mVU0(ADD,    "ADD",    ((_cXYZW_SS2 || clampE) ? 0x2110 : 0x3110) + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDi,   "ADDi",   0x2110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDq,   "ADDq",   0x2111 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDx,   "ADDx",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDy,   "ADDy",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDz,   "ADDz",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDw,   "ADDw",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(ADDA,   "ADDA",   ((!(_cXYZW_SS2 || clampE) && !_cXYZW_SS) ? 0x4110 : 0x3110));
+REC_COP2_mVU0(ADDAi,  "ADDAi",  0x3110);
+REC_COP2_mVU0(ADDAq,  "ADDAq",  0x2111 + ((clampE || !_cXYZW_SS) ? 0x1000 : 0));
+REC_COP2_mVU0(ADDAx,  "ADDAx",  0x4110);
+REC_COP2_mVU0(ADDAy,  "ADDAy",  0x4110);
+REC_COP2_mVU0(ADDAz,  "ADDAz",  0x4110);
+REC_COP2_mVU0(ADDAw,  "ADDAw",  0x4110);
+REC_COP2_mVU0(SUB,    "SUB",    (_Rt_ == _Rd_) ? (!(_cXYZW_SS) ? 0x3110 : 0x2110) : ((_cXYZW_SS2 || clampE) ? 0x2110 : 0x3110) + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBi,   "SUBi",   0x2110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBq,   "SUBq",   0x2111 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBx,   "SUBx",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBy,   "SUBy",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBz,   "SUBz",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBw,   "SUBw",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(SUBA,   "SUBA",   (_Rt_ == _Rd_) ? (!(_cXYZW_SS) ? 0x3110 : 0x2110) : ((!clampE && !_cXYZW_SS) ? 0x4110 : 0x3110));
+REC_COP2_mVU0(SUBAi,  "SUBAi",  0x3110);
+REC_COP2_mVU0(SUBAq,  "SUBAq",  0x2111 + ((clampE || !_cXYZW_SS) ? 0x1000 : 0));
+REC_COP2_mVU0(SUBAx,  "SUBAx",  0x4110);
+REC_COP2_mVU0(SUBAy,  "SUBAy",  0x4110);
+REC_COP2_mVU0(SUBAz,  "SUBAz",  0x4110);
+REC_COP2_mVU0(SUBAw,  "SUBAw",  0x4110);
+REC_COP2_mVU0(MUL,    "MUL",    ((_cXYZW_SS2 || clampE) ? 0x2110 : 0x3110) + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULi,   "MULi",   0x2110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULq,   "MULq",   0x2111 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULx,   "MULx",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULy,   "MULy",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULz,   "MULz",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULw,   "MULw",   0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MULA,   "MULA",   0x3110 + ((!_cXYZW_SS2 && !clampE && !_cXYZW_SS) ? 0x1000 : 0)); // Done
+REC_COP2_mVU0(MULAi,  "MULAi",  0x3110);
+REC_COP2_mVU0(MULAq,  "MULAq",  0x2111 + ((clampE || !_cXYZW_SS) ? 0x1000 : 0));
+REC_COP2_mVU0(MULAx,  "MULAx",  0x4110);
+REC_COP2_mVU0(MULAy,  "MULAy",  0x4110);
+REC_COP2_mVU0(MULAz,  "MULAz",  0x4110);
+REC_COP2_mVU0(MULAw,  "MULAw",  0x4110);
+REC_COP2_mVU0(MAX,    "MAX",    0x3000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MAXi,   "MAXi",	0x3000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MAXx,   "MAXx",   0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MAXy,   "MAXy",   0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MAXz,   "MAXz",   0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MAXw,   "MAXw",   0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINI,   "MINI",   0x3000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINIi,  "MINIi",  0x3000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINIx,  "MINIx",  0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINIy,  "MINIy",  0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINIz,  "MINIz",  0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MINIw,  "MINIw",  0x4000 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADD,   "MADD",   ((_cXYZW_SS2 || clampE) ? 0x3110 : 0x4110) + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDi,  "MADDi",  0x3110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDq,  "MADDq",  0x3111 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDx,  "MADDx",  0x4110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDy,  "MADDy",  0x4110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDz,  "MADDz",  0x4110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDw,  "MADDw",  0x4110 + (!_cXYZW_SS ? 0x1000 : 0));
+REC_COP2_mVU0(MADDA,  "MADDA",  ((_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x3110 : 0x4110) + ((!_cXYZW_SS2 && !clampE && !_cXYZW_SS) ? 0x1000 : 0));
+REC_COP2_mVU0(MADDAi, "MADDAi", 0x3110);
+REC_COP2_mVU0(MADDAq, "MADDAq", 0x2111 + ((clampE || !_cXYZW_SS) ? 0x1000 : 0) + (!(_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x1000 : 0));
+REC_COP2_mVU0(MADDAx, "MADDAx", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MADDAy, "MADDAy", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MADDAz, "MADDAz", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MADDAw, "MADDAw", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MSUB,   "MSUB",   0x3110 + ((!_cXYZW_SS && !clampE) ? 0x1000 : 0));
+REC_COP2_mVU0(MSUBi,  "MSUBi",  0x3110);
+REC_COP2_mVU0(MSUBq,  "MSUBq",  0x2111 + (!(_cXYZW_SS && !clampE) ? 0x1000 : 0));
+REC_COP2_mVU0(MSUBx,  "MSUBx",  0x4110);
+REC_COP2_mVU0(MSUBy,  "MSUBy",  0x4110);
+REC_COP2_mVU0(MSUBz,  "MSUBz",  0x4110);
+REC_COP2_mVU0(MSUBw,  "MSUBw",  0x4110);
+REC_COP2_mVU0(MSUBA,  "MSUBA",  ((!(_cXYZW_SS2 || clampE) && !_cXYZW_SS) ? 0x4110 : 0x3110) + ((!_cXYZW_SS && _cX_Y_Z_W != 0xf) ? 0x1000 : 0));
+REC_COP2_mVU0(MSUBAi, "MSUBAi", (!(_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x3110));
+REC_COP2_mVU0(MSUBAq, "MSUBAq", 0x2111 + ((clampE || !_cXYZW_SS) ? 0x1000 : 0) + (!(_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x1000 : 0));
+REC_COP2_mVU0(MSUBAx, "MSUBAx", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MSUBAy, "MSUBAy", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MSUBAz, "MSUBAz", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(MSUBAw, "MSUBAw", (_cXYZW_SS || _cX_Y_Z_W == 0xf) ? 0x4110 : 0x5110);
+REC_COP2_mVU0(OPMULA, "OPMULA", 0x4110);
+REC_COP2_mVU0(OPMSUB, "OPMSUB", 0x5110);
+REC_COP2_mVU0(CLIP,   "CLIP",   0x3108);
 
 //------------------------------------------------------------------
 // Macro VU - Redirect Lower Instructions
 //------------------------------------------------------------------
 
-REC_COP2_mVU0(DIV,   "DIV",   0x12);
-REC_COP2_mVU0(SQRT,  "SQRT",  0x12);
-REC_COP2_mVU0(RSQRT, "RSQRT", 0x12);
-REC_COP2_mVU0(IADD,  "IADD",  0x04);
-REC_COP2_mVU0(IADDI, "IADDI", 0x04);
-REC_COP2_mVU0(IAND,  "IAND",  0x04);
-REC_COP2_mVU0(IOR,   "IOR",   0x04);
-REC_COP2_mVU0(ISUB,  "ISUB",  0x04);
-REC_COP2_mVU0(ILWR,  "ILWR",  0x04);
-REC_COP2_mVU0(ISWR,  "ISWR",  0x00);
-REC_COP2_mVU0(LQI,   "LQI",   0x04);
-REC_COP2_mVU0(LQD,   "LQD",   0x04);
-REC_COP2_mVU0(SQI,   "SQI",   0x00);
-REC_COP2_mVU0(SQD,   "SQD",   0x00);
-REC_COP2_mVU0(MFIR,  "MFIR",  0x04);
-REC_COP2_mVU0(MTIR,  "MTIR",  0x04);
-REC_COP2_mVU0(MOVE,  "MOVE",  0x00);
-REC_COP2_mVU0(MR32,  "MR32",  0x00);
-REC_COP2_mVU0(RINIT, "RINIT", 0x00);
-REC_COP2_mVU0(RGET,  "RGET",  0x04);
-REC_COP2_mVU0(RNEXT, "RNEXT", 0x04);
-REC_COP2_mVU0(RXOR,  "RXOR",  0x00);
+REC_COP2_mVU0(DIV,   "DIV",   0x3112);
+REC_COP2_mVU0(SQRT,  "SQRT",  0x1112);
+REC_COP2_mVU0(RSQRT, "RSQRT", 0x3112);
+REC_COP2_mVU0(IADD,  "IADD",  0x104);
+REC_COP2_mVU0(IADDI, "IADDI", 0x104);
+REC_COP2_mVU0(IAND,  "IAND",  0x104);
+REC_COP2_mVU0(IOR,   "IOR",   0x104);
+REC_COP2_mVU0(ISUB,  "ISUB",  0x104);
+REC_COP2_mVU0(ILWR,  "ILWR",  0x104);
+REC_COP2_mVU0(ISWR,  "ISWR",  0x100);
+REC_COP2_mVU0(LQI,   "LQI",   0x0104 + ((_Rt_) ? 0x1100 : 0));
+REC_COP2_mVU0(LQD,   "LQD",   0x0104 + ((_Rt_) ? 0x1100 : 0));
+REC_COP2_mVU0(SQI,   "SQI",   0x1100);
+REC_COP2_mVU0(SQD,   "SQD",   0x1100);
+REC_COP2_mVU0(MFIR,  "MFIR",  0x0104 + ((_Rt_) ? 0x1000 : 0));
+REC_COP2_mVU0(MTIR,  "MTIR",  0x0104 + (((cpuRegs.code >> 16) & 0xF) ? 0x1000 : 0)); // It
+REC_COP2_mVU0(MOVE,  "MOVE",  0x1000);
+REC_COP2_mVU0(MR32,  "MR32",  0x2000);
+REC_COP2_mVU0(RINIT, "RINIT", 0x0100 + ((_Rd_ || (((cpuRegs.code >> 21) & 0x03) == 3)) ? 0x1000 : 0)); //Fsf
+REC_COP2_mVU0(RGET,  "RGET",  0x0104 + (_Rt_ != 0 ? 0x1000 : 0));
+REC_COP2_mVU0(RNEXT, "RNEXT", 0x0104 + (_Rt_ != 0 ? 0x1000 : 0));
+REC_COP2_mVU0(RXOR,  "RXOR",  0x0100 + ((_Rd_ || (((cpuRegs.code >> 21) & 0x03) == 3)) ? 0x1000 : 0)); //Fsf
 
 //------------------------------------------------------------------
 // Macro VU - Misc...
@@ -285,13 +319,14 @@ void COP2_Interlock(bool mBitSync)
 
 	if (cpuRegs.code & 1)
 	{
-		iFlushCall(FLUSH_EVERYTHING);
+		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
 		xMOV(ptr32[&cpuRegs.cycle], eax); // update cycles
 
 		xTEST(ptr32[&VU0.VI[REG_VPU_STAT].UL], 0x1);
 		xForwardJZ32 skipvuidle;
+		_cop2BackupRegs();
 		if (mBitSync)
 		{
 			xSUB(eax, ptr32[&VU0.cycle]);
@@ -306,6 +341,7 @@ void COP2_Interlock(bool mBitSync)
 		}
 		else
 			xFastCall((void*)_vu0FinishMicro);
+		_cop2RestoreRegs();
 		skipvuidle.SetTarget();
 	}
 }
@@ -321,80 +357,47 @@ void TEST_FBRST_RESET(FnType_Void* resetFunct, int vuIndex)
 
 static void recCFC2()
 {
-
 	printCOP2("CFC2");
 
 	COP2_Interlock(false);
+
 	if (!_Rt_)
 		return;
 
-	iFlushCall(FLUSH_EVERYTHING);
-
 	if (!(cpuRegs.code & 1))
 	{
+		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
 		xMOV(ptr32[&cpuRegs.cycle], eax); // update cycles
+
 		xTEST(ptr32[&VU0.VI[REG_VPU_STAT].UL], 0x1);
 		xForwardJZ32 skipvuidle;
 		xSUB(eax, ptr32[&VU0.cycle]);
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
 		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
 		xForwardJL32 skip;
+		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
 		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
 	}
+
+	_flushEEreg(_Rt_, true);
 
 	if (_Rd_ == REG_STATUS_FLAG) // Normalize Status Flag
 		xMOV(eax, ptr32[&vu0Regs.VI[REG_STATUS_FLAG].UL]);
 	else
 		xMOV(eax, ptr32[&vu0Regs.VI[_Rd_].UL]);
 
-	if (_Rd_ == REG_TPC) // Divide TPC register value by 8 during copying
-	{
-		// Ok, this deserves an explanation.
-		// Accoring to the official PS2 VU0 coding manual there are 3 ways to execute a micro subroutine on VU0
-		// one of which is using the VCALLMSR intruction.
-		// The manual requires putting the address of the micro subroutine
-		// into the CMSAR0 register divided by 8 using the CTC2 command before executing VCALLMSR.
-		// Many games (for instance, 24: The Game, GTA LCS, GTA VCS and FFXII) do in fact use this way,
-		// they diligently put the address of the micro subroutine into a separate register (v0, v1 etc), divide it by 8
-		// and move it to CMSAR0 by calling the CTC2 command.
-
-		// However, there are also at least 2 confirmed games (R Racing Evolution, Street Fighter EX3)
-		// that execute a piece of code to run a micro subroutine on VU0 like this:
-		//
-		// ...
-		// cfc2	t4, TPC
-		// ctc2	t4, CMSAR0
-		// callmsr
-		// ...
-		//
-		// Interestingly enough there is no division by 8 but it works fine in these 2 mentioned games.
-		// It means the division operation is implicit.
-		// Homebrew tests for the real PS2 have shown that in fact the instruction "cfc2 t4, TPC" ends up with values that are not always divisible by 8.
-
-		// There are 2 possibilities: either the CFC2 instruction divides the value of the TPC (which is the Program Counter register
-		// for micro subroutines) by 8 itself during copying or the TPC register always works with addresses already divided by 8.
-		// The latter seems less possible because the Program Counter register by definition holds the memory address of the instruction.
-		// In addition, PCSX2 already implements TPC as an instruction pointer so we'll assume that division by 8
-		// is done by CFC2 while working with the TPC register.
-		// (fixes R Racing Evolution and Street Fighter EX3)
-
-		//xSHR(eax, 3);
-
-		//Update Refraction - Don't need to do this anymore as addresses are fed in divided by 8 always.
-		//Games such at The Incredible Hulk will read VU1's TPC from VU0 (which will already be multiplied by 8) then try to use CMSAR1 (which will also multiply by 8)
-		//So everything is now fed in without multiplication
-	}
-
 	// FixMe: Should R-Reg have upper 9 bits 0?
 	xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], eax);
 
 	if (_Rd_ >= 16)
 	{
+		_freeX86reg(edx);
 		xCDQ(); // Sign Extend
 		xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], edx);
 	}
@@ -402,21 +405,23 @@ static void recCFC2()
 		xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], 0);
 
 	// FixMe: I think this is needed, but not sure how it works
-	_eeOnWriteReg(_Rt_, 1);
+	// Update Refraction 20/09/2021: This is needed because Const Prop is broken
+	// the Flushed flag isn't being cleared when it's not flushed. TODO I guess
+	_eeOnWriteReg(_Rt_, 0);
 }
 
 static void recCTC2()
 {
-
 	printCOP2("CTC2");
+
 	COP2_Interlock(1);
+
 	if (!_Rd_)
 		return;
 
-	iFlushCall(FLUSH_EVERYTHING);
-
 	if (!(cpuRegs.code & 1))
 	{
+		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
 		xMOV(ptr32[&cpuRegs.cycle], eax); // update cycles
@@ -427,11 +432,15 @@ static void recCTC2()
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
 		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
 		xForwardJL32 skip;
+		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
 		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
 	}
+
+	_flushEEreg(_Rt_);
 
 	switch (_Rd_)
 	{
@@ -456,6 +465,7 @@ static void recCTC2()
 			else
 				xAND(ptr32[&vu0Regs.VI[REG_STATUS_FLAG].UL], 0x3F);
 
+			_freeXMMreg(xmmT1.Id);
 			//Need to update the sticky flags for microVU
 			mVUallocSFLAGd(&vu0Regs.VI[REG_STATUS_FLAG].UL);
 			xMOVDZX(xmmT1, eax);
@@ -465,6 +475,7 @@ static void recCTC2()
 			break;
 		}
 		case REG_CMSAR1: // Execute VU1 Micro SubRoutine
+			_cop2BackupRegs();
 			xMOV(ecx, 1);
 			xFastCall((void*)vu1Finish, ecx);
 			if (_Rt_)
@@ -474,6 +485,7 @@ static void recCTC2()
 			else
 				xXOR(ecx, ecx);
 			xFastCall((void*)vu1ExecMicro, ecx);
+			_cop2RestoreRegs();
 			break;
 		case REG_FBRST:
 			if (!_Rt_)
@@ -483,10 +495,10 @@ static void recCTC2()
 			}
 			else
 				xMOV(eax, ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]]);
-
+			_cop2BackupRegs();
 			TEST_FBRST_RESET(vu0ResetRegs, 0);
 			TEST_FBRST_RESET(vu1ResetRegs, 1);
-
+			_cop2RestoreRegs();
 			xAND(eax, 0x0C0C);
 			xMOV(ptr32[&vu0Regs.VI[REG_FBRST].UL], eax);
 			break;
@@ -503,14 +515,15 @@ static void recQMFC2()
 {
 
 	printCOP2("QMFC2");
+
 	COP2_Interlock(false);
+
 	if (!_Rt_)
 		return;
-
-	iFlushCall(FLUSH_EVERYTHING);
-
+	
 	if (!(cpuRegs.code & 1))
 	{
+		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
 		xMOV(ptr32[&cpuRegs.cycle], eax); // update cycles
@@ -521,31 +534,36 @@ static void recQMFC2()
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
 		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
 		xForwardJL32 skip;
+		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
 		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
 	}
 
-	// FixMe: For some reason this line is needed or else games break:
-	_eeOnWriteReg(_Rt_, 0);
+	int rtreg = _allocGPRtoXMMreg(-1, _Rt_, MODE_WRITE);
+	int t0reg = _allocTempXMMreg(XMMT_INT, -1);
+	// Update Refraction 20/09/2021: This is needed because Const Prop is broken
+	// the Flushed flag isn't being cleared when it's not flushed. TODO I guess
+	_eeOnWriteReg(_Rt_, 0); // This is needed because Const Prop is broken
 
-	xMOVAPS(xmmT1, ptr128[&vu0Regs.VF[_Rd_]]);
-	xMOVAPS(ptr128[&cpuRegs.GPR.r[_Rt_]], xmmT1);
+	xMOVAPS(xRegisterSSE(t0reg), ptr128[&vu0Regs.VF[_Rd_]]);
+	xMOVAPS(xRegisterSSE(rtreg), xRegisterSSE(t0reg));
+	_freeXMMreg(t0reg);
 }
 
 static void recQMTC2()
 {
-
 	printCOP2("QMTC2");
 	COP2_Interlock(true);
+
 	if (!_Rd_)
 		return;
-
-	iFlushCall(FLUSH_EVERYTHING);
-
+	
 	if (!(cpuRegs.code & 1))
 	{
+		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
 		xMOV(ptr32[&cpuRegs.cycle], eax); // update cycles
@@ -556,14 +574,20 @@ static void recQMTC2()
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
 		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
 		xForwardJL32 skip;
+		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
 		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
 	}
 
-	xMOVAPS(xmmT1, ptr128[&cpuRegs.GPR.r[_Rt_]]);
-	xMOVAPS(ptr128[&vu0Regs.VF[_Rd_]], xmmT1);
+	int rtreg = _allocGPRtoXMMreg(-1, _Rt_, MODE_READ);
+	int t0reg = _allocTempXMMreg(XMMT_INT, -1);
+
+	xMOVAPS(xRegisterSSE(t0reg), xRegisterSSE(rtreg));
+	xMOVAPS(ptr128[&vu0Regs.VF[_Rd_]], xRegisterSSE(t0reg));
+	_freeXMMreg(t0reg);
 }
 
 //------------------------------------------------------------------
@@ -637,12 +661,14 @@ namespace OpcodeImpl {
 void recCOP2_BC2() { recCOP2_BC2t[_Rt_](); }
 void recCOP2_SPEC1()
 {
-	iFlushCall(FLUSH_EVERYTHING);
 	xTEST(ptr32[&VU0.VI[REG_VPU_STAT].UL], 0x1);
 	xForwardJZ32 skipvuidle;
+	_cop2BackupRegs();
 	xFastCall((void*)_vu0FinishMicro);
+	_cop2RestoreRegs();
 	skipvuidle.SetTarget();
 
 	recCOP2SPECIAL1t[_Funct_]();
+
 }
 void recCOP2_SPEC2() { recCOP2SPECIAL2t[(cpuRegs.code & 3) | ((cpuRegs.code >> 4) & 0x7c)](); }

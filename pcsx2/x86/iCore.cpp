@@ -45,8 +45,80 @@ _x86regs x86regs[iREGCNT_GPR], s_saveX86regs[iREGCNT_GPR];
 #define VU_VFx_ADDR(x) (uptr)&VU->VF[x].UL[0]
 #define VU_ACCx_ADDR   (uptr)&VU->ACC.UL[0]
 
+
+__aligned16 u32 xmmBackup[iREGCNT_XMM][4];
+
+#ifdef __M_X86_64
+__aligned16 u64 gprBackup[iREGCNT_GPR];
+#else
+__aligned16 u32 gprBackup[iREGCNT_GPR];
+#endif
+
 static int s_xmmchecknext = 0;
 
+void _backupNeededXMM()
+{
+	for (int i = 0; i < iREGCNT_XMM; i++)
+	{
+		if (xmmregs[i].inuse)
+		{
+			xMOVAPS(ptr128[&xmmBackup[i][0]], xRegisterSSE(i));
+		}
+	}
+}
+
+void _restoreNeededXMM()
+{
+	for (int i = 0; i < iREGCNT_XMM; i++)
+	{
+		if (xmmregs[i].inuse)
+		{
+			xMOVAPS(xRegisterSSE(i), ptr128[&xmmBackup[i][0]]);
+		}
+	}
+}
+
+void _backupNeededx86()
+{
+	for (int i = 0; i < iREGCNT_GPR; i++)
+	{
+		if (x86regs[i].inuse)
+		{
+#ifdef __M_X86_64
+			xMOV(ptr64[&gprBackup[i]], xRegister64(i));
+#else
+			xMOV(ptr32[&gprBackup[i]], xRegister32(i));
+#endif
+		}
+	}
+}
+
+void _restoreNeededx86()
+{
+	for (int i = 0; i < iREGCNT_GPR; i++)
+	{
+		if (x86regs[i].inuse)
+		{
+#ifdef __M_X86_64
+			xMOV(xRegister64(i), ptr64[&gprBackup[i]]);
+#else
+			xMOV(xRegister32(i), ptr32[&gprBackup[i]]);
+#endif
+		}
+	}
+}
+
+void _cop2BackupRegs()
+{
+	_backupNeededx86();
+	_backupNeededXMM();
+}
+
+void _cop2RestoreRegs()
+{
+	_restoreNeededx86();
+	_restoreNeededXMM();
+}
 // Clear current register mapping structure
 // Clear allocation counter
 void _initXMMregs()
@@ -689,6 +761,68 @@ void _freeXMMreg(u32 xmmreg)
 	}
 	xmmregs[xmmreg].mode &= ~(MODE_WRITE | MODE_VUXYZ);
 	xmmregs[xmmreg].inuse = 0;
+}
+
+u16 _freeXMMregsCOP2(int requiredcount)
+{
+	int count = requiredcount;
+	u16 regs = 0;
+
+	// First check what's already free, it might be enough
+	for (int i = 0; i < iREGCNT_XMM - 1; i++)
+	{
+		if (!xmmregs[i].inuse)
+		{
+			count--;
+			regs |= (1 << i);
+		}
+	}
+
+	if (count <= 0)
+		return regs;
+
+	// If we still don't have enough, find regs in use but not needed
+	for (int i = 0; i < iREGCNT_XMM - 1; i++)
+	{
+		if (xmmregs[i].inuse && xmmregs[i].counter == 0)
+		{
+			count--;
+			regs |= (1 << i);
+			_freeXMMreg(i);
+		}
+
+		if (count <= 0)
+			break;
+	}
+
+	if (count <= 0)
+		return regs;
+
+	// Finally Get rid of registers which are gonna be needed, they'll need to be reloaded
+	int maxcount = 9999; // The lower this value the more towards the end of the block it'll need flushing
+	int regtoclear = -1;
+
+	while (count > 0)
+	{
+		for (int i = 0; i < iREGCNT_XMM - 1; i++)
+		{
+			if (xmmregs[i].inuse && xmmregs[i].counter < maxcount)
+			{
+				regtoclear = i;
+				maxcount = xmmregs[i].counter;
+			}
+		}
+		if (regtoclear != -1)
+		{
+			_freeXMMreg(regtoclear);
+			count--;
+			regs |= (1 << regtoclear);
+		}
+	}
+
+	pxAssert(count <= 0);
+
+	return regs;
 }
 
 // Return the number of inuse XMM register that have the MODE_WRITE flag

@@ -159,6 +159,8 @@ struct _xmmregs
 	u16 counter;
 };
 
+void _cop2BackupRegs();
+void _cop2RestoreRegs();
 void _initXMMregs();
 int _getFreeXMMreg();
 int _allocTempXMMreg(XMMSSEType type, int xmmreg);
@@ -174,6 +176,7 @@ void _clearNeededXMMregs();
 void _deleteGPRtoXMMreg(int reg, int flush);
 void _deleteFPtoXMMreg(int reg, int flush);
 void _freeXMMreg(u32 xmmreg);
+u16 _freeXMMregsCOP2(int requiredcount);
 //void _moveXMMreg(int xmmreg); // instead of freeing, moves it to a diff location
 void _flushXMMregs();
 u8 _hasFreeXMMreg();
