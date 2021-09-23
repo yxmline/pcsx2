@@ -71,9 +71,7 @@ void recADDI_(int info)
 		if (_Imm_ != 0)
 			xADD(eax, _Imm_);
 
-		xCDQ();
-		xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UL[0]], eax);
-		xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UL[1]], edx);
+		eeSignExtendTo(_Rt_);
 	}
 }
 
@@ -95,6 +93,23 @@ void recDADDI_(int info)
 {
 	pxAssert(!(info & PROCESS_EE_XMM));
 
+#ifdef __M_X86_64
+	if (_Rt_ == _Rs_)
+	{
+		xADD(ptr64[&cpuRegs.GPR.r[_Rt_].UD[0]], _Imm_);
+	}
+	else
+	{
+		xMOV(rax, ptr[&cpuRegs.GPR.r[_Rs_].UD[0]]);
+
+		if (_Imm_ != 0)
+		{
+			xADD(rax, _Imm_);
+		}
+
+		xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UD[0]], rax);
+	}
+#else
 	if (_Rt_ == _Rs_)
 	{
 		xADD(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], _Imm_);
@@ -116,6 +131,7 @@ void recDADDI_(int info)
 
 		xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UL[1]], edx);
 	}
+#endif
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, DADDI);
@@ -137,6 +153,12 @@ extern u32 s_sltone;
 
 void recSLTIU_(int info)
 {
+#ifdef __M_X86_64
+	xXOR(eax, eax);
+	xCMP(ptr64[&cpuRegs.GPR.r[_Rs_].UD[0]], _Imm_);
+	xSETB(al);
+	xMOV(ptr64[&cpuRegs.GPR.r[_Rt_].UD[0]], rax);
+#else
 	xMOV(eax, 1);
 
 	xCMP(ptr32[&cpuRegs.GPR.r[_Rs_].UL[1]], _Imm_ >= 0 ? 0 : 0xffffffff);
@@ -154,6 +176,7 @@ void recSLTIU_(int info)
 
 	xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], eax);
 	xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], 0);
+#endif
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, SLTIU);
@@ -167,6 +190,12 @@ void recSLTI_const()
 void recSLTI_(int info)
 {
 	// test silent hill if modding
+#ifdef __M_X86_64
+	xXOR(eax, eax);
+	xCMP(ptr64[&cpuRegs.GPR.r[_Rs_].UD[0]], _Imm_);
+	xSETL(al);
+	xMOV(ptr64[&cpuRegs.GPR.r[_Rt_].UD[0]], rax);
+#else
 	xMOV(eax, 1);
 
 	xCMP(ptr32[&cpuRegs.GPR.r[_Rs_].UL[1]], _Imm_ >= 0 ? 0 : 0xffffffff);
@@ -184,6 +213,7 @@ void recSLTI_(int info)
 
 	xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], eax);
 	xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], 0);
+#endif
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, SLTI);
@@ -194,47 +224,81 @@ void recANDI_const()
 	g_cpuConstRegs[_Rt_].UD[0] = g_cpuConstRegs[_Rs_].UD[0] & (u64)_ImmU_; // Zero-extended Immediate
 }
 
-void recLogicalOpI(int info, int op)
+enum class LogicalOp
 {
+	AND,
+	OR,
+	XOR
+};
+
+static void recLogicalOpI(int info, LogicalOp op)
+{
+	xImpl_G1Logic bad{};
+	const xImpl_G1Logic& xOP = op == LogicalOp::AND ? xAND
+	                         : op == LogicalOp::OR  ? xOR
+	                         : op == LogicalOp::XOR ? xXOR : bad;
+	pxAssert(&xOP != &bad);
+
+#ifdef __M_X86_64
 	if (_ImmU_ != 0)
 	{
 		if (_Rt_ == _Rs_)
 		{
-			switch (op)
+			if (op == LogicalOp::AND)
+				xOP(ptr64[&cpuRegs.GPR.r[_Rt_].UD[0]], _ImmU_);
+			else
+				xOP(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], _ImmU_);
+		}
+		else
+		{
+			xMOV(rax, ptr[&cpuRegs.GPR.r[_Rs_].UD[0]]);
+			xOP(rax, _ImmU_);
+			xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UD[0]], rax);
+		}
+	}
+	else
+	{
+		if (op == LogicalOp::AND)
+		{
+			xMOV(ptr64[&cpuRegs.GPR.r[_Rt_].UD[0]], 0);
+		}
+		else
+		{
+			if (_Rt_ != _Rs_)
 			{
-				case 0: xAND(ptr32[&cpuRegs.GPR.r[ _Rt_ ].UL[ 0 ]], _ImmU_); break;
-				case 1: xOR(ptr32[&cpuRegs.GPR.r[ _Rt_ ].UL[ 0 ]], _ImmU_); break;
-				case 2: xXOR(ptr32[&cpuRegs.GPR.r[ _Rt_ ].UL[ 0 ]], _ImmU_); break;
-				default: pxAssert(0);
+				xMOV(rax, ptr[&cpuRegs.GPR.r[_Rs_].UD[0]]);
+				xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UD[0]], rax);
 			}
+		}
+	}
+#else
+	if (_ImmU_ != 0)
+	{
+		if (_Rt_ == _Rs_)
+		{
+			xOP(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], _ImmU_);
 		}
 		else
 		{
 			xMOV(eax, ptr[&cpuRegs.GPR.r[_Rs_].UL[0]]);
-			if (op != 0)
+			if (op != LogicalOp::AND)
 				xMOV(edx, ptr[&cpuRegs.GPR.r[_Rs_].UL[1]]);
 
-			switch (op)
-			{
-				case 0: xAND(eax, _ImmU_); break;
-				case 1: xOR(eax, _ImmU_); break;
-				case 2: xXOR(eax, _ImmU_); break;
-				default: pxAssert(0);
-			}
+			xOP(eax, _ImmU_);
 
-			if (op != 0)
+			if (op != LogicalOp::AND)
 				xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UL[1]], edx);
 			xMOV(ptr[&cpuRegs.GPR.r[_Rt_].UL[0]], eax);
 		}
 
-		if (op == 0)
+		if (op == LogicalOp::AND)
 		{
 			xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], 0);
 		}
 	}
 	else
 	{
-		if (op == 0)
+		if (op == LogicalOp::AND)
 		{
 			xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[0]], 0);
 			xMOV(ptr32[&cpuRegs.GPR.r[_Rt_].UL[1]], 0);
@@ -250,11 +314,12 @@ void recLogicalOpI(int info, int op)
 			}
 		}
 	}
+#endif
 }
 
 void recANDI_(int info)
 {
-	recLogicalOpI(info, 0);
+	recLogicalOpI(info, LogicalOp::AND);
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, ANDI);
@@ -267,7 +332,7 @@ void recORI_const()
 
 void recORI_(int info)
 {
-	recLogicalOpI(info, 1);
+	recLogicalOpI(info, LogicalOp::OR);
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, ORI);
@@ -280,7 +345,7 @@ void recXORI_const()
 
 void recXORI_(int info)
 {
-	recLogicalOpI(info, 2);
+	recLogicalOpI(info, LogicalOp::XOR);
 }
 
 EERECOMPILE_CODEX(eeRecompileCode1, XORI);

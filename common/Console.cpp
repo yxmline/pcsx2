@@ -26,7 +26,21 @@ static DeclareTls(int) conlog_Indent(0);
 static DeclareTls(ConsoleColors) conlog_Color(DefaultConsoleColor);
 
 #ifdef __POSIX__
+#include <unistd.h>
+
 static FILE* stdout_fp = stdout;
+
+static bool checkSupportsColor()
+{
+	if (!isatty(fileno(stdout_fp)))
+		return false;
+	char* term = getenv("TERM");
+	if (!term || (0 == strcmp(term, "dumb")))
+		return false;
+	return true; // Probably supports color
+}
+
+static bool supports_color = checkSupportsColor();
 
 void Console_SetStdout(FILE* fp)
 {
@@ -99,7 +113,7 @@ const IConsoleWriter ConsoleWriter_Null =
 //  Console_Stdout
 // --------------------------------------------------------------------------------------
 
-#if defined(__unix__)
+#if defined(__POSIX__)
 static __fi const char* GetLinuxConsoleColor(ConsoleColors color)
 {
 	switch (color)
@@ -176,7 +190,9 @@ static void __concall ConsoleStdout_Newline()
 
 static void __concall ConsoleStdout_DoSetColor(ConsoleColors color)
 {
-#if defined(__unix__)
+#if defined(__POSIX__)
+	if (!supports_color)
+		return;
 	fprintf(stdout_fp, "\033[0m%s", GetLinuxConsoleColor(color));
 	fflush(stdout_fp);
 #endif
@@ -184,10 +200,12 @@ static void __concall ConsoleStdout_DoSetColor(ConsoleColors color)
 
 static void __concall ConsoleStdout_SetTitle(const wxString& title)
 {
-#if defined(__unix__)
-	fputs("\033]0;", stdout_fp);
+#if defined(__POSIX__)
+	if (supports_color)
+		fputs("\033]0;", stdout_fp);
 	fputs(title.utf8_str(), stdout_fp);
-	fputs("\007", stdout_fp);
+	if (supports_color)
+		fputs("\007", stdout_fp);
 #endif
 }
 
