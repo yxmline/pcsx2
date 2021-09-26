@@ -21,6 +21,8 @@
 #include "AppCommon.h"
 #include "SaveState.h"
 
+#include <memory>
+
 #define AffinityAssert_AllowFrom_CoreThread() \
 	pxAssertMsg(GetCoreThread().IsSelf(), "Thread affinity violation: Call allowed from SysCoreThread only.")
 
@@ -117,13 +119,17 @@ public:
 	virtual ~SysExecEvent_CoreThreadPause() = default;
 	SysExecEvent_CoreThreadPause* Clone() const { return new SysExecEvent_CoreThreadPause(*this); }
 
-	SysExecEvent_CoreThreadPause(SynchronousActionState* sync = NULL, SynchronousActionState* resume_sync = NULL, Threading::Mutex* mtx_resume = NULL)
+	SysExecEvent_CoreThreadPause(SystemsMask systemsToTearDown, SynchronousActionState* sync = NULL, SynchronousActionState* resume_sync = NULL, Threading::Mutex* mtx_resume = NULL)
 		: BaseSysExecEvent_ScopedCore(sync, resume_sync, mtx_resume)
+		, m_systemsToTearDown(systemsToTearDown)
 	{
 	}
 
 protected:
 	void InvokeEvent();
+
+private:
+	SystemsMask m_systemsToTearDown;
 };
 
 // --------------------------------------------------------------------------------------
@@ -158,7 +164,7 @@ protected:
 	virtual void OnResumeReady();
 	virtual void OnPause();
 	virtual void OnPauseDebug();
-	virtual void OnResumeInThread(bool IsSuspended);
+	virtual void OnResumeInThread(SystemsMask systemsToReinstate) override;
 	virtual void OnSuspendInThread();
 	virtual void OnCleanupInThread();
 	virtual void VsyncInThread();
@@ -201,7 +207,7 @@ public:
 	virtual void AllowResume();
 	virtual void DisallowResume();
 
-	virtual bool PostToSysExec(BaseSysExecEvent_ScopedCore* msg);
+	virtual bool PostToSysExec(std::unique_ptr<BaseSysExecEvent_ScopedCore> msg);
 
 protected:
 	// Called from destructors -- do not make virtual!!
@@ -240,7 +246,7 @@ struct ScopedCoreThreadPause : public BaseScopedCoreThread
 	typedef BaseScopedCoreThread _parent;
 
 public:
-	ScopedCoreThreadPause(BaseSysExecEvent_ScopedCore* abuse_me = NULL);
+	ScopedCoreThreadPause(SystemsMask systemsToTearDown = {});
 	virtual ~ScopedCoreThreadPause();
 };
 

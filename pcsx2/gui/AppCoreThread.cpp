@@ -577,7 +577,7 @@ void AppCoreThread::DoCpuReset()
 	_parent::DoCpuReset();
 }
 
-void AppCoreThread::OnResumeInThread(bool isSuspended)
+void AppCoreThread::OnResumeInThread(SystemsMask systemsToReinstate)
 {
 	if (m_resetCdvd)
 	{
@@ -586,10 +586,10 @@ void AppCoreThread::OnResumeInThread(bool isSuspended)
 		DoCDVDopen();
 		m_resetCdvd = false;
 	}
-	else if (isSuspended)
+	else if (systemsToReinstate & System_CDVD)
 		DoCDVDopen();
 
-	_parent::OnResumeInThread(isSuspended);
+	_parent::OnResumeInThread(systemsToReinstate);
 	PostCoreStatus(CoreThread_Resumed);
 }
 
@@ -720,7 +720,7 @@ void SysExecEvent_CoreThreadClose::InvokeEvent()
 
 void SysExecEvent_CoreThreadPause::InvokeEvent()
 {
-	ScopedCoreThreadPause paused_core;
+	ScopedCoreThreadPause paused_core(m_systemsToTearDown);
 	_post_and_wait(paused_core);
 	paused_core.AllowResume();
 }
@@ -774,16 +774,15 @@ void BaseScopedCoreThread::DoResume()
 // Returns TRUE if the event is posted to the SysExecutor.
 // Returns FALSE if the thread *is* the SysExecutor (no message is posted, calling code should
 //  handle the code directly).
-bool BaseScopedCoreThread::PostToSysExec(BaseSysExecEvent_ScopedCore* msg)
+bool BaseScopedCoreThread::PostToSysExec(std::unique_ptr<BaseSysExecEvent_ScopedCore> msg)
 {
-	std::unique_ptr<BaseSysExecEvent_ScopedCore> smsg(msg);
-	if (!smsg || GetSysExecutorThread().IsSelf())
+	if (!msg || GetSysExecutorThread().IsSelf())
 		return false;
 
 	msg->SetSyncState(m_sync);
 	msg->SetResumeStates(m_sync_resume, m_mtx_resume);
 
-	GetSysExecutorThread().PostEvent(smsg.release());
+	GetSysExecutorThread().PostEvent(msg.release());
 	m_sync.WaitForResult();
 	m_sync.RethrowException();
 
@@ -799,7 +798,7 @@ ScopedCoreThreadClose::ScopedCoreThreadClose()
 		return;
 	}
 
-	if (!PostToSysExec(new SysExecEvent_CoreThreadClose()))
+	if (!PostToSysExec(std::make_unique<SysExecEvent_CoreThreadClose>()))
 	{
 		m_alreadyStopped = CoreThread.IsClosed();
 		if (!m_alreadyStopped)
@@ -821,7 +820,7 @@ ScopedCoreThreadClose::~ScopedCoreThreadClose()
 	DESTRUCTOR_CATCHALL
 }
 
-ScopedCoreThreadPause::ScopedCoreThreadPause(BaseSysExecEvent_ScopedCore* abuse_me)
+ScopedCoreThreadPause::ScopedCoreThreadPause(SystemsMask systemsToTearDown)
 {
 	if (ScopedCore_IsFullyClosed || ScopedCore_IsPaused)
 	{
@@ -830,13 +829,11 @@ ScopedCoreThreadPause::ScopedCoreThreadPause(BaseSysExecEvent_ScopedCore* abuse_
 		return;
 	}
 
-	if (!abuse_me)
-		abuse_me = new SysExecEvent_CoreThreadPause();
-	if (!PostToSysExec(abuse_me))
+	if (!PostToSysExec(std::make_unique<SysExecEvent_CoreThreadPause>(systemsToTearDown)))
 	{
 		m_alreadyStopped = CoreThread.IsPaused();
 		if (!m_alreadyStopped)
-			CoreThread.Pause();
+			CoreThread.Pause(systemsToTearDown);
 	}
 
 	ScopedCore_IsPaused = true;
