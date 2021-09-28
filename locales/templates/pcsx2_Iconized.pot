@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-09-06 00:40+0800\n"
+"POT-Creation-Date: 2021-09-28 23:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,11 @@ msgstr ""
 "X-Poedit-SearchPath-0: pcsx2\n"
 "X-Poedit-SearchPath-1: common\n"
 
-#: common/Exceptions.cpp:241
+#: common/Exceptions.cpp:246
 msgid "There is not enough virtual memory available, or necessary virtual memory mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 
-#: pcsx2/CDVD/CDVD.cpp:2152
+#: pcsx2/CDVD/CDVD.cpp:2159
 msgid "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr ""
 
@@ -227,7 +227,11 @@ msgstr ""
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:53
+msgid "Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and others."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:58
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -235,7 +239,7 @@ msgid ""
 " * Resident Evil: Dead Aim (Causes garbled textures)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:67
 msgid ""
 "Known to affect following games:\n"
 " * Bleach Blade Battler\n"
@@ -243,24 +247,24 @@ msgid ""
 " * Wizardry"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:72
 msgid ""
 "Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down Behind Enemy Lines\n"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:77
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
 " * Transformers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
 msgid "It's better to enable 'Automatic game fixes' at the main menu instead, and leave this page empty ('Automatic' means: selectively use specific tested fixes for specific games). Manual game fixes will NOT increase your performance. In fact they may decrease it."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:113
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -396,15 +400,15 @@ msgstr ""
 msgid "Note that when Framelimiting is disabled, Turbo and SlowMotion modes will not be available either."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:217
+#: pcsx2/gui/Panels/VideoPanel.cpp:218
 msgid "Notice: Due to PS2 hardware design, precise frame skipping is impossible. Enabling it will cause severe graphical errors in some games."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:297
+#: pcsx2/gui/Panels/VideoPanel.cpp:299
 msgid "Setting this to a lower value improves input lag, a value around 2 or 3 will slightly improve framerates. (Default is 2)"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:298
+#: pcsx2/gui/Panels/VideoPanel.cpp:301
 msgid "Enable this if you think MTGS thread sync is causing crashes or graphical errors. For debugging to see if GS is running at the correct speed."
 msgstr ""
 

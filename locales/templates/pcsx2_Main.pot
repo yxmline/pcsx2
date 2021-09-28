@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-09-06 00:40+0800\n"
+"POT-Creation-Date: 2021-09-28 23:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,64 +22,52 @@ msgstr ""
 "X-Poedit-SearchPath-0: pcsx2\n"
 "X-Poedit-SearchPath-1: common\n"
 
-#: common/Exceptions.cpp:206
+#: common/Exceptions.cpp:211
 msgid "Oh noes! Out of memory!"
 msgstr ""
 
-#: common/Exceptions.cpp:221
+#: common/Exceptions.cpp:226
 msgid "Virtual memory mapping failure!  Your system may have conflicting device drivers, services, or may simply have insufficient memory or resources to meet PCSX2's lofty needs."
 msgstr ""
 
-#: common/Exceptions.cpp:292
+#: common/Exceptions.cpp:297
 msgid "Path: "
 msgstr ""
 
-#: common/Exceptions.cpp:296
+#: common/Exceptions.cpp:301
 msgid "[Unnamed or unknown]"
 msgstr ""
 
-#: common/Exceptions.cpp:316
+#: common/Exceptions.cpp:321
 msgid "A file could not be created."
 msgstr ""
 
-#: common/Exceptions.cpp:336
+#: common/Exceptions.cpp:341
 msgid "File not found."
 msgstr ""
 
-#: common/Exceptions.cpp:356
+#: common/Exceptions.cpp:361
 msgid "Permission denied while trying to open file, likely due to insufficient user account rights."
 msgstr ""
 
-#: common/Exceptions.cpp:376
+#: common/Exceptions.cpp:381
 msgid "Unexpected end of file or stream encountered.  File is probably truncated or corrupted."
 msgstr ""
 
-#: common/Exceptions.h:220
+#: common/Exceptions.h:239
 msgid "No reason given."
 msgstr ""
 
-#: common/Exceptions.h:259
+#: common/Exceptions.h:278
 msgid "Parse error"
 msgstr ""
 
-#: common/Exceptions.h:283
+#: common/Exceptions.h:302
 msgid "Your machine's hardware is incapable of running PCSX2.  Sorry dood."
 msgstr ""
 
 #: common/ThreadTools.cpp:39
 msgid "Threading activity: start, detach, sync, deletion, etc."
-msgstr ""
-
-#: common/ThreadingDialogs.cpp:29
-msgid "Waiting for tasks..."
-msgstr ""
-
-#: common/ThreadingDialogs.cpp:41
-msgid "Waiting for task..."
-msgstr ""
-
-#: common/wxAppWithHelpers.cpp:33
-msgid "Includes idle event processing and some other uncommon event usages."
 msgstr ""
 
 #: pcsx2/CDVD/InputIsoFile.cpp:254
@@ -103,15 +91,15 @@ msgstr ""
 msgid "If loading from an ISO image, this error may be caused by an unsupported ISO image type or a bug in PCSX2 ISO image support."
 msgstr ""
 
-#: pcsx2/MTGS.cpp:919
+#: pcsx2/MTGS.cpp:918
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
 msgstr ""
 
-#: pcsx2/Recording/InputRecording.cpp:385
+#: pcsx2/Recording/InputRecording.cpp:387
 msgid "Select the savestate that will accompany this recording"
 msgstr ""
 
-#: pcsx2/Recording/InputRecording.cpp:423
+#: pcsx2/Recording/InputRecording.cpp:425
 msgid "Select a savestate to accompany the recording with"
 msgstr ""
 
@@ -1959,7 +1947,7 @@ msgid "Interpreter only; provided for diagnostic"
 msgstr ""
 
 #: pcsx2/gui/Panels/CpuPanel.cpp:170 pcsx2/gui/Panels/CpuPanel.cpp:221
-#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:295
+#: pcsx2/gui/Panels/SpeedhacksPanel.cpp:130 pcsx2/gui/Panels/VideoPanel.cpp:297
 msgid "Restore Defaults"
 msgstr ""
 
@@ -2097,50 +2085,50 @@ msgid "FPU Negative Div Hack - For Gundam games."
 msgstr ""
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:52
-msgid "VU XGkick Hack - For Erementar Gerad."
+msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:56
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
 msgid "EE timing hack - Multi purpose hack. Try if all else fails."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:62
 msgid "Skip MPEG hack - Skips videos/FMVs in games to avoid game hanging/freezes."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:65
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
 msgid "OPH Flag hack - Try if your game freezes showing the same frame."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:70
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
 msgid "Handle DMAC writes when it is busy."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
 msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:81
 msgid "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:85
 msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
 msgid "Preload TLB hack to avoid tlb miss on Goemon"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:93
 msgid "VU I bit Hack avoid constant recompilation in some games (Scarface The World Is Yours, Crash Tag Team Racing)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:97
 msgid "VU Kickstart (Run ahead) to avoid sync problems when reading or writing VU registers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:107
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
 msgid "Enable manual game fixes [Not recommended]"
 msgstr ""
 
@@ -2566,47 +2554,47 @@ msgstr ""
 msgid "PAL Framerate:"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:174
+#: pcsx2/gui/Panels/VideoPanel.cpp:175
 msgid "Disabled [default]"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:178
+#: pcsx2/gui/Panels/VideoPanel.cpp:179
 msgid "Skip only on Turbo, to enable press"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:182
+#: pcsx2/gui/Panels/VideoPanel.cpp:183
 msgid "Constant skipping"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:184
+#: pcsx2/gui/Panels/VideoPanel.cpp:185
 msgid "Normal and Turbo limit rates skip frames.  Slow motion mode will still disable frameskipping."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:207
+#: pcsx2/gui/Panels/VideoPanel.cpp:208
 msgid "Frames to Draw"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:212
+#: pcsx2/gui/Panels/VideoPanel.cpp:213
 msgid "Frames to Skip"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:288
+#: pcsx2/gui/Panels/VideoPanel.cpp:289
 msgid "Use Synchronized MTGS"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:289
+#: pcsx2/gui/Panels/VideoPanel.cpp:290
 msgid "For troubleshooting potential bugs in the MTGS only, as it is potentially very slow."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:304
+#: pcsx2/gui/Panels/VideoPanel.cpp:308
 msgid "Frame Skipping"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:307
+#: pcsx2/gui/Panels/VideoPanel.cpp:311
 msgid "Framelimiter"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:321
+#: pcsx2/gui/Panels/VideoPanel.cpp:325
 msgid "Vsyncs in MTGS Queue:"
 msgstr ""
 
@@ -2654,8 +2642,20 @@ msgstr ""
 msgid "This savestate cannot be loaded due to missing critical components.  See the log file for details."
 msgstr ""
 
+#: pcsx2/gui/ThreadingDialogs.cpp:30
+msgid "Waiting for tasks..."
+msgstr ""
+
+#: pcsx2/gui/ThreadingDialogs.cpp:42
+msgid "Waiting for task..."
+msgstr ""
+
 #: pcsx2/gui/i18n.cpp:63
 msgid " (default)"
+msgstr ""
+
+#: pcsx2/gui/wxAppWithHelpers.cpp:34
+msgid "Includes idle event processing and some other uncommon event usages."
 msgstr ""
 
 #: pcsx2/ps2/BiosTools.cpp:85 pcsx2/ps2/BiosTools.cpp:153
@@ -2670,7 +2670,7 @@ msgstr ""
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr ""
 
-#: pcsx2/x86/ix86-32/iR5900-32.cpp:506
+#: pcsx2/x86/ix86-32/iR5900-32.cpp:523
 #, c-format
 msgid "%s Extensions not found.  The R5900-32 recompiler requires a host CPU with SSE2 extensions."
 msgstr ""

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-09-06 00:40+0800\n"
-"PO-Revision-Date: 2021-09-06 00:43+0800\n"
+"POT-Creation-Date: 2021-09-28 23:55+0800\n"
+"PO-Revision-Date: 2021-09-28 23:59+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,14 +14,14 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: common/Exceptions.cpp:241
+#: common/Exceptions.cpp:246
 msgid ""
 "There is not enough virtual memory available, or necessary virtual memory "
 "mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 "没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保留。"
 
-#: pcsx2/CDVD/CDVD.cpp:2152
+#: pcsx2/CDVD/CDVD.cpp:2159
 msgid ""
 "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr "读写 NMV/MEC 文件失败，请检查你的 BIOS 与权限设置。"
@@ -367,7 +367,13 @@ msgid ""
 "pausing the emulator."
 msgstr "在按 ESC 或挂起模拟器时彻底关闭 GS 窗口。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:53
+msgid ""
+"Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and "
+"others."
+msgstr "修复 WRC,武器种族传说,Tennis Court Smash和其他的图形错误。"
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:58
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -379,7 +385,7 @@ msgstr ""
 " * 极限滑雪 (修正图像错误及崩溃问题)\n"
 " * 生化危机: 死亡目标 (导致纹理混乱)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:67
 msgid ""
 "Known to affect following games:\n"
 " * Bleach Blade Battler\n"
@@ -391,7 +397,7 @@ msgstr ""
 " * 梦幻骑士 II 和 III\n"
 " * 巫术"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:72
 msgid ""
 "Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down "
@@ -402,7 +408,7 @@ msgstr ""
 "* 重装机兵(介绍 FMV)\n"
 "* 敌后阵线\n"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:77
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
@@ -412,7 +418,7 @@ msgstr ""
 " * Test Drive Unlimited (无限试驾 2)\n"
 " * Transformers (变形金刚)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
 msgid ""
 "It's better to enable 'Automatic game fixes' at the main menu instead, and "
 "leave this page empty ('Automatic' means: selectively use specific tested "
@@ -422,7 +428,7 @@ msgstr ""
 "建议在主菜单启用 '自动应用游戏特殊修正'，而不建议在此手动设置 ('自动' 即针对"
 "特定游戏自动应用对应修正)。事实上，手动设置并不能提升性能，反而会降低性能。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:113
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -671,21 +677,21 @@ msgid ""
 "not be available either."
 msgstr "注意: 如限帧被禁用，快速模式和慢动作模式将不可用。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:217
+#: pcsx2/gui/Panels/VideoPanel.cpp:218
 msgid ""
 "Notice: Due to PS2 hardware design, precise frame skipping is impossible. "
 "Enabling it will cause severe graphical errors in some games."
 msgstr ""
 "注意: 由于 PS2 硬件设计，不可能准确跳帧。启用此选项可能在游戏中导致图像错误。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:297
+#: pcsx2/gui/Panels/VideoPanel.cpp:299
 msgid ""
 "Setting this to a lower value improves input lag, a value around 2 or 3 will "
 "slightly improve framerates. (Default is 2)"
 msgstr ""
 "将其设置为较低的值会改善输入延迟,2 或 3 左右的值会略微提高帧率。(默认值为 2)"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:298
+#: pcsx2/gui/Panels/VideoPanel.cpp:301
 msgid ""
 "Enable this if you think MTGS thread sync is causing crashes or graphical "
 "errors. For debugging to see if GS is running at the correct speed."
