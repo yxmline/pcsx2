@@ -23,7 +23,7 @@
 #include "Renderers/OpenGL/GSRendererOGL.h"
 #include "GSLzma.h"
 
-#include "gui/AppConfig.h"    // GetSettingsFolder()
+#include "Config.h"
 #include "common/pxStreams.h"
 
 #ifdef _WIN32
@@ -658,7 +658,7 @@ uint32 GSmakeSnapshot(char* path)
 	}
 }
 
-void GSkeyEvent(GSKeyEventData* e)
+void GSkeyEvent(const HostKeyEvent& e)
 {
 	try
 	{
@@ -860,19 +860,6 @@ void GSsetExclusive(int enabled)
 	if (s_gs)
 	{
 		s_gs->SetVSync(s_vsync);
-	}
-}
-
-bool GSGetFMVSwitch()
-{
-	return s_gs ? s_gs->GetFMVSwitch() : false;
-}
-
-void GSSetFMVSwitch(bool enabled)
-{
-	if (s_gs)
-	{
-		s_gs->SetFMVSwitch(enabled);
 	}
 }
 
@@ -1787,7 +1774,7 @@ void GSApp::SetConfigDir()
 	// core settings aren't populated yet, thus we do populate it if needed either when
 	// opening GS settings or init -- govanify
 	wxString iniName(L"GS.ini");
-	m_ini = GetSettingsFolder().Combine(iniName).GetFullPath();
+	m_ini = EmuFolders::Settings.Combine(iniName).GetFullPath();
 }
 
 std::string GSApp::GetConfigS(const char* entry)

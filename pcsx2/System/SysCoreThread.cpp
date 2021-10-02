@@ -30,7 +30,7 @@
 #include "SPU2/spu2.h"
 #include "DEV9/DEV9.h"
 #include "USB/USB.h"
-#include "gui/MemoryCardFile.h"
+#include "MemoryCardFile.h"
 #ifdef _WIN32
 #include "PAD/Windows/PAD.h"
 #else
@@ -182,7 +182,7 @@ void SysCoreThread::ApplySettings(const Pcsx2Config& src)
 	m_resetProfilers = (src.Profiler != EmuConfig.Profiler);
 	m_resetVsyncTimers = (src.GS != EmuConfig.GS);
 
-	const_cast<Pcsx2Config&>(EmuConfig) = src;
+	EmuConfig.CopyConfig(src);
 }
 
 // --------------------------------------------------------------------------------------

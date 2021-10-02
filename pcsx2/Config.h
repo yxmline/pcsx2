@@ -17,9 +17,13 @@
 
 #include "common/emitter/tools.h"
 #include "common/General.h"
-#include <wx/filename.h>
+#include "common/Path.h"
+#include <string>
 
-class IniInterface;
+class SettingsInterface;
+class SettingsWrapper;
+
+enum class CDVD_SourceType : uint8_t;
 
 enum GamefixId
 {
@@ -62,6 +66,37 @@ enum class VsyncMode
 	Off,
 	On,
 	Adaptive,
+};
+
+enum class AspectRatioType : u8
+{
+	Stretch,
+	R4_3,
+	R16_9,
+	MaxCount
+};
+
+enum class FMVAspectRatioSwitchType : u8
+{
+	Off,
+	R4_3,
+	R16_9,
+	MaxCount
+};
+
+enum MemoryCardType
+{
+	MemoryCard_None,
+	MemoryCard_File,
+	MemoryCard_Folder,
+	MemoryCard_MaxCount
+};
+
+enum class LimiterModeType : u8
+{
+	Nominal,
+	Turbo,
+	Slomo,
 };
 
 // Template function for casting enumerations to their underlying type
@@ -157,7 +192,7 @@ struct TraceLogFilters
 		Enabled	= false;
 	}
 
-	void LoadSave( IniInterface& ini );
+	void LoadSave( SettingsWrapper& ini );
 
 	bool operator ==( const TraceLogFilters& right ) const
 	{
@@ -196,7 +231,7 @@ struct Pcsx2Config
 
 		// Default is Disabled, with all recs enabled underneath.
 		ProfilerOptions() : bitset( 0xfffffffe ) {}
-		void LoadSave( IniInterface& conf );
+		void LoadSave( SettingsWrapper& wrap);
 
 		bool operator ==( const ProfilerOptions& right ) const
 		{
@@ -241,7 +276,7 @@ struct Pcsx2Config
 		RecompilerOptions();
 		void ApplySanityCheck();
 
-		void LoadSave( IniInterface& conf );
+		void LoadSave( SettingsWrapper& wrap);
 
 		bool operator ==( const RecompilerOptions& right ) const
 		{
@@ -264,7 +299,7 @@ struct Pcsx2Config
 		SSE_MXCSR sseVUMXCSR;
 
 		CpuOptions();
-		void LoadSave( IniInterface& conf );
+		void LoadSave( SettingsWrapper& wrap);
 		void ApplySanityCheck();
 
 		bool operator ==( const CpuOptions& right ) const
@@ -298,7 +333,15 @@ struct Pcsx2Config
 		double FramerateNTSC{ 59.94 };
 		double FrameratePAL{ 50.00 };
 
-		void LoadSave( IniInterface& conf );
+		AspectRatioType AspectRatio{AspectRatioType::R4_3};
+		FMVAspectRatioSwitchType FMVAspectRatioSwitch{FMVAspectRatioSwitchType::Off};
+
+		double Zoom{100.0};
+		double StretchY{100.0};
+		double OffsetX{0.0};
+		double OffsetY{0.0};
+
+		void LoadSave( SettingsWrapper& wrap);
 
 		int GetVsync() const;
 
@@ -351,7 +394,7 @@ struct Pcsx2Config
 		BITFIELD_END
 
 		GamefixOptions();
-		void LoadSave( IniInterface& conf );
+		void LoadSave( SettingsWrapper& wrap);
 		GamefixOptions& DisableAll();
 
 		void Set( const wxString& list, bool enabled=true );
@@ -389,7 +432,7 @@ struct Pcsx2Config
 		u8	EECycleSkip;		// EE Cycle skip factor (0, 1, 2, or 3)
 
 		SpeedhackOptions();
-		void LoadSave(IniInterface& conf);
+		void LoadSave(SettingsWrapper& conf);
 		SpeedhackOptions& DisableAll();
 
 		void Set(SpeedhackId id, bool enabled = true);
@@ -421,7 +464,7 @@ struct Pcsx2Config
 		u32 MemoryViewBytesPerRow;
 
 		DebugOptions();
-		void LoadSave( IniInterface& conf );
+		void LoadSave( SettingsWrapper& wrap);
 		
 		bool operator ==( const DebugOptions& right ) const
 		{
@@ -433,6 +476,49 @@ struct Pcsx2Config
 		{
 			return !this->operator ==( right );
 		}
+	};
+
+	// ------------------------------------------------------------------------
+	struct FramerateOptions
+	{
+		bool SkipOnLimit{false};
+		bool SkipOnTurbo{false};
+
+		double NominalScalar{1.0};
+		double TurboScalar{2.0};
+		double SlomoScalar{0.5};
+
+		void LoadSave(SettingsWrapper& wrap);
+		void SanityCheck();
+	};
+
+	// ------------------------------------------------------------------------
+	struct FilenameOptions
+	{
+		std::string Bios;
+
+		FilenameOptions();
+		void LoadSave(SettingsWrapper& wrap);
+
+		bool operator==(const FilenameOptions& right) const
+		{
+			return OpEqu(Bios);
+		}
+
+		bool operator!=(const FilenameOptions& right) const
+		{
+			return !this->operator==(right);
+		}
+	};
+
+	// ------------------------------------------------------------------------
+	// Options struct for each memory card.
+	//
+	struct McdOptions
+	{
+		std::string	Filename;	// user-configured location of this memory card
+		bool		Enabled;	// memory card enabled (if false, memcard will not show up in-game)
+		MemoryCardType Type;	// the memory card implementation that should be used
 	};
 
 	BITFIELD32()
@@ -458,8 +544,12 @@ struct Pcsx2Config
 			MultitapPort1_Enabled:1,
 
 			ConsoleToStdio		:1,
-			HostFs				:1,
-			FullBootConfig		:1;
+			HostFs				:1;
+
+			// uses automatic ntfs compression when creating new memory cards (Win32 only)
+#ifdef __WXMSW__
+			bool		McdCompressNTFS;
+#endif
 	BITFIELD_END
 
 	CpuOptions			Cpu;
@@ -468,18 +558,31 @@ struct Pcsx2Config
 	GamefixOptions		Gamefixes;
 	ProfilerOptions		Profiler;
 	DebugOptions		Debugger;
+	FramerateOptions		Framerate;
 
 	TraceLogFilters		Trace;
 
-	wxFileName			BiosFilename;
+	FilenameOptions BaseFilenames;
+
+	// Memorycard options - first 2 are default slots, last 6 are multitap 1 and 2
+	// slots (3 each)
+	McdOptions Mcd[8];
+	std::string GzipIsoIndexTemplate; // for quick-access index with gzipped ISO
+
+	// Set at runtime, not loaded from config.
+	std::string CurrentBlockdump;
+	std::string CurrentIRX;
+	std::string CurrentGameArgs;
+	AspectRatioType CurrentAspectRatio = AspectRatioType::R4_3;
+	LimiterModeType LimiterMode = LimiterModeType::Nominal;
 
 	Pcsx2Config();
-	void LoadSave( IniInterface& ini );
+	void LoadSave(SettingsWrapper& wrap);
+	void LoadSaveMemcards(SettingsWrapper& wrap);
 
-	void Load( const wxString& srcfile );
-	void Load( const wxInputStream& srcstream );
-	void Save( const wxString& dstfile );
-	void Save( const wxOutputStream& deststream );
+	// TODO: Make these std::string when we remove wxFile...
+	wxString FullpathToBios() const;
+	wxString FullpathToMcd(uint slot) const;
 
 	bool MultitapEnabled( uint port ) const;
 
@@ -493,22 +596,33 @@ struct Pcsx2Config
 			OpEqu( Gamefixes )	&&
 			OpEqu( Profiler )	&&
 			OpEqu( Trace )		&&
-			OpEqu( BiosFilename );
+			OpEqu( BaseFilenames );
 	}
 
 	bool operator !=( const Pcsx2Config& right ) const
 	{
 		return !this->operator ==( right );
 	}
+
+	// You shouldn't assign to this class, because it'll mess with the runtime variables (Current...).
+	// But you can still use this to copy config. Only needed until we drop wx.
+	void CopyConfig(const Pcsx2Config& cfg);
 };
 
-extern const Pcsx2Config EmuConfig;
+extern Pcsx2Config EmuConfig;
 
-Pcsx2Config::GSOptions&			SetGSConfig();
-Pcsx2Config::RecompilerOptions& SetRecompilerConfig();
-Pcsx2Config::GamefixOptions&	SetGameFixConfig();
-TraceLogFilters&				SetTraceConfig();
-
+namespace EmuFolders
+{
+	extern wxDirName Settings;
+	extern wxDirName Bios;
+	extern wxDirName Snapshots;
+	extern wxDirName Savestates;
+	extern wxDirName MemoryCards;
+	extern wxDirName Langs;
+	extern wxDirName Logs;
+	extern wxDirName Cheats;
+	extern wxDirName CheatsWS;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Helper Macros for Reading Emu Configurations.
@@ -518,9 +632,9 @@ TraceLogFilters&				SetTraceConfig();
 
 #define THREAD_VU1					(EmuConfig.Cpu.Recompiler.EnableVU1 && EmuConfig.Speedhacks.vuThread)
 #define INSTANT_VU1					(EmuConfig.Speedhacks.vu1Instant)
-#define CHECK_EEREC					(EmuConfig.Cpu.Recompiler.EnableEE && GetCpuProviders().IsRecAvailable_EE())
+#define CHECK_EEREC					(EmuConfig.Cpu.Recompiler.EnableEE)
 #define CHECK_CACHE					(EmuConfig.Cpu.Recompiler.EnableEECache)
-#define CHECK_IOPREC				(EmuConfig.Cpu.Recompiler.EnableIOP && GetCpuProviders().IsRecAvailable_IOP())
+#define CHECK_IOPREC				(EmuConfig.Cpu.Recompiler.EnableIOP)
 
 //------------ SPECIAL GAME FIXES!!! ---------------
 #define CHECK_VUADDSUBHACK			(EmuConfig.Gamefixes.VuAddSubHack)	 // Special Fix for Tri-ace games, they use an encryption algorithm that requires VU addi opcode to be bit-accurate.

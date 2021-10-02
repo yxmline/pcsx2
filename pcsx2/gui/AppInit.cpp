@@ -21,6 +21,7 @@
 #include "MTVU.h" // for thread cancellation on shutdown
 
 #include "common/IniInterface.h"
+#include "common/StringUtil.h"
 #include "DebugTools/Debug.h"
 #include "Dialogs/ModalPopups.h"
 
@@ -458,7 +459,7 @@ bool Pcsx2App::OnInit()
 		(new GameDatabaseLoaderThread())->Start();
 
 		// By default no IRX injection
-		g_Conf->CurrentIRX = "";
+		EmuConfig.CurrentIRX.clear();
 
 		if (Startup.SysAutoRun)
 		{
@@ -467,7 +468,7 @@ bool Pcsx2App::OnInit()
 			if (Startup.CdvdSource == CDVD_SourceType::Iso)
 				SysUpdateIsoSrcFile(Startup.IsoFile);
 			sApp.SysExecute(Startup.CdvdSource);
-			g_Conf->CurrentGameArgs = Startup.GameLaunchArgs;
+			EmuConfig.CurrentGameArgs = StringUtil::wxStringToUTF8String(Startup.GameLaunchArgs);
 		}
 		else if (Startup.SysAutoRunElf)
 		{
@@ -495,7 +496,7 @@ bool Pcsx2App::OnInit()
 		{
 			g_Conf->EmuOptions.UseBOOT2Injection = true;
 
-			g_Conf->CurrentIRX = Startup.ElfFile;
+			EmuConfig.CurrentIRX = StringUtil::wxStringToUTF8String(Startup.ElfFile);
 
 			// FIXME: ElfFile is an irx it will crash
 			sApp.SysExecute(Startup.CdvdSource, Startup.ElfFile);

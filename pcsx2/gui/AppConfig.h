@@ -26,6 +26,8 @@
 #include <wx/gdicmn.h>
 #include <memory>
 
+class SettingsWrapper;
+
 enum DocsModeType
 {
 	// uses /home/user or /cwd for the program data.  This is the default mode and is the most
@@ -63,14 +65,9 @@ extern wxDirName		SettingsFolder;				// dictates where the settings folder comes
 
 extern wxDirName		InstallFolder;
 
-extern wxDirName GetSettingsFolder();
 extern wxString  GetVmSettingsFilename();
 extern wxString  GetUiSettingsFilename();
 extern wxString  GetUiKeysFilename();
-
-extern wxDirName GetLogFolder();
-extern wxDirName GetCheatsFolder();
-extern wxDirName GetCheatsWsFolder();
 
 enum InstallationModeType
 {
@@ -90,30 +87,6 @@ enum InstallationModeType
 bool IsPortable();
 
 extern InstallationModeType	InstallationMode;
-
-enum AspectRatioType
-{
-	AspectRatio_Stretch,
-	AspectRatio_4_3,
-	AspectRatio_16_9,
-	AspectRatio_MaxCount
-};
-
-enum FMVAspectRatioSwitchType
-{
-	FMV_AspectRatio_Switch_Off,
-	FMV_AspectRatio_Switch_4_3,
-	FMV_AspectRatio_Switch_16_9,
-	FMV_AspectRatio_Switch_MaxCount
-};
-
-enum MemoryCardType
-{
-	MemoryCard_None,
-	MemoryCard_File,
-	MemoryCard_Folder,
-	MemoryCard_MaxCount
-};
 
 // =====================================================================================================
 //  Pcsx2 Application Configuration. 
@@ -167,9 +140,9 @@ public:
 			Cheats,
 			CheatsWS;
 
-		wxDirName RunIso;		// last used location for Iso loading.
-		wxDirName RunELF;		// last used location for ELF loading.
-		wxString RunDisc;		// last used location for Disc loading.
+		wxDirName RunIso; // last used location for Iso loading.
+		wxDirName RunELF; // last used location for ELF loading.
+		wxString RunDisc; // last used location for Disc loading.
 
 		FolderOptions();
 		void LoadSave( IniInterface& conf );
@@ -180,24 +153,6 @@ public:
 		const wxDirName& operator[]( FoldersEnum_t folderidx ) const;
 		wxDirName& operator[]( FoldersEnum_t folderidx );
 		bool IsDefault( FoldersEnum_t folderidx ) const;
-	};
-
-	// ------------------------------------------------------------------------
-	struct FilenameOptions
-	{
-		wxFileName Bios;
-
-		void LoadSave( IniInterface& conf );
-	};
-
-	// ------------------------------------------------------------------------
-	// Options struct for each memory card.
-	//
-	struct McdOptions
-	{
-		wxFileName	Filename;	// user-configured location of this memory card
-		bool		Enabled;	// memory card enabled (if false, memcard will not show up in-game)
-		MemoryCardType Type;	// the memory card implementation that should be used
 	};
 
 	// ------------------------------------------------------------------------
@@ -212,14 +167,6 @@ public:
 		bool DisableResizeBorders;
 		bool DisableScreenSaver;
 
-		AspectRatioType AspectRatio;
-		FMVAspectRatioSwitchType FMVAspectRatioSwitch;
-
-		double Zoom;
-		double StretchY;
-		double OffsetX;
-		double OffsetY;
-
 		wxSize WindowSize;
 		wxPoint WindowPos;
 
@@ -229,19 +176,6 @@ public:
 		bool IsToggleFullscreenOnDoubleClick;
 
 		GSWindowOptions();
-
-		void LoadSave( IniInterface& conf );
-		void SanityCheck();
-	};
-
-	struct FramerateOptions
-	{
-		bool SkipOnLimit{ false };
-		bool SkipOnTurbo{ false };
-
-		double NominalScalar{ 1.0 };
-		double TurboScalar{ 2.0 };
-		double SlomoScalar{ 0.5 };
 
 		void LoadSave( IniInterface& conf );
 		void SanityCheck();
@@ -318,11 +252,6 @@ public:
 	// Enables display of toolbar text labels.
 	bool		Toolbar_ShowLabels;
 
-	// uses automatic ntfs compression when creating new memory cards (Win32 only)
-#ifdef __WXMSW__
-	bool		McdCompressNTFS;
-#endif
-
 	// Master toggle for enabling or disabling all speedhacks in one fail-free swoop.
 	// (the toggle is applied when a new EmuConfig is sent through AppCoreThread::ApplySettings)
 	bool		EnableSpeedHacks;
@@ -341,23 +270,14 @@ public:
 
 	bool		AskOnBoot;
 
-	wxString				CurrentIso;
-    wxString				CurrentBlockdump;
-	wxString				CurrentELF;
-	wxString				CurrentIRX;
-	CDVD_SourceType			CdvdSource;
-	wxString				CurrentGameArgs;
 
-	// Memorycard options - first 2 are default slots, last 6 are multitap 1 and 2
-	// slots (3 each)
-	McdOptions				Mcd[8];
-	wxString				GzipIsoIndexTemplate; // for quick-access index with gzipped ISO
+	wxString				CurrentIso;
+	wxString				CurrentELF;
+	CDVD_SourceType			CdvdSource;
 
 	ConsoleLogOptions		ProgLogBox;
 	FolderOptions			Folders;
-	FilenameOptions			BaseFilenames;
 	GSWindowOptions			GSWindow;
-	FramerateOptions		Framerate;
 #ifndef DISABLE_RECORDING
 	InputRecordingOptions   inputRecording;
 #endif
@@ -373,12 +293,8 @@ public:
 public:
 	AppConfig();
 
-	wxString FullpathToBios() const;
-	wxString FullpathToMcd( uint slot ) const;
-
-	void LoadSave( IniInterface& ini );
-	void LoadSaveRootItems( IniInterface& ini );
-	void LoadSaveMemcards( IniInterface& ini );
+	void LoadSave(IniInterface& ini, SettingsWrapper& wrap);
+	void LoadSaveRootItems(IniInterface& ini);
 
 	static int  GetMaxPresetIndex();
     static bool isOkGetPresetTextAndColor(int n, wxString& label, wxColor& c);

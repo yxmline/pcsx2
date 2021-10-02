@@ -130,6 +130,8 @@ set(pcsx2Sources
 	IPC.cpp
 	Mdec.cpp
 	Memory.cpp
+	MemoryCardFile.cpp
+	MemoryCardFolder.cpp
 	MMI.cpp
 	MTGS.cpp
 	MTVU.cpp
@@ -204,6 +206,8 @@ set(pcsx2Headers
 	Mdec.h
 	MTVU.h
 	Memory.h
+	MemoryCardFile.h
+	MemoryCardFolder.h
 	MemoryTypes.h
 	Patch.h
 	PathDefs.h
@@ -1010,8 +1014,6 @@ set(pcsx2GuiSources
 	gui/IsoDropTarget.cpp
 	gui/MainFrame.cpp
 	gui/MainMenuClicks.cpp
-	gui/MemoryCardFile.cpp
-	gui/MemoryCardFolder.cpp
 	gui/MessageBoxes.cpp
 	gui/MSWstuff.cpp
 	gui/Panels/BaseApplicableConfigPanel.cpp
@@ -1029,12 +1031,17 @@ set(pcsx2GuiSources
 	gui/Panels/VideoPanel.cpp
 	gui/pxCheckBox.cpp
 	gui/pxRadioPanel.cpp
+	gui/pxStaticText.cpp
+	gui/pxWindowTextWriter.cpp
 	gui/RecentIsoList.cpp
 	gui/Saveslots.cpp
 	gui/SysState.cpp
 	gui/ThreadingDialogs.cpp
 	gui/UpdateUI.cpp
 	gui/wxAppWithHelpers.cpp
+	gui/wxGuiTools.cpp
+	gui/wxHelpers.cpp
+	gui/wxSettingsInterface.cpp
 	)
 
 # gui headers
@@ -1068,8 +1075,6 @@ set(pcsx2GuiHeaders
 	gui/i18n.h
 	gui/IsoDropTarget.h
 	gui/MainFrame.h
-	gui/MemoryCardFile.h
-	gui/MemoryCardFolder.h
 	gui/MSWstuff.h
 	gui/Panels/ConfigurationPanels.h
 	gui/Panels/LogOptionsPanels.h
@@ -1078,10 +1083,13 @@ set(pcsx2GuiHeaders
 	gui/pxEvents.h
 	gui/pxEventThread.h
 	gui/pxRadioPanel.h
+	gui/pxStaticText.h
 	gui/RecentIsoList.h
 	gui/Saveslots.h
 	gui/ThreadingDialogs.h
 	gui/ThreadingDialogs.cpp
+	gui/wxGuiTools.h
+	gui/wxSettingsInterface.h
 	)
 
 # Warning: the declaration of the .h are mandatory in case of resources files. It will ensure the creation
@@ -1265,15 +1273,6 @@ set(pcsx2UtilitiesSources
 set(pcsx2UtilitiesHeaders
 	Utilities/AsciiFile.h)
 
-# Zip tools utilies sources
-set(pcsx2ZipToolsSources
-	ZipTools/thread_gzip.cpp
-	ZipTools/thread_lzma.cpp)
-
-# Zip tools utilies headers
-set(pcsx2ZipToolsHeaders
-	ZipTools/ThreadedZipTools.h)
-
 
 # Windows sources
 set(pcsx2WindowsSources
@@ -1408,9 +1407,7 @@ target_sources(PCSX2 PRIVATE
 	${pcsx2SystemSources}
 	${pcsx2SystemHeaders}
 	${pcsx2UtilitiesSources}
-	${pcsx2UtilitiesHeaders}
-	${pcsx2ZipToolsSources}
-	${pcsx2ZipToolsHeaders})
+	${pcsx2UtilitiesHeaders})
 
 # platform sources
 # Linux

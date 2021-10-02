@@ -21,6 +21,7 @@
 #include <wx/stdpaths.h>
 #include "fmt/core.h"
 
+#include "common/StringUtil.h"
 #include "common/Threading.h"
 
 #include "ps2/BiosTools.h"
@@ -42,6 +43,15 @@ __aligned16 AppCoreThread CoreThread;
 
 typedef void (AppCoreThread::*FnPtr_CoreThreadMethod)();
 
+SysCoreThread& GetCoreThread()
+{
+	return CoreThread;
+}
+
+SysMtgsThread& GetMTGS()
+{
+	return mtgsThread;
+}
 
 namespace GameInfo
 {
@@ -206,13 +216,18 @@ void Pcsx2App::SysApplySettings()
 		return;
 	CoreThread.ApplySettings(g_Conf->EmuOptions);
 
-	CDVD_SourceType cdvdsrc(g_Conf->CdvdSource);
-	if (cdvdsrc != CDVDsys_GetSourceType() || (cdvdsrc == CDVD_SourceType::Iso && (CDVDsys_GetFile(cdvdsrc) != g_Conf->CurrentIso)))
+	const CDVD_SourceType cdvdsrc(g_Conf->CdvdSource);
+	const std::string currentIso(StringUtil::wxStringToUTF8String(g_Conf->CurrentIso));
+	const std::string currentDisc(StringUtil::wxStringToUTF8String(g_Conf->Folders.RunDisc));
+	if (cdvdsrc != CDVDsys_GetSourceType() ||
+			CDVDsys_GetFile(CDVD_SourceType::Iso) != currentIso ||
+			CDVDsys_GetFile(CDVD_SourceType::Disc) != currentDisc)
 	{
 		CoreThread.ResetCdvd();
 	}
 
-	CDVDsys_SetFile(CDVD_SourceType::Iso, g_Conf->CurrentIso);
+	CDVDsys_SetFile(CDVD_SourceType::Iso, currentIso);
+	CDVDsys_SetFile(CDVD_SourceType::Disc, currentDisc);
 }
 
 void AppCoreThread::OnResumeReady()
@@ -383,7 +398,7 @@ static void _ApplySettings(const Pcsx2Config& src, Pcsx2Config& fixup)
 	// Note: It's important that we apply the commandline overrides *before* database fixes.
 	// The database takes precedence (if enabled).
 
-	fixup = src;
+	fixup.CopyConfig(src);
 
 	const CommandlineOverrides& overrides(wxGetApp().Overrides);
 	if (overrides.DisableSpeedhacks || !g_Conf->EnableSpeedHacks)
@@ -482,12 +497,12 @@ static void _ApplySettings(const Pcsx2Config& src, Pcsx2Config& fixup)
 
 	// regular cheat patches
 	if (fixup.EnableCheats)
-		gameCheats.Printf(L" [%d Cheats]", LoadPatchesFromDir(GameInfo::gameCRC, GetCheatsFolder(), L"Cheats"));
+		gameCheats.Printf(L" [%d Cheats]", LoadPatchesFromDir(GameInfo::gameCRC, EmuFolders::Cheats, L"Cheats"));
 
 	// wide screen patches
 	if (fixup.EnableWideScreenPatches)
 	{
-		if (int numberLoadedWideScreenPatches = LoadPatchesFromDir(GameInfo::gameCRC, GetCheatsWsFolder(), L"Widescreen hacks"))
+		if (int numberLoadedWideScreenPatches = LoadPatchesFromDir(GameInfo::gameCRC, EmuFolders::CheatsWS, L"Widescreen hacks"))
 		{
 			gameWsHacks.Printf(L" [%d widescreen hacks]", numberLoadedWideScreenPatches);
 			Console.WriteLn(Color_Gray, "Found widescreen patches in the cheats_ws folder --> skipping cheats_ws.zip");

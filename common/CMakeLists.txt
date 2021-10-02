@@ -23,16 +23,14 @@ target_sources(common PRIVATE
 	PathUtils.cpp
 	PrecompiledHeader.cpp
 	Perf.cpp
-	pxStaticText.cpp
 	pxStreams.cpp
 	pxTranslate.cpp
-	pxWindowTextWriter.cpp
 	RwMutex.cpp
 	Semaphore.cpp
+	SettingsWrapper.cpp
 	StringHelpers.cpp
+	StringUtil.cpp
 	ThreadTools.cpp
-	wxGuiTools.cpp
-	wxHelpers.cpp
 	emitter/bmi.cpp
 	emitter/cpudetect.cpp
 	emitter/fpu.cpp
@@ -72,18 +70,19 @@ target_sources(common PRIVATE
 	PageFaultSource.h
 	PrecompiledHeader.h
 	pxForwardDefs.h
-	pxStaticText.h
 	pxStreams.h
 	RedtapeWindows.h
 	RwMutex.h
 	SafeArray.h
 	ScopedAlloc.h
 	ScopedPtrMT.h
+	SettingsInterface.h
+	SettingsWrapper.h
 	StringHelpers.h
+	StringUtil.h
 	Threading.h
 	TraceLog.h
 	wxBaseTools.h
-	wxGuiTools.h
 	emitter/cpudetect_internal.h
 	emitter/implement/dwshift.h
 	emitter/implement/group1.h

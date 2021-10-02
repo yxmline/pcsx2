@@ -318,11 +318,16 @@
     <ClCompile Include="gui\Panels\MemoryCardListView.cpp" />
     <ClCompile Include="gui\pxCheckBox.cpp" />
     <ClCompile Include="gui\pxRadioPanel.cpp" />
+    <ClCompile Include="gui\pxStaticText.cpp" />
+    <ClCompile Include="gui\pxWindowTextWriter.cpp" />
     <ClCompile Include="gui\ThreadingDialogs.cpp" />
     <ClCompile Include="gui\wxAppWithHelpers.cpp" />
+    <ClCompile Include="gui\wxSettingsInterface.cpp" />
     <ClCompile Include="IopGte.cpp" />
     <ClCompile Include="IPC.cpp" />
     <ClCompile Include="FW.cpp" />
+    <ClCompile Include="MemoryCardFile.cpp" />
+    <ClCompile Include="MemoryCardFolder.cpp" />
     <ClCompile Include="PAD\Windows\PADConfig.cpp" />
     <ClCompile Include="PAD\Windows\DeviceEnumerator.cpp" />
     <ClCompile Include="PAD\Windows\Diagnostics.cpp" />
@@ -660,12 +665,12 @@
     <ClCompile Include="gui\IsoDropTarget.cpp" />
     <ClCompile Include="gui\MainFrame.cpp" />
     <ClCompile Include="gui\MainMenuClicks.cpp" />
-    <ClCompile Include="gui\MemoryCardFile.cpp" />
-    <ClCompile Include="gui\MemoryCardFolder.cpp" />
     <ClCompile Include="gui\MessageBoxes.cpp" />
     <ClCompile Include="gui\MSWstuff.cpp" />
     <ClCompile Include="gui\RecentIsoList.cpp" />
     <ClCompile Include="gui\UpdateUI.cpp" />
+    <ClCompile Include="gui\wxGuiTools.cpp" />
+    <ClCompile Include="gui\wxHelpers.cpp" />
     <ClCompile Include="gui\Dialogs\AboutBoxDialog.cpp" />
     <ClCompile Include="gui\Dialogs\AssertionDialog.cpp" />
     <ClCompile Include="gui\Dialogs\BaseConfigurationDialog.cpp" />
@@ -697,8 +702,6 @@
     </ClCompile>
     <ClCompile Include="gui\Saveslots.cpp" />
     <ClCompile Include="gui\SysState.cpp" />
-    <ClCompile Include="ZipTools\thread_gzip.cpp" />
-    <ClCompile Include="ZipTools\thread_lzma.cpp" />
     <ClCompile Include="windows\Optimus.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -758,6 +761,7 @@
     <ClInclude Include="gui\pxCheckBox.h" />
     <ClInclude Include="gui\pxEvents.h" />
     <ClInclude Include="gui\pxRadioPanel.h" />
+    <ClInclude Include="gui\pxStaticText.h" />
     <ClInclude Include="gui\Saveslots.h" />
     <ClInclude Include="gui\Debugger\BreakpointWindow.h" />
     <ClInclude Include="gui\Debugger\CtrlDisassemblyView.h" />
@@ -769,9 +773,13 @@
     <ClInclude Include="gui\Panels\MemoryCardPanels.h" />
     <ClInclude Include="gui\ThreadingDialogs.h" />
     <ClInclude Include="gui\wxAppWithHelpers.h" />
+    <ClInclude Include="gui\wxSettingsInterface.h" />
+    <ClInclude Include="Host.h" />
     <ClInclude Include="IopGte.h" />
     <ClInclude Include="IPC.h" />
     <ClInclude Include="FW.h" />
+    <ClInclude Include="MemoryCardFile.h" />
+    <ClInclude Include="MemoryCardFolder.h" />
     <ClInclude Include="PAD\Windows\PAD.h" />
     <ClInclude Include="PAD\Windows\PADConfig.h" />
     <ClInclude Include="PAD\Windows\DeviceEnumerator.h" />
@@ -1082,13 +1090,11 @@
     <ClInclude Include="gui\GSFrame.h" />
     <ClInclude Include="gui\IsoDropTarget.h" />
     <ClInclude Include="gui\MainFrame.h" />
-    <ClInclude Include="gui\MemoryCardFile.h" />
-    <ClInclude Include="gui\MemoryCardFolder.h" />
     <ClInclude Include="gui\pxEventThread.h" />
     <ClInclude Include="gui\RecentIsoList.h" />
+    <ClInclude Include="gui\wxGuiTools.h" />
     <ClInclude Include="PathDefs.h" />
     <ClInclude Include="SysForwardDefs.h" />
-    <ClInclude Include="ZipTools\ThreadedZipTools.h" />
     <ClInclude Include="cheatscpp.h" />
   </ItemGroup>
   <ItemGroup>

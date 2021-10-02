@@ -18,6 +18,7 @@
 #include "MainFrame.h"
 #include "GSFrame.h"
 #include "GS.h"
+#include "Host.h"
 #include "AppSaveStates.h"
 #include "AppGameDatabase.h"
 #include "AppAccelerators.h"
@@ -41,6 +42,7 @@
 #endif
 
 #include "common/IniInterface.h"
+#include "common/StringUtil.h"
 #include "common/AppTrait.h"
 
 #include <wx/stdpaths.h>
@@ -202,9 +204,9 @@ extern int TranslateVKToWXK( u32 keysym );
 extern int TranslateGDKtoWXK( u32 keysym );
 #endif
 
-void Pcsx2App::PadKeyDispatch( const keyEvent& ev )
+void Pcsx2App::PadKeyDispatch(const HostKeyEvent& ev)
 {
-	m_kevt.SetEventType( ( ev.evt == KEYPRESS ) ? wxEVT_KEY_DOWN : wxEVT_KEY_UP );
+	m_kevt.SetEventType( ( ev.type == HostKeyEvent::Type::KeyPressed ) ? wxEVT_KEY_DOWN : wxEVT_KEY_UP );
 
 //returns 0 for normal keys and a WXK_* value for special keys
 #ifdef __WXMSW__
@@ -458,10 +460,21 @@ void Pcsx2App::LogicalVsync()
 
 	FpsManager.DoFrame();
 
-	if (g_Conf->GSWindow.FMVAspectRatioSwitch != FMV_AspectRatio_Switch_Off) {
+	if (EmuConfig.GS.FMVAspectRatioSwitch != FMVAspectRatioSwitchType::Off) {
 		if (EnableFMV) {
 			DevCon.Warning("FMV on");
-			GSSetFMVSwitch(true);
+
+			switch (EmuConfig.GS.FMVAspectRatioSwitch)
+			{
+			case FMVAspectRatioSwitchType::R4_3:
+				EmuConfig.CurrentAspectRatio = AspectRatioType::R4_3;
+				break;
+			case FMVAspectRatioSwitchType::R16_9:
+				EmuConfig.CurrentAspectRatio = AspectRatioType::R16_9;
+				break;
+			default:
+				break;
+			}
 			EnableFMV = false;
 		}
 
@@ -469,7 +482,7 @@ void Pcsx2App::LogicalVsync()
 			int diff = cpuRegs.cycle - eecount_on_last_vdec;
 			if (diff > 60000000 ) {
 				DevCon.Warning("FMV off");
-				GSSetFMVSwitch(false);
+				EmuConfig.CurrentAspectRatio = EmuConfig.GS.AspectRatio;
 				FMVstarted = false;
 			}
 		}
@@ -478,7 +491,7 @@ void Pcsx2App::LogicalVsync()
 	if( (wxGetApp().GetGsFramePtr() != NULL) )
 		PADupdate(0);
 
-	while( const keyEvent* ev = PADkeyEvent() )
+	while( const HostKeyEvent* ev = PADkeyEvent() )
 	{
 		if( ev->key == 0 ) break;
 
@@ -487,7 +500,7 @@ void Pcsx2App::LogicalVsync()
 		// sucked and we had multiple components battling for input processing. I managed to make
 		// most of them go away during the plugin merge but GS still needs to process the inputs,
 		// we might want to move all the input handling in a frontend-specific file in the future -- govanify
-		GSkeyEvent((GSKeyEventData*)ev);
+		GSkeyEvent(*ev);
 		PadKeyDispatch( *ev );
 	}
 }
@@ -529,7 +542,7 @@ void Pcsx2App::HandleEvent(wxEvtHandler* handler, wxEventFunction func, wxEvent&
 				// When the GSFrame CoreThread is paused, so is the logical VSync
 				// Meaning that we have to grab the user-input through here to potentially
 				// resume emulation.
-				if (const keyEvent* ev = PADkeyEvent() )
+				if (const HostKeyEvent* ev = PADkeyEvent() )
 				{
 					if( ev->key != 0 )
 					{
@@ -722,8 +735,6 @@ void AppApplySettings( const AppConfig* oldconf )
 	g_Conf->Folders.Cheats.Mkdir();
 	g_Conf->Folders.CheatsWS.Mkdir();
 
-	g_Conf->EmuOptions.BiosFilename = g_Conf->FullpathToBios();
-
 	RelocateLogfile();
 
 	if( (oldconf == NULL) || (oldconf->LanguageCode.CmpNoCase(g_Conf->LanguageCode)) )
@@ -736,7 +747,7 @@ void AppApplySettings( const AppConfig* oldconf )
 	// Memcards generally compress very well via NTFS compression.
 
 	#ifdef __WXMSW__
-	NTFS_CompressFile( g_Conf->Folders.MemoryCards.ToString(), g_Conf->McdCompressNTFS );
+	NTFS_CompressFile( g_Conf->Folders.MemoryCards.ToString(), g_Conf->EmuOptions.McdCompressNTFS );
 	#endif
 	sApp.DispatchEvent( AppStatus_SettingsApplied );
 
@@ -1004,7 +1015,8 @@ protected:
 		// This function below gets called again from AppCoreThread.cpp and will pass the current ISO regardless if we
 		// are starting an ELF. In terms of symbol loading this doesn't matter because AppCoreThread.cpp doesn't clear the symbol map
 		// and we _only_ read symbols if the map is empty
-		CDVDsys_SetFile(CDVD_SourceType::Iso, m_UseELFOverride ? m_elf_override : g_Conf->CurrentIso );
+		CDVDsys_SetFile(CDVD_SourceType::Disc, StringUtil::wxStringToUTF8String(g_Conf->Folders.RunDisc) );
+		CDVDsys_SetFile(CDVD_SourceType::Iso, StringUtil::wxStringToUTF8String(m_UseELFOverride ? m_elf_override : g_Conf->CurrentIso) );
 		if( m_UseCDVDsrc )
 			CDVDsys_ChangeSource( m_cdvdsrc_type );
 		else if( CDVD == NULL )
@@ -1029,7 +1041,7 @@ void Pcsx2App::SysExecute()
 // sources.
 void Pcsx2App::SysExecute( CDVD_SourceType cdvdsrc, const wxString& elf_override )
 {
-	SysExecutorThread.PostEvent( new SysExecEvent_Execute(cdvdsrc, elf_override) );
+	SysExecutorThread.PostEvent( new SysExecEvent_Execute(cdvdsrc, elf_override.ToStdString()) );
 #ifndef DISABLE_RECORDING
 	if (g_Conf->EmuOptions.EnableRecordingTools)
 	{
@@ -1098,16 +1110,6 @@ MainEmuFrame* GetMainFramePtr()
 SysMainMemory& GetVmMemory()
 {
 	return wxGetApp().GetVmReserve();
-}
-
-SysCoreThread& GetCoreThread()
-{
-	return CoreThread;
-}
-
-SysMtgsThread& GetMTGS()
-{
-	return mtgsThread;
 }
 
 SysCpuProviderPack& GetCpuProviders()
