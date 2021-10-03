@@ -511,7 +511,7 @@ Pcsx2Config::Pcsx2Config()
 		Mcd[slot].Filename = FileMcd_GetDefaultName(slot);
 
 		// Folder memory card is autodetected later.
-		Mcd[slot].Type = MemoryCardType::MemoryCard_File;
+		Mcd[slot].Type = MemoryCardType::File;
 	}
 
 	GzipIsoIndexTemplate = "$(f).pindex.tmp";
@@ -622,7 +622,12 @@ void Pcsx2Config::CopyConfig(const Pcsx2Config& cfg)
 	BaseFilenames = cfg.BaseFilenames;
 	Framerate = cfg.Framerate;
 	for (u32 i = 0; i < sizeof(Mcd) / sizeof(Mcd[0]); i++)
-		Mcd[i] = cfg.Mcd[i];
+	{
+		// Type will be File here, even if it's a folder, so we preserve the old value.
+		// When the memory card is re-opened, it should redetect anyway.
+		Mcd[i].Enabled = cfg.Mcd[i].Enabled;
+		Mcd[i].Filename = cfg.Mcd[i].Filename;
+	}
 
 	GzipIsoIndexTemplate = cfg.GzipIsoIndexTemplate;
 
