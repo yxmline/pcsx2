@@ -727,16 +727,21 @@ void AppConfig::FolderOptions::LoadSave(IniInterface& ini)
 		for (int i = 0; i < FolderId_COUNT; ++i)
 			operator[]((FoldersEnum_t)i).Normalize();
 
-		EmuFolders::Settings = GetSettingsFolder();
-		EmuFolders::Bios = GetResolvedFolder(FolderId_Bios);
-		EmuFolders::Snapshots = GetResolvedFolder(FolderId_Snapshots);
-		EmuFolders::Savestates = GetResolvedFolder(FolderId_Savestates);
-		EmuFolders::MemoryCards = GetResolvedFolder(FolderId_MemoryCards);
-		EmuFolders::Logs = GetResolvedFolder(FolderId_Logs);
-		EmuFolders::Langs = GetResolvedFolder(FolderId_Langs);
-		EmuFolders::Cheats = GetResolvedFolder(FolderId_Cheats);
-		EmuFolders::CheatsWS = GetResolvedFolder(FolderId_CheatsWS);
+		AppSetEmuFolders();
 	}
+}
+
+void AppSetEmuFolders()
+{
+	EmuFolders::Settings = GetSettingsFolder();
+	EmuFolders::Bios = GetResolvedFolder(FolderId_Bios);
+	EmuFolders::Snapshots = GetResolvedFolder(FolderId_Snapshots);
+	EmuFolders::Savestates = GetResolvedFolder(FolderId_Savestates);
+	EmuFolders::MemoryCards = GetResolvedFolder(FolderId_MemoryCards);
+	EmuFolders::Logs = GetResolvedFolder(FolderId_Logs);
+	EmuFolders::Langs = GetResolvedFolder(FolderId_Langs);
+	EmuFolders::Cheats = GetResolvedFolder(FolderId_Cheats);
+	EmuFolders::CheatsWS = GetResolvedFolder(FolderId_CheatsWS);
 }
 
 // ------------------------------------------------------------------------
@@ -1080,6 +1085,8 @@ void AppConfig_OnChangedSettingsFolder(bool overwrite)
 
 	if (!overwrite)
 		AppLoadSettings();
+	else
+		AppSetEmuFolders();
 
 	AppApplySettings();
 	AppSaveSettings(); //Make sure both ini files are created if needed.
@@ -1175,10 +1182,12 @@ static void LoadUiSettings()
 	ConLog_LoadSaveSettings(loader);
 	SysTraceLog_LoadSaveSettings(loader);
 
-	wxSettingsInterface wxsi(&loader.GetConfig());
-	SettingsLoadWrapper wrapper(wxsi);
-	g_Conf = std::make_unique<AppConfig>();
-	g_Conf->LoadSave(loader, wrapper);
+	{
+		wxSettingsInterface wxsi(&loader.GetConfig());
+		SettingsLoadWrapper wrapper(wxsi);
+		g_Conf = std::make_unique<AppConfig>();
+		g_Conf->LoadSave(loader, wrapper);
+	}
 
 	if (!wxFile::Exists(g_Conf->CurrentIso))
 	{
@@ -1194,11 +1203,13 @@ static void LoadVmSettings()
 	// are regulated by the PCSX2 UI.
 
 	std::unique_ptr<wxFileConfig> vmini(OpenFileConfig(GetVmSettingsFilename()));
-	wxSettingsInterface wxsi(vmini.get());
 	IniLoader vmloader(vmini.get());
-	SettingsLoadWrapper vmwrapper(wxsi);
-	g_Conf->EmuOptions.LoadSave(vmwrapper);
-	g_Conf->EmuOptions.GS.LimitScalar = g_Conf->EmuOptions.Framerate.NominalScalar;
+	{
+		wxSettingsInterface wxsi(vmini.get());
+		SettingsLoadWrapper vmwrapper(wxsi);
+		g_Conf->EmuOptions.LoadSave(vmwrapper);
+		g_Conf->EmuOptions.GS.LimitScalar = g_Conf->EmuOptions.Framerate.NominalScalar;
+	}
 
 	if (g_Conf->EnablePresets)
 	{
@@ -1227,9 +1238,11 @@ static void SaveUiSettings()
 	sApp.GetRecentIsoManager().Add(g_Conf->CurrentIso);
 
 	AppIniSaver saver;
-	wxSettingsInterface wxsi(&saver.GetConfig());
-	SettingsSaveWrapper wrapper(wxsi);
-	g_Conf->LoadSave(saver, wrapper);
+	{
+		wxSettingsInterface wxsi(&saver.GetConfig());
+		SettingsSaveWrapper wrapper(wxsi);
+		g_Conf->LoadSave(saver, wrapper);
+	}
 	ConLog_LoadSaveSettings(saver);
 	SysTraceLog_LoadSaveSettings(saver);
 
@@ -1239,10 +1252,12 @@ static void SaveUiSettings()
 static void SaveVmSettings()
 {
 	std::unique_ptr<wxFileConfig> vmini(OpenFileConfig(GetVmSettingsFilename()));
-	wxSettingsInterface wxsi(vmini.get());
 	IniSaver vmsaver(vmini.get());
-	SettingsSaveWrapper vmwrapper(wxsi);
-	g_Conf->EmuOptions.LoadSave(vmwrapper);
+	{
+		wxSettingsInterface wxsi(vmini.get());
+		SettingsSaveWrapper vmwrapper(wxsi);
+		g_Conf->EmuOptions.LoadSave(vmwrapper);
+	}
 
 	sApp.DispatchVmSettingsEvent(vmsaver);
 }
