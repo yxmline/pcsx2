@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-09-28 23:55+0800\n"
-"PO-Revision-Date: 2021-09-28 23:59+0800\n"
+"POT-Creation-Date: 2021-10-08 08:54+0800\n"
+"PO-Revision-Date: 2021-10-08 11:03+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -21,10 +21,25 @@ msgid ""
 msgstr ""
 "没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保留。"
 
-#: pcsx2/CDVD/CDVD.cpp:2159
+#: pcsx2/CDVD/CDVD.cpp:2422
 msgid ""
 "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr "读写 NMV/MEC 文件失败，请检查你的 BIOS 与权限设置。"
+
+#: pcsx2/MemoryCardFile.cpp:193 pcsx2/MemoryCardFolder.h:581
+#, c-format
+msgid ""
+"The PS2-slot %d has been automatically disabled.  You can correct the "
+"problem\n"
+"and re-enable it at any time using Config:Memory cards from the main menu."
+msgstr ""
+"%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题并"
+"重新启用记忆卡。"
+
+#: pcsx2/MemoryCardFolder.h:586
+#, c-format
+msgid "(FolderMcd) Memory Card is full, could not add: %s"
+msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
 
 #: pcsx2/System.cpp:111
 msgid ""
@@ -36,20 +51,20 @@ msgstr ""
 "重编译器无法保留内部缓存所需的连续内存空间。此错误可能是由虚拟内存资源不足引"
 "起，如交换文件过小或未使用交换文件、某个其它程序正占用过大内存。"
 
-#: pcsx2/System.cpp:354
+#: pcsx2/System.cpp:320
 msgid ""
 "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close "
 "out some memory hogging background tasks and try again."
 msgstr ""
 "PCSX2 无法分配 PS2 虚拟机所需内存。请关闭一些占用内存的后台任务后重试。"
 
-#: pcsx2/gui/AppInit.cpp:158
+#: pcsx2/gui/AppInit.cpp:159
 msgid ""
 "Warning: Some of the configured PS2 recompilers failed to initialize and "
 "have been disabled:"
 msgstr "警告: 部分已配置的 PS2 重编译器初始化失败且已被禁用："
 
-#: pcsx2/gui/AppInit.cpp:189
+#: pcsx2/gui/AppInit.cpp:190
 msgid ""
 "Note: Recompilers are not necessary for PCSX2 to run, however they typically "
 "improve emulation speed substantially. You may have to manually re-enable "
@@ -58,7 +73,7 @@ msgstr ""
 "注意: 重编译器对 PCSX2 非必需，但是它们通常可大大提升模拟速度。如错误已解决，"
 "您可能要手动重新启用以上列出的重编译器。"
 
-#: pcsx2/gui/AppMain.cpp:81
+#: pcsx2/gui/AppMain.cpp:83
 msgid ""
 "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* "
 "obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't "
@@ -67,7 +82,7 @@ msgstr ""
 "PCSX2 需要一个 PS2 BIOS 才可以运行。由于法律问题，您必须从一台属于您的 PS2 实"
 "机中取得一个 BIOS 文件。请参考常见问题及教程以获取进一步的说明。"
 
-#: pcsx2/gui/AppMain.cpp:589
+#: pcsx2/gui/AppMain.cpp:602
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -214,14 +229,7 @@ msgid ""
 "1) Safest - No speed hacks. Most reliable, but possibly slow setting.\n"
 "2) Safe - Default. A few speed hacks known to provide boosts, with minimal "
 "to no side effects.\n"
-"3) Balanced - May help quad core CPUs.\n"
-"4) Aggressive - May help underpowered CPUs on less demanding games, but "
-"risks causing problems in other cases.\n"
-"5) Very Aggressive - May help underpowered CPUs on less demanding games, but "
-"is likely to cause problems in other cases.\n"
-"6) Mostly Harmful - Harsh application of speed hacks. May help a very small "
-"set of games that have unusual performance requirements, but have adverse "
-"effects on most others. Not recommended for underpowered PCs."
+"3) Balanced - May help quad core CPUs."
 msgstr ""
 "预设应用一些速度Hacks，可能会在性能不足的系统上提高速度或对性能需求非比寻常的"
 "游戏有助。取消选中此框可手动应用设置。\n"
@@ -229,13 +237,7 @@ msgstr ""
 "1） 最安全的 - 没有速度Hacks。最可靠，但可能设置缓慢。\n"
 "2） 安全 - 默认值。启用一些已知可以提升速度的速度Hacks，基本上没有或者有很少"
 "的副作用。\n"
-"3） 平衡 - 对四核心的CPU可能有帮助。\n"
-"4） 攻击性 - 可能对性能不足CPU运行要求较低的游戏有帮助，但在其他情况下可能会"
-"导致问题。\n"
-"5） 非常激进 - 可能对性能不足CPU运行要求较低的游戏有帮助，但可能会导致在其他"
-"情况下出现问题。\n"
-"6） 最有害 - 速度Hacks的苛刻应用。可能帮助一些有不寻常的性能要求的游戏，但对"
-"大多数其他有不利影响。不建议用于性能不足的 PC。"
+"3） 平衡 - 对四核心的CPU可能有帮助。"
 
 #: pcsx2/gui/IsoDropTarget.cpp:28
 msgid ""
@@ -258,22 +260,7 @@ msgstr ""
 "警告!! 单击确定将删除全部 %s 的设置且强制关闭应用程序，当前模拟进度将丢失。是"
 "否确定?"
 
-#: pcsx2/gui/MemoryCardFile.cpp:192 pcsx2/gui/MemoryCardFolder.h:581
-#, c-format
-msgid ""
-"The PS2-slot %d has been automatically disabled.  You can correct the "
-"problem\n"
-"and re-enable it at any time using Config:Memory cards from the main menu."
-msgstr ""
-"%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题并"
-"重新启用记忆卡。"
-
-#: pcsx2/gui/MemoryCardFolder.h:586
-#, c-format
-msgid "(FolderMcd) Memory Card is full, could not add: %s"
-msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
-
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:137
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:138
 msgid ""
 "Please select a valid BIOS.  If you are unable to make a valid selection "
 "then press Cancel to close the Configuration panel."
@@ -367,13 +354,19 @@ msgid ""
 "pausing the emulator."
 msgstr "在按 ESC 或挂起模拟器时彻底关闭 GS 窗口。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:53
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
 msgid ""
-"Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and "
-"others."
-msgstr "修复 WRC,武器种族传说,Tennis Court Smash和其他的图形错误。"
+"Known to affect following games:\n"
+" * Bleach Blade Battler\n"
+" * Growlanser II and III\n"
+" * Wizardry"
+msgstr ""
+"已知对以下游戏有效:\n"
+" * 死神刀刃战士\n"
+" * 梦幻骑士 II 和 III\n"
+" * 巫术"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:58
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:62
 msgid ""
 "Known to affect following games:\n"
 " * Digital Devil Saga (Fixes FMV and crashes)\n"
@@ -388,18 +381,6 @@ msgstr ""
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:67
 msgid ""
 "Known to affect following games:\n"
-" * Bleach Blade Battler\n"
-" * Growlanser II and III\n"
-" * Wizardry"
-msgstr ""
-"已知对以下游戏有效:\n"
-" * 死神刀刃战士\n"
-" * 梦幻骑士 II 和 III\n"
-" * 巫术"
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:72
-msgid ""
-"Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down "
 "Behind Enemy Lines\n"
 msgstr ""
@@ -408,7 +389,7 @@ msgstr ""
 "* 重装机兵(介绍 FMV)\n"
 "* 敌后阵线\n"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:77
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
@@ -418,7 +399,13 @@ msgstr ""
 " * Test Drive Unlimited (无限试驾 2)\n"
 " * Transformers (变形金刚)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:101
+msgid ""
+"Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and "
+"others."
+msgstr "修复 WRC,武器种族传说,Tennis Court Smash和其他的图形错误。"
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:113
 msgid ""
 "It's better to enable 'Automatic game fixes' at the main menu instead, and "
 "leave this page empty ('Automatic' means: selectively use specific tested "
@@ -428,7 +415,7 @@ msgstr ""
 "建议在主菜单启用 '自动应用游戏特殊修正'，而不建议在此手动设置 ('自动' 即针对"
 "特定游戏自动应用对应修正)。事实上，手动设置并不能提升性能，反而会降低性能。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:113
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:117
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -440,19 +427,19 @@ msgstr ""
 "\n"
 "最安全的方式是禁用任何游戏特殊修正。"
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:727
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:724
 #, c-format
 msgid ""
 "You are about to delete the formatted memory card '%s'. All data on this "
 "card will be lost!  Are you absolutely and quite positively sure?"
 msgstr "即将删除已格式化的记忆卡 '%s'。此记忆卡中所有数据将丢失! 是否确定?"
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:766
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:763
 msgid ""
 "Failed: Duplicate is only allowed to an empty PS2-Port or to the file system."
 msgstr "失败: 只允许复制到一个空的 PS2 端口或文件系统。"
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:805
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:802
 #, c-format
 msgid "Failed: Destination memory card '%s' is in use."
 msgstr "失败: 目标记忆卡 '%s' 正在被使用。"

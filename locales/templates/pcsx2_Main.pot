@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-09-28 23:55+0800\n"
+"POT-Creation-Date: 2021-10-08 08:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,11 +74,11 @@ msgstr ""
 msgid "Unrecognized ISO image file format"
 msgstr ""
 
-#: pcsx2/DEV9/Linux/Linux.cpp:206
+#: pcsx2/DEV9/Linux/Linux.cpp:207
 msgid "HDD Image File"
 msgstr ""
 
-#: pcsx2/DEV9/Linux/Linux.cpp:207 pcsx2/gui/MainMenuClicks.cpp:413
+#: pcsx2/DEV9/Linux/Linux.cpp:208 pcsx2/gui/MainMenuClicks.cpp:413
 #: pcsx2/gui/MainMenuClicks.cpp:434
 msgid "All Files (*.*)"
 msgstr ""
@@ -91,8 +91,42 @@ msgstr ""
 msgid "If loading from an ISO image, this error may be caused by an unsupported ISO image type or a bug in PCSX2 ISO image support."
 msgstr ""
 
-#: pcsx2/MTGS.cpp:918
+#: pcsx2/MTGS.cpp:913
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:320
+#, c-format
+msgid ""
+"Could not create a memory card: \n"
+"\n"
+"%s\n"
+"\n"
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:349
+#, c-format
+msgid ""
+"Access denied to memory card: \n"
+"\n"
+"%s\n"
+"\n"
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:786
+msgid "File name empty or too short"
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:792
+msgid "File name outside of required directory"
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:798 pcsx2/MemoryCardFile.cpp:803
+msgid "File name already exists"
+msgstr ""
+
+#: pcsx2/MemoryCardFile.cpp:810
+msgid "The Operating-System prevents this file from being created"
 msgstr ""
 
 #: pcsx2/Recording/InputRecording.cpp:387
@@ -133,7 +167,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr ""
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:689
+#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:690
 msgid "Cancel"
 msgstr ""
 
@@ -146,8 +180,32 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: pcsx2/SaveState.cpp:311
+#: pcsx2/SaveState.cpp:331
 msgid "The savestate cannot be loaded, as it appears to be corrupt or incomplete."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:662 pcsx2/SaveState.cpp:669
+msgid "Cannot load this savestate. The state is an unsupported version."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:677
+msgid "There is no active virtual machine state to download or save."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:760
+msgid "The savestate was not properly saved. The temporary file was created successfully but could not be moved to its final resting place."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:804
+msgid "This savestate cannot be loaded because it is not a valid gzip archive.  It may have been created by an older unsupported version of PCSX2, or it may be corrupted."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:864
+msgid "This file is not a valid PCSX2 savestate.  See the logfile for details."
+msgstr ""
+
+#: pcsx2/SaveState.cpp:884
+msgid "This savestate cannot be loaded due to missing critical components.  See the log file for details."
 msgstr ""
 
 #: pcsx2/SourceLog.cpp:97
@@ -306,244 +364,228 @@ msgstr ""
 msgid "PCSX2 Message"
 msgstr ""
 
-#: pcsx2/ZipTools/thread_gzip.cpp:85
-msgid "The savestate was not properly saved. The temporary file was created successfully but could not be moved to its final resting place."
-msgstr ""
-
-#: pcsx2/gui/AppConfig.cpp:942
+#: pcsx2/gui/AppConfig.cpp:899
 msgid "Safest (No hacks)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:943
+#: pcsx2/gui/AppConfig.cpp:900
 msgid "Safe (Default)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:944
+#: pcsx2/gui/AppConfig.cpp:901
 msgid "Balanced"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:945
-msgid "Aggressive"
-msgstr ""
-
-#: pcsx2/gui/AppConfig.cpp:946
-msgid "Very Aggressive"
-msgstr ""
-
-#: pcsx2/gui/AppConfig.cpp:947
-msgid "Mostly Harmful"
-msgstr ""
-
-#: pcsx2/gui/AppConfig.cpp:1113 pcsx2/gui/AppConfig.cpp:1119
+#: pcsx2/gui/AppConfig.cpp:1056 pcsx2/gui/AppConfig.cpp:1062
 msgid "Failed to overwrite existing settings file; permission was denied."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:55
+#: pcsx2/gui/AppInit.cpp:56
 msgid "SSE4 extensions are not available.  PCSX2 requires a cpu that supports the SSE4.1 instruction set."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:151
+#: pcsx2/gui/AppInit.cpp:152
 msgid "PCSX2 Recompiler Error(s)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:200
+#: pcsx2/gui/AppInit.cpp:201
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:210 pcsx2/gui/AppMain.cpp:290
+#: pcsx2/gui/AppInit.cpp:211 pcsx2/gui/AppMain.cpp:292
 msgid "IsoFile"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:211
+#: pcsx2/gui/AppInit.cpp:212
 msgid "displays this list of command line options"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:212
+#: pcsx2/gui/AppInit.cpp:213
 msgid "forces the program log/console to be visible"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:213
+#: pcsx2/gui/AppInit.cpp:214
 msgid "use fullscreen GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:214
+#: pcsx2/gui/AppInit.cpp:215
 msgid "use windowed GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:216
+#: pcsx2/gui/AppInit.cpp:217
 msgid "disables display of the gui while running games"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:217
+#: pcsx2/gui/AppInit.cpp:218
 msgid "when nogui - prompt before exiting on suspend"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:219
+#: pcsx2/gui/AppInit.cpp:220
 msgid "executes an ELF image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:220
+#: pcsx2/gui/AppInit.cpp:221
 msgid "executes an IRX image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:221
+#: pcsx2/gui/AppInit.cpp:222
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:222
+#: pcsx2/gui/AppInit.cpp:223
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:224
+#: pcsx2/gui/AppInit.cpp:225
 msgid "disables all speedhacks"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:225
+#: pcsx2/gui/AppInit.cpp:226
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:226
+#: pcsx2/gui/AppInit.cpp:227
 msgid "disables fast booting"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:227
+#: pcsx2/gui/AppInit.cpp:228
 msgid "passes the specified space-delimited string of launch arguments to the game"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:229
+#: pcsx2/gui/AppInit.cpp:230
 msgid "changes the configuration file path"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:230
+#: pcsx2/gui/AppInit.cpp:231
 msgid "specifies the PCSX2 configuration file to use"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:231
+#: pcsx2/gui/AppInit.cpp:232
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:232
+#: pcsx2/gui/AppInit.cpp:233
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:234
+#: pcsx2/gui/AppInit.cpp:235
 msgid "update options to ease profiling (debug)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:486
+#: pcsx2/gui/AppInit.cpp:487
 #, c-format
 msgid "Specified elf file %s does not exist!"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:513
+#: pcsx2/gui/AppInit.cpp:514
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:513 pcsx2/gui/AppInit.cpp:525
+#: pcsx2/gui/AppInit.cpp:514 pcsx2/gui/AppInit.cpp:526
 #, c-format
 msgid "Press OK to close %s."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:526
+#: pcsx2/gui/AppInit.cpp:527
 #, c-format
 msgid "%s Critical Error"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:687
+#: pcsx2/gui/AppInit.cpp:688
 msgid "OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:688
+#: pcsx2/gui/AppInit.cpp:689
 msgid "&OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:690
+#: pcsx2/gui/AppInit.cpp:691
 msgid "&Cancel"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:691
+#: pcsx2/gui/AppInit.cpp:692
 msgid "&Apply"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:692
+#: pcsx2/gui/AppInit.cpp:693
 msgid "&Next >"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:693
+#: pcsx2/gui/AppInit.cpp:694
 msgid "< &Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:694
+#: pcsx2/gui/AppInit.cpp:695
 msgid "&Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:695
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&Finish"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:696
+#: pcsx2/gui/AppInit.cpp:697
 msgid "&Yes"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:697
+#: pcsx2/gui/AppInit.cpp:698
 msgid "&No"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:698
+#: pcsx2/gui/AppInit.cpp:699
 msgid "Browse"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:699
+#: pcsx2/gui/AppInit.cpp:700
 msgid "&Save"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:700
+#: pcsx2/gui/AppInit.cpp:701
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:701 pcsx2/gui/MainFrame.cpp:604
+#: pcsx2/gui/AppInit.cpp:702 pcsx2/gui/MainFrame.cpp:604
 msgid "&Help"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:702
+#: pcsx2/gui/AppInit.cpp:703
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:703
+#: pcsx2/gui/AppInit.cpp:704
 msgid "&Window"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:705
+#: pcsx2/gui/AppInit.cpp:706
 msgid "Show about dialog."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:106 pcsx2/gui/AppMain.cpp:111
+#: pcsx2/gui/AppMain.cpp:108 pcsx2/gui/AppMain.cpp:113
 msgid "PS2 BIOS Error"
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:106
+#: pcsx2/gui/AppMain.cpp:108
 msgid "Press Ok to go to the BIOS Configuration Panel."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:129
+#: pcsx2/gui/AppMain.cpp:131
 msgid "Warning! Valid BIOS has not been selected. PCSX2 may be inoperable."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:302
+#: pcsx2/gui/AppMain.cpp:304
 #, c-format
 msgid "%s Commandline Options"
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:586
+#: pcsx2/gui/AppMain.cpp:599
 msgid "PCSX2 Unresponsive Thread"
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:593
+#: pcsx2/gui/AppMain.cpp:606
 msgid "Terminate"
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:975
+#: pcsx2/gui/AppMain.cpp:986
 msgid "Executing PS2 Virtual Machine..."
 msgstr ""
 
@@ -855,7 +897,7 @@ msgstr ""
 
 #: pcsx2/gui/Dialogs/ConvertMemoryCardDialog.cpp:125
 #: pcsx2/gui/Dialogs/CreateMemoryCardDialog.cpp:171
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:855
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:852
 #, c-format
 msgid "Error (%s)"
 msgstr ""
@@ -1140,44 +1182,44 @@ msgstr ""
 msgid "Preset:"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:195
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:198
 #, c-format
 msgid "General Settings - %s"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:205
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:208
 msgid "BIOS"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:206
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:209
 msgid "Folders"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:207
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:210
 msgid "EE/IOP"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:208
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:211
 msgid "VUs"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:209
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:212
 msgid "GS"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:210
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:213
 msgid "GS Window"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:211
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:214
 msgid "Speedhacks"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:212
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:215
 msgid "Game Fixes"
 msgstr ""
 
-#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:225
+#: pcsx2/gui/Dialogs/SysConfigDialog.cpp:228
 msgid "Language Selector"
 msgstr ""
 
@@ -1189,47 +1231,47 @@ msgstr ""
 msgid "Logs events as they are passed to the PS2 virtual machine."
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:325
+#: pcsx2/gui/GlobalCommands.cpp:326
 msgid "Exit PCSX2?"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:662
+#: pcsx2/gui/GlobalCommands.cpp:665
 msgid "Save state"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:663
+#: pcsx2/gui/GlobalCommands.cpp:666
 msgid "Saves the virtual machine state to the current slot."
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:670
+#: pcsx2/gui/GlobalCommands.cpp:673
 msgid "Load state"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:671
+#: pcsx2/gui/GlobalCommands.cpp:674
 msgid "Loads a virtual machine state from the current slot."
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:678
+#: pcsx2/gui/GlobalCommands.cpp:681
 msgid "Load State Backup"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:679
+#: pcsx2/gui/GlobalCommands.cpp:682
 msgid "Loads virtual machine state backup for current slot."
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:686 pcsx2/gui/MainFrame.cpp:65
+#: pcsx2/gui/GlobalCommands.cpp:689 pcsx2/gui/MainFrame.cpp:65
 msgid "Cycle to next slot"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:687
+#: pcsx2/gui/GlobalCommands.cpp:690
 msgid "Cycles the current save slot in +1 fashion!"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:694
+#: pcsx2/gui/GlobalCommands.cpp:697
 msgid "Cycle to prev slot"
 msgstr ""
 
-#: pcsx2/gui/GlobalCommands.cpp:695
+#: pcsx2/gui/GlobalCommands.cpp:698
 msgid "Cycles the current save slot in -1 fashion!"
 msgstr ""
 
@@ -1802,62 +1844,28 @@ msgstr ""
 msgid "Number of Frames"
 msgstr ""
 
-#: pcsx2/gui/MemoryCardFile.cpp:319
-#, c-format
-msgid ""
-"Could not create a memory card: \n"
-"\n"
-"%s\n"
-"\n"
-msgstr ""
-
-#: pcsx2/gui/MemoryCardFile.cpp:348
-#, c-format
-msgid ""
-"Access denied to memory card: \n"
-"\n"
-"%s\n"
-"\n"
-msgstr ""
-
-#: pcsx2/gui/MemoryCardFile.cpp:785
-msgid "File name empty or too short"
-msgstr ""
-
-#: pcsx2/gui/MemoryCardFile.cpp:791
-msgid "File name outside of required directory"
-msgstr ""
-
-#: pcsx2/gui/MemoryCardFile.cpp:797 pcsx2/gui/MemoryCardFile.cpp:802
-msgid "File name already exists"
-msgstr ""
-
-#: pcsx2/gui/MemoryCardFile.cpp:809
-msgid "The Operating-System prevents this file from being created"
-msgstr ""
-
 #: pcsx2/gui/Panels/BaseApplicableConfigPanel.cpp:103
 msgid "Cannot apply settings..."
 msgstr ""
 
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:103
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:104
 msgid "BIOS Search Path:"
 msgstr ""
 
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:104
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:105
 msgid "Select folder with PS2 BIOS roms"
 msgstr ""
 
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:111
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:112
 msgid "Click the Browse button to select a different folder where PCSX2 will look for PS2 BIOS roms."
 msgstr ""
 
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:113
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:213
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:114
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:214
 msgid "Refresh list"
 msgstr ""
 
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:115
+#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:116
 msgid "Select a BIOS rom:"
 msgstr ""
 
@@ -2056,7 +2064,7 @@ msgstr ""
 msgid "Wait for Vsync on refresh:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:203
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:205
 msgid "Invalid window dimensions specified: Size cannot contain non-numeric digits! >_<"
 msgstr ""
 
@@ -2065,10 +2073,50 @@ msgid "Gamefixes"
 msgstr ""
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:40
+msgid "FPU Multiply Hack - For Tales of Destiny."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:44
+msgid "FPU Negative Div Hack - For Gundam games."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:48
+msgid "Preload TLB hack to avoid tlb miss on Goemon"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:52
+msgid "Skip MPEG hack - Skips videos/FMVs in games to avoid game hanging/freezes."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:56
+msgid "OPH Flag hack - Try if your game freezes showing the same frame."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:61
+msgid "EE timing hack - Multi purpose hack. Try if all else fails."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
+msgid "Handle DMAC writes when it is busy."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
+msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+msgid "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
 msgid "VU Add Hack - Fixes Tri-Ace games boot crash."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:41
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:85
 msgid ""
 "Games that need this hack to boot:\n"
 " * Star Ocean 3\n"
@@ -2076,59 +2124,23 @@ msgid ""
 " * Valkyrie Profile 2"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:44
-msgid "FPU Multiply Hack - For Tales of Destiny."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:48
-msgid "FPU Negative Div Hack - For Gundam games."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:52
-msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:57
-msgid "EE timing hack - Multi purpose hack. Try if all else fails."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:62
-msgid "Skip MPEG hack - Skips videos/FMVs in games to avoid game hanging/freezes."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:66
-msgid "OPH Flag hack - Try if your game freezes showing the same frame."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:71
-msgid "Handle DMAC writes when it is busy."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
-msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:81
-msgid "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:85
-msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
-msgid "Preload TLB hack to avoid tlb miss on Goemon"
-msgstr ""
-
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:93
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
 msgid "VU I bit Hack avoid constant recompilation in some games (Scarface The World Is Yours, Crash Tag Team Racing)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:97
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
 msgid "VU Kickstart (Run ahead) to avoid sync problems when reading or writing VU registers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:108
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+msgid "VU Overflow hack to check for possible float overflows (Superman Returns)"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:100
+msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:112
 msgid "Enable manual game fixes [Not recommended]"
 msgstr ""
 
@@ -2144,192 +2156,192 @@ msgstr ""
 msgid "Warning: Trace logging is typically very slow, and is a leading cause of 'What happened to my FPS?' problems. :)"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:206
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:207
 msgid "Select folder with PS2 memory cards"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:415
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:508
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:416
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:509
 msgid "Eject"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:416
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:417
 msgid "Duplicate ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:417
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:418
 msgid "Rename ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:418
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:489
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:521
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:419
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:490
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:522
 msgid "Create ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:419
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:420
 msgid "Convert ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:431
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:432
 msgid "Card: "
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:490
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:528
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:491
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:529
 msgid "Create a new memory card."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:504
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:505
 msgid "Rename this memory card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:508
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:509
 msgid "Insert ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:509
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:510
 msgid "Eject the card from this port"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:509
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:510
 msgid "Insert this card to a port ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:513
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:514
 msgid "Create a duplicate of this memory card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:517
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:518
 msgid ""
 "Convert this memory card to or from a folder memory card. Creates a duplicate of the current memory card in the new type.\n"
 "\n"
 "Note: Only available when a memory card is formatted. Not available for PSX memory cards."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:521
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:522
 msgid "Delete"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:524
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:525
 msgid "Permanently delete this memory card from disk (all contents are lost)"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:526
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:527
 msgid "Create a new memory card and assign it to this Port."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:729
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:726
 msgid "Delete memory file?"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:758
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:768
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:775
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:789
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:755
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:765
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:772
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:786
 msgid "Duplicate memory card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:758
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:755
 msgid "Failed: Can only duplicate an existing card."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:775
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:772
 msgid ""
 "Select a name for the duplicate\n"
 "( '.ps2' will be added automatically)"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:788
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:785
 #, c-format
 msgid "Failed: %s"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:810
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:807
 msgid "Copy failed!"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:817
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:814
 #, c-format
 msgid "Memory card '%s' duplicated to '%s'."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:820
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:817
 msgid "Success"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:842
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:839
 #, c-format
 msgid ""
 "Select a new name for the memory card '%s'\n"
 "( '.ps2' will be added automatically)"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:844
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:856
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:870
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:841
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:853
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:867
 msgid "Rename memory card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:870
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:867
 msgid "Error: Rename could not be completed.\n"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:975
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:972
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:134
 #, c-format
 msgid "Port-%u / Multitap-%u--Port-1"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:976
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:973
 #: pcsx2/gui/Panels/MemoryCardListView.cpp:135
 #, c-format
 msgid "             Multitap-%u--Port-%u"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1001
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:998
 msgid "Empty"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1007
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1004
 #, c-format
 msgid "Select a target port for '%s'"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1008
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1005
 msgid "Insert card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1073
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1070
 msgid "&Eject card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1073
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1070
 msgid "&Insert card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1074
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1071
 msgid "D&uplicate card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1075
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1072
 msgid "&Rename card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1076
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1073
 msgid "&Delete card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1079
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1076
 msgid "&Convert card"
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1084
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1089
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1081
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1086
 msgid "&Create a new card ..."
 msgstr ""
 
-#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1094
+#: pcsx2/gui/Panels/MemoryCardListPanel.cpp:1091
 msgid "Re&fresh List"
 msgstr ""
 
@@ -2622,26 +2634,6 @@ msgstr ""
 msgid "Write time is %s %s."
 msgstr ""
 
-#: pcsx2/gui/SysState.cpp:365 pcsx2/gui/SysState.cpp:372
-msgid "Cannot load this savestate. The state is an unsupported version."
-msgstr ""
-
-#: pcsx2/gui/SysState.cpp:408
-msgid "There is no active virtual machine state to download or save."
-msgstr ""
-
-#: pcsx2/gui/SysState.cpp:597
-msgid "This savestate cannot be loaded because it is not a valid gzip archive.  It may have been created by an older unsupported version of PCSX2, or it may be corrupted."
-msgstr ""
-
-#: pcsx2/gui/SysState.cpp:657
-msgid "This file is not a valid PCSX2 savestate.  See the logfile for details."
-msgstr ""
-
-#: pcsx2/gui/SysState.cpp:677
-msgid "This savestate cannot be loaded due to missing critical components.  See the log file for details."
-msgstr ""
-
 #: pcsx2/gui/ThreadingDialogs.cpp:30
 msgid "Waiting for tasks..."
 msgstr ""
@@ -2658,15 +2650,15 @@ msgstr ""
 msgid "Includes idle event processing and some other uncommon event usages."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:85 pcsx2/ps2/BiosTools.cpp:153
+#: pcsx2/ps2/BiosTools.cpp:83 pcsx2/ps2/BiosTools.cpp:151
 msgid "The selected BIOS file is not a valid PS2 BIOS.  Please re-configure."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:266
+#: pcsx2/ps2/BiosTools.cpp:264
 msgid "The PS2 BIOS could not be loaded.  The BIOS has not been configured, or the configuration has been corrupted.  Please re-configure."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:273
+#: pcsx2/ps2/BiosTools.cpp:271
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr ""
 
