@@ -602,7 +602,7 @@ s32 cdvdCtrlTrayOpen()
 
 	cdvd.mediaChanged = true;
 
-	if (cdvd.Type > 0)
+	if (cdvd.Type > 0 || CDVDsys_GetSourceType() == CDVD_SourceType::NoDisc)
 	{
 		cdvd.Tray.cdvdActionSeconds = 3;
 		cdvd.Tray.trayState = CDVD_DISC_EJECT;
@@ -626,10 +626,10 @@ s32 cdvdCtrlTrayClose()
 	}
 	else
 	{
-		DevCon.WriteLn(Color_Green, L"Seeking media");
+		DevCon.WriteLn(Color_Green, L"Detecting media");
 		cdvd.Ready &= ~CDVD_DRIVE_READY;
 		cdvd.Status = CDVD_STATUS_SEEK;
-		cdvd.Tray.trayState = CDVD_DISC_SEEKING;
+		cdvd.Tray.trayState = CDVD_DISC_DETECTING;
 		cdvd.Tray.cdvdActionSeconds = 3;
 	}
 	cdvdDetectDisk();
@@ -662,6 +662,29 @@ static bool cdvdIsDVD()
 		return false;
 }
 
+static int cdvdTrayStateDetecting()
+{
+	if (cdvd.Tray.trayState == CDVD_DISC_DETECTING)
+		return CDVD_TYPE_DETCT;
+
+	if (cdvdIsDVD())
+	{
+		u32 layer1Start;
+		s32 dualType;
+
+		cdvdReadDvdDualInfo(&dualType, &layer1Start);
+
+		if (dualType > 0)
+			return CDVD_TYPE_DETCTDVDD;
+		else
+			return CDVD_TYPE_DETCTDVDS;
+	}
+
+	if(cdvd.Type != CDVD_TYPE_NODISC)
+		return CDVD_TYPE_DETCTCD;
+	else
+		return CDVD_TYPE_DETCT; //Detecting any kind of disc existing
+}
 static uint cdvdRotationalLatency(CDVD_MODE_TYPE mode)
 {
 	// CAV rotation is constant (minimum speed to maintain exact speed on outer dge
@@ -836,7 +859,7 @@ void cdvdNewDiskCB()
 		DevCon.WriteLn(Color_Green, L"Seeking new media");
 		cdvd.Ready &= ~CDVD_DRIVE_READY;
 		cdvd.Status = CDVD_STATUS_SEEK;
-		cdvd.Tray.trayState = CDVD_DISC_SEEKING;
+		cdvd.Tray.trayState = CDVD_DISC_DETECTING;
 		cdvd.Tray.cdvdActionSeconds = 3;
 	}
 }
@@ -1253,13 +1276,23 @@ void cdvdUpdateTrayState()
 			case CDVD_DISC_EJECT:
 				cdvdCtrlTrayClose();
 				break;
+			case CDVD_DISC_DETECTING:
+				DevCon.WriteLn(Color_Green, L"Seeking new disc");
+				cdvd.Tray.trayState = CDVD_DISC_SEEKING;
+				cdvd.Tray.cdvdActionSeconds = 2;
+				break;
 			case CDVD_DISC_SEEKING:
 			case CDVD_DISC_ENGAGED:
-				cdvd.mediaChanged = true;
-				DevCon.WriteLn(Color_Green, L"Media ready to read");
 				cdvd.Tray.trayState = CDVD_DISC_ENGAGED;
-				cdvd.Status = CDVD_STATUS_PAUSE;
 				cdvd.Ready |= CDVD_DRIVE_READY;
+				if (CDVDsys_GetSourceType() != CDVD_SourceType::NoDisc)
+				{
+					DevCon.WriteLn(Color_Green, L"Media ready to read");
+					cdvd.mediaChanged = true;
+					cdvd.Status = CDVD_STATUS_PAUSE;
+				}
+				else
+					cdvd.Status = CDVD_STATUS_STOP;
 				break;
 			}
 		}
@@ -1381,8 +1414,8 @@ u8 cdvdRead(u8 key)
 			}
 			else
 			{
-				CDVD_LOG("cdvdRead0F(Disc Type) Detecting %x", (cdvd.Tray.trayState == CDVD_DISC_SEEKING) ? 1 : 0);
-				return (cdvd.Tray.trayState == CDVD_DISC_SEEKING) ? 1 : 0; // Detecting Disc / No Disc
+				CDVD_LOG("cdvdRead0F(Disc Type) Detecting %x", (cdvd.Tray.trayState <= CDVD_DISC_SEEKING) ? cdvdTrayStateDetecting() : 0);
+				return (cdvd.Tray.trayState <= CDVD_DISC_SEEKING) ? cdvdTrayStateDetecting() : 0; // Detecting Disc / No Disc
 			}
 
 		case 0x13: // UNKNOWN
