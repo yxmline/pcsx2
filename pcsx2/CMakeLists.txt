@@ -77,7 +77,6 @@ if(WIN32)
 		GS/GS.rc
 		PAD/Windows/PAD.rc
 		SPU2/Windows/SPU2.rc
-		DEV9/Win32/DEV9ghzdrk.rc
 		USB/usb-pad/dx/versionproxy.rc
 		USB/usb-pad/raw/raw-config.rc
 		windows/wxResources.rc
@@ -321,30 +320,6 @@ set(pcsx2SPU2Headers
 	SPU2/WavFile.h
 )
 
-if(NOT WIN32)
-
-	# DEV9 UI sources
-	compile_gresources( pcsx2DEV9UISources
-	                    pcsx2DEV9UIXML
-	                    TYPE EMBED_C
-	                    RESOURCES "DEV9/Linux/dev9.ui"
-	                    PREFIX "/net/pcsx2/dev9"
-	                    COMPRESS_ALL
-	                    STRIPBLANKS_ALL
-	)
-
-	# DEV9 UI headers
-	compile_gresources( pcsx2DEV9UIHeaders
-	                    pcsx2DEV9UIXML
-	                    TYPE EMBED_H
-	                    RESOURCES "DEV9/Linux/dev9.ui"
-	                    PREFIX "/net/pcsx2/dev9"
-	                    COMPRESS_ALL
-	                    STRIPBLANKS_ALL
-	)
-
-endif()
-
 # DEV9 sources
 set(pcsx2DEV9Sources
 	DEV9/ATA/Commands/ATA_Command.cpp
@@ -370,13 +345,13 @@ set(pcsx2DEV9Sources
 	DEV9/PacketReader/IP/IP_Packet.cpp
 	DEV9/PacketReader/EthernetFrame.cpp
 	DEV9/PacketReader/NetLib.cpp
+	DEV9/ConfigUI.cpp
 	DEV9/smap.cpp
 	DEV9/DEV9.cpp
 	DEV9/DEV9Config.cpp
 	DEV9/flash.cpp
 	DEV9/pcap_io.cpp
 	DEV9/net.cpp
-	${pcsx2DEV9UISources}
 	)
 
 # DEV9 headers
@@ -404,7 +379,6 @@ set(pcsx2DEV9Headers
 	DEV9/pcap_io.h
 	DEV9/SimpleQueue.h
 	DEV9/smap.h
-	${pcsx2DEV9UIHeaders}
 	)
 
 # USBNull
@@ -781,11 +755,9 @@ if(WIN32)
 		DEV9/Win32/DEV9WinConfig.cpp
 		DEV9/Win32/pcap_io_win32.cpp
 		DEV9/Win32/tap-win32.cpp
-		DEV9/Win32/Win32.cpp
 	)
 	list(APPEND pcsx2DEV9Headers
 		DEV9/Win32/pcap_io_win32_funcs.h
-		DEV9/Win32/resource.h
 		DEV9/Win32/tap.h
 	)
 
@@ -859,7 +831,6 @@ else(WIN32)
 
 	list(APPEND pcsx2DEV9Sources
 		DEV9/Linux/Config.cpp
-		DEV9/Linux/Linux.cpp
 	)
 
 	list(APPEND pcsx2USBSources
