@@ -40,6 +40,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\baseclasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\libpng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
@@ -513,12 +514,6 @@
     <ClCompile Include="GS\Renderers\Common\GSVertexList.cpp" />
     <ClCompile Include="GS\Renderers\SW\GSVertexSW.cpp" />
     <ClCompile Include="GS\Renderers\Common\GSVertexTrace.cpp" />
-    <ClCompile Include="GS\Window\GSWnd.cpp" />
-    <ClCompile Include="GS\Window\GSWndDX.cpp" />
-    <ClCompile Include="GS\Window\GSWndEGL.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GS\Window\GSWndWGL.cpp" />
     <ClCompile Include="Utilities\FileUtils.cpp" />
     <ClCompile Include="Dump.cpp" />
     <ClCompile Include="x86\iMisc.cpp" />
@@ -885,10 +880,6 @@
     <ClInclude Include="GS\Renderers\Common\GSVertexList.h" />
     <ClInclude Include="GS\Renderers\SW\GSVertexSW.h" />
     <ClInclude Include="GS\Renderers\Common\GSVertexTrace.h" />
-    <ClInclude Include="GS\Window\GSWnd.h" />
-    <ClInclude Include="GS\Window\GSWndDX.h" />
-    <ClInclude Include="GS\Window\GSWndEGL.h" />
-    <ClInclude Include="GS\Window\GSWndWGL.h" />
     <ClInclude Include="GS\resource.h" />
     <ClInclude Include="IPU\IPUdma.h" />
     <ClInclude Include="Mdec.h" />
@@ -1170,6 +1161,9 @@
     </ProjectReference>
     <ProjectReference Include="..\common\common.vcxproj">
       <Project>{4639972e-424e-4e13-8b07-ca403c481346}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rdparty\glad\glad.vcxproj">
+      <Project>{c0293b32-5acf-40f0-aa6c-e6da6f3bf33a}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
