@@ -23,7 +23,7 @@
 int GSState::s_n = 0;
 
 GSState::GSState()
-	: m_version(6)
+	: m_version(7)
 	, m_gsc(NULL)
 	, m_skip(0)
 	, m_skip_offset(0)
@@ -87,7 +87,6 @@ GSState::GSState()
 
 	m_sssize += sizeof(m_version);
 	m_sssize += sizeof(m_env.PRIM);
-	m_sssize += sizeof(m_env.PRMODE);
 	m_sssize += sizeof(m_env.PRMODECONT);
 	m_sssize += sizeof(m_env.TEXCLUT);
 	m_sssize += sizeof(m_env.SCANMSK);
@@ -547,7 +546,7 @@ float GSState::GetTvRefreshRate()
 		case GSVideoMode::HDTV_1080I:
 			return 60;
 		default:
-			Console.Error("Unknown video mode. Please report: https://github.com/PCSX2/pcsx2/issues");
+			Console.Error("GS: Unknown video mode. Please report: https://github.com/PCSX2/pcsx2/issues");
 			return 0;
 	}
 
@@ -1433,37 +1432,38 @@ void GSState::FlushPrim()
 			ASSERT((int)unused < GSUtil::GetVertexCount(PRIM->PRIM));
 		}
 
-		if (GSLocalMemory::m_psm[m_context->FRAME.PSM].fmt < 3 && GSLocalMemory::m_psm[m_context->ZBUF.PSM].fmt < 3)
+		// If the PSM format of Z is invalid, but it is masked (no write) and ZTST is set to ALWAYS pass (no test, just allow)
+		// we can ignore the Z format, since it won't be used in the draw (Star Ocean 3 transitions)
+		const bool ignoreZ = m_context->ZBUF.ZMSK && m_context->TEST.ZTST == 1;
+
+		if (GSLocalMemory::m_psm[m_context->FRAME.PSM].fmt >= 3 || (GSLocalMemory::m_psm[m_context->ZBUF.PSM].fmt >= 3 && !ignoreZ))
 		{
-			m_vt.Update(m_vertex.buff, m_index.buff, m_vertex.tail, m_index.tail, GSUtil::GetPrimClass(PRIM->PRIM));
-
-			m_context->SaveReg();
-
-			try
-			{
-				Draw();
-			}
-			catch (GSRecoverableError&)
-			{
-				// could be an unsupported draw call
-			}
-			catch (const std::bad_alloc&)
-			{
-				// Texture Out Of Memory
-				PurgePool();
-				Console.Error("Memory allocation failure.");
-			}
-
-			m_context->RestoreReg();
-
-			m_perfmon.Put(GSPerfMon::Draw, 1);
-			m_perfmon.Put(GSPerfMon::Prim, m_index.tail / GSUtil::GetVertexCount(PRIM->PRIM));
+			Console.Warning("GS: Possible invalid draw, Frame PSM %x ZPSM %x", m_context->FRAME.PSM, m_context->ZBUF.PSM);
 		}
-		else
+
+		m_vt.Update(m_vertex.buff, m_index.buff, m_vertex.tail, m_index.tail, GSUtil::GetPrimClass(PRIM->PRIM));
+
+		m_context->SaveReg();
+
+		try
 		{
-			Console.Error("Draw skipped due to invalid guest framebuffer format."
-			              "Please report: https://github.com/PCSX2/pcsx2/issues");
+			Draw();
 		}
+		catch (GSRecoverableError&)
+		{
+			// could be an unsupported draw call
+		}
+		catch (const std::bad_alloc&)
+		{
+			// Texture Out Of Memory
+			PurgePool();
+			Console.Error("GS: Memory allocation failure.");
+		}
+
+		m_context->RestoreReg();
+
+		m_perfmon.Put(GSPerfMon::Draw, 1);
+		m_perfmon.Put(GSPerfMon::Prim, m_index.tail / GSUtil::GetVertexCount(PRIM->PRIM));
 
 		m_index.tail = 0;
 
@@ -2087,7 +2087,6 @@ int GSState::Freeze(freezeData* fd, bool sizeonly)
 
 	WriteState(data, &m_version);
 	WriteState(data, &m_env.PRIM);
-	WriteState(data, &m_env.PRMODE);
 	WriteState(data, &m_env.PRMODECONT);
 	WriteState(data, &m_env.TEXCLUT);
 	WriteState(data, &m_env.SCANMSK);
@@ -2174,7 +2173,10 @@ int GSState::Defrost(const freezeData* fd)
 	Reset();
 
 	ReadState(&m_env.PRIM, data);
-	ReadState(&m_env.PRMODE, data);
+
+	if (version <= 6)
+		data += sizeof(GIFRegPRMODE);
+
 	ReadState(&m_env.PRMODECONT, data);
 	ReadState(&m_env.TEXCLUT, data);
 	ReadState(&m_env.SCANMSK, data);
@@ -2201,6 +2203,10 @@ int GSState::Defrost(const freezeData* fd)
 		ReadState(&m_env.CTXT[i].XYOFFSET, data);
 		ReadState(&m_env.CTXT[i].TEX0, data);
 		ReadState(&m_env.CTXT[i].TEX1, data);
+
+		if (version <= 6)
+			data += sizeof(GIFRegTEX2);
+
 		ReadState(&m_env.CTXT[i].CLAMP, data);
 		ReadState(&m_env.CTXT[i].MIPTBP1, data);
 		ReadState(&m_env.CTXT[i].MIPTBP2, data);
@@ -3006,7 +3012,7 @@ GIFRegTEX0 GSState::GetTex0Layer(uint32 lod)
 			TEX0.TBW = m_context->MIPTBP2.TBW6;
 			break;
 		default:
-			Console.Error("Invalid guest lod setting. Please report: https://github.com/PCSX2/pcsx2/issues");
+			Console.Error("GS: Invalid guest lod setting. Please report: https://github.com/PCSX2/pcsx2/issues");
 	}
 
 	// Correct the texture size
