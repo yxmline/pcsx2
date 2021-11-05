@@ -639,21 +639,12 @@ set(pcsx2GSSources
 	GS/Renderers/HW/GSTextureCache.cpp
 	GS/Renderers/SW/GSDrawScanline.cpp
 	GS/Renderers/SW/GSDrawScanlineCodeGenerator.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x64.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x64.avx.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x64.avx2.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x86.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x86.avx.cpp
-	GS/Renderers/SW/GSDrawScanlineCodeGenerator.x86.avx2.cpp
+	GS/Renderers/SW/GSDrawScanlineCodeGenerator.all.cpp
+	GS/Renderers/SW/GSNewCodeGenerator.cpp
 	GS/Renderers/SW/GSRasterizer.cpp
 	GS/Renderers/SW/GSRendererSW.cpp
 	GS/Renderers/SW/GSSetupPrimCodeGenerator.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x64.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x64.avx.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x64.avx2.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x86.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x86.avx.cpp
-	GS/Renderers/SW/GSSetupPrimCodeGenerator.x86.avx2.cpp
+	GS/Renderers/SW/GSSetupPrimCodeGenerator.all.cpp
 	GS/Renderers/SW/GSTextureCacheSW.cpp
 	GS/Renderers/SW/GSTextureSW.cpp
 	GS/Renderers/OpenGL/GLLoader.cpp
@@ -679,7 +670,6 @@ set(pcsx2GSHeaders
 	GS/GSDrawingEnvironment.h
 	GS/GSDump.h
 	GS/GS_types.h
-	GS/GS_codegen.h
 	GS/GS.h
 	GS/GSLocalMemory.h
 	GS/GSLzma.h
@@ -712,11 +702,14 @@ set(pcsx2GSHeaders
 	GS/Renderers/HW/GSTextureCache.h
 	GS/Renderers/HW/GSVertexHW.h
 	GS/Renderers/SW/GSDrawScanlineCodeGenerator.h
+	GS/Renderers/SW/GSDrawScanlineCodeGenerator.all.h
 	GS/Renderers/SW/GSDrawScanline.h
+	GS/Renderers/SW/GSNewCodeGenerator.h
 	GS/Renderers/SW/GSRasterizer.h
 	GS/Renderers/SW/GSRendererSW.h
 	GS/Renderers/SW/GSScanlineEnvironment.h
 	GS/Renderers/SW/GSSetupPrimCodeGenerator.h
+	GS/Renderers/SW/GSSetupPrimCodeGenerator.all.h
 	GS/Renderers/SW/GSTextureCacheSW.h
 	GS/Renderers/SW/GSTextureSW.h
 	GS/Renderers/SW/GSVertexSW.h
