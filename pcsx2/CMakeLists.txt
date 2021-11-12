@@ -655,6 +655,7 @@ set(pcsx2GSSources
 	GS/Renderers/OpenGL/GSTextureCacheOGL.cpp
 	GS/Renderers/OpenGL/GSTextureOGL.cpp
 	GS/Window/GSSetting.cpp
+	GS/Window/GSwxDialog.cpp
 	)
 
 # GS headers
@@ -724,7 +725,7 @@ set(pcsx2GSHeaders
 	GS/Window/GSCaptureDlg.h
 	GS/Window/GSDialog.h
 	GS/Window/GSSetting.h
-	GS/Window/GSSettingsDlg.h
+	GS/Window/GSwxDialog.h
 	)
 
 if(WIN32)
@@ -789,6 +790,7 @@ if(WIN32)
 	)
 
 	list(APPEND pcsx2GSSources
+		GS/Renderers/DX11/D3D.cpp
 		GS/Renderers/DX11/GSDevice11.cpp
 		GS/Renderers/DX11/GSRendererDX11.cpp
 		GS/Renderers/DX11/GSTexture11.cpp
@@ -796,9 +798,9 @@ if(WIN32)
 		GS/Renderers/DX11/GSTextureFX11.cpp
 		GS/Window/GSCaptureDlg.cpp
 		GS/Window/GSDialog.cpp
-		GS/Window/GSSettingsDlg.cpp
 	)
 	list(APPEND pcsx2GSHeaders
+		GS/Renderers/DX11/D3D.h
 		GS/Renderers/DX11/GSDevice11.h
 		GS/Renderers/DX11/GSRendererDX11.h
 		GS/Renderers/DX11/GSTexture11.h
@@ -887,7 +889,6 @@ else(WIN32)
 
 	list(APPEND pcsx2GSSources
 		GS/GS_res.cpp
-		GS/Window/GSLinuxDialog.cpp
 	)
 
 	list(APPEND pcsx2GSHeaders
