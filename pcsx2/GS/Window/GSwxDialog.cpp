@@ -273,9 +273,9 @@ RendererTab::RendererTab(wxWindow* parent)
 
 	auto* hw_checks_box = new wxWrapSizer(wxHORIZONTAL);
 
-	m_ui.addCheckBox(hw_checks_box, "GPU Palette Conversion",          "paltex",                   IDC_PALTEX,          hw_prereq);
-	m_ui.addCheckBox(hw_checks_box, "Conservative Buffer Allocation",  "conservative_framebuffer", IDC_CONSERVATIVE_FB, hw_prereq);
 	m_ui.addCheckBox(hw_checks_box, "Accurate Destination Alpha Test", "accurate_date",            IDC_ACCURATE_DATE,   hw_prereq);
+	m_ui.addCheckBox(hw_checks_box, "Conservative Buffer Allocation",  "conservative_framebuffer", IDC_CONSERVATIVE_FB, hw_prereq);
+	m_ui.addCheckBox(hw_checks_box, "GPU Palette Conversion",          "paltex",                   IDC_PALTEX,          hw_prereq);
 
 	auto* hw_choice_grid = new wxFlexGridSizer(2, space, space);
 
@@ -341,8 +341,9 @@ HacksTab::HacksTab(wxWindow* parent)
 	const int space = wxSizerFlags().Border().GetBorderInPixels();
 	PaddedBoxSizer<wxBoxSizer> tab_box(wxVERTICAL);
 
-	auto* hacks_check_box = m_ui.addCheckBox(tab_box.inner, "Enable User Hacks", "UserHacks");
-	CheckboxPrereq hacks_check(hacks_check_box);
+	auto hw_prereq = [this]{ return m_is_hardware; };
+	auto* hacks_check_box = m_ui.addCheckBox(tab_box.inner, "Enable HW Hacks", "UserHacks", -1, hw_prereq);
+	auto hacks_prereq = [this, hacks_check_box]{ return m_is_hardware && hacks_check_box->GetValue(); };
 	auto upscale_hacks_prereq = [this, hacks_check_box]{ return !m_is_native_res && hacks_check_box->GetValue(); };
 
 	PaddedBoxSizer<wxStaticBoxSizer> rend_hacks_box   (wxVERTICAL, this, "Renderer Hacks");
@@ -352,13 +353,13 @@ HacksTab::HacksTab(wxWindow* parent)
 	auto* upscale_hacks_grid = new wxFlexGridSizer(3, space, space);
 
 	// Renderer Hacks
-	m_ui.addCheckBox(rend_hacks_grid, "Auto Flush",                "UserHacks_AutoFlush",                  IDC_AUTO_FLUSH_HW,     hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Fast Texture Invalidation", "UserHacks_DisablePartialInvalidation", IDC_FAST_TC_INV,       hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Disable Depth Emulation",   "UserHacks_DisableDepthSupport",        IDC_TC_DEPTH,          hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Frame Buffer Conversion",   "UserHacks_CPU_FB_Conversion",          IDC_CPU_FB_CONVERSION, hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Disable Safe Features",     "UserHacks_Disable_Safe_Features",      IDC_SAFE_FEATURES,     hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Memory Wrapping",           "wrap_gs_mem",                          IDC_MEMORY_WRAPPING,   hacks_check);
-	m_ui.addCheckBox(rend_hacks_grid, "Preload Frame Data",        "preload_frame_with_gs_data",           IDC_PRELOAD_GS,        hacks_check);
+	m_ui.addCheckBox(rend_hacks_grid, "Auto Flush",                "UserHacks_AutoFlush",                  IDC_AUTO_FLUSH_HW,     hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Frame Buffer Conversion",   "UserHacks_CPU_FB_Conversion",          IDC_CPU_FB_CONVERSION, hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Disable Depth Emulation",   "UserHacks_DisableDepthSupport",        IDC_TC_DEPTH,          hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Memory Wrapping",           "wrap_gs_mem",                          IDC_MEMORY_WRAPPING,   hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Disable Safe Features",     "UserHacks_Disable_Safe_Features",      IDC_SAFE_FEATURES,     hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Preload Frame Data",        "preload_frame_with_gs_data",           IDC_PRELOAD_GS,        hacks_prereq);
+	m_ui.addCheckBox(rend_hacks_grid, "Fast Texture Invalidation", "UserHacks_DisablePartialInvalidation", IDC_FAST_TC_INV,       hacks_prereq);
 
 	// Upscale
 	m_ui.addCheckBox(upscale_hacks_grid, "Align Sprite",   "UserHacks_align_sprite_X",  IDC_ALIGN_SPRITE,    upscale_hacks_prereq);
@@ -371,31 +372,31 @@ HacksTab::HacksTab(wxWindow* parent)
 	upscale_hack_choice_grid->AddGrowableCol(1);
 
 	// Renderer Hacks:
-	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Half Screen Fix:",     "UserHacks_HalfPixelOffset", &theApp.m_gs_generic_list, IDC_HALF_SCREEN_TS, hacks_check);
-	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Trilinear Filtering:", "UserHacks_TriFilter",       &theApp.m_gs_trifilter,    IDC_TRI_FILTER,     hacks_check);
+	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Half Screen Fix:",     "UserHacks_Half_Bottom_Override", &theApp.m_gs_generic_list, IDC_HALF_SCREEN_TS, hacks_prereq);
+	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Trilinear Filtering:", "UserHacks_TriFilter",            &theApp.m_gs_trifilter,    IDC_TRI_FILTER,     hacks_prereq);
 
 	// Skipdraw Range
 	add_label(this, rend_hack_choice_grid, "Skipdraw Range:", IDC_SKIPDRAWHACK);
 	auto* skip_box = new wxBoxSizer(wxHORIZONTAL);
-	skip_x_spin = m_ui.addSpin(skip_box, "UserHacks_SkipDraw_Offset", 0, 10000, 0, IDC_SKIPDRAWOFFSET, hacks_check);
-	skip_y_spin = m_ui.addSpin(skip_box, "UserHacks_SkipDraw",        0, 10000, 0, IDC_SKIPDRAWHACK,   hacks_check);
+	skip_x_spin = m_ui.addSpin(skip_box, "UserHacks_SkipDraw_Offset", 0, 10000, 0, IDC_SKIPDRAWOFFSET, hacks_prereq);
+	skip_y_spin = m_ui.addSpin(skip_box, "UserHacks_SkipDraw",        0, 10000, 0, IDC_SKIPDRAWHACK,   hacks_prereq);
 
 	rend_hack_choice_grid->Add(skip_box, wxSizerFlags().Expand());
 
 	// Upscale Hacks:
-	m_ui.addComboBoxAndLabel(upscale_hack_choice_grid, "Half-Pixel Offset:", "UserHacks_Half_Bottom_Override", &theApp.m_gs_offset_hack, IDC_OFFSETHACK,   upscale_hacks_prereq);
-	m_ui.addComboBoxAndLabel(upscale_hack_choice_grid, "Round Sprite:",      "UserHacks_round_sprite_offset",  &theApp.m_gs_hack,        IDC_ROUND_SPRITE, upscale_hacks_prereq);
+	m_ui.addComboBoxAndLabel(upscale_hack_choice_grid, "Half-Pixel Offset:", "UserHacks_HalfPixelOffset",     &theApp.m_gs_offset_hack, IDC_OFFSETHACK,   upscale_hacks_prereq);
+	m_ui.addComboBoxAndLabel(upscale_hack_choice_grid, "Round Sprite:",      "UserHacks_round_sprite_offset", &theApp.m_gs_hack,        IDC_ROUND_SPRITE, upscale_hacks_prereq);
 
 	// Texture Offsets
 	add_label(this, upscale_hack_choice_grid, "Texture Offsets:", IDC_TCOFFSETX);
 	auto* tex_off_box = new wxBoxSizer(wxHORIZONTAL);
 	add_label(this, tex_off_box, "X:", IDC_TCOFFSETX, wxSizerFlags().Centre());
 	tex_off_box->AddSpacer(space);
-	m_ui.addSpin(tex_off_box, "UserHacks_TCOffsetX", 0, 10000, 0, IDC_TCOFFSETX, hacks_check);
+	m_ui.addSpin(tex_off_box, "UserHacks_TCOffsetX", 0, 10000, 0, IDC_TCOFFSETX, hacks_prereq);
 	tex_off_box->AddSpacer(space);
 	add_label(this, tex_off_box, "Y:", IDC_TCOFFSETY, wxSizerFlags().Centre());
 	tex_off_box->AddSpacer(space);
-	m_ui.addSpin(tex_off_box, "UserHacks_TCOffsetY", 0, 10000, 0, IDC_TCOFFSETY, hacks_check);
+	m_ui.addSpin(tex_off_box, "UserHacks_TCOffsetY", 0, 10000, 0, IDC_TCOFFSETY, hacks_prereq);
 
 	upscale_hack_choice_grid->Add(tex_off_box, wxSizerFlags().Expand());
 
@@ -640,9 +641,9 @@ Dialog::Dialog()
 	book->AddPage(m_debug_panel, "Advanced");
 
 	m_top_box->Add(top_grid, wxSizerFlags().Centre());
-	m_top_box->Add(book, wxSizerFlags().Expand());
+	m_top_box->Add(book, wxSizerFlags(1).Expand());
 
-	padding->Add(m_top_box, wxSizerFlags().Expand().Border());
+	padding->Add(m_top_box, wxSizerFlags(1).Expand().Border());
 
 	m_top_box->Add(CreateStdDialogButtonSizer(wxOK | wxCANCEL), wxSizerFlags().Right());
 
@@ -780,6 +781,7 @@ void Dialog::Update()
 		bool is_hw = renderer == GSRendererType::OGL_HW || renderer == GSRendererType::DX1011_HW;
 		bool is_upscale = m_renderer_panel->m_internal_resolution->GetSelection() != 0;
 		m_hacks_panel->m_is_native_res = !is_hw || !is_upscale;
+		m_hacks_panel->m_is_hardware = is_hw;
 		m_renderer_panel->m_is_hardware = is_hw;
 		m_debug_panel->m_is_ogl_hw = renderer == GSRendererType::OGL_HW;
 
