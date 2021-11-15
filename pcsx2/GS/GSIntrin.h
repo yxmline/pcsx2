@@ -15,23 +15,30 @@
 
 #pragma once
 
-#include "GSScanlineEnvironment.h"
-#include "GS/Renderers/Common/GSFunctionMap.h"
-#include "GS/GSUtil.h"
+#include <xmmintrin.h>
+#include <emmintrin.h>
 
-class GSSetupPrimCodeGenerator : public GSCodeGenerator
+#include <tmmintrin.h>
+#include <smmintrin.h>
+
+#if _M_SSE >= 0x500
+	#include <immintrin.h>
+#endif
+
+#if !defined(_MSC_VER)
+// http://svn.reactos.org/svn/reactos/trunk/reactos/include/crt/mingw32/intrin_x86.h?view=markup
+
+static int _BitScanForward(unsigned long* const Index, const unsigned long Mask)
 {
-	void operator=(const GSSetupPrimCodeGenerator&);
+#if __has_builtin(__builtin_ctz)
+	if (Mask == 0)
+		return 0;
+	*Index = __builtin_ctz(Mask);
+	return 1;
+#else
+	__asm__("bsfl %k[Mask], %k[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask) : "cc");
+	return Mask ? 1 : 0;
+#endif
+}
 
-	GSScanlineSelector m_sel;
-	GSScanlineLocalData& m_local;
-	bool m_rip;
-
-	struct
-	{
-		u32 z : 1, f : 1, t : 1, c : 1;
-	} m_en;
-
-public:
-	GSSetupPrimCodeGenerator(void* param, u64 key, void* code, size_t maxsize);
-};
+#endif

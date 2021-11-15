@@ -15,8 +15,8 @@
 
 #include "PrecompiledHeader.h"
 #include "GSRenderer.h"
-#include "Host.h"
-#include "pcsx2/Config.h"
+#include "gui/AppConfig.h"
+#include "GS/GSGL.h"
 #if defined(__unix__)
 #include <X11/keysym.h>
 #endif
@@ -452,7 +452,7 @@ void GSRenderer::VSync(int field)
 
 		std::lock_guard<std::mutex> lock(m_pGSsetTitle_Crit);
 
-		strncpy(m_GStitleInfoBuffer, s.c_str(), countof(m_GStitleInfoBuffer) - 1);
+        strncpy(m_GStitleInfoBuffer, s.c_str(), std::size(m_GStitleInfoBuffer) - 1);
 
 		m_GStitleInfoBuffer[sizeof(m_GStitleInfoBuffer) - 1] = 0; // make sure null terminated even if text overflows
 	}

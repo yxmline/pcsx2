@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2021 PCSX2 Dev Team
+ *  Copyright (C) 2002-2021  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -13,25 +13,25 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// Base defines and typedefs that are needed by all code in PCSX2
+/// Prefer this over including Pcsx2Defs.h to make sure everyone gets all the defines, as missing defines fail silently
+
 #pragma once
 
-#include "GSScanlineEnvironment.h"
-#include "GS/Renderers/Common/GSFunctionMap.h"
-#include "GS/GSUtil.h"
+#include "common/Pcsx2Defs.h"
+#include "GS/config.h"
 
-class GSSetupPrimCodeGenerator : public GSCodeGenerator
-{
-	void operator=(const GSSetupPrimCodeGenerator&);
-
-	GSScanlineSelector m_sel;
-	GSScanlineLocalData& m_local;
-	bool m_rip;
-
-	struct
-	{
-		u32 z : 1, f : 1, t : 1, c : 1;
-	} m_en;
-
-public:
-	GSSetupPrimCodeGenerator(void* param, u64 key, void* code, size_t maxsize);
-};
+#if defined(__GNUC__)
+	// Convert gcc see define into GS (windows) define
+	#if defined(__AVX2__)
+		#define _M_SSE 0x501
+	#elif defined(__AVX__)
+		#define _M_SSE 0x500
+	#elif defined(__SSE4_1__)
+		#define _M_SSE 0x401
+	#else
+		#error PCSX2 requires compiling for at least SSE 4.1
+	#endif
+#elif _M_SSE < 0x401
+	#error PCSX2 requires compiling for at least SSE 4.1
+#endif

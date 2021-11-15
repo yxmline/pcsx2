@@ -17,10 +17,13 @@
 #include "GS.h"
 #include "GSDevice11.h"
 #include "GS/Renderers/DX11/D3D.h"
+#include "GS/GSExtra.h"
 #include "GS/GSUtil.h"
 #include "GS/resource.h"
 #include <fstream>
+#include <sstream>
 #include <VersionHelpers.h>
+#include <d3dcompiler.h>
 
 GSDevice11::GSDevice11()
 {
@@ -113,7 +116,7 @@ bool GSDevice11::Create(const WindowInfo& wi)
 
 	// device creation
 	{
-		uint32 flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+		u32 flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 
 		if(enable_debugging)
 			flags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -228,14 +231,14 @@ bool GSDevice11::Create(const WindowInfo& wi)
 
 	std::vector<char> shader;
 	theApp.LoadResource(IDR_CONVERT_FX, shader);
-	CreateShader(shader, "convert.fx", nullptr, "vs_main", sm_model.GetPtr(), &m_convert.vs, il_convert, countof(il_convert), m_convert.il.put());
+    CreateShader(shader, "convert.fx", nullptr, "vs_main", sm_model.GetPtr(), &m_convert.vs, il_convert, std::size(il_convert), m_convert.il.put());
 
 	ShaderMacro sm_convert(m_shader.model);
 	sm_convert.AddMacro("PS_SCALE_FACTOR", std::max(1, m_upscale_multiplier));
 
 	D3D_SHADER_MACRO* sm_convert_ptr = sm_convert.GetPtr();
 
-	for (size_t i = 0; i < countof(m_convert.ps); i++)
+	for (size_t i = 0; i < std::size(m_convert.ps); i++)
 	{
 		CreateShader(shader, "convert.fx", nullptr, format("ps_main%d", i).c_str(), sm_convert_ptr, m_convert.ps[i].put());
 	}
@@ -267,7 +270,7 @@ bool GSDevice11::Create(const WindowInfo& wi)
 	m_dev->CreateBuffer(&bd, nullptr, m_merge.cb.put());
 
 	theApp.LoadResource(IDR_MERGE_FX, shader);
-	for (size_t i = 0; i < countof(m_merge.ps); i++)
+	for (size_t i = 0; i < std::size(m_merge.ps); i++)
 	{
 		CreateShader(shader, "merge.fx", nullptr, format("ps_main%d", i).c_str(), sm_model.GetPtr(), m_merge.ps[i].put());
 	}
@@ -296,7 +299,7 @@ bool GSDevice11::Create(const WindowInfo& wi)
 	m_dev->CreateBuffer(&bd, nullptr, m_interlace.cb.put());
 
 	theApp.LoadResource(IDR_INTERLACE_FX, shader);
-	for (size_t i = 0; i < countof(m_interlace.ps); i++)
+	for (size_t i = 0; i < std::size(m_interlace.ps); i++)
 	{
 		CreateShader(shader, "interlace.fx", nullptr, format("ps_main%d", i).c_str(), sm_model.GetPtr(), m_interlace.ps[i].put());
 	}
@@ -536,7 +539,7 @@ void GSDevice11::ClearRenderTarget(GSTexture* t, const GSVector4& c)
 	m_ctx->ClearRenderTargetView(*(GSTexture11*)t, c.v);
 }
 
-void GSDevice11::ClearRenderTarget(GSTexture* t, uint32 c)
+void GSDevice11::ClearRenderTarget(GSTexture* t, u32 c)
 {
 	if (!t)
 		return;
@@ -552,7 +555,7 @@ void GSDevice11::ClearDepth(GSTexture* t)
 	m_ctx->ClearDepthStencilView(*(GSTexture11*)t, D3D11_CLEAR_DEPTH, 0.0f, 0);
 }
 
-void GSDevice11::ClearStencil(GSTexture* t, uint8 c)
+void GSDevice11::ClearStencil(GSTexture* t, u8 c)
 {
 	if (!t)
 		return;
@@ -714,7 +717,7 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 {
 	D3D11_BLEND_DESC bd = {};
 
-	uint8 write_mask = 0;
+	u8 write_mask = 0;
 
 	if (red)   write_mask |= D3D11_COLOR_WRITE_ENABLE_RED;
 	if (green) write_mask |= D3D11_COLOR_WRITE_ENABLE_GREEN;
@@ -776,7 +779,7 @@ void GSDevice11::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 
 
 
-	IASetVertexBuffer(vertices, sizeof(vertices[0]), countof(vertices));
+    IASetVertexBuffer(vertices, sizeof(vertices[0]), std::size(vertices));
 	IASetInputLayout(m_convert.il.get());
 	IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
@@ -1087,7 +1090,7 @@ bool GSDevice11::IAMapVertexBuffer(void** vertex, size_t stride, size_t count)
 		return false;
 	}
 
-	*vertex = (uint8*)m.pData + m_vertex.start * stride;
+	*vertex = (u8*)m.pData + m_vertex.start * stride;
 
 	m_vertex.count = count;
 	m_vertex.stride = stride;
@@ -1109,8 +1112,8 @@ void GSDevice11::IASetVertexBuffer(ID3D11Buffer* vb, size_t stride)
 		m_state.vb = vb;
 		m_state.vb_stride = stride;
 
-		const uint32 stride2 = stride;
-		const uint32 offset = 0;
+		const u32 stride2 = stride;
+		const u32 offset = 0;
 
 		m_ctx->IASetVertexBuffers(0, 1, &vb, &stride2, &offset);
 	}
@@ -1135,7 +1138,7 @@ void GSDevice11::IASetIndexBuffer(const void* index, size_t count)
 		memset(&bd, 0, sizeof(bd));
 
 		bd.Usage = D3D11_USAGE_DYNAMIC;
-		bd.ByteWidth = m_index.limit * sizeof(uint32);
+		bd.ByteWidth = m_index.limit * sizeof(u32);
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
@@ -1158,7 +1161,7 @@ void GSDevice11::IASetIndexBuffer(const void* index, size_t count)
 
 	if (SUCCEEDED(m_ctx->Map(m_ib.get(), 0, type, 0, &m)))
 	{
-		memcpy((uint8*)m.pData + m_index.start * sizeof(uint32), index, count * sizeof(uint32));
+		memcpy((u8*)m.pData + m_index.start * sizeof(u32), index, count * sizeof(u32));
 
 		m_ctx->Unmap(m_ib.get(), 0);
 	}
@@ -1294,10 +1297,10 @@ void GSDevice11::PSSetShader(ID3D11PixelShader* ps, ID3D11Buffer* ps_cb)
 void GSDevice11::PSUpdateShaderState()
 {
 	m_ctx->PSSetShaderResources(0, m_state.ps_sr_views.size(), m_state.ps_sr_views.data());
-	m_ctx->PSSetSamplers(0, countof(m_state.ps_ss), m_state.ps_ss);
+	m_ctx->PSSetSamplers(0, std::size(m_state.ps_ss), m_state.ps_ss);
 }
 
-void GSDevice11::OMSetDepthStencilState(ID3D11DepthStencilState* dss, uint8 sref)
+void GSDevice11::OMSetDepthStencilState(ID3D11DepthStencilState* dss, u8 sref)
 {
 	if (m_state.dss != dss || m_state.sref != sref)
 	{
@@ -1464,7 +1467,7 @@ void GSDevice11::CompileShader(const std::vector<char>& source, const char* fn, 
 		throw GSRecoverableError();
 }
 
-uint16 GSDevice11::ConvertBlendEnum(uint16 generic)
+u16 GSDevice11::ConvertBlendEnum(u16 generic)
 {
 	switch (generic)
 	{

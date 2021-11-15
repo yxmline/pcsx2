@@ -14,8 +14,9 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "GS/GS.h"
 #include "GSDevice.h"
+#include "GS/GSGL.h"
+#include "GS/GS.h"
 
 GSDevice::GSDevice()
 	: m_vsync(false)
@@ -126,7 +127,7 @@ GSTexture* GSDevice::FetchSurface(int type, int w, int h, int format)
 void GSDevice::PrintMemoryUsage()
 {
 #ifdef ENABLE_OGL_DEBUG
-	uint32 pool = 0;
+	u32 pool = 0;
 	for (auto t : m_pool)
 	{
 		if (t)
@@ -242,7 +243,7 @@ void GSDevice::Merge(GSTexture* sTex[3], GSVector4* sRect, GSVector4* dRect, con
 	{
 		GSTexture* tex[3] = {NULL, NULL, NULL};
 
-		for (size_t i = 0; i < countof(tex); i++)
+		for (size_t i = 0; i < std::size(tex); i++)
 		{
 			if (sTex[i] != NULL)
 			{
@@ -252,7 +253,7 @@ void GSDevice::Merge(GSTexture* sTex[3], GSVector4* sRect, GSVector4* dRect, con
 
 		DoMerge(tex, sRect, m_merge, dRect, PMODE, EXTBUF, c);
 
-		for (size_t i = 0; i < countof(tex); i++)
+		for (size_t i = 0; i < std::size(tex); i++)
 		{
 			if (tex[i] != sTex[i])
 			{
@@ -422,7 +423,7 @@ HWBlend GSDevice::GetBlend(size_t index)
 	return blend;
 }
 
-uint16 GSDevice::GetBlendFlags(size_t index) { return m_blendMap[index].flags; }
+u16 GSDevice::GetBlendFlags(size_t index) { return m_blendMap[index].flags; }
 
 // clang-format off
 

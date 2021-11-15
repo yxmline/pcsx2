@@ -13,8 +13,6 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GS_types.h"
-
 class alignas(16) GSVector4i
 {
 	static const GSVector4i m_xff[17];
@@ -54,15 +52,15 @@ public:
 		struct { int r, g, b, a; };
 		struct { int left, top, right, bottom; };
 		int v[4];
-		float f32[4];
-		int8 i8[16];
-		int16 i16[8];
-		int32 i32[4];
-		int64 i64[2];
-		uint8 u8[16];
-		uint16 u16[8];
-		uint32 u32[4];
-		uint64 u64[2];
+		float F32[4];
+		s8  I8[16];
+		s16 I16[8];
+		s32 I32[4];
+		s64 I64[2];
+		u8  U8[16];
+		u16 U16[8];
+		u32 U32[4];
+		u64 U64[2];
 		__m128i m;
 	};
 
@@ -286,14 +284,14 @@ public:
 
 	//
 
-	__forceinline uint32 rgba32() const
+	__forceinline u32 rgba32() const
 	{
 		GSVector4i v = *this;
 
 		v = v.ps32(v);
 		v = v.pu16(v);
 
-		return (uint32)store(v);
+		return (u32)store(v);
 	}
 
 	__forceinline GSVector4i sat_i8(const GSVector4i& a, const GSVector4i& b) const
@@ -1073,13 +1071,13 @@ public:
 #ifdef _M_AMD64
 
 	template <int i>
-	__forceinline GSVector4i insert64(int64 a) const
+	__forceinline GSVector4i insert64(s64 a) const
 	{
 		return GSVector4i(_mm_insert_epi64(m, a, i));
 	}
 
 	template <int i>
-	__forceinline int64 extract64() const
+	__forceinline s64 extract64() const
 	{
 		if (i == 0)
 			return GSVector4i::storeq(*this);
@@ -1321,8 +1319,8 @@ public:
 	{
 		GSVector4i v;
 
-		v = loadq((int64)ptr[extract8<src + 0>() & 0xf]);
-		v = v.insert64<1>((int64)ptr[extract8<src + 0>() >> 4]);
+		v = loadq((s64)ptr[extract8<src + 0>() & 0xf]);
+		v = v.insert64<1>((s64)ptr[extract8<src + 0>() >> 4]);
 
 		return v;
 	}
@@ -1332,8 +1330,8 @@ public:
 	{
 		GSVector4i v;
 
-		v = loadq((int64)ptr[extract8<src + 0>()]);
-		v = v.insert64<1>((int64)ptr[extract8<src + 1>()]);
+		v = loadq((s64)ptr[extract8<src + 0>()]);
+		v = v.insert64<1>((s64)ptr[extract8<src + 1>()]);
 
 		return v;
 	}
@@ -1343,8 +1341,8 @@ public:
 	{
 		GSVector4i v;
 
-		v = loadq((int64)ptr[extract16<src + 0>()]);
-		v = v.insert64<1>((int64)ptr[extract16<src + 1>()]);
+		v = loadq((s64)ptr[extract16<src + 0>()]);
+		v = v.insert64<1>((s64)ptr[extract16<src + 1>()]);
 
 		return v;
 	}
@@ -1354,8 +1352,8 @@ public:
 	{
 		GSVector4i v;
 
-		v = loadq((int64)ptr[extract32<src + 0>()]);
-		v = v.insert64<1>((int64)ptr[extract32<src + 1>()]);
+		v = loadq((s64)ptr[extract32<src + 0>()]);
+		v = v.insert64<1>((s64)ptr[extract32<src + 1>()]);
 
 		return v;
 	}
@@ -1365,8 +1363,8 @@ public:
 	{
 		GSVector4i v;
 
-		v = loadq((int64)ptr[extract64<0>()]);
-		v = v.insert64<1>((int64)ptr[extract64<1>()]);
+		v = loadq((s64)ptr[extract64<0>()]);
+		v = v.insert64<1>((s64)ptr[extract64<1>()]);
 
 		return v;
 	}
@@ -1422,7 +1420,7 @@ public:
 		dst[1] = gather8_4<8>(ptr);
 	}
 
-	__forceinline void gather8_8(const uint8* RESTRICT ptr, GSVector4i* RESTRICT dst) const
+	__forceinline void gather8_8(const u8* RESTRICT ptr, GSVector4i* RESTRICT dst) const
 	{
 		dst[0] = gather8_8<>(ptr);
 	}
@@ -1590,7 +1588,7 @@ public:
 
 #ifdef _M_AMD64
 
-	__forceinline static GSVector4i loadq(int64 i)
+	__forceinline static GSVector4i loadq(s64 i)
 	{
 		return GSVector4i(_mm_cvtsi64_si128(i));
 	}
@@ -1634,7 +1632,7 @@ public:
 
 #ifdef _M_AMD64
 
-	__forceinline static int64 storeq(const GSVector4i& v)
+	__forceinline static s64 storeq(const GSVector4i& v)
 	{
 		return _mm_cvtsi128_si64(v.m);
 	}
@@ -1670,7 +1668,14 @@ public:
 
 	__forceinline static void transpose(GSVector4i& a, GSVector4i& b, GSVector4i& c, GSVector4i& d)
 	{
-		_MM_TRANSPOSE4_SI128(a.m, b.m, c.m, d.m);
+		__m128 tmp0 = _mm_shuffle_ps(_mm_castsi128_ps(a.m), _mm_castsi128_ps(b.m), 0x44);
+		__m128 tmp2 = _mm_shuffle_ps(_mm_castsi128_ps(a.m), _mm_castsi128_ps(b.m), 0xEE);
+		__m128 tmp1 = _mm_shuffle_ps(_mm_castsi128_ps(c.m), _mm_castsi128_ps(d.m), 0x44);
+		__m128 tmp3 = _mm_shuffle_ps(_mm_castsi128_ps(c.m), _mm_castsi128_ps(d.m), 0xEE);
+		a = _mm_castps_si128(_mm_shuffle_ps(tmp0, tmp1, 0x88));
+		b = _mm_castps_si128(_mm_shuffle_ps(tmp0, tmp1, 0xDD));
+		c = _mm_castps_si128(_mm_shuffle_ps(tmp2, tmp3, 0x88));
+		d = _mm_castps_si128(_mm_shuffle_ps(tmp2, tmp3, 0xDD));
 	}
 
 	__forceinline static void sw4(GSVector4i& a, GSVector4i& b, GSVector4i& c, GSVector4i& d)

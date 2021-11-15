@@ -15,7 +15,6 @@
 
 #include "PrecompiledHeader.h"
 #include "GSPerfMon.h"
-#include "GS_types.h"
 
 GSPerfMon::GSPerfMon()
 	: m_frame(0)
@@ -40,7 +39,7 @@ void GSPerfMon::Put(counter_t c, double val)
 # else
 		clock_gettime(CLOCK_MONOTONIC, &ts);
 # endif
-		uint64 now = (uint64)ts.tv_sec * (uint64)1e6 + (uint64)ts.tv_nsec / (uint64)1e3;
+		u64 now = (u64)ts.tv_sec * (u64)1e6 + (u64)ts.tv_nsec / (u64)1e3;
 #else
 		clock_t now = clock();
 #endif
@@ -66,7 +65,7 @@ void GSPerfMon::Update()
 #ifndef DISABLE_PERF_MON
 	if (m_count > 0)
 	{
-		for (size_t i = 0; i < countof(m_counters); i++)
+		for (size_t i = 0; i < std::size(m_counters); i++)
 		{
 			m_stats[i] = m_counters[i] / m_count;
 		}
