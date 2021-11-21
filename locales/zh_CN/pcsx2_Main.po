@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-10-27 20:39+0800\n"
-"PO-Revision-Date: 2021-10-27 20:42+0800\n"
+"POT-Creation-Date: 2021-11-21 19:11+0800\n"
+"PO-Revision-Date: 2021-11-21 19:16+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -100,68 +100,68 @@ msgstr "自动"
 msgid "Network and HDD Settings"
 msgstr "网络和硬盘设置"
 
-#: pcsx2/DEV9/ConfigUI.cpp:124
+#: pcsx2/DEV9/ConfigUI.cpp:127
 msgid "Ethernet"
 msgstr "以太网"
 
-#: pcsx2/DEV9/ConfigUI.cpp:126 pcsx2/DEV9/ConfigUI.cpp:151
-#: pcsx2/DEV9/ConfigUI.cpp:175
+#: pcsx2/DEV9/ConfigUI.cpp:129 pcsx2/DEV9/ConfigUI.cpp:154
+#: pcsx2/DEV9/ConfigUI.cpp:178
 msgid "Enabled"
 msgstr "启用"
 
-#: pcsx2/DEV9/ConfigUI.cpp:145
+#: pcsx2/DEV9/ConfigUI.cpp:148
 msgid "Ethernet Device Type:"
 msgstr "以太网设备类型："
 
-#: pcsx2/DEV9/ConfigUI.cpp:146
+#: pcsx2/DEV9/ConfigUI.cpp:149
 msgid "Ethernet Device:"
 msgstr "以太网设备："
 
-#: pcsx2/DEV9/ConfigUI.cpp:147
+#: pcsx2/DEV9/ConfigUI.cpp:150
 msgid "Intercept DHCP:"
 msgstr "获取 DHCP："
 
-#: pcsx2/DEV9/ConfigUI.cpp:148
+#: pcsx2/DEV9/ConfigUI.cpp:151
 msgid "PS2 Address:"
 msgstr "PS2 地址："
 
-#: pcsx2/DEV9/ConfigUI.cpp:164
+#: pcsx2/DEV9/ConfigUI.cpp:167
 msgid "Subnet Mask:"
 msgstr "子网掩码："
 
-#: pcsx2/DEV9/ConfigUI.cpp:165
+#: pcsx2/DEV9/ConfigUI.cpp:168
 msgid "Gateway Address:"
 msgstr "默认网关："
 
-#: pcsx2/DEV9/ConfigUI.cpp:166
+#: pcsx2/DEV9/ConfigUI.cpp:169
 msgid "DNS1 Address:"
 msgstr "DNS1 地址："
 
-#: pcsx2/DEV9/ConfigUI.cpp:167
+#: pcsx2/DEV9/ConfigUI.cpp:170
 msgid "DNS2 Address:"
 msgstr "DNS2 地址："
 
-#: pcsx2/DEV9/ConfigUI.cpp:173
+#: pcsx2/DEV9/ConfigUI.cpp:176
 msgid "Hard Disk Drive"
 msgstr "硬盘驱动器"
 
-#: pcsx2/DEV9/ConfigUI.cpp:181
-msgid "HDD File:"
-msgstr "硬盘文件："
+#: pcsx2/DEV9/ConfigUI.cpp:180
+msgid "HDD File"
+msgstr "硬盘文件"
 
-#: pcsx2/DEV9/ConfigUI.cpp:182
+#: pcsx2/DEV9/ConfigUI.cpp:181
 msgid "HDD image file"
 msgstr "硬盘镜像文件"
 
-#: pcsx2/DEV9/ConfigUI.cpp:185
-msgid "HDD Size (GiB):"
-msgstr "硬盘尺寸 (GiB):"
+#: pcsx2/DEV9/ConfigUI.cpp:182
+msgid "HDD Size (GiB)"
+msgstr "硬盘尺寸 (GiB)"
 
-#: pcsx2/DEV9/ConfigUI.cpp:352
+#: pcsx2/DEV9/ConfigUI.cpp:360
 msgid "Please select an ethernet adapter or disable ethernet"
 msgstr "请选择以太网适配器或禁用以太网"
 
-#: pcsx2/DEV9/ConfigUI.cpp:354
+#: pcsx2/DEV9/ConfigUI.cpp:362
 msgid "Please specify a HDD file or disable the hard drive"
 msgstr "请指定硬盘文件或禁用硬盘驱动器"
 
@@ -181,11 +181,11 @@ msgstr "TAP"
 msgid "UNK"
 msgstr "UNK"
 
-#: pcsx2/Elfheader.cpp:164
+#: pcsx2/Elfheader.cpp:168
 msgid "Cannot load ELF binary image.  The file may be corrupt or incomplete."
 msgstr "无法加载 ELF 二进制映像。文件可能已损坏或不完整。"
 
-#: pcsx2/Elfheader.cpp:166
+#: pcsx2/Elfheader.cpp:170
 msgid ""
 "If loading from an ISO image, this error may be caused by an unsupported ISO "
 "image type or a bug in PCSX2 ISO image support."
@@ -193,7 +193,7 @@ msgstr ""
 "如从一个 ISO 镜像加载，此错误可能由一个不被支持的 ISO 镜像类型或 PCSX2 ISO 镜"
 "像支持的 bug 引起。"
 
-#: pcsx2/MTGS.cpp:909
+#: pcsx2/MTGS.cpp:911
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
 msgstr "MTGS 线程在等待 GS 打开时失去响应。"
 
@@ -252,7 +252,7 @@ msgid "New Input Recording"
 msgstr "新建输入录像"
 
 #: pcsx2/Recording/NewRecordingFrame.cpp:27
-#: pcsx2/gui/Debugger/DisassemblyDialog.cpp:240
+#: pcsx2/gui/Debugger/DisassemblyDialog.cpp:253
 msgid "panel"
 msgstr "面板"
 
@@ -284,7 +284,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr "需要浏览"
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:690
+#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:697
 msgid "Cancel"
 msgstr "取消"
 
@@ -305,26 +305,26 @@ msgstr "开始"
 msgid "Reset"
 msgstr "重置"
 
-#: pcsx2/SaveState.cpp:349
+#: pcsx2/SaveState.cpp:388
 msgid ""
 "The savestate cannot be loaded, as it appears to be corrupt or incomplete."
 msgstr "即时存档无法读取，文件可能已损坏或不完整。"
 
-#: pcsx2/SaveState.cpp:680 pcsx2/SaveState.cpp:687
+#: pcsx2/SaveState.cpp:719 pcsx2/SaveState.cpp:726
 msgid "Cannot load this savestate. The state is an unsupported version."
 msgstr "无法加载即时存档。存档为一个不支持的版本。"
 
-#: pcsx2/SaveState.cpp:695
+#: pcsx2/SaveState.cpp:734
 msgid "There is no active virtual machine state to download or save."
 msgstr "没有活动的虚拟机状态可供下载或保存。"
 
-#: pcsx2/SaveState.cpp:778
+#: pcsx2/SaveState.cpp:818
 msgid ""
 "The savestate was not properly saved. The temporary file was created "
 "successfully but could not be moved to its final resting place."
 msgstr "即时存档未正确保存。临时文件建立成功但无法移至存档位置。"
 
-#: pcsx2/SaveState.cpp:822
+#: pcsx2/SaveState.cpp:862
 msgid ""
 "This savestate cannot be loaded because it is not a valid gzip archive.  It "
 "may have been created by an older unsupported version of PCSX2, or it may be "
@@ -333,11 +333,11 @@ msgstr ""
 "此即时存档无法加载。它不是一个合法的 gzip 归档。它可能是由一个旧的不受支持的 "
 "PCSX2 版本创建的，或可能已损坏。"
 
-#: pcsx2/SaveState.cpp:882
+#: pcsx2/SaveState.cpp:922
 msgid "This file is not a valid PCSX2 savestate.  See the logfile for details."
 msgstr "这不是一个合法的 PCSX2 即时存档。请查看日志文件以获取详细信息。"
 
-#: pcsx2/SaveState.cpp:902
+#: pcsx2/SaveState.cpp:942
 msgid ""
 "This savestate cannot be loaded due to missing critical components.  See the "
 "log file for details."
@@ -504,202 +504,202 @@ msgstr "详细记录 CG 动画 (FMV) 解码硬件信息。"
 msgid "PCSX2 Message"
 msgstr "PCSX2 消息"
 
-#: pcsx2/gui/AppConfig.cpp:899
+#: pcsx2/gui/AppConfig.cpp:909
 msgid "Safest (No hacks)"
 msgstr "安全(无修正)"
 
-#: pcsx2/gui/AppConfig.cpp:900
+#: pcsx2/gui/AppConfig.cpp:910
 msgid "Safe (Default)"
 msgstr "安全(默认)"
 
-#: pcsx2/gui/AppConfig.cpp:901
+#: pcsx2/gui/AppConfig.cpp:911
 msgid "Balanced"
 msgstr "平衡"
 
-#: pcsx2/gui/AppConfig.cpp:1055 pcsx2/gui/AppConfig.cpp:1061
+#: pcsx2/gui/AppConfig.cpp:1065 pcsx2/gui/AppConfig.cpp:1071
 msgid "Failed to overwrite existing settings file; permission was denied."
 msgstr "覆盖已存在文件失败；权限被拒绝。"
 
-#: pcsx2/gui/AppInit.cpp:56
+#: pcsx2/gui/AppInit.cpp:63
 msgid ""
 "SSE4 extensions are not available.  PCSX2 requires a cpu that supports the "
 "SSE4.1 instruction set."
 msgstr "SSE4 扩展不可用。PCSX2 需要一个支持 SSE4.1 指令集的 CPU。"
 
-#: pcsx2/gui/AppInit.cpp:152
+#: pcsx2/gui/AppInit.cpp:159
 msgid "PCSX2 Recompiler Error(s)"
 msgstr "PCSX2 重编译器错误"
 
-#: pcsx2/gui/AppInit.cpp:201
+#: pcsx2/gui/AppInit.cpp:208
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr "全部选项仅对当前会话有效，不会被保存。\n"
 
-#: pcsx2/gui/AppInit.cpp:211 pcsx2/gui/AppMain.cpp:292
+#: pcsx2/gui/AppInit.cpp:218 pcsx2/gui/AppMain.cpp:292
 msgid "IsoFile"
 msgstr "ISO 文件"
 
-#: pcsx2/gui/AppInit.cpp:212
+#: pcsx2/gui/AppInit.cpp:219
 msgid "displays this list of command line options"
 msgstr "显示此命令行选项列表"
 
-#: pcsx2/gui/AppInit.cpp:213
+#: pcsx2/gui/AppInit.cpp:220
 msgid "forces the program log/console to be visible"
 msgstr "强制程序日志/控制台为可见状态"
 
-#: pcsx2/gui/AppInit.cpp:214
+#: pcsx2/gui/AppInit.cpp:221
 msgid "use fullscreen GS mode"
 msgstr "使用全屏幕 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:215
+#: pcsx2/gui/AppInit.cpp:222
 msgid "use windowed GS mode"
 msgstr "使用窗口化 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:217
+#: pcsx2/gui/AppInit.cpp:224
 msgid "disables display of the gui while running games"
 msgstr "运行游戏时不显示图形界面"
 
-#: pcsx2/gui/AppInit.cpp:218
+#: pcsx2/gui/AppInit.cpp:225
 msgid "when nogui - prompt before exiting on suspend"
 msgstr "当关闭图形界面时，在退出前暂停并提示"
 
-#: pcsx2/gui/AppInit.cpp:220
+#: pcsx2/gui/AppInit.cpp:227
 msgid "executes an ELF image"
 msgstr "执行一个 ELF 映像"
 
-#: pcsx2/gui/AppInit.cpp:221
+#: pcsx2/gui/AppInit.cpp:228
 msgid "executes an IRX image"
 msgstr "执行一个 IRX 映像"
 
-#: pcsx2/gui/AppInit.cpp:222
+#: pcsx2/gui/AppInit.cpp:229
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr "使用空白的 DVD 盘启动；用于进入 PS2 系统菜单"
 
-#: pcsx2/gui/AppInit.cpp:223
+#: pcsx2/gui/AppInit.cpp:230
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr "从 CDVD 插件启动 (将覆盖 IsoFile 参数)"
 
-#: pcsx2/gui/AppInit.cpp:225
+#: pcsx2/gui/AppInit.cpp:232
 msgid "disables all speedhacks"
 msgstr "取消所有速度 Hack"
 
-#: pcsx2/gui/AppInit.cpp:226
+#: pcsx2/gui/AppInit.cpp:233
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr "使用指定的逗号或管道符隔开的游戏特殊修正列表。"
 
-#: pcsx2/gui/AppInit.cpp:227
+#: pcsx2/gui/AppInit.cpp:234
 msgid "disables fast booting"
 msgstr "禁用快速启动"
 
-#: pcsx2/gui/AppInit.cpp:228
+#: pcsx2/gui/AppInit.cpp:235
 msgid ""
 "passes the specified space-delimited string of launch arguments to the game"
 msgstr "传送指定的以空白分隔的执行选项字串至游戏"
 
-#: pcsx2/gui/AppInit.cpp:230
+#: pcsx2/gui/AppInit.cpp:237
 msgid "changes the configuration file path"
 msgstr "更改配置文件路径"
 
-#: pcsx2/gui/AppInit.cpp:231
+#: pcsx2/gui/AppInit.cpp:238
 msgid "specifies the PCSX2 configuration file to use"
 msgstr "指定使用的 PCSX2 配置文件"
 
-#: pcsx2/gui/AppInit.cpp:232
+#: pcsx2/gui/AppInit.cpp:239
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr "强制 %s 启动首次运行向导"
 
-#: pcsx2/gui/AppInit.cpp:233
+#: pcsx2/gui/AppInit.cpp:240
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr "启用绿色模式 (需要管理员权限)"
 
-#: pcsx2/gui/AppInit.cpp:235
+#: pcsx2/gui/AppInit.cpp:242
 msgid "update options to ease profiling (debug)"
 msgstr "更新选项以简化分析 (调试)"
 
-#: pcsx2/gui/AppInit.cpp:487
+#: pcsx2/gui/AppInit.cpp:494
 #, c-format
 msgid "Specified elf file %s does not exist!"
 msgstr "指定的 elf 文件 %s 不存在！"
 
-#: pcsx2/gui/AppInit.cpp:514
+#: pcsx2/gui/AppInit.cpp:521
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr "PCSX2 错误: 硬件缺陷。"
 
-#: pcsx2/gui/AppInit.cpp:514 pcsx2/gui/AppInit.cpp:526
+#: pcsx2/gui/AppInit.cpp:521 pcsx2/gui/AppInit.cpp:533
 #, c-format
 msgid "Press OK to close %s."
 msgstr "请单击 \"确定\" 来关闭 %s。"
 
-#: pcsx2/gui/AppInit.cpp:527
+#: pcsx2/gui/AppInit.cpp:534
 #, c-format
 msgid "%s Critical Error"
 msgstr "%s 严重错误"
 
-#: pcsx2/gui/AppInit.cpp:688
+#: pcsx2/gui/AppInit.cpp:695
 msgid "OK"
 msgstr "确定"
 
-#: pcsx2/gui/AppInit.cpp:689
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: pcsx2/gui/AppInit.cpp:691
+#: pcsx2/gui/AppInit.cpp:698
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: pcsx2/gui/AppInit.cpp:692
+#: pcsx2/gui/AppInit.cpp:699
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: pcsx2/gui/AppInit.cpp:693
+#: pcsx2/gui/AppInit.cpp:700
 msgid "&Next >"
 msgstr "下一步(&N) >"
 
-#: pcsx2/gui/AppInit.cpp:694
+#: pcsx2/gui/AppInit.cpp:701
 msgid "< &Back"
 msgstr "< 上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:695
+#: pcsx2/gui/AppInit.cpp:702
 msgid "&Back"
 msgstr "上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:696
+#: pcsx2/gui/AppInit.cpp:703
 msgid "&Finish"
 msgstr "完成(&F)"
 
-#: pcsx2/gui/AppInit.cpp:697
+#: pcsx2/gui/AppInit.cpp:704
 msgid "&Yes"
 msgstr "是(&Y)"
 
-#: pcsx2/gui/AppInit.cpp:698
+#: pcsx2/gui/AppInit.cpp:705
 msgid "&No"
 msgstr "不(&N)"
 
-#: pcsx2/gui/AppInit.cpp:699
+#: pcsx2/gui/AppInit.cpp:706
 msgid "Browse"
 msgstr "浏览"
 
-#: pcsx2/gui/AppInit.cpp:700
+#: pcsx2/gui/AppInit.cpp:707
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: pcsx2/gui/AppInit.cpp:701
+#: pcsx2/gui/AppInit.cpp:708
 msgid "Save &As..."
 msgstr "另存为(&A)..."
 
-#: pcsx2/gui/AppInit.cpp:702 pcsx2/gui/MainFrame.cpp:610
+#: pcsx2/gui/AppInit.cpp:709 pcsx2/gui/MainFrame.cpp:610
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: pcsx2/gui/AppInit.cpp:703
+#: pcsx2/gui/AppInit.cpp:710
 msgid "&Home"
 msgstr "首页(&H)"
 
-#: pcsx2/gui/AppInit.cpp:704
+#: pcsx2/gui/AppInit.cpp:711
 msgid "&Window"
 msgstr "窗口(&W)"
 
-#: pcsx2/gui/AppInit.cpp:706
+#: pcsx2/gui/AppInit.cpp:713
 msgid "Show about dialog."
 msgstr "显示关于对话框。"
 
@@ -728,7 +728,7 @@ msgstr "PCSX2 线程没有响应"
 msgid "Terminate"
 msgstr "终止"
 
-#: pcsx2/gui/AppMain.cpp:986
+#: pcsx2/gui/AppMain.cpp:959
 msgid "Executing PS2 Virtual Machine..."
 msgstr "正在执行 PS2 虚拟机..."
 
@@ -1246,8 +1246,8 @@ msgid "%s First Time Configuration"
 msgstr "%s 首次运行向导"
 
 #: pcsx2/gui/Dialogs/GSDumpDialog.cpp:59 pcsx2/gui/Dialogs/GSDumpDialog.cpp:217
-#: pcsx2/gui/MainMenuClicks.cpp:194 pcsx2/gui/MainMenuClicks.cpp:256
-#: pcsx2/gui/MainMenuClicks.cpp:309 pcsx2/gui/MainMenuClicks.cpp:450
+#: pcsx2/gui/MainMenuClicks.cpp:190 pcsx2/gui/MainMenuClicks.cpp:252
+#: pcsx2/gui/MainMenuClicks.cpp:305 pcsx2/gui/MainMenuClicks.cpp:446
 msgid "GS Debugger"
 msgstr "GS调试"
 
@@ -1469,7 +1469,7 @@ msgid ""
 "please, thank you."
 msgstr "不可以将多个文件同时拖到到 %s 窗口上。一次只能拖动一个文件。"
 
-#: pcsx2/gui/IsoDropTarget.cpp:87 pcsx2/gui/MainMenuClicks.cpp:489
+#: pcsx2/gui/IsoDropTarget.cpp:87 pcsx2/gui/MainMenuClicks.cpp:485
 msgid "Confirm PS2 Reset"
 msgstr "确认 PS2 重启"
 
@@ -1758,8 +1758,8 @@ msgstr "播放"
 msgid "Playback an existing input recording."
 msgstr "播放一个现存的输入录制。"
 
-#: pcsx2/gui/MainFrame.cpp:526 pcsx2/gui/MainFrame.cpp:832
-#: pcsx2/gui/MainMenuClicks.cpp:1111 pcsx2/gui/MainMenuClicks.cpp:1116
+#: pcsx2/gui/MainFrame.cpp:526 pcsx2/gui/MainFrame.cpp:838
+#: pcsx2/gui/MainMenuClicks.cpp:1107 pcsx2/gui/MainMenuClicks.cpp:1112
 msgid "Configure Frame Advance"
 msgstr "配置帧步进"
 
@@ -1855,64 +1855,64 @@ msgstr "调试(&D)"
 msgid "Captu&re"
 msgstr "捕获(&R)"
 
-#: pcsx2/gui/MainFrame.cpp:607 pcsx2/gui/MainMenuClicks.cpp:675
+#: pcsx2/gui/MainFrame.cpp:607 pcsx2/gui/MainMenuClicks.cpp:671
 msgid "&Input Record"
 msgstr "录制输入(&I)"
 
-#: pcsx2/gui/MainFrame.cpp:756
+#: pcsx2/gui/MainFrame.cpp:762
 msgid "Paus&e"
 msgstr "暂停(&E)"
 
-#: pcsx2/gui/MainFrame.cpp:757
+#: pcsx2/gui/MainFrame.cpp:763
 msgid "Safely pauses emulation and preserves the PS2 state."
 msgstr "安全地暂停模拟并保留 PS2 状态。"
 
-#: pcsx2/gui/MainFrame.cpp:765
+#: pcsx2/gui/MainFrame.cpp:771
 msgid "R&esume"
 msgstr "恢复(&E)"
 
-#: pcsx2/gui/MainFrame.cpp:766
+#: pcsx2/gui/MainFrame.cpp:772
 msgid "Resumes the suspended emulation state."
 msgstr "从挂起的模拟状态中恢复。"
 
-#: pcsx2/gui/MainFrame.cpp:770
+#: pcsx2/gui/MainFrame.cpp:776
 msgid "Pause/Resume"
 msgstr "暂停/恢复"
 
-#: pcsx2/gui/MainFrame.cpp:771
+#: pcsx2/gui/MainFrame.cpp:777
 msgid "No emulation state is active; cannot suspend or resume."
 msgstr "模拟器未运行；无法挂起或恢复。"
 
-#: pcsx2/gui/MainFrame.cpp:786
+#: pcsx2/gui/MainFrame.cpp:792
 msgid "Use fast boot to skip PS2 startup and splash screens."
 msgstr "使用快速启动模式来跳过 PS2 启动画面。"
 
-#: pcsx2/gui/MainFrame.cpp:791
+#: pcsx2/gui/MainFrame.cpp:797
 msgid "Boot ISO"
 msgstr "启动 ISO"
 
-#: pcsx2/gui/MainFrame.cpp:794
+#: pcsx2/gui/MainFrame.cpp:800
 msgid "Boot CDVD"
 msgstr "启动 CDVD"
 
-#: pcsx2/gui/MainFrame.cpp:797 pcsx2/gui/MainFrame.cpp:800
+#: pcsx2/gui/MainFrame.cpp:803 pcsx2/gui/MainFrame.cpp:806
 msgid "Boot BIOS"
 msgstr "启动 BIOS"
 
-#: pcsx2/gui/MainMenuClicks.cpp:175
+#: pcsx2/gui/MainMenuClicks.cpp:171
 msgid "Reset all settings?"
 msgstr "重置所有设置?"
 
-#: pcsx2/gui/MainMenuClicks.cpp:208
+#: pcsx2/gui/MainMenuClicks.cpp:204
 msgid "Confirm ISO image change"
 msgstr "确认 ISO 镜像更改"
 
-#: pcsx2/gui/MainMenuClicks.cpp:213
+#: pcsx2/gui/MainMenuClicks.cpp:209
 msgid "Do you want to swap discs or boot the new image (via system reset)?"
 msgstr "是否要更换光盘或启动新光盘镜像 (通过系统复位)?"
 
-#: pcsx2/gui/MainMenuClicks.cpp:217 pcsx2/gui/MainMenuClicks.cpp:278
-#: pcsx2/gui/MainMenuClicks.cpp:330
+#: pcsx2/gui/MainMenuClicks.cpp:213 pcsx2/gui/MainMenuClicks.cpp:274
+#: pcsx2/gui/MainMenuClicks.cpp:326
 msgid ""
 "\n"
 "(Warning: The savestate accompanying the active input recording\n"
@@ -1922,79 +1922,79 @@ msgstr ""
 "（警告：主动输入记录附带的保存状态\n"
 "可能与新版不兼容）"
 
-#: pcsx2/gui/MainMenuClicks.cpp:220 pcsx2/gui/MainMenuClicks.cpp:281
-#: pcsx2/gui/MainMenuClicks.cpp:333
+#: pcsx2/gui/MainMenuClicks.cpp:216 pcsx2/gui/MainMenuClicks.cpp:277
+#: pcsx2/gui/MainMenuClicks.cpp:329
 msgid "Swap Disc"
 msgstr "更换光盘"
 
-#: pcsx2/gui/MainMenuClicks.cpp:270
+#: pcsx2/gui/MainMenuClicks.cpp:266
 msgid "Confirm disc change"
 msgstr "确认光盘更改"
 
-#: pcsx2/gui/MainMenuClicks.cpp:274
+#: pcsx2/gui/MainMenuClicks.cpp:270
 msgid "Do you want to swap discs or boot the new disc (via system reset)?"
 msgstr "是否要更换光盘或启动新光盘镜像 (通过系统复位)?"
 
-#: pcsx2/gui/MainMenuClicks.cpp:319
+#: pcsx2/gui/MainMenuClicks.cpp:315
 msgid "Confirm CDVD source change"
 msgstr "确认 CDVD 源更改"
 
-#: pcsx2/gui/MainMenuClicks.cpp:322
+#: pcsx2/gui/MainMenuClicks.cpp:318
 #, c-format
 msgid "You've selected to switch the CDVD source from %s to %s."
 msgstr "您已经选择将 CDVD 源由 %s 更换到 %s。"
 
-#: pcsx2/gui/MainMenuClicks.cpp:326
+#: pcsx2/gui/MainMenuClicks.cpp:322
 msgid "Do you want to swap discs or boot the new image (system reset)?"
 msgstr "您是否要更换光盘或启动新光盘镜像 (系统复位)?"
 
-#: pcsx2/gui/MainMenuClicks.cpp:401
+#: pcsx2/gui/MainMenuClicks.cpp:397
 #, c-format
 msgid "All Supported (%s)"
 msgstr "全部支持的 (%s)"
 
-#: pcsx2/gui/MainMenuClicks.cpp:404
+#: pcsx2/gui/MainMenuClicks.cpp:400
 #, c-format
 msgid "Disc Images (%s)"
 msgstr "光盘映像 (%s)"
 
-#: pcsx2/gui/MainMenuClicks.cpp:407
+#: pcsx2/gui/MainMenuClicks.cpp:403
 #, c-format
 msgid "Blockdumps (%s)"
 msgstr "块转储 (%s)"
 
-#: pcsx2/gui/MainMenuClicks.cpp:410
+#: pcsx2/gui/MainMenuClicks.cpp:406
 #, c-format
 msgid "Compressed (%s)"
 msgstr "压缩的 (%s)"
 
-#: pcsx2/gui/MainMenuClicks.cpp:413 pcsx2/gui/MainMenuClicks.cpp:434
+#: pcsx2/gui/MainMenuClicks.cpp:409 pcsx2/gui/MainMenuClicks.cpp:430
 msgid "All Files (*.*)"
 msgstr "全部文件 (*.*)"
 
-#: pcsx2/gui/MainMenuClicks.cpp:416
+#: pcsx2/gui/MainMenuClicks.cpp:412
 msgid "Select disc image, compressed disc image, or block-dump..."
 msgstr "选择光盘镜像、压缩的光盘镜像或块转储..."
 
-#: pcsx2/gui/MainMenuClicks.cpp:433
+#: pcsx2/gui/MainMenuClicks.cpp:429
 msgid "Select ELF file..."
 msgstr "选择 ELF 文件..."
 
-#: pcsx2/gui/MainMenuClicks.cpp:464
+#: pcsx2/gui/MainMenuClicks.cpp:460
 msgid "ISO file not found!"
 msgstr "ISO 文件未找到!"
 
-#: pcsx2/gui/MainMenuClicks.cpp:466
+#: pcsx2/gui/MainMenuClicks.cpp:462
 msgid "An error occurred while trying to open the file:"
 msgstr "打开文件时出现一个错误:"
 
-#: pcsx2/gui/MainMenuClicks.cpp:467
+#: pcsx2/gui/MainMenuClicks.cpp:463
 msgid ""
 "Error: The configured ISO file does not exist.  Click OK to select a new ISO "
 "source for CDVD."
 msgstr "错误: 配置的 ISO 文件不存在。单击确定为 CDVD 选择一个新的 ISO 源。"
 
-#: pcsx2/gui/MainMenuClicks.cpp:551
+#: pcsx2/gui/MainMenuClicks.cpp:547
 msgid ""
 "You have selected the following ISO image into PCSX2:\n"
 "\n"
@@ -2002,17 +2002,17 @@ msgstr ""
 "您已为 PCSX2 选择了以下 ISO 镜像:\n"
 "\n"
 
-#: pcsx2/gui/MainMenuClicks.cpp:571
+#: pcsx2/gui/MainMenuClicks.cpp:567
 msgid "Confirm clearing ISO list"
 msgstr "确认清除ISO列表"
 
-#: pcsx2/gui/MainMenuClicks.cpp:572
+#: pcsx2/gui/MainMenuClicks.cpp:568
 msgid ""
 "This will clear the ISO list. If an ISO is running it will remain in the "
 "list. Continue?"
 msgstr "这将清除ISO列表。如果ISO正在使用它将保留在列表中。是否继续？"
 
-#: pcsx2/gui/MainMenuClicks.cpp:662
+#: pcsx2/gui/MainMenuClicks.cpp:658
 msgid ""
 "Please be aware that PCSX2's input recording features are still very much a "
 "work-in-progress.\n"
@@ -2027,31 +2027,31 @@ msgstr ""
 "\n"
 "这些工具应该由您慎重的考虑后再启用。"
 
-#: pcsx2/gui/MainMenuClicks.cpp:759
+#: pcsx2/gui/MainMenuClicks.cpp:755
 msgid "Load State"
 msgstr "即时读档"
 
-#: pcsx2/gui/MainMenuClicks.cpp:773
+#: pcsx2/gui/MainMenuClicks.cpp:769
 msgid "Save State"
 msgstr "即时存档"
 
-#: pcsx2/gui/MainMenuClicks.cpp:842
+#: pcsx2/gui/MainMenuClicks.cpp:838
 msgid "Shutdown & Close Input Recording"
 msgstr "关机并关闭输入录制"
 
-#: pcsx2/gui/MainMenuClicks.cpp:1021
+#: pcsx2/gui/MainMenuClicks.cpp:1017
 msgid "Select a file"
 msgstr "选择文件"
 
-#: pcsx2/gui/MainMenuClicks.cpp:1065
+#: pcsx2/gui/MainMenuClicks.cpp:1061
 msgid "Select P2M2 record file."
 msgstr "选择P2M2记录文件..."
 
-#: pcsx2/gui/MainMenuClicks.cpp:1111
+#: pcsx2/gui/MainMenuClicks.cpp:1107
 msgid "Enter the number of frames to advance per advance"
 msgstr "输入每步帧数"
 
-#: pcsx2/gui/MainMenuClicks.cpp:1111
+#: pcsx2/gui/MainMenuClicks.cpp:1107
 msgid "Number of Frames"
 msgstr "帧数"
 
@@ -2913,17 +2913,17 @@ msgstr " (默认)"
 msgid "Includes idle event processing and some other uncommon event usages."
 msgstr "包含空闲事件处理及一些其它的非常见事件使用。"
 
-#: pcsx2/ps2/BiosTools.cpp:85 pcsx2/ps2/BiosTools.cpp:153
+#: pcsx2/ps2/BiosTools.cpp:82 pcsx2/ps2/BiosTools.cpp:150
 msgid "The selected BIOS file is not a valid PS2 BIOS.  Please re-configure."
 msgstr "选择的 BIOS 文件不是一个合法的 PS2 BIOS。请重新配置。"
 
-#: pcsx2/ps2/BiosTools.cpp:266
+#: pcsx2/ps2/BiosTools.cpp:264
 msgid ""
 "The PS2 BIOS could not be loaded.  The BIOS has not been configured, or the "
 "configuration has been corrupted.  Please re-configure."
 msgstr "PS2 BIOS 无法加载。BIOS 未被配置，或配置已被破坏。请重新配置。"
 
-#: pcsx2/ps2/BiosTools.cpp:273
+#: pcsx2/ps2/BiosTools.cpp:271
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr "配置的 BIOS 文件不存在。请重新配置。"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-10-27 20:39+0800\n"
+"POT-Creation-Date: 2021-11-21 19:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,68 +99,68 @@ msgstr ""
 msgid "Network and HDD Settings"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:124
+#: pcsx2/DEV9/ConfigUI.cpp:127
 msgid "Ethernet"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:126 pcsx2/DEV9/ConfigUI.cpp:151
-#: pcsx2/DEV9/ConfigUI.cpp:175
+#: pcsx2/DEV9/ConfigUI.cpp:129 pcsx2/DEV9/ConfigUI.cpp:154
+#: pcsx2/DEV9/ConfigUI.cpp:178
 msgid "Enabled"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:145
+#: pcsx2/DEV9/ConfigUI.cpp:148
 msgid "Ethernet Device Type:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:146
+#: pcsx2/DEV9/ConfigUI.cpp:149
 msgid "Ethernet Device:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:147
+#: pcsx2/DEV9/ConfigUI.cpp:150
 msgid "Intercept DHCP:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:148
+#: pcsx2/DEV9/ConfigUI.cpp:151
 msgid "PS2 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:164
+#: pcsx2/DEV9/ConfigUI.cpp:167
 msgid "Subnet Mask:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:165
+#: pcsx2/DEV9/ConfigUI.cpp:168
 msgid "Gateway Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:166
+#: pcsx2/DEV9/ConfigUI.cpp:169
 msgid "DNS1 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:167
+#: pcsx2/DEV9/ConfigUI.cpp:170
 msgid "DNS2 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:173
+#: pcsx2/DEV9/ConfigUI.cpp:176
 msgid "Hard Disk Drive"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:181
-msgid "HDD File:"
+#: pcsx2/DEV9/ConfigUI.cpp:180
+msgid "HDD File"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:182
+#: pcsx2/DEV9/ConfigUI.cpp:181
 msgid "HDD image file"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:185
-msgid "HDD Size (GiB):"
+#: pcsx2/DEV9/ConfigUI.cpp:182
+msgid "HDD Size (GiB)"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:352
+#: pcsx2/DEV9/ConfigUI.cpp:360
 msgid "Please select an ethernet adapter or disable ethernet"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:354
+#: pcsx2/DEV9/ConfigUI.cpp:362
 msgid "Please specify a HDD file or disable the hard drive"
 msgstr ""
 
@@ -180,15 +180,15 @@ msgstr ""
 msgid "UNK"
 msgstr ""
 
-#: pcsx2/Elfheader.cpp:164
+#: pcsx2/Elfheader.cpp:168
 msgid "Cannot load ELF binary image.  The file may be corrupt or incomplete."
 msgstr ""
 
-#: pcsx2/Elfheader.cpp:166
+#: pcsx2/Elfheader.cpp:170
 msgid "If loading from an ISO image, this error may be caused by an unsupported ISO image type or a bug in PCSX2 ISO image support."
 msgstr ""
 
-#: pcsx2/MTGS.cpp:909
+#: pcsx2/MTGS.cpp:911
 msgid "The MTGS thread has become unresponsive while waiting for GS to open."
 msgstr ""
 
@@ -239,7 +239,7 @@ msgid "New Input Recording"
 msgstr ""
 
 #: pcsx2/Recording/NewRecordingFrame.cpp:27
-#: pcsx2/gui/Debugger/DisassemblyDialog.cpp:240
+#: pcsx2/gui/Debugger/DisassemblyDialog.cpp:253
 msgid "panel"
 msgstr ""
 
@@ -264,7 +264,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr ""
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:690
+#: pcsx2/Recording/NewRecordingFrame.cpp:49 pcsx2/gui/AppInit.cpp:697
 msgid "Cancel"
 msgstr ""
 
@@ -285,31 +285,31 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: pcsx2/SaveState.cpp:349
+#: pcsx2/SaveState.cpp:388
 msgid "The savestate cannot be loaded, as it appears to be corrupt or incomplete."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:680 pcsx2/SaveState.cpp:687
+#: pcsx2/SaveState.cpp:719 pcsx2/SaveState.cpp:726
 msgid "Cannot load this savestate. The state is an unsupported version."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:695
+#: pcsx2/SaveState.cpp:734
 msgid "There is no active virtual machine state to download or save."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:778
+#: pcsx2/SaveState.cpp:818
 msgid "The savestate was not properly saved. The temporary file was created successfully but could not be moved to its final resting place."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:822
+#: pcsx2/SaveState.cpp:862
 msgid "This savestate cannot be loaded because it is not a valid gzip archive.  It may have been created by an older unsupported version of PCSX2, or it may be corrupted."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:882
+#: pcsx2/SaveState.cpp:922
 msgid "This file is not a valid PCSX2 savestate.  See the logfile for details."
 msgstr ""
 
-#: pcsx2/SaveState.cpp:902
+#: pcsx2/SaveState.cpp:942
 msgid "This savestate cannot be loaded due to missing critical components.  See the log file for details."
 msgstr ""
 
@@ -469,199 +469,199 @@ msgstr ""
 msgid "PCSX2 Message"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:899
+#: pcsx2/gui/AppConfig.cpp:909
 msgid "Safest (No hacks)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:900
+#: pcsx2/gui/AppConfig.cpp:910
 msgid "Safe (Default)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:901
+#: pcsx2/gui/AppConfig.cpp:911
 msgid "Balanced"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1055 pcsx2/gui/AppConfig.cpp:1061
+#: pcsx2/gui/AppConfig.cpp:1065 pcsx2/gui/AppConfig.cpp:1071
 msgid "Failed to overwrite existing settings file; permission was denied."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:56
+#: pcsx2/gui/AppInit.cpp:63
 msgid "SSE4 extensions are not available.  PCSX2 requires a cpu that supports the SSE4.1 instruction set."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:152
+#: pcsx2/gui/AppInit.cpp:159
 msgid "PCSX2 Recompiler Error(s)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:201
+#: pcsx2/gui/AppInit.cpp:208
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:211 pcsx2/gui/AppMain.cpp:292
+#: pcsx2/gui/AppInit.cpp:218 pcsx2/gui/AppMain.cpp:292
 msgid "IsoFile"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:212
+#: pcsx2/gui/AppInit.cpp:219
 msgid "displays this list of command line options"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:213
+#: pcsx2/gui/AppInit.cpp:220
 msgid "forces the program log/console to be visible"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:214
+#: pcsx2/gui/AppInit.cpp:221
 msgid "use fullscreen GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:215
+#: pcsx2/gui/AppInit.cpp:222
 msgid "use windowed GS mode"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:217
+#: pcsx2/gui/AppInit.cpp:224
 msgid "disables display of the gui while running games"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:218
+#: pcsx2/gui/AppInit.cpp:225
 msgid "when nogui - prompt before exiting on suspend"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:220
+#: pcsx2/gui/AppInit.cpp:227
 msgid "executes an ELF image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:221
+#: pcsx2/gui/AppInit.cpp:228
 msgid "executes an IRX image"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:222
+#: pcsx2/gui/AppInit.cpp:229
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:223
+#: pcsx2/gui/AppInit.cpp:230
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:225
+#: pcsx2/gui/AppInit.cpp:232
 msgid "disables all speedhacks"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:226
+#: pcsx2/gui/AppInit.cpp:233
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:227
+#: pcsx2/gui/AppInit.cpp:234
 msgid "disables fast booting"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:228
+#: pcsx2/gui/AppInit.cpp:235
 msgid "passes the specified space-delimited string of launch arguments to the game"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:230
+#: pcsx2/gui/AppInit.cpp:237
 msgid "changes the configuration file path"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:231
+#: pcsx2/gui/AppInit.cpp:238
 msgid "specifies the PCSX2 configuration file to use"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:232
+#: pcsx2/gui/AppInit.cpp:239
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:233
+#: pcsx2/gui/AppInit.cpp:240
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:235
+#: pcsx2/gui/AppInit.cpp:242
 msgid "update options to ease profiling (debug)"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:487
+#: pcsx2/gui/AppInit.cpp:494
 #, c-format
 msgid "Specified elf file %s does not exist!"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:514
+#: pcsx2/gui/AppInit.cpp:521
 msgid "PCSX2 Error: Hardware Deficiency."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:514 pcsx2/gui/AppInit.cpp:526
+#: pcsx2/gui/AppInit.cpp:521 pcsx2/gui/AppInit.cpp:533
 #, c-format
 msgid "Press OK to close %s."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:527
+#: pcsx2/gui/AppInit.cpp:534
 #, c-format
 msgid "%s Critical Error"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:688
+#: pcsx2/gui/AppInit.cpp:695
 msgid "OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:689
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:691
+#: pcsx2/gui/AppInit.cpp:698
 msgid "&Cancel"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:692
+#: pcsx2/gui/AppInit.cpp:699
 msgid "&Apply"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:693
+#: pcsx2/gui/AppInit.cpp:700
 msgid "&Next >"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:694
+#: pcsx2/gui/AppInit.cpp:701
 msgid "< &Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:695
+#: pcsx2/gui/AppInit.cpp:702
 msgid "&Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:696
+#: pcsx2/gui/AppInit.cpp:703
 msgid "&Finish"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:697
+#: pcsx2/gui/AppInit.cpp:704
 msgid "&Yes"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:698
+#: pcsx2/gui/AppInit.cpp:705
 msgid "&No"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:699
+#: pcsx2/gui/AppInit.cpp:706
 msgid "Browse"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:700
+#: pcsx2/gui/AppInit.cpp:707
 msgid "&Save"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:701
+#: pcsx2/gui/AppInit.cpp:708
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:702 pcsx2/gui/MainFrame.cpp:610
+#: pcsx2/gui/AppInit.cpp:709 pcsx2/gui/MainFrame.cpp:610
 msgid "&Help"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:703
+#: pcsx2/gui/AppInit.cpp:710
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:704
+#: pcsx2/gui/AppInit.cpp:711
 msgid "&Window"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:706
+#: pcsx2/gui/AppInit.cpp:713
 msgid "Show about dialog."
 msgstr ""
 
@@ -690,7 +690,7 @@ msgstr ""
 msgid "Terminate"
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:986
+#: pcsx2/gui/AppMain.cpp:959
 msgid "Executing PS2 Virtual Machine..."
 msgstr ""
 
@@ -1170,8 +1170,8 @@ msgid "%s First Time Configuration"
 msgstr ""
 
 #: pcsx2/gui/Dialogs/GSDumpDialog.cpp:59 pcsx2/gui/Dialogs/GSDumpDialog.cpp:217
-#: pcsx2/gui/MainMenuClicks.cpp:194 pcsx2/gui/MainMenuClicks.cpp:256
-#: pcsx2/gui/MainMenuClicks.cpp:309 pcsx2/gui/MainMenuClicks.cpp:450
+#: pcsx2/gui/MainMenuClicks.cpp:190 pcsx2/gui/MainMenuClicks.cpp:252
+#: pcsx2/gui/MainMenuClicks.cpp:305 pcsx2/gui/MainMenuClicks.cpp:446
 msgid "GS Debugger"
 msgstr ""
 
@@ -1389,7 +1389,7 @@ msgstr ""
 msgid "It is an error to drop multiple files onto a %s window.  One at a time please, thank you."
 msgstr ""
 
-#: pcsx2/gui/IsoDropTarget.cpp:87 pcsx2/gui/MainMenuClicks.cpp:489
+#: pcsx2/gui/IsoDropTarget.cpp:87 pcsx2/gui/MainMenuClicks.cpp:485
 msgid "Confirm PS2 Reset"
 msgstr ""
 
@@ -1672,8 +1672,8 @@ msgstr ""
 msgid "Playback an existing input recording."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:526 pcsx2/gui/MainFrame.cpp:832
-#: pcsx2/gui/MainMenuClicks.cpp:1111 pcsx2/gui/MainMenuClicks.cpp:1116
+#: pcsx2/gui/MainFrame.cpp:526 pcsx2/gui/MainFrame.cpp:838
+#: pcsx2/gui/MainMenuClicks.cpp:1107 pcsx2/gui/MainMenuClicks.cpp:1112
 msgid "Configure Frame Advance"
 msgstr ""
 
@@ -1769,155 +1769,155 @@ msgstr ""
 msgid "Captu&re"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:607 pcsx2/gui/MainMenuClicks.cpp:675
+#: pcsx2/gui/MainFrame.cpp:607 pcsx2/gui/MainMenuClicks.cpp:671
 msgid "&Input Record"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:756
+#: pcsx2/gui/MainFrame.cpp:762
 msgid "Paus&e"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:757
+#: pcsx2/gui/MainFrame.cpp:763
 msgid "Safely pauses emulation and preserves the PS2 state."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:765
+#: pcsx2/gui/MainFrame.cpp:771
 msgid "R&esume"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:766
+#: pcsx2/gui/MainFrame.cpp:772
 msgid "Resumes the suspended emulation state."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:770
+#: pcsx2/gui/MainFrame.cpp:776
 msgid "Pause/Resume"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:771
+#: pcsx2/gui/MainFrame.cpp:777
 msgid "No emulation state is active; cannot suspend or resume."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:786
+#: pcsx2/gui/MainFrame.cpp:792
 msgid "Use fast boot to skip PS2 startup and splash screens."
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:791
+#: pcsx2/gui/MainFrame.cpp:797
 msgid "Boot ISO"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:794
+#: pcsx2/gui/MainFrame.cpp:800
 msgid "Boot CDVD"
 msgstr ""
 
-#: pcsx2/gui/MainFrame.cpp:797 pcsx2/gui/MainFrame.cpp:800
+#: pcsx2/gui/MainFrame.cpp:803 pcsx2/gui/MainFrame.cpp:806
 msgid "Boot BIOS"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:175
+#: pcsx2/gui/MainMenuClicks.cpp:171
 msgid "Reset all settings?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:208
+#: pcsx2/gui/MainMenuClicks.cpp:204
 msgid "Confirm ISO image change"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:213
+#: pcsx2/gui/MainMenuClicks.cpp:209
 msgid "Do you want to swap discs or boot the new image (via system reset)?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:217 pcsx2/gui/MainMenuClicks.cpp:278
-#: pcsx2/gui/MainMenuClicks.cpp:330
+#: pcsx2/gui/MainMenuClicks.cpp:213 pcsx2/gui/MainMenuClicks.cpp:274
+#: pcsx2/gui/MainMenuClicks.cpp:326
 msgid ""
 "\n"
 "(Warning: The savestate accompanying the active input recording\n"
 "may not be compatible with the new source)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:220 pcsx2/gui/MainMenuClicks.cpp:281
-#: pcsx2/gui/MainMenuClicks.cpp:333
+#: pcsx2/gui/MainMenuClicks.cpp:216 pcsx2/gui/MainMenuClicks.cpp:277
+#: pcsx2/gui/MainMenuClicks.cpp:329
 msgid "Swap Disc"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:270
+#: pcsx2/gui/MainMenuClicks.cpp:266
 msgid "Confirm disc change"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:274
+#: pcsx2/gui/MainMenuClicks.cpp:270
 msgid "Do you want to swap discs or boot the new disc (via system reset)?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:319
+#: pcsx2/gui/MainMenuClicks.cpp:315
 msgid "Confirm CDVD source change"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:322
+#: pcsx2/gui/MainMenuClicks.cpp:318
 #, c-format
 msgid "You've selected to switch the CDVD source from %s to %s."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:326
+#: pcsx2/gui/MainMenuClicks.cpp:322
 msgid "Do you want to swap discs or boot the new image (system reset)?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:401
+#: pcsx2/gui/MainMenuClicks.cpp:397
 #, c-format
 msgid "All Supported (%s)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:404
+#: pcsx2/gui/MainMenuClicks.cpp:400
 #, c-format
 msgid "Disc Images (%s)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:407
+#: pcsx2/gui/MainMenuClicks.cpp:403
 #, c-format
 msgid "Blockdumps (%s)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:410
+#: pcsx2/gui/MainMenuClicks.cpp:406
 #, c-format
 msgid "Compressed (%s)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:413 pcsx2/gui/MainMenuClicks.cpp:434
+#: pcsx2/gui/MainMenuClicks.cpp:409 pcsx2/gui/MainMenuClicks.cpp:430
 msgid "All Files (*.*)"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:416
+#: pcsx2/gui/MainMenuClicks.cpp:412
 msgid "Select disc image, compressed disc image, or block-dump..."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:433
+#: pcsx2/gui/MainMenuClicks.cpp:429
 msgid "Select ELF file..."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:464
+#: pcsx2/gui/MainMenuClicks.cpp:460
 msgid "ISO file not found!"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:466
+#: pcsx2/gui/MainMenuClicks.cpp:462
 msgid "An error occurred while trying to open the file:"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:467
+#: pcsx2/gui/MainMenuClicks.cpp:463
 msgid "Error: The configured ISO file does not exist.  Click OK to select a new ISO source for CDVD."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:551
+#: pcsx2/gui/MainMenuClicks.cpp:547
 msgid ""
 "You have selected the following ISO image into PCSX2:\n"
 "\n"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:571
+#: pcsx2/gui/MainMenuClicks.cpp:567
 msgid "Confirm clearing ISO list"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:572
+#: pcsx2/gui/MainMenuClicks.cpp:568
 msgid "This will clear the ISO list. If an ISO is running it will remain in the list. Continue?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:662
+#: pcsx2/gui/MainMenuClicks.cpp:658
 msgid ""
 "Please be aware that PCSX2's input recording features are still very much a work-in-progress.\n"
 "As a result, there may be unforeseen bugs, performance implications and instability with certain games.\n"
@@ -1925,31 +1925,31 @@ msgid ""
 "These tools are provided as-is and should be enabled under your own discretion."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:759
+#: pcsx2/gui/MainMenuClicks.cpp:755
 msgid "Load State"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:773
+#: pcsx2/gui/MainMenuClicks.cpp:769
 msgid "Save State"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:842
+#: pcsx2/gui/MainMenuClicks.cpp:838
 msgid "Shutdown & Close Input Recording"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:1021
+#: pcsx2/gui/MainMenuClicks.cpp:1017
 msgid "Select a file"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:1065
+#: pcsx2/gui/MainMenuClicks.cpp:1061
 msgid "Select P2M2 record file."
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:1111
+#: pcsx2/gui/MainMenuClicks.cpp:1107
 msgid "Enter the number of frames to advance per advance"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:1111
+#: pcsx2/gui/MainMenuClicks.cpp:1107
 msgid "Number of Frames"
 msgstr ""
 
@@ -2759,15 +2759,15 @@ msgstr ""
 msgid "Includes idle event processing and some other uncommon event usages."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:85 pcsx2/ps2/BiosTools.cpp:153
+#: pcsx2/ps2/BiosTools.cpp:82 pcsx2/ps2/BiosTools.cpp:150
 msgid "The selected BIOS file is not a valid PS2 BIOS.  Please re-configure."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:266
+#: pcsx2/ps2/BiosTools.cpp:264
 msgid "The PS2 BIOS could not be loaded.  The BIOS has not been configured, or the configuration has been corrupted.  Please re-configure."
 msgstr ""
 
-#: pcsx2/ps2/BiosTools.cpp:273
+#: pcsx2/ps2/BiosTools.cpp:271
 msgid "The configured BIOS file does not exist.  Please re-configure."
 msgstr ""
 

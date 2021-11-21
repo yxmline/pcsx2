@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2021-10-27 20:39+0800\n"
+"POT-Creation-Date: 2021-11-21 19:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "There is not enough virtual memory available, or necessary virtual memory mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 
-#: pcsx2/CDVD/CDVD.cpp:2602
+#: pcsx2/CDVD/CDVD.cpp:2662
 msgid "Failed to read/write NVM/MEC file. Check your BIOS setup/permission settings."
 msgstr ""
 
@@ -46,15 +46,15 @@ msgstr ""
 msgid "This recompiler was unable to reserve contiguous memory required for internal caches.  This error can be caused by low virtual memory resources, such as a small or disabled swapfile, or by another program that is hogging a lot of memory."
 msgstr ""
 
-#: pcsx2/System.cpp:320
+#: pcsx2/System.cpp:328
 msgid "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close out some memory hogging background tasks and try again."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:159
+#: pcsx2/gui/AppInit.cpp:166
 msgid "Warning: Some of the configured PS2 recompilers failed to initialize and have been disabled:"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:190
+#: pcsx2/gui/AppInit.cpp:197
 msgid "Note: Recompilers are not necessary for PCSX2 to run, however they typically improve emulation speed substantially. You may have to manually re-enable the recompilers listed above, if you resolve the errors."
 msgstr ""
 
@@ -158,7 +158,7 @@ msgstr ""
 msgid "This action will reset the existing PS2 virtual machine state; all current progress will be lost.  Are you sure?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:174
+#: pcsx2/gui/MainMenuClicks.cpp:170
 #, c-format
 msgid ""
 "This command clears %s settings and allows you to re-run the First-Time Wizard.  You will need to manually restart %s after this operation.\n"
