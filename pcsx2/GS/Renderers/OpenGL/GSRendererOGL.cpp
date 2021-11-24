@@ -122,7 +122,8 @@ void GSRendererOGL::EmulateZbuffer()
 	if (m_context->TEST.ZTE)
 	{
 		m_om_dssel.ztst = m_context->TEST.ZTST;
-		m_om_dssel.zwe = !m_context->ZBUF.ZMSK;
+		// AA1: Z is not written on lines since coverage is always less than 0x80.
+		m_om_dssel.zwe = (m_context->ZBUF.ZMSK || (PRIM->AA1 && m_vt.m_primclass == GS_LINE_CLASS)) ? 0 : 1;
 	}
 	else
 	{
@@ -462,17 +463,20 @@ void GSRendererOGL::EmulateChannelShuffle(GSTexture** rt, const GSTextureCache::
 void GSRendererOGL::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 {
 	GSDeviceOGL* dev = (GSDeviceOGL*)m_dev;
-	const GIFRegALPHA& ALPHA = m_context->ALPHA;
-	bool sw_blending = false;
 
-	// No blending so early exit
-	if (!(PRIM->ABE || m_env.PABE.PABE || (PRIM->AA1 && m_vt.m_primclass == GS_LINE_CLASS)))
+	// AA1: Don't enable blending on AA1, not yet implemented on hardware mode,
+	// it requires coverage sample so it's safer to turn it off instead.
+	const bool aa1 = PRIM->AA1 && (m_vt.m_primclass == GS_LINE_CLASS);
+
+	// No blending or coverage anti-aliasing so early exit
+	if (!(PRIM->ABE || m_env.PABE.PABE || aa1))
 	{
 		dev->OMSetBlendState();
 		return;
 	}
 
 	// Compute the blending equation to detect special case
+	const GIFRegALPHA& ALPHA = m_context->ALPHA;
 	const u8 blend_index = u8(((ALPHA.A * 3 + ALPHA.B) * 3 + ALPHA.C) * 3 + ALPHA.D);
 	const int blend_flag = m_dev->GetBlendFlags(blend_index);
 
@@ -489,6 +493,7 @@ void GSRendererOGL::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 
 	// Warning no break on purpose
 	// Note: the [[fallthrough]] attribute tell compilers not to complain about not having breaks.
+	bool sw_blending = false;
 	switch (m_sw_blending)
 	{
 		case ACC_BLEND_ULTRA:
