@@ -25907,7 +25907,7 @@ SLPM-66358:
   name: "Shinobido Takumi"
   region: "NTSC-J"
   clampModes:
-    eeClampMode: 3
+    eeClampMode: 3 # Fixes crash after main menu. 
 SLPM-66359:
   name: "Mutsu-boshi Kirari - Hoshifuru Miyako"
   region: "NTSC-J"
