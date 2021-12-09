@@ -17,7 +17,6 @@
 #include "GSRendererDX11.h"
 
 GSRendererDX11::GSRendererDX11()
-	: GSRendererHW(new GSTextureCache11(this))
 {
 	m_sw_blending = theApp.GetConfigI("accurate_blending_unit_d3d11");
 
@@ -317,7 +316,7 @@ void GSRendererDX11::EmulateChannelShuffle(GSTexture** rt, const GSTextureCache:
 				m_channel_shuffle = false;
 			}
 		}
-		else if ((tex->m_texture->GetType() == GSTexture::DepthStencil) && !(tex->m_32_bits_fmt))
+		else if ((tex->m_texture->GetType() == GSTexture::Type::DepthStencil) && !(tex->m_32_bits_fmt))
 		{
 			// So far 2 games hit this code path. Urban Chaos and Tales of Abyss
 			// UC: will copy depth to green channel
@@ -653,7 +652,7 @@ void GSRendererDX11::EmulateTextureSampler(const GSTextureCache::Source* tex)
 		// Require a float conversion if the texure is a depth otherwise uses Integral scaling
 		if (psm.depth)
 		{
-			m_ps_sel.depth_fmt = (tex->m_texture->GetType() != GSTexture::DepthStencil) ? 3 : 1;
+			m_ps_sel.depth_fmt = (tex->m_texture->GetType() != GSTexture::Type::DepthStencil) ? 3 : 1;
 		}
 
 		// Shuffle is a 16 bits format, so aem is always required
@@ -700,7 +699,7 @@ void GSRendererDX11::EmulateTextureSampler(const GSTextureCache::Source* tex)
 		}
 
 		// Depth format
-		if (tex->m_texture->GetType() == GSTexture::DepthStencil)
+		if (tex->m_texture->GetType() == GSTexture::Type::DepthStencil)
 		{
 			// Require a float conversion if the texure is a depth format
 			m_ps_sel.depth_fmt = (psm.bpp == 16) ? 2 : 1;
@@ -890,10 +889,10 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 	{
 		const GSVector4 dRect(ComputeBoundingBox(rtscale, rtsize));
 		const GSVector4 sRect = dRect / GSVector4(rtsize.x, rtsize.y).xyxy();
-		hdr_rt = dev->CreateRenderTarget(rtsize.x, rtsize.y, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		hdr_rt = dev->CreateRenderTarget(rtsize.x, rtsize.y, GSTexture::Format::FloatColor);
 		// Warning: StretchRect must be called before BeginScene otherwise
 		// vertices will be overwritten. Trust me you don't want to do that.
-		dev->StretchRect(rt, sRect, hdr_rt, dRect, ShaderConvert_COPY, false);
+		dev->StretchRect(rt, sRect, hdr_rt, dRect, ShaderConvert::COPY, false);
 	}
 
 	if (m_ps_sel.dfmt == 1)
@@ -1180,7 +1179,7 @@ void GSRendererDX11::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sou
 	{
 		const GSVector4 dRect(ComputeBoundingBox(rtscale, rtsize));
 		const GSVector4 sRect = dRect / GSVector4(rtsize.x, rtsize.y).xyxy();
-		dev->StretchRect(hdr_rt, sRect, rt, dRect, ShaderConvert_MOD_256, false);
+		dev->StretchRect(hdr_rt, sRect, rt, dRect, ShaderConvert::MOD_256, false);
 
 		dev->Recycle(hdr_rt);
 	}

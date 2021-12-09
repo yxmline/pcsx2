@@ -18,7 +18,6 @@
 
 
 GSRendererOGL::GSRendererOGL()
-	: GSRendererHW(new GSTextureCacheOGL(this))
 {
 	m_sw_blending = theApp.GetConfigI("accurate_blending_unit");
 	if (theApp.GetConfigB("UserHacks"))
@@ -337,7 +336,7 @@ void GSRendererOGL::EmulateChannelShuffle(GSTexture** rt, const GSTextureCache::
 				m_channel_shuffle = false;
 			}
 		}
-		else if ((tex->m_texture->GetType() == GSTexture::DepthStencil) && !(tex->m_32_bits_fmt))
+		else if ((tex->m_texture->GetType() == GSTexture::Type::DepthStencil) && !(tex->m_32_bits_fmt))
 		{
 			// So far 2 games hit this code path. Urban Chaos and Tales of Abyss
 			// UC: will copy depth to green channel
@@ -746,7 +745,7 @@ void GSRendererOGL::EmulateTextureSampler(const GSTextureCache::Source* tex)
 		// Require a float conversion if the texure is a depth otherwise uses Integral scaling
 		if (psm.depth)
 		{
-			m_ps_sel.depth_fmt = (tex->m_texture->GetType() != GSTexture::DepthStencil) ? 3 : 1;
+			m_ps_sel.depth_fmt = (tex->m_texture->GetType() != GSTexture::Type::DepthStencil) ? 3 : 1;
 			m_vs_sel.int_fst = !PRIM->FST; // select float/int coordinate
 		}
 
@@ -760,7 +759,9 @@ void GSRendererOGL::EmulateTextureSampler(const GSTextureCache::Source* tex)
 		// The purpose of texture shuffle is to move color channel. Extra interpolation is likely a bad idea.
 		bilinear &= m_vt.IsLinear();
 
-		vs_cb.TextureOffset = RealignTargetTextureCoordinate(tex);
+		GSVector4 half_offset = RealignTargetTextureCoordinate(tex);
+		vs_cb.Texture_Scale_Offset.z = half_offset.x;
+		vs_cb.Texture_Scale_Offset.w = half_offset.y;
 	}
 	else if (tex->m_target)
 	{
@@ -799,7 +800,7 @@ void GSRendererOGL::EmulateTextureSampler(const GSTextureCache::Source* tex)
 		}
 
 		// Depth format
-		if (tex->m_texture->GetType() == GSTexture::DepthStencil)
+		if (tex->m_texture->GetType() == GSTexture::Type::DepthStencil)
 		{
 			// Require a float conversion if the texure is a depth format
 			m_ps_sel.depth_fmt = (psm.bpp == 16) ? 2 : 1;
@@ -818,7 +819,9 @@ void GSRendererOGL::EmulateTextureSampler(const GSTextureCache::Source* tex)
 			bilinear &= m_vt.IsLinear();
 		}
 
-		vs_cb.TextureOffset = RealignTargetTextureCoordinate(tex);
+		GSVector4 half_offset = RealignTargetTextureCoordinate(tex);
+		vs_cb.Texture_Scale_Offset.z = half_offset.x;
+		vs_cb.Texture_Scale_Offset.w = half_offset.y;
 	}
 	else if (tex->m_palette)
 	{
@@ -883,7 +886,10 @@ void GSRendererOGL::EmulateTextureSampler(const GSTextureCache::Source* tex)
 
 	// TC Offset Hack
 	m_ps_sel.tcoffsethack = m_userhacks_tcoffset;
-	ps_cb.TC_OH_TS = GSVector4(1 / 16.0f, 1 / 16.0f, m_userhacks_tcoffset_x, m_userhacks_tcoffset_y) / WH.xyxy();
+	GSVector4 tc_oh_ts = GSVector4(1 / 16.0f, 1 / 16.0f, m_userhacks_tcoffset_x, m_userhacks_tcoffset_y) / WH.xyxy();
+	ps_cb.TC_OH = tc_oh_ts.zwzw();
+	vs_cb.Texture_Scale_Offset.x = tc_oh_ts.x;
+	vs_cb.Texture_Scale_Offset.y = tc_oh_ts.y;
 
 	// Must be done after all coordinates math
 	if (m_context->HasFixedTEX0() && !PRIM->FST)
@@ -1139,7 +1145,7 @@ void GSRendererOGL::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sour
 	const bool ate_second_pass = m_context->TEST.DoSecondPass();
 
 	ResetStates();
-	vs_cb.TextureOffset = GSVector4(0.0f);
+	vs_cb.Texture_Scale_Offset = GSVector4(0.0f);
 
 	ASSERT(m_dev != NULL);
 	GSDeviceOGL* dev = (GSDeviceOGL*)m_dev;
@@ -1424,7 +1430,7 @@ void GSRendererOGL::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sour
 
 	if (m_ps_sel.hdr)
 	{
-		hdr_rt = dev->CreateRenderTarget(rtsize.x, rtsize.y, GL_RGBA32F);
+		hdr_rt = dev->CreateRenderTarget(rtsize.x, rtsize.y, GSTexture::Format::FloatColor);
 		dev->OMSetRenderTargets(hdr_rt, ds, &scissor);
 
 		// save blend state, since BlitRect destroys it
@@ -1614,7 +1620,7 @@ void GSRendererOGL::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sour
 	if (hdr_rt)
 	{
 		const GSVector4 sRect = GSVector4(commitRect) / GSVector4(rtsize.x, rtsize.y).xyxy();
-		dev->StretchRect(hdr_rt, sRect, rt, GSVector4(commitRect), ShaderConvert_MOD_256, false);
+		dev->StretchRect(hdr_rt, sRect, rt, GSVector4(commitRect), ShaderConvert::MOD_256, false);
 
 		dev->Recycle(hdr_rt);
 	}

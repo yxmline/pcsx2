@@ -22,6 +22,7 @@
 #include "GSUniformBufferOGL.h"
 #include "GSShaderOGL.h"
 #include "GLState.h"
+#include "GS/GS.h"
 
 #ifdef ENABLE_OGL_DEBUG_MEM_BW
 extern u64 g_real_texture_upload_byte;
@@ -126,17 +127,17 @@ public:
 	{
 		GSVector4 Vertex_Scale_Offset;
 
-		GSVector4 TextureOffset;
+		GSVector4 Texture_Scale_Offset;
 
 		GSVector2 PointSize;
 		GSVector2i MaxDepth;
 
 		VSConstantBuffer()
 		{
-			Vertex_Scale_Offset = GSVector4::zero();
-			TextureOffset       = GSVector4::zero();
-			PointSize           = GSVector2(0);
-			MaxDepth            = GSVector2i(0);
+			Vertex_Scale_Offset  = GSVector4::zero();
+			Texture_Scale_Offset = GSVector4::zero();
+			PointSize            = GSVector2(0);
+			MaxDepth             = GSVector2i(0);
 		}
 
 		__forceinline bool Update(const VSConstantBuffer* cb)
@@ -220,7 +221,7 @@ public:
 
 		GSVector4 HalfTexel;
 		GSVector4 MinMax;
-		GSVector4 TC_OH_TS;
+		GSVector4 TC_OH;
 		GSVector4 MaxDepth;
 
 		GSVector4 DitherMatrix[4];
@@ -233,7 +234,7 @@ public:
 			TA_Af         = GSVector4::zero();
 			MinMax        = GSVector4::zero();
 			MskFix        = GSVector4i::zero();
-			TC_OH_TS      = GSVector4::zero();
+			TC_OH         = GSVector4::zero();
 			FbMask        = GSVector4i::zero();
 			MaxDepth      = GSVector4::zero();
 
@@ -505,7 +506,7 @@ private:
 	struct
 	{
 		GLuint vs; // program object
-		GLuint ps[ShaderConvert_Count]; // program object
+		GLuint ps[(int)ShaderConvert::Count]; // program object
 		GLuint ln; // sampler object
 		GLuint pt; // sampler object
 		GSDepthStencilOGL* dss;
@@ -558,9 +559,10 @@ private:
 	MiscConstantBuffer m_misc_cb_cache;
 
 	std::unique_ptr<GSTexture> m_font;
+	AlignedBuffer<u8, 32> m_download_buffer;
 
-	GSTexture* CreateSurface(int type, int w, int h, int format) final;
-	GSTexture* FetchSurface(int type, int w, int h, int format) final;
+	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, GSTexture::Format format) final;
+	GSTexture* FetchSurface(GSTexture::Type type, int w, int h, GSTexture::Format format) final;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
@@ -593,9 +595,9 @@ public:
 	void Flip() override;
 	void SetVSync(int vsync) override;
 
-	void DrawPrimitive() final;
-	void DrawIndexedPrimitive() final;
-	void DrawIndexedPrimitive(int offset, int count) final;
+	void DrawPrimitive();
+	void DrawIndexedPrimitive();
+	void DrawIndexedPrimitive(int offset, int count);
 
 	void ClearRenderTarget(GSTexture* t, const GSVector4& c) final;
 	void ClearRenderTarget(GSTexture* t, u32 c) final;
@@ -605,14 +607,14 @@ public:
 	void InitPrimDateTexture(GSTexture* rt, const GSVector4i& area);
 	void RecycleDateTexture();
 
-	GSTexture* CopyOffscreen(GSTexture* src, const GSVector4& sRect, int w, int h, int format = 0, int ps_shader = 0) final;
+	bool DownloadTexture(GSTexture* src, const GSVector4i& rect, GSTexture::GSMap& out_map) final;
 
 	void CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r) final;
 
 	// BlitRect *does* mess with GL state, be sure to re-bind.
 	void BlitRect(GSTexture* sTex, const GSVector4i& r, const GSVector2i& dsize, bool at_origin, bool linear);
 
-	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, int shader = 0, bool linear = true) final;
+	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader = ShaderConvert::COPY, bool linear = true) final;
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, bool linear = true);
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, bool red, bool green, bool blue, bool alpha) final;
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, int bs, OMColorMaskSelector cms, bool linear = true);
@@ -623,13 +625,13 @@ public:
 	void IASetVertexBuffer(const void* vertices, size_t count);
 	void IASetIndexBuffer(const void* index, size_t count);
 
-	void PSSetShaderResource(int i, GSTexture* sr) final;
-	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1) final;
+	void PSSetShaderResource(int i, GSTexture* sr);
+	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1);
 	void PSSetSamplerState(GLuint ss);
 
 	void OMSetDepthStencilState(GSDepthStencilOGL* dss);
 	void OMSetBlendState(u8 blend_index = 0, u8 blend_factor = 0, bool is_blend_constant = false, bool accumulation_blend = false, bool blend_mix = false);
-	void OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector4i* scissor = NULL) final;
+	void OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector4i* scissor = NULL);
 	void OMSetColorMaskState(OMColorMaskSelector sel = OMColorMaskSelector());
 
 	bool HasColorSparse() final { return GLLoader::found_compatible_GL_ARB_sparse_texture2; }

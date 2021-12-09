@@ -18,6 +18,36 @@
 #include "GS/GSGL.h"
 #include "GS/GS.h"
 
+const char* shaderName(ShaderConvert value)
+{
+	switch (value)
+	{
+		case ShaderConvert::COPY:                return "ps_copy";
+		case ShaderConvert::RGBA8_TO_16_BITS:    return "ps_convert_rgba8_16bits";
+		case ShaderConvert::DATM_1:              return "ps_datm1";
+		case ShaderConvert::DATM_0:              return "ps_datm0";
+		case ShaderConvert::MOD_256:             return "ps_mod256";
+		case ShaderConvert::SCANLINE:            return "ps_filter_scanlines";
+		case ShaderConvert::DIAGONAL_FILTER:     return "ps_filter_diagonal";
+		case ShaderConvert::TRANSPARENCY_FILTER: return "ps_filter_transparency";
+		case ShaderConvert::TRIANGULAR_FILTER:   return "ps_filter_triangular";
+		case ShaderConvert::COMPLEX_FILTER:      return "ps_filter_complex";
+		case ShaderConvert::FLOAT32_TO_32_BITS:  return "ps_convert_float32_32bits";
+		case ShaderConvert::FLOAT32_TO_RGBA8:    return "ps_convert_float32_rgba8";
+		case ShaderConvert::FLOAT16_TO_RGB5A1:   return "ps_convert_float16_rgb5a1";
+		case ShaderConvert::RGBA8_TO_FLOAT32:    return "ps_convert_rgba8_float32";
+		case ShaderConvert::RGBA8_TO_FLOAT24:    return "ps_convert_rgba8_float24";
+		case ShaderConvert::RGBA8_TO_FLOAT16:    return "ps_convert_rgba8_float16";
+		case ShaderConvert::RGB5A1_TO_FLOAT16:   return "ps_convert_rgb5a1_float16";
+		case ShaderConvert::RGBA_TO_8I:          return "ps_convert_rgba_8i";
+		case ShaderConvert::YUV:                 return "ps_yuv";
+		case ShaderConvert::OSD:                 return "ps_osd";
+		default:
+			ASSERT(0);
+			return "ShaderConvertUnknownShader";
+	}
+}
+
 GSDevice::GSDevice()
 	: m_vsync(false)
 	, m_rbswapped(false)
@@ -89,9 +119,9 @@ void GSDevice::Present(const GSVector4i& r, int shader)
 
 	if (m_current)
 	{
-		static int s_shader[5] = {ShaderConvert_COPY, ShaderConvert_SCANLINE,
-			ShaderConvert_DIAGONAL_FILTER, ShaderConvert_TRIANGULAR_FILTER,
-			ShaderConvert_COMPLEX_FILTER}; // FIXME
+		static constexpr ShaderConvert s_shader[5] = {ShaderConvert::COPY, ShaderConvert::SCANLINE,
+			ShaderConvert::DIAGONAL_FILTER, ShaderConvert::TRIANGULAR_FILTER,
+			ShaderConvert::COMPLEX_FILTER}; // FIXME
 
 		Present(m_current, m_backbuffer, GSVector4(r), s_shader[shader]);
 		RenderOsd(m_backbuffer);
@@ -100,12 +130,12 @@ void GSDevice::Present(const GSVector4i& r, int shader)
 	Flip();
 }
 
-void GSDevice::Present(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, int shader)
+void GSDevice::Present(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader)
 {
 	StretchRect(sTex, dTex, dRect, shader, m_linear_present);
 }
 
-GSTexture* GSDevice::FetchSurface(int type, int w, int h, int format)
+GSTexture* GSDevice::FetchSurface(GSTexture::Type type, int w, int h, GSTexture::Format format)
 {
 	const GSVector2i size(w, h);
 
@@ -193,37 +223,62 @@ void GSDevice::PurgePool()
 	}
 }
 
-GSTexture* GSDevice::CreateSparseRenderTarget(int w, int h, int format)
+GSTexture* GSDevice::CreateSparseRenderTarget(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(HasColorSparse() ? GSTexture::SparseRenderTarget : GSTexture::RenderTarget, w, h, format);
+	return FetchSurface(HasColorSparse() ? GSTexture::Type::SparseRenderTarget : GSTexture::Type::RenderTarget, w, h, format);
 }
 
-GSTexture* GSDevice::CreateSparseDepthStencil(int w, int h, int format)
+GSTexture* GSDevice::CreateSparseDepthStencil(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(HasDepthSparse() ? GSTexture::SparseDepthStencil : GSTexture::DepthStencil, w, h, format);
+	return FetchSurface(HasDepthSparse() ? GSTexture::Type::SparseDepthStencil : GSTexture::Type::DepthStencil, w, h, format);
 }
 
-GSTexture* GSDevice::CreateRenderTarget(int w, int h, int format)
+GSTexture* GSDevice::CreateRenderTarget(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(GSTexture::RenderTarget, w, h, format);
+	return FetchSurface(GSTexture::Type::RenderTarget, w, h, format);
 }
 
-GSTexture* GSDevice::CreateDepthStencil(int w, int h, int format)
+GSTexture* GSDevice::CreateDepthStencil(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(GSTexture::DepthStencil, w, h, format);
+	return FetchSurface(GSTexture::Type::DepthStencil, w, h, format);
 }
 
-GSTexture* GSDevice::CreateTexture(int w, int h, int format)
+GSTexture* GSDevice::CreateTexture(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(GSTexture::Texture, w, h, format);
+	return FetchSurface(GSTexture::Type::Texture, w, h, format);
 }
 
-GSTexture* GSDevice::CreateOffscreen(int w, int h, int format)
+GSTexture* GSDevice::CreateOffscreen(int w, int h, GSTexture::Format format)
 {
-	return FetchSurface(GSTexture::Offscreen, w, h, format);
+	return FetchSurface(GSTexture::Type::Offscreen, w, h, format);
 }
 
-void GSDevice::StretchRect(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, int shader, bool linear)
+GSTexture::Format GSDevice::GetDefaultTextureFormat(GSTexture::Type type)
+{
+	if (type == GSTexture::Type::DepthStencil || type == GSTexture::Type::SparseDepthStencil)
+		return GSTexture::Format::DepthStencil;
+	else
+		return GSTexture::Format::Color;
+}
+
+bool GSDevice::DownloadTextureConvert(GSTexture* src, const GSVector4& sRect, const GSVector2i& dSize, GSTexture::Format format, ShaderConvert ps_shader, GSTexture::GSMap& out_map)
+{
+	ASSERT(src);
+	ASSERT(format == GSTexture::Format::Color || format == GSTexture::Format::UInt16 || format == GSTexture::Format::UInt32);
+
+	GSTexture* dst = CreateRenderTarget(dSize.x, dSize.y, format);
+	if (!dst)
+		return false;
+
+	GSVector4i dRect(0, 0, dSize.x, dSize.y);
+	StretchRect(src, sRect, dst, GSVector4(dRect), ps_shader);
+
+	bool ret = DownloadTexture(src, dRect, out_map);
+	Recycle(dst);
+	return ret;
+}
+
+void GSDevice::StretchRect(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader, bool linear)
 {
 	StretchRect(sTex, GSVector4(0, 0, 1, 1), dTex, dRect, shader, linear);
 }
@@ -315,7 +370,7 @@ void GSDevice::ExternalFX()
 		const GSVector4 sRect(0, 0, 1, 1);
 		const GSVector4 dRect(0, 0, s.x, s.y);
 
-		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert_TRANSPARENCY_FILTER, false);
+		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert::TRANSPARENCY_FILTER, false);
 		DoExternalFX(m_target_tmp, m_current);
 	}
 }
@@ -329,7 +384,7 @@ void GSDevice::FXAA()
 		const GSVector4 sRect(0, 0, 1, 1);
 		const GSVector4 dRect(0, 0, s.x, s.y);
 
-		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert_TRANSPARENCY_FILTER, false);
+		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert::TRANSPARENCY_FILTER, false);
 		DoFXAA(m_target_tmp, m_current);
 	}
 }
@@ -343,12 +398,12 @@ void GSDevice::ShadeBoost()
 		const GSVector4 sRect(0, 0, 1, 1);
 		const GSVector4 dRect(0, 0, s.x, s.y);
 
-		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert_COPY, false);
+		StretchRect(m_current, sRect, m_target_tmp, dRect, ShaderConvert::COPY, false);
 		DoShadeBoost(m_target_tmp, m_current);
 	}
 }
 
-bool GSDevice::ResizeTexture(GSTexture** t, int type, int w, int h)
+bool GSDevice::ResizeTexture(GSTexture** t, GSTexture::Type type, int w, int h)
 {
 	if (t == NULL)
 	{
@@ -360,9 +415,10 @@ bool GSDevice::ResizeTexture(GSTexture** t, int type, int w, int h)
 
 	if (t2 == NULL || t2->GetWidth() != w || t2->GetHeight() != h)
 	{
+		GSTexture::Format fmt = t2 ? t2->GetFormat() : GetDefaultTextureFormat(type);
 		delete t2;
 
-		t2 = FetchSurface(type, w, h, 0);
+		t2 = FetchSurface(type, w, h, fmt);
 
 		*t = t2;
 	}
@@ -372,18 +428,18 @@ bool GSDevice::ResizeTexture(GSTexture** t, int type, int w, int h)
 
 bool GSDevice::ResizeTexture(GSTexture** t, int w, int h)
 {
-	return ResizeTexture(t, GSTexture::Texture, w, h);
+	return ResizeTexture(t, GSTexture::Type::Texture, w, h);
 }
 
 bool GSDevice::ResizeTarget(GSTexture** t, int w, int h)
 {
-	return ResizeTexture(t, GSTexture::RenderTarget, w, h);
+	return ResizeTexture(t, GSTexture::Type::RenderTarget, w, h);
 }
 
 bool GSDevice::ResizeTarget(GSTexture** t)
 {
 	GSVector2i s = m_current->GetSize();
-	return ResizeTexture(t, GSTexture::RenderTarget, s.x, s.y);
+	return ResizeTexture(t, GSTexture::Type::RenderTarget, s.x, s.y);
 }
 
 GSAdapter::operator std::string() const
