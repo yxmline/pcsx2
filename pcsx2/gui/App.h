@@ -279,33 +279,9 @@ public:
 	std::unique_ptr<wxIconBundle> IconBundle;
 	std::unique_ptr<wxBitmap> Bitmap_Logo;
 	std::unique_ptr<wxBitmap> ScreenshotBitmap;
-	std::unique_ptr<AppGameDatabase> GameDB;
 
 	pxAppResources();
 	virtual ~pxAppResources();
-};
-
-// --------------------------------------------------------------------------------------
-//  FramerateManager
-// --------------------------------------------------------------------------------------
-class FramerateManager
-{
-public:
-	static const uint FramerateQueueDepth = 64;
-
-protected:
-	u64 m_fpsqueue[FramerateQueueDepth];
-	int m_fpsqueue_writepos;
-	uint m_initpause;
-
-public:
-	FramerateManager() { Reset(); }
-	virtual ~FramerateManager() = default;
-
-	void Reset();
-	void Resume();
-	void DoFrame();
-	double GetFramerate() const;
 };
 
 class StartupOptions
@@ -475,7 +451,6 @@ protected:
 	Threading::Mutex m_mtx_LoadingGameDB;
 
 public:
-	FramerateManager FpsManager;
 	std::unique_ptr<CommandDictionary> GlobalCommands;
 	std::unique_ptr<AcceleratorDictionary> GlobalAccels;
 
@@ -592,7 +567,6 @@ public:
 	wxImageList& GetImgList_Toolbars();
 
 	const AppImageIds& GetImgId() const;
-	AppGameDatabase* GetGameDatabase();
 
 	// --------------------------------------------------------------------------
 	//  Overrides of wxApp virtuals:

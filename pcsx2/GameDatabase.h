@@ -15,11 +15,12 @@
 
 #pragma once
 
-#include "yaml-cpp/yaml.h"
-
 #include <unordered_map>
 #include <vector>
 #include <string>
+
+enum GamefixId;
+enum SpeedhackId;
 
 // Since this is kinda yaml specific, might be a good idea to
 // relocate this into the yaml class
@@ -56,15 +57,10 @@ public:
 		Full
 	};
 
-	struct Patch
-	{
-		std::string author;
-		std::vector<std::string> patchLines;
-	};
+	using Patch = std::vector<std::string>;
 
 	struct GameEntry
 	{
-		bool isValid = true;
 		std::string name;
 		std::string region;
 		Compatibility compat = Compatibility::Unknown;
@@ -72,39 +68,22 @@ public:
 		RoundMode vuRoundMode = RoundMode::Undefined;
 		ClampMode eeClampMode = ClampMode::Undefined;
 		ClampMode vuClampMode = ClampMode::Undefined;
-		std::vector<std::string> gameFixes;
-		std::unordered_map<std::string, int> speedHacks;
+		std::vector<GamefixId> gameFixes;
+		std::vector<std::pair<SpeedhackId, int>> speedHacks;
 		std::vector<std::string> memcardFilters;
 		std::unordered_map<std::string, Patch> patches;
 
 		// Returns the list of memory card serials as a `/` delimited string
-		std::string memcardFiltersAsString() const;
-		bool findPatch(const std::string crc, Patch& patch) const;
+		std::string MemcardFiltersAsString() const;
+		const Patch* FindPatch(const std::string& crc) const;
 	};
+
+	static const char* compatToString(GameDatabaseSchema::Compatibility compat);
 };
 
-class IGameDatabase
+namespace GameDatabase
 {
-public:
-	virtual bool initDatabase(std::ifstream& stream) = 0;
-	virtual GameDatabaseSchema::GameEntry findGame(const std::string serial) = 0;
-	virtual int numGames() = 0;
-};
+	void EnsureLoaded();
 
-class YamlGameDatabaseImpl : public IGameDatabase
-{
-public:
-	bool initDatabase(std::ifstream& stream) override;
-	GameDatabaseSchema::GameEntry findGame(const std::string serial) override;
-	int numGames() override;
-
-private:
-	std::unordered_map<std::string, GameDatabaseSchema::GameEntry> gameDb;
-	GameDatabaseSchema::GameEntry entryFromYaml(const std::string serial, const YAML::Node& node);
-
-	std::vector<std::string> convertMultiLineStringToVector(const std::string multiLineString);
-};
-
-extern IGameDatabase* AppHost_GetGameDatabase();
-extern std::string strToLower(std::string str);
-extern bool compareStrNoCase(const std::string str1, const std::string str2);
+	const GameDatabaseSchema::GameEntry* FindGame(const std::string& serial);
+}; // namespace GameDatabase

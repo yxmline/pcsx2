@@ -20,12 +20,14 @@ target_sources(common PRIVATE
 	FastJmp.cpp
 	GL/Context.cpp
 	GL/StreamBuffer.cpp
+	FileSystem.cpp
 	IniInterface.cpp
 	Mutex.cpp
 	Misc.cpp
 	PathUtils.cpp
 	PrecompiledHeader.cpp
 	Perf.cpp
+	ProgressCallback.cpp
 	pxStreams.cpp
 	pxTranslate.cpp
 	RwMutex.cpp
@@ -33,6 +35,7 @@ target_sources(common PRIVATE
 	SettingsWrapper.cpp
 	StringHelpers.cpp
 	StringUtil.cpp
+	Timer.cpp
 	ThreadTools.cpp
 	WindowInfo.cpp
 	emitter/bmi.cpp
@@ -69,6 +72,7 @@ target_sources(common PRIVATE
 	EventSource.h
 	Exceptions.h
 	FastJmp.h
+	FileSystem.h
 	General.h
 	GL/Context.h
 	GL/StreamBuffer.h
@@ -77,6 +81,7 @@ target_sources(common PRIVATE
 	Path.h
 	PageFaultSource.h
 	PrecompiledHeader.h
+	ProgressCallback.h
 	pxForwardDefs.h
 	pxStreams.h
 	RedtapeWindows.h
@@ -88,6 +93,7 @@ target_sources(common PRIVATE
 	SettingsWrapper.h
 	StringHelpers.h
 	StringUtil.h
+	Timer.h
 	Threading.h
 	TraceLog.h
 	WindowInfo.h

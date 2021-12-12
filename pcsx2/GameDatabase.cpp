@@ -16,54 +16,83 @@
 #include "PrecompiledHeader.h"
 
 #include "GameDatabase.h"
+#include "Config.h"
+#include "Host.h"
+
+#include "common/FileSystem.h"
+#include "common/Path.h"
+#include "common/StringUtil.h"
+#include "common/Timer.h"
 
 #include "fmt/core.h"
 #include "fmt/ranges.h"
 #include "yaml-cpp/yaml.h"
 #include <fstream>
 #include <algorithm>
+#include <mutex>
+#include <thread>
 
-std::string strToLower(std::string str)
+static constexpr char GAMEDB_YAML_FILE_NAME[] = "GameIndex.yaml";
+
+static std::unordered_map<std::string, GameDatabaseSchema::GameEntry> s_game_db;
+static std::once_flag s_load_once_flag;
+
+static std::string strToLower(std::string str)
 {
 	std::transform(str.begin(), str.end(), str.begin(),
-				   [](unsigned char c) { return std::tolower(c); });
+		[](unsigned char c) { return std::tolower(c); });
 	return str;
 }
 
-bool compareStrNoCase(const std::string str1, const std::string str2)
-{
-	return std::equal(str1.begin(), str1.end(), str2.begin(),
-					  [](char a, char b) {
-						  return tolower(a) == tolower(b);
-					  });
-}
-
-std::string GameDatabaseSchema::GameEntry::memcardFiltersAsString() const
+std::string GameDatabaseSchema::GameEntry::MemcardFiltersAsString() const
 {
 	return fmt::to_string(fmt::join(memcardFilters, "/"));
 }
 
-bool GameDatabaseSchema::GameEntry::findPatch(const std::string crc, Patch& patch) const
+const GameDatabaseSchema::Patch* GameDatabaseSchema::GameEntry::FindPatch(const std::string& crc) const
 {
-	std::string crcLower = strToLower(crc);
+	const std::string crcLower(strToLower(crc));
 	Console.WriteLn(fmt::format("[GameDB] Searching for patch with CRC '{}'", crc));
-	if (patches.count(crcLower) == 1)
+
+	auto it = patches.find(crcLower);
+	if (it != patches.end())
 	{
 		Console.WriteLn(fmt::format("[GameDB] Found patch with CRC '{}'", crc));
-		patch = patches.at(crcLower);
-		return true;
+		return &it->second;
 	}
-	else if (patches.count("default") == 1)
+
+	it = patches.find("default");
+	if (it != patches.end())
 	{
 		Console.WriteLn("[GameDB] Found and falling back to default patch");
-		patch = patches.at("default");
-		return true;
+		return &it->second;
 	}
 	Console.WriteLn("[GameDB] No CRC-specific patch or default patch found");
-	return false;
+	return nullptr;
 }
 
-std::vector<std::string> YamlGameDatabaseImpl::convertMultiLineStringToVector(const std::string multiLineString)
+const char* GameDatabaseSchema::compatToString(Compatibility compat)
+{
+	switch (compat)
+	{
+		case GameDatabaseSchema::Compatibility::Perfect:
+			return "Perfect";
+		case GameDatabaseSchema::Compatibility::Playable:
+			return "Playable";
+		case GameDatabaseSchema::Compatibility::InGame:
+			return "In-Game";
+		case GameDatabaseSchema::Compatibility::Menu:
+			return "Menu";
+		case GameDatabaseSchema::Compatibility::Intro:
+			return "Intro";
+		case GameDatabaseSchema::Compatibility::Nothing:
+			return "Nothing";
+		default:
+			return "Unknown";
+	}
+}
+
+static std::vector<std::string> convertMultiLineStringToVector(const std::string& multiLineString)
 {
 	std::vector<std::string> lines;
 	std::istringstream stream(multiLineString);
@@ -77,7 +106,7 @@ std::vector<std::string> YamlGameDatabaseImpl::convertMultiLineStringToVector(co
 	return lines;
 }
 
-GameDatabaseSchema::GameEntry YamlGameDatabaseImpl::entryFromYaml(const std::string serial, const YAML::Node& node)
+static bool parseAndInsert(std::string serial, const YAML::Node& node)
 {
 	GameDatabaseSchema::GameEntry gameEntry;
 	try
@@ -98,51 +127,63 @@ GameDatabaseSchema::GameEntry YamlGameDatabaseImpl::entryFromYaml(const std::str
 		}
 
 		// Validate game fixes, invalid ones will be dropped!
-		for (std::string& fix : node["gameFixes"].as<std::vector<std::string>>(std::vector<std::string>()))
+		if (auto gameFixes = node["gameFixes"])
 		{
-			bool fixValidated = false;
-			for (GamefixId id = GamefixId_FIRST; id < pxEnumEnd; id++)
+			gameEntry.gameFixes.reserve(gameFixes.size());
+			for (std::string& fix : gameFixes.as<std::vector<std::string>>(std::vector<std::string>()))
 			{
-				std::string validFix = fmt::format("{}Hack", wxString(EnumToString(id)).ToUTF8());
-				if (validFix == fix)
+				// Enum values don't end with Hack, but gamedb does, so remove it before comparing.
+				bool fixValidated = false;
+				if (StringUtil::EndsWith(fix, "Hack"))
 				{
-					fixValidated = true;
-					break;
+					fix.erase(fix.size() - 4);
+					for (GamefixId id = GamefixId_FIRST; id < pxEnumEnd; id++)
+					{
+						if (fix.compare(EnumToString(id)) == 0 &&
+								std::find(gameEntry.gameFixes.begin(), gameEntry.gameFixes.end(), id) == gameEntry.gameFixes.end())
+						{
+							gameEntry.gameFixes.push_back(id);
+							fixValidated = true;
+							break;
+						}
+					}
 				}
-			}
-			if (fixValidated)
-			{
-				gameEntry.gameFixes.push_back(fix);
-			}
-			else
-			{
-				Console.Error(fmt::format("[GameDB] Invalid gamefix: '{}', specified for serial: '{}'. Dropping!", fix, serial));
+
+				if (!fixValidated)
+				{
+					Console.Error("[GameDB] Invalid gamefix: '%s', specified for serial: '%s'. Dropping!", fix.c_str(), serial.c_str());
+				}
 			}
 		}
 
 		// Validate speed hacks, invalid ones will be dropped!
-		if (YAML::Node speedHacksNode = node["speedHacks"])
+		if (auto speedHacksNode = node["speedHacks"])
 		{
+			gameEntry.speedHacks.reserve(speedHacksNode.size());
 			for (const auto& entry : speedHacksNode)
 			{
-				std::string speedHack = entry.first.as<std::string>();
 				bool speedHackValidated = false;
-				for (SpeedhackId id = SpeedhackId_FIRST; id < pxEnumEnd; id++)
+				std::string speedHack(entry.first.as<std::string>());
+
+				// Same deal with SpeedHacks
+				if (StringUtil::EndsWith(speedHack, "SpeedHack"))
 				{
-					std::string validSpeedHack = fmt::format("{}SpeedHack", wxString(EnumToString(id)).ToUTF8());
-					if (validSpeedHack == speedHack)
+					speedHack.erase(speedHack.size() - 9);
+					for (SpeedhackId id = SpeedhackId_FIRST; id < pxEnumEnd; id++)
 					{
-						speedHackValidated = true;
-						break;
+						if (speedHack.compare(EnumToString(id)) == 0 &&
+								std::none_of(gameEntry.speedHacks.begin(), gameEntry.speedHacks.end(), [id](const auto& it) { return it.first == id; }))
+						{
+							gameEntry.speedHacks.emplace_back(id, entry.second.as<int>());
+							speedHackValidated = true;
+							break;
+						}
 					}
 				}
-				if (speedHackValidated)
+
+				if (!speedHackValidated)
 				{
-					gameEntry.speedHacks[speedHack] = entry.second.as<int>();
-				}
-				else
-				{
-					Console.Error(fmt::format("[GameDB] Invalid speedhack: '{}', specified for serial: '{}'. Dropping!", speedHack, serial));
+					Console.Error("[GameDB] Invalid speedhack: '%s', specified for serial: '%s'. Dropping!", speedHack.c_str(), serial.c_str());
 				}
 			}
 		}
@@ -161,60 +202,38 @@ GameDatabaseSchema::GameEntry YamlGameDatabaseImpl::entryFromYaml(const std::str
 				}
 				YAML::Node patchNode = entry.second;
 
-				GameDatabaseSchema::Patch patchCol;
-
-				patchCol.author = patchNode["author"].as<std::string>("");
-				patchCol.patchLines = convertMultiLineStringToVector(patchNode["content"].as<std::string>(""));
-				gameEntry.patches[crc] = patchCol;
+				gameEntry.patches[crc] = convertMultiLineStringToVector(patchNode["content"].as<std::string>(""));
 			}
 		}
+
+		s_game_db.emplace(std::move(serial), std::move(gameEntry));
+		return true;
 	}
 	catch (const YAML::RepresentationException& e)
 	{
 		Console.Error(fmt::format("[GameDB] Invalid GameDB syntax detected on serial: '{}'. Error Details - {}", serial, e.msg));
-		gameEntry.isValid = false;
 	}
 	catch (const std::exception& e)
 	{
 		Console.Error(fmt::format("[GameDB] Unexpected error occurred when reading serial: '{}'. Error Details - {}", serial, e.what()));
-		gameEntry.isValid = false;
-	}
-	return gameEntry;
-}
-
-GameDatabaseSchema::GameEntry YamlGameDatabaseImpl::findGame(const std::string serial)
-{
-	std::string serialLower = strToLower(serial);
-	Console.WriteLn(fmt::format("[GameDB] Searching for '{}' in GameDB", serialLower));
-	if (gameDb.count(serialLower) == 1)
-	{
-		Console.WriteLn(fmt::format("[GameDB] Found '{}' in GameDB", serialLower));
-		return gameDb[serialLower];
 	}
 
-	Console.Error(fmt::format("[GameDB] Could not find '{}' in GameDB", serialLower));
-	GameDatabaseSchema::GameEntry entry;
-	entry.isValid = false;
-	return entry;
+	return false;
 }
 
-int YamlGameDatabaseImpl::numGames()
-{
-	return gameDb.size();
-}
-
-bool YamlGameDatabaseImpl::initDatabase(std::ifstream& stream)
+static bool LoadYamlFile()
 {
 	try
 	{
-		if (!stream)
+		std::optional<std::string> file_data(Host::ReadResourceFileToString(GAMEDB_YAML_FILE_NAME));
+		if (!file_data.has_value())
 		{
 			Console.Error("[GameDB] Unable to open GameDB file.");
 			return false;
 		}
 		// yaml-cpp has memory leak issues if you persist and modify a YAML::Node
 		// convert to a map and throw it away instead!
-		YAML::Node data = YAML::Load(stream);
+		YAML::Node data = YAML::Load(file_data.value());
 		for (const auto& entry : data)
 		{
 			// we don't want to throw away the entire GameDB file if a single entry is made incorrectly,
@@ -225,13 +244,13 @@ bool YamlGameDatabaseImpl::initDatabase(std::ifstream& stream)
 				// this is because the application may pass a lowercase CRC or serial along
 				//
 				// However, YAML's keys are as expected case-sensitive, so we have to explicitly do our own duplicate checking
-				std::string serial = strToLower(entry.first.as<std::string>());
-				if (gameDb.count(serial) == 1)
+				std::string serial(strToLower(entry.first.as<std::string>()));
+				if (s_game_db.count(serial) == 1)
 				{
 					Console.Error(fmt::format("[GameDB] Duplicate serial '{}' found in GameDB. Skipping, Serials are case-insensitive!", serial));
 					continue;
 				}
-				gameDb[serial] = entryFromYaml(serial, entry.second);
+				parseAndInsert(std::move(serial), entry.second);
 			}
 			catch (const YAML::RepresentationException& e)
 			{
@@ -246,4 +265,37 @@ bool YamlGameDatabaseImpl::initDatabase(std::ifstream& stream)
 	}
 
 	return true;
+}
+
+void GameDatabase::EnsureLoaded()
+{
+	std::call_once(s_load_once_flag, []() {
+		Common::Timer timer;
+
+		if (!LoadYamlFile())
+		{
+			Console.Error("GameDB: Failed to load YAML file");
+			return;
+		}
+
+		Console.WriteLn("[GameDB] %zu games on record (loaded in %.2fms)", s_game_db.size(), timer.GetTimeMilliseconds());
+	});
+}
+
+const GameDatabaseSchema::GameEntry* GameDatabase::FindGame(const std::string& serial)
+{
+	EnsureLoaded();
+
+	const std::string serialLower(strToLower(serial));
+	Console.WriteLn("[GameDB] Searching for '%s' in GameDB", serialLower.c_str());
+
+	auto iter = s_game_db.find(serialLower);
+	if (iter == s_game_db.end())
+	{
+		Console.Error("[GameDB] Could not find '%s' in GameDB", serialLower.c_str());
+		return nullptr;
+	}
+
+	Console.WriteLn("[GameDB] Found '%s' in GameDB", serialLower.c_str());
+	return &iter->second;
 }

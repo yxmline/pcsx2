@@ -52,11 +52,14 @@
     <ClCompile Include="GL\Context.cpp" />
     <ClCompile Include="GL\ContextWGL.cpp" />
     <ClCompile Include="GL\StreamBuffer.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="IniInterface.cpp" />
+    <ClCompile Include="ProgressCallback.cpp" />
     <ClCompile Include="pxStreams.cpp" />
     <ClCompile Include="pxTranslate.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="SettingsWrapper.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="VirtualMemory.cpp" />
     <ClCompile Include="WindowInfo.cpp" />
     <ClCompile Include="x86\MemcpyFast.cpp" />
@@ -108,6 +111,8 @@
     <ClInclude Include="GL\Context.h" />
     <ClInclude Include="GL\ContextWGL.h" />
     <ClInclude Include="GL\StreamBuffer.h" />
+    <ClInclude Include="FileSystem.h" />
+    <ClInclude Include="ProgressCallback.h" />
     <ClInclude Include="ScopedGuard.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="SettingsInterface.h" />
@@ -126,6 +131,7 @@
     <ClInclude Include="RedtapeWindows.h" />
     <ClInclude Include="SafeArray.h" />
     <ClInclude Include="StringHelpers.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="WindowInfo.h" />
     <ClInclude Include="wxBaseTools.h" />
     <ClInclude Include="Threading.h" />

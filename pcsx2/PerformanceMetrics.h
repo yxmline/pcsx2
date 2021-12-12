@@ -14,30 +14,29 @@
  */
 
 #pragma once
-#include "ThreadedFileReader.h"
-#include "libchdr/chd.h"
-#include <vector>
+#include "common/Timer.h"
 
-class ChdFileReader : public ThreadedFileReader
+namespace PerformanceMetrics
 {
-	DeclareNoncopyableObject(ChdFileReader);
+	void Clear();
+	void Reset();
+	void Update();
 
-public:
-	virtual ~ChdFileReader() override;;
+	/// Sets the EE thread for CPU usage calculations.
+	void SetCPUThreadTimer(Common::ThreadCPUTimer timer);
 
-	static bool CanHandle(const std::string& fileName, const std::string& displayName);
-	bool Open2(std::string fileName) override;
+	/// Sets the vertical frequency, used in speed calculations.
+	void SetVerticalFrequency(float rate);
 
-	Chunk ChunkForOffset(u64 offset) override;
-	int ReadChunk(void *dst, s64 blockID) override;
+	float GetFPS();
+	float GetSpeed();
+	float GetAverageFrameTime();
+	float GetWorstFrameTime();
 
-	void Close2(void) override;
-	uint GetBlockCount(void) const override;
-	ChdFileReader(void);
-
-private:
-	chd_file* ChdFile;
-	u64 file_size;
-	u32 hunk_size;
-	std::vector<std::FILE*> m_files;
-};
+	double GetCPUThreadUsage();
+	double GetCPUThreadAverageTime();
+	float GetGSThreadUsage();
+	float GetGSThreadAverageTime();
+	float GetVUThreadUsage();
+	float GetVUThreadAverageTime();
+} // namespace PerformanceMetrics

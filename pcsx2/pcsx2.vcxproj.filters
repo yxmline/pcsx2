@@ -746,9 +746,6 @@
     <ClCompile Include="gui\ConsoleLogger.cpp">
       <Filter>AppHost</Filter>
     </ClCompile>
-    <ClCompile Include="gui\CpuUsageProvider.cpp">
-      <Filter>AppHost</Filter>
-    </ClCompile>
     <ClCompile Include="gui\FrameForGS.cpp">
       <Filter>AppHost</Filter>
     </ClCompile>
@@ -882,9 +879,6 @@
       <Filter>System\Ps2</Filter>
     </ClCompile>
     <ClCompile Include="gui\AppUserMode.cpp">
-      <Filter>AppHost</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\AppGameDatabase.cpp">
       <Filter>AppHost</Filter>
     </ClCompile>
     <ClCompile Include="gui\Dialogs\McdConfigDialog.cpp">
@@ -1646,6 +1640,13 @@
     <ClCompile Include="gui\pxWindowTextWriter.cpp">
       <Filter>AppHost</Filter>
     </ClCompile>
+    <ClCompile Include="gui\AppHost.cpp">
+      <Filter>AppHost</Filter>
+    </ClCompile>
+    <ClCompile Include="GS\Renderers\SW\GSSetupPrimCodeGenerator.all.cpp" />
+    <ClCompile Include="PerformanceMetrics.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Patch.h">
@@ -1966,9 +1967,6 @@
     <ClInclude Include="gui\ConsoleLogger.h">
       <Filter>AppHost\Include</Filter>
     </ClInclude>
-    <ClInclude Include="gui\CpuUsageProvider.h">
-      <Filter>AppHost\Include</Filter>
-    </ClInclude>
     <ClInclude Include="gui\IsoDropTarget.h">
       <Filter>AppHost\Include</Filter>
     </ClInclude>
@@ -2004,9 +2002,6 @@
     </ClInclude>
     <ClInclude Include="IPU\IPUdma.h">
       <Filter>System\Ps2\IPU</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\AppGameDatabase.h">
-      <Filter>AppHost</Filter>
     </ClInclude>
     <ClInclude Include="gui\i18n.h">
       <Filter>AppHost</Filter>
@@ -2754,6 +2749,9 @@
     </ClInclude>
     <ClInclude Include="PAD\Gamepad.h">
       <Filter>System\Ps2\PAD</Filter>
+    </ClInclude>
+    <ClInclude Include="PerformanceMetrics.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
