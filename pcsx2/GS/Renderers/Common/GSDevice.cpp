@@ -66,9 +66,7 @@ GSDevice::GSDevice()
 
 GSDevice::~GSDevice()
 {
-	for (auto t : m_pool)
-		delete t;
-
+	PurgePool();
 	delete m_backbuffer;
 	delete m_merge;
 	delete m_weavebob;
@@ -83,10 +81,7 @@ bool GSDevice::Create(const WindowInfo& wi)
 
 bool GSDevice::Reset(int w, int h)
 {
-	for (auto t : m_pool)
-		delete t;
-
-	m_pool.clear();
+	PurgePool();
 
 	delete m_backbuffer;
 	delete m_merge;
@@ -94,13 +89,13 @@ bool GSDevice::Reset(int w, int h)
 	delete m_blend;
 	delete m_target_tmp;
 
-	m_backbuffer = NULL;
-	m_merge = NULL;
-	m_weavebob = NULL;
-	m_blend = NULL;
-	m_target_tmp = NULL;
+	m_backbuffer = nullptr;
+	m_merge = nullptr;
+	m_weavebob = nullptr;
+	m_blend = nullptr;
+	m_target_tmp = nullptr;
 
-	m_current = NULL; // current is special, points to other textures, no need to delete
+	m_current = nullptr; // current is special, points to other textures, no need to delete
 	return true;
 }
 
@@ -139,19 +134,44 @@ GSTexture* GSDevice::FetchSurface(GSTexture::Type type, int w, int h, GSTexture:
 {
 	const GSVector2i size(w, h);
 
+	GSTexture* t = nullptr;
+
 	for (auto i = m_pool.begin(); i != m_pool.end(); ++i)
 	{
-		GSTexture* t = *i;
+		t = *i;
+
+		assert(t);
 
 		if (t->GetType() == type && t->GetFormat() == format && t->GetSize() == size)
 		{
 			m_pool.erase(i);
-
-			return t;
+			break;
 		}
+
+		t = nullptr;
 	}
 
-	return CreateSurface(type, w, h, format);
+	if (!t)
+		t = CreateSurface(type, w, h, format);
+
+	if (!t)
+		throw std::bad_alloc();
+
+	t->Commit(); // Clear won't be done if the texture isn't committed.
+	
+	switch (type)
+	{
+	case GSTexture::Type::RenderTarget:
+		ClearRenderTarget(t, 0);
+		break;
+	case GSTexture::Type::DepthStencil:
+		ClearDepth(t);
+		break;
+	default:
+		break;
+	}
+
+	return t;
 }
 
 void GSDevice::PrintMemoryUsage()
@@ -214,13 +234,9 @@ void GSDevice::AgePool()
 
 void GSDevice::PurgePool()
 {
-	// OOM emergency. Let's free this useless pool
-	while (!m_pool.empty())
-	{
-		delete m_pool.back();
-
-		m_pool.pop_back();
-	}
+	for (auto t : m_pool)
+		delete t;
+	m_pool.clear();
 }
 
 GSTexture* GSDevice::CreateSparseRenderTarget(int w, int h, GSTexture::Format format)
@@ -261,7 +277,7 @@ GSTexture::Format GSDevice::GetDefaultTextureFormat(GSTexture::Type type)
 		return GSTexture::Format::Color;
 }
 
-bool GSDevice::DownloadTextureConvert(GSTexture* src, const GSVector4& sRect, const GSVector2i& dSize, GSTexture::Format format, ShaderConvert ps_shader, GSTexture::GSMap& out_map)
+bool GSDevice::DownloadTextureConvert(GSTexture* src, const GSVector4& sRect, const GSVector2i& dSize, GSTexture::Format format, ShaderConvert ps_shader, GSTexture::GSMap& out_map, const bool linear)
 {
 	ASSERT(src);
 	ASSERT(format == GSTexture::Format::Color || format == GSTexture::Format::UInt16 || format == GSTexture::Format::UInt32);
@@ -271,7 +287,7 @@ bool GSDevice::DownloadTextureConvert(GSTexture* src, const GSVector4& sRect, co
 		return false;
 
 	GSVector4i dRect(0, 0, dSize.x, dSize.y);
-	StretchRect(src, sRect, dst, GSVector4(dRect), ps_shader);
+	StretchRect(src, sRect, dst, GSVector4(dRect), ps_shader, linear);
 
 	bool ret = DownloadTexture(dst, dRect, out_map);
 	Recycle(dst);
