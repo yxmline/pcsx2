@@ -1038,7 +1038,7 @@ __fi void cdvdActionInterrupt()
 			cdvd.Spinning = true;
 			cdvd.Ready |= CDVD_DRIVE_READY; //check (rama)
 			cdvd.Sector = cdvd.SeekToSector;
-			cdvd.Status = CDVD_STATUS_READ;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 			cdvd.nextSectorsBuffered = 0;
 			cdvd.triggerDataReady = true;
 			CDVDSECTORREADY_INT(cdvd.ReadTime);
@@ -1049,7 +1049,7 @@ __fi void cdvdActionInterrupt()
 			cdvd.Spinning = true; //check (rama)
 			cdvd.Ready |= CDVD_DRIVE_READY; //check (rama)
 			cdvd.Sector = cdvd.SeekToSector;
-			cdvd.Status = CDVD_STATUS_READ;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 			cdvd.nextSectorsBuffered = 0;
 			cdvd.triggerDataReady = true;
 			CDVDSECTORREADY_INT(cdvd.ReadTime);
@@ -1103,18 +1103,8 @@ __fi void cdvdSectorReady()
 		}
 	}
 
-	if (cdvd.nextSectorsBuffered == 16 && (cdvd.Ready & CDVD_DRIVE_READY))
-	{
-		cdvd.Status = CDVD_STATUS_PAUSE; // Needed here but could be smth else than Pause (rama)
-	}
-	else
-	{
-		if (cdvd.nextSectorsBuffered < 16)
-		{
-			CDVDSECTORREADY_INT(cdvd.ReadTime);
-			cdvd.Status = CDVD_STATUS_READ;
-		}
-	}
+	if (cdvd.nextSectorsBuffered < 16)
+		CDVDSECTORREADY_INT(cdvd.ReadTime);
 }
 
 // inlined due to being referenced in only one place.
@@ -1139,14 +1129,10 @@ __fi void cdvdReadInterrupt()
 		cdvd.Reading = 1;
 		cdvd.Readed = 1;
 		cdvd.Sector = cdvd.SeekToSector;
-		CDVD_LOG("Cdvd Seek Complete > Scheduling block read interrupt at iopcycle=%8.8x.",
-			psxRegs.cycle + cdvd.ReadTime);
-
-		CDVDREAD_INT(cdvd.ReadTime);
-		cdvd.Status = CDVD_STATUS_READ;
-		return;
+		CDVD_LOG("Cdvd Seek Complete at iopcycle=%8.8x.", psxRegs.cycle);
 	}
-	else if (cdvd.Reading)
+	
+	if (cdvd.Reading)
 	{
 		if (cdvd.RErr == 0)
 		{
@@ -1217,10 +1203,7 @@ __fi void cdvdReadInterrupt()
 			iopIntcIrq(2);
 			cdvd.Ready |= CDVD_DRIVE_READY;
 
-			if (cdvd.nextSectorsBuffered < 16)
-				cdvd.Status = CDVD_STATUS_READ;
-			else
-				cdvd.Status = CDVD_STATUS_PAUSE;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 
 			cdvd.nCommand = 0;
 			//DevCon.Warning("Scheduling interrupt in %d cycles", cdvd.ReadTime - ((cdvd.BlockSize / 4) * 12));
@@ -1300,6 +1283,7 @@ static uint cdvdStartSeek(uint newsector, CDVD_MODE_TYPE mode)
 
 		// if delta > 0 it will read a new sector so the readInterrupt will account for this.
 		seektime = 0;
+		isSeeking = false;
 		
 		if (delta == 0)
 		{
@@ -1324,24 +1308,16 @@ static uint cdvdStartSeek(uint newsector, CDVD_MODE_TYPE mode)
 				}
 				else
 				{
-					CDVDSECTORREADY_INT(cdvd.ReadTime);
-					seektime = cdvd.ReadTime + ((cdvd.BlockSize / 4) * 12);
+					delta = 1; // Forces it to use the rotational delay since we have no sectors buffered and it isn't buffering any.
 				}
 			}
 			else
-				seektime = (cdvd.BlockSize / 4) * 12;
+				return (cdvd.BlockSize / 4) * 12;
 		}
 		else
 		{
-			if (delta < cdvd.nextSectorsBuffered)
-			{
-				isSeeking = false;
-			}
-			else
-			{
-				psxRegs.interrupt &= ~(1 << IopEvt_CdvdSectorReady);
-				cdvd.nextSectorsBuffered = 0;
-			}
+			psxRegs.interrupt &= ~(1 << IopEvt_CdvdSectorReady);
+			cdvd.nextSectorsBuffered = 0;
 		}
 	}
 
@@ -1354,8 +1330,9 @@ static uint cdvdStartSeek(uint newsector, CDVD_MODE_TYPE mode)
 		CDVDSECTORREADY_INT(seektime);
 		seektime += (cdvd.BlockSize / 4) * 12;
 	}
-	else if(cdvd.nCommand != N_CD_SEEK)
-		CDVDSECTORREADY_INT(seektime + ((cdvd.BlockSize / 4) * 12));
+	else
+		CDVDSECTORREADY_INT(seektime);
+
 	return seektime;
 }
 
@@ -1633,7 +1610,7 @@ static void cdvdWrite04(u8 rt)
 			cdvdSetIrq();
 			cdvd.nCommand = 0;
 			//After Pausing needs to buffer the next sector
-			cdvd.Status = CDVD_STATUS_READ;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 			cdvd.nextSectorsBuffered = 0;
 			cdvd.triggerDataReady = true;
 			CDVDSECTORREADY_INT(cdvd.ReadTime);
@@ -1865,7 +1842,7 @@ static void cdvdWrite04(u8 rt)
 			HW_DMA3_CHCR &= ~0x01000000;
 			psxDmaInterrupt(3);
 			//After reading the TOC it needs to go back to buffer the next sector
-			cdvd.Status = CDVD_STATUS_READ;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 			cdvd.nextSectorsBuffered = 0;
 			cdvd.triggerDataReady = true;
 			CDVDSECTORREADY_INT(cdvd.ReadTime);
@@ -1882,7 +1859,7 @@ static void cdvdWrite04(u8 rt)
 			cdvdSetIrq();
 			cdvd.nCommand = 0;
 			//After reading the key it needs to go back to buffer the next sector
-			cdvd.Status = CDVD_STATUS_READ;
+			cdvd.Status = CDVD_STATUS_PAUSE;
 			cdvd.nextSectorsBuffered = 0;
 			cdvd.triggerDataReady = true;
 			CDVDSECTORREADY_INT(cdvd.ReadTime);
