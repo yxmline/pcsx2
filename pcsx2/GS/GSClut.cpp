@@ -148,16 +148,17 @@ bool GSClut::WriteTest(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 			__assume(0);
 	}
 
-	return m_write.IsDirty(TEX0, TEXCLUT);
+	// CLUT only reloads if PSM is a valid index type, avoid unnecessary flushes
+	return ((TEX0.PSM & 0x7) >= 3) && m_write.IsDirty(TEX0, TEXCLUT);
 }
 
 void GSClut::Write(const GIFRegTEX0& TEX0, const GIFRegTEXCLUT& TEXCLUT)
 {
 	m_write.TEX0 = TEX0;
 	m_write.TEXCLUT = TEXCLUT;
-	m_write.dirty = false;
 	m_read.dirty = true;
-
+	m_write.dirty = false;
+	
 	(this->*m_wc[TEX0.CSM][TEX0.CPSM][TEX0.PSM])(TEX0, TEXCLUT);
 }
 
