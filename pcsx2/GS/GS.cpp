@@ -22,7 +22,7 @@
 #include "Renderers/Null/GSRendererNull.h"
 #include "Renderers/Null/GSDeviceNull.h"
 #include "Renderers/OpenGL/GSDeviceOGL.h"
-#include "Renderers/OpenGL/GSRendererOGL.h"
+#include "Renderers/HW/GSRendererNew.h"
 #include "GSLzma.h"
 
 #include "common/pxStreams.h"
@@ -30,7 +30,6 @@
 
 #ifdef _WIN32
 
-#include "Renderers/DX11/GSRendererDX11.h"
 #include "Renderers/DX11/GSDevice11.h"
 #include "GS/Renderers/DX11/D3D.h"
 
@@ -218,13 +217,9 @@ int _GSopen(const WindowInfo& wi, const char* title, GSRendererType renderer, in
 			switch (renderer)
 			{
 				default:
-#ifdef _WIN32
 				case GSRendererType::DX1011_HW:
-					s_gs = (GSRenderer*)new GSRendererDX11();
-					break;
-#endif
 				case GSRendererType::OGL_HW:
-					s_gs = (GSRenderer*)new GSRendererOGL();
+					s_gs = (GSRenderer*)new GSRendererNew();
 					break;
 				case GSRendererType::OGL_SW:
 					s_gs = new GSRendererSW(threads);
@@ -1082,17 +1077,17 @@ void GSApp::Init()
 		GSSetting(CRCHackLevel::Aggressive, "Aggressive", ""),
 	};
 
-	m_gs_acc_blend_level.push_back(GSSetting(0, "Minimum", "Fastest"));
-	m_gs_acc_blend_level.push_back(GSSetting(1, "Basic", "Recommended"));
-	m_gs_acc_blend_level.push_back(GSSetting(2, "Medium", ""));
-	m_gs_acc_blend_level.push_back(GSSetting(3, "High", ""));
-	m_gs_acc_blend_level.push_back(GSSetting(4, "Full", "Very Slow"));
-	m_gs_acc_blend_level.push_back(GSSetting(5, "Ultra", "Ultra Slow"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::None), "Minimum", "Fastest"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Basic), "Basic", "Recommended"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Medium), "Medium", ""));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::High), "High", ""));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Full), "Full", "Very Slow"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Ultra), "Ultra", "Ultra Slow"));
 
-	m_gs_acc_blend_level_d3d11.push_back(GSSetting(0, "Minimum", "Fastest"));
-	m_gs_acc_blend_level_d3d11.push_back(GSSetting(1, "Basic", "Recommended"));
-	m_gs_acc_blend_level_d3d11.push_back(GSSetting(2, "Medium", "Debug"));
-	m_gs_acc_blend_level_d3d11.push_back(GSSetting(3, "High", "Debug"));
+	m_gs_acc_blend_level_d3d11.push_back(GSSetting(static_cast<u32>(AccBlendLevel::None), "Minimum", "Fastest"));
+	m_gs_acc_blend_level_d3d11.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Basic), "Basic", "Recommended"));
+	m_gs_acc_blend_level_d3d11.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Medium), "Medium", "Debug"));
+	m_gs_acc_blend_level_d3d11.push_back(GSSetting(static_cast<u32>(AccBlendLevel::High), "High", "Debug"));
 
 	m_gs_tv_shaders.push_back(GSSetting(0, "None", ""));
 	m_gs_tv_shaders.push_back(GSSetting(1, "Scanline filter", ""));

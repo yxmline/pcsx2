@@ -15,11 +15,10 @@
 
 #pragma once
 
-#include "GSDeviceOGL.h"
 #include "GS/Renderers/HW/GSRendererHW.h"
 #include "GS/Renderers/HW/GSVertexHW.h"
 
-class GSRendererOGL final : public GSRendererHW
+class GSRendererNew final : public GSRendererHW
 {
 	enum PRIM_OVERLAP
 	{
@@ -28,35 +27,13 @@ class GSRendererOGL final : public GSRendererHW
 		PRIM_OVERLAP_NO
 	};
 
-	enum ACC_BLEND
-	{
-		ACC_BLEND_NONE   = 0,
-		ACC_BLEND_BASIC  = 1,
-		ACC_BLEND_MEDIUM = 2,
-		ACC_BLEND_HIGH   = 3,
-		ACC_BLEND_FULL   = 4,
-		ACC_BLEND_ULTRA  = 5
-	};
-
 private:
 	PRIM_OVERLAP m_prim_overlap;
 	std::vector<size_t> m_drawlist;
 
 	TriFiltering UserHacks_tri_filter;
 
-	GSDeviceOGL::VSConstantBuffer vs_cb;
-	GSDeviceOGL::PSConstantBuffer ps_cb;
-
-	bool m_require_one_barrier;
-	bool m_require_full_barrier;
-
-	GSDeviceOGL::VSSelector m_vs_sel;
-	GSDeviceOGL::GSSelector m_gs_sel;
-	GSDeviceOGL::PSSelector m_ps_sel;
-
-	GSDeviceOGL::PSSamplerSelector      m_ps_ssel;
-	GSDeviceOGL::OMColorMaskSelector    m_om_csel;
-	GSDeviceOGL::OMDepthStencilSelector m_om_dssel;
+	GSHWDrawConfig m_conf;
 
 private:
 	inline void ResetStates();
@@ -66,16 +43,16 @@ private:
 	inline void EmulateBlending(bool& DATE_GL42, bool& DATE_GL45);
 	inline void EmulateTextureSampler(const GSTextureCache::Source* tex);
 	inline void EmulateZbuffer();
+	inline void EmulateATST(GSHWDrawConfig::PSConstantBuffer& cb, GSHWDrawConfig::PSSelector& ps, bool pass_2);
 
 public:
-	GSRendererOGL();
-	virtual ~GSRendererOGL() {}
+	GSRendererNew();
+	~GSRendererNew() override {}
 
-	void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex) final;
+	bool CreateDevice(GSDevice* dev, const WindowInfo& wi) override;
+	void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex) override;
 
 	PRIM_OVERLAP PrimitiveOverlap();
 
-	void SendDraw();
-
-	bool IsDummyTexture() const final;
+	bool IsDummyTexture() const override;
 };
