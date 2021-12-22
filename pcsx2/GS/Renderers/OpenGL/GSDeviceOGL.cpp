@@ -67,6 +67,7 @@ GSDeviceOGL::GSDeviceOGL()
 	GLState::Clear();
 
 	m_mipmap = theApp.GetConfigI("mipmap");
+	m_upscale_multiplier = std::max(1, theApp.GetConfigI("upscale_multiplier"));
 	if (theApp.GetConfigB("UserHacks"))
 		m_filter = static_cast<TriFiltering>(theApp.GetConfigI("UserHacks_TriFilter"));
 	else
@@ -381,11 +382,6 @@ bool GSDeviceOGL::Create(const WindowInfo& wi)
 		GL_PUSH("GSDeviceOGL::Convert");
 
 		m_convert.cb = new GSUniformBufferOGL("Misc UBO", g_convert_index, sizeof(MiscConstantBuffer));
-		// Upload once and forget about it.
-		// Use value of 1 when upscale multiplier is 0 for ScalingFactor,
-		// this is to avoid doing math with 0 in shader. It helps custom res be less broken.
-		m_misc_cb_cache.ScalingFactor = GSVector4i(std::max(1, theApp.GetConfigI("upscale_multiplier")));
-		m_convert.cb->cache_upload(&m_misc_cb_cache);
 
 		const auto shader = Host::ReadResourceFileToString("shaders/opengl/convert.glsl");
 		if (!shader.has_value())
@@ -397,7 +393,10 @@ bool GSDeviceOGL::Create(const WindowInfo& wi)
 		for (size_t i = 0; i < std::size(m_convert.ps); i++)
 		{
 			const char* name = shaderName(static_cast<ShaderConvert>(i));
-			ps = m_shader->Compile("convert.glsl", name, GL_FRAGMENT_SHADER, m_shader_common_header, shader->c_str());
+			const std::string macro_sel = (static_cast<ShaderConvert>(i) == ShaderConvert::RGBA_TO_8I) ?
+                                              format("#define PS_SCALE_FACTOR %d\n", m_upscale_multiplier) :
+                                              std::string();
+			ps = m_shader->Compile("convert.glsl", name, GL_FRAGMENT_SHADER, m_shader_common_header, shader->c_str(), macro_sel);
 			std::string pretty_name = std::string("Convert pipe ") + name;
 			m_convert.ps[i] = m_shader->LinkPipeline(pretty_name, vs, 0, ps);
 		}
@@ -1009,6 +1008,7 @@ GLuint GSDeviceOGL::CompilePS(PSSelector sel)
 		+ format("#define PS_DITHER %d\n", sel.dither)
 		+ format("#define PS_ZCLAMP %d\n", sel.zclamp)
 		+ format("#define PS_PABE %d\n", sel.pabe)
+		+ format("#define PS_SCALE_FACTOR %d\n", m_upscale_multiplier)
 	;
 
 	if (GLLoader::buggy_sso_dual_src)
@@ -1907,29 +1907,6 @@ __fi static void WriteToStreamBuffer(GL::StreamBuffer* sb, u32 index, u32 align,
 	glBindBufferRange(GL_UNIFORM_BUFFER, index, sb->GetGLBufferId(), res.buffer_offset, size);
 }
 
-void GSDeviceOGL::SetupCB(const VSConstantBuffer* vs_cb, const PSConstantBuffer* ps_cb)
-{
-	GL_PUSH("UBO");
-
-	if (m_vs_cb_cache.Update(vs_cb))
-	{
-		WriteToStreamBuffer(m_vertex_uniform_stream_buffer.get(), g_vs_cb_index,
-			m_uniform_buffer_alignment, vs_cb, sizeof(VSConstantBuffer));
-	}
-
-	if (m_ps_cb_cache.Update(ps_cb))
-	{
-		WriteToStreamBuffer(m_fragment_uniform_stream_buffer.get(), g_ps_cb_index,
-			m_uniform_buffer_alignment, ps_cb, sizeof(PSConstantBuffer));
-	}
-}
-
-void GSDeviceOGL::SetupCBMisc(const GSVector4i& channel)
-{
-	m_misc_cb_cache.ChannelShuffle = channel;
-	m_convert.cb->cache_upload(&m_misc_cb_cache);
-}
-
 void GSDeviceOGL::SetupPipeline(const VSSelector& vsel, const GSSelector& gsel, const PSSelector& psel)
 {
 	auto i = m_ps.find(psel.key);
@@ -2019,44 +1996,6 @@ void GSDeviceOGL::SetupOM(OMDepthStencilSelector dssel)
 	OMSetDepthStencilState(m_om_dss[dssel.key]);
 }
 
-static GSDeviceOGL::VSConstantBuffer convertCB(const GSHWDrawConfig::VSConstantBuffer& cb)
-{
-	GSDeviceOGL::VSConstantBuffer out;
-	out.Vertex_Scale_Offset = GSVector4::loadl(&cb.vertex_scale).upld(GSVector4::loadl(&cb.vertex_offset));
-	out.Texture_Scale_Offset = GSVector4::loadl(&cb.texture_scale).upld(GSVector4::loadl(&cb.texture_offset));
-	out.PointSize = cb.point_size;
-	out.MaxDepth = cb.max_depth;
-	return out;
-}
-
-static GSDeviceOGL::PSConstantBuffer convertCB(const GSHWDrawConfig::PSConstantBuffer& cb, int atst)
-{
-	GSDeviceOGL::PSConstantBuffer out;
-	out.FogColor_AREF = GSVector4(GSVector4i::load(cb.fog_color_aref).u8to32());
-	if (atst == 1 || atst == 2) // Greater / Less alpha
-		out.FogColor_AREF.w -= 0.1f;
-	out.WH = cb.texture_size;
-	out.TA_MaxDepth_Af = GSVector4(GSVector4i::load(cb.ta_af).u8to32()) / GSVector4(255.f, 255.f, 1.f, 128.f);
-	out.TA_MaxDepth_Af.z = cb.max_depth * ldexpf(1, -32);
-	out.MskFix = GSVector4i::loadl(&cb.uv_msk_fix).u16to32();
-	out.FbMask = GSVector4i::load(cb.fbmask_int).u8to32();
-	out.HalfTexel = cb.half_texel;
-	out.MinMax = cb.uv_min_max;
-	out.TC_OH = GSVector4::zero().upld(GSVector4(cb.tc_offset));
-
-	GSVector4i dither = GSVector4i::loadl(&cb.dither_matrix).u8to16();
-	const GSVector4i ditherLow = dither.sll16(13).sra16(13);
-	const GSVector4i ditherHi  = dither.sll16( 9).sra16( 5);
-	dither = ditherLow.blend8(ditherHi, GSVector4i(0xFF00FF00));
-
-	out.DitherMatrix[0] = GSVector4(dither.xxxx().i8to32());
-	out.DitherMatrix[1] = GSVector4(dither.yyyy().i8to32());
-	out.DitherMatrix[2] = GSVector4(dither.zzzz().i8to32());
-	out.DitherMatrix[3] = GSVector4(dither.wwww().i8to32());
-
-	return out;
-}
-
 static GSDeviceOGL::VSSelector convertSel(const GSHWDrawConfig::VSSelector sel)
 {
 	GSDeviceOGL::VSSelector out;
@@ -2066,8 +2005,11 @@ static GSDeviceOGL::VSSelector convertSel(const GSHWDrawConfig::VSSelector sel)
 
 void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 {
-	glScissor(config.scissor.x, config.scissor.y, config.scissor.width(), config.scissor.height());
-	GLState::scissor = config.scissor;
+	if (!GLState::scissor.eq(config.scissor))
+	{
+		glScissor(config.scissor.x, config.scissor.y, config.scissor.width(), config.scissor.height());
+		GLState::scissor = config.scissor;
+	}
 
 	// Destination Alpha Setup
 	switch (config.destination_alpha)
@@ -2076,14 +2018,14 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 		case GSHWDrawConfig::DestinationAlphaMode::Full:
 			break; // No setup
 		case GSHWDrawConfig::DestinationAlphaMode::PrimIDTracking:
-			InitPrimDateTexture(config.rt, config.scissor);
+			InitPrimDateTexture(config.rt, config.drawarea);
 			break;
 		case GSHWDrawConfig::DestinationAlphaMode::StencilOne:
 			ClearStencil(config.ds, 1);
 			break;
 		case GSHWDrawConfig::DestinationAlphaMode::Stencil:
 		{
-			const GSVector4 src = GSVector4(config.scissor) / GSVector4(config.ds->GetSize()).xyxy();
+			const GSVector4 src = GSVector4(config.drawarea) / GSVector4(config.ds->GetSize()).xyxy();
 			const GSVector4 dst = src * 2.f - 1.f;
 			GSVertexPT1 vertices[] =
 			{
@@ -2101,12 +2043,12 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 	{
 		GSVector2i size = config.rt->GetSize();
 		hdr_rt = CreateRenderTarget(size.x, size.y, GSTexture::Format::FloatColor);
-		hdr_rt->CommitRegion(GSVector2i(config.scissor.z, config.scissor.w));
+		hdr_rt->CommitRegion(GSVector2i(config.drawarea.z, config.drawarea.w));
 		OMSetRenderTargets(hdr_rt, config.ds, &config.scissor);
 
 		// save blend state, since BlitRect destroys it
 		const bool old_blend = GLState::blend;
-		BlitRect(config.rt, config.scissor, config.rt->GetSize(), false, false);
+		BlitRect(config.rt, config.drawarea, config.rt->GetSize(), false, false);
 		if (old_blend)
 		{
 			GLState::blend = old_blend;
@@ -2137,13 +2079,15 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 	OMSetColorMaskState(config.colormask);
 	SetupOM(config.depth);
 
-	VSConstantBuffer cb_vs = convertCB(config.cb_vs);
-	PSConstantBuffer cb_ps = convertCB(config.cb_ps, config.ps.atst);
-	SetupCB(&cb_vs, &cb_ps);
-
-	if (config.cb_ps.channel_shuffle_int)
+	if (m_vs_cb_cache.Update(config.cb_vs))
 	{
-		SetupCBMisc(GSVector4i::load(config.cb_ps.channel_shuffle_int).u8to32());
+		WriteToStreamBuffer(m_vertex_uniform_stream_buffer.get(), g_vs_cb_index,
+			m_uniform_buffer_alignment, &config.cb_vs, sizeof(config.cb_vs));
+	}
+	if (m_ps_cb_cache.Update(config.cb_ps))
+	{
+		WriteToStreamBuffer(m_fragment_uniform_stream_buffer.get(), g_ps_cb_index,
+			m_uniform_buffer_alignment, &config.cb_ps, sizeof(config.cb_ps));
 	}
 
 	GSSelector gssel;
@@ -2198,11 +2142,14 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 
 	if (config.alpha_second_pass.enable)
 	{
-		if (config.cb_ps != config.alpha_second_pass.cb_ps)
+		// cbuffer will definitely be dirty if aref changes, no need to check it
+		if (config.cb_ps.FogColor_AREF.a != config.alpha_second_pass.ps_aref)
 		{
-			cb_ps = convertCB(config.alpha_second_pass.cb_ps, config.alpha_second_pass.ps.atst);
-			SetupCB(&cb_vs, &cb_ps);
+			config.cb_ps.FogColor_AREF.a = config.alpha_second_pass.ps_aref;
+			WriteToStreamBuffer(m_fragment_uniform_stream_buffer.get(), g_ps_cb_index,
+				m_uniform_buffer_alignment, &config.cb_ps, sizeof(config.cb_ps));
 		}
+
 		SetupPipeline(vssel, gssel, config.alpha_second_pass.ps);
 		OMSetColorMaskState(config.alpha_second_pass.colormask);
 		SetupOM(config.alpha_second_pass.depth);
@@ -2220,7 +2167,7 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 	if (hdr_rt)
 	{
 		GSVector2i size = config.rt->GetSize();
-		GSVector4 dRect(config.scissor);
+		GSVector4 dRect(config.drawarea);
 		const GSVector4 sRect = dRect / GSVector4(size.x, size.y).xyxy();
 		StretchRect(hdr_rt, sRect, config.rt, dRect, ShaderConvert::MOD_256, false);
 

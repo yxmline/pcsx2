@@ -1477,53 +1477,6 @@ void GSDevice11::CompileShader(const std::string& source, const char* fn, ID3DIn
 		throw GSRecoverableError();
 }
 
-static GSDevice11::VSConstantBuffer convertCB(const GSHWDrawConfig::VSConstantBuffer& cb)
-{
-	GSDevice11::VSConstantBuffer out;
-	out.VertexScale  = GSVector4(cb.vertex_scale.x, -cb.vertex_scale.y, ldexpf(1, -32), 0.0f);
-	out.VertexOffset = GSVector4(cb.vertex_offset.x, -cb.vertex_offset.y, 0.0f, -1.0f);
-	out.Texture_Scale_Offset = GSVector4::loadl(&cb.texture_scale).upld(GSVector4::loadl(&cb.texture_offset));
-	out.MaxDepth = cb.max_depth;
-	return out;
-}
-
-static GSDevice11::GSConstantBuffer convertCBGS(const GSHWDrawConfig::VSConstantBuffer& cb)
-{
-	GSDevice11::GSConstantBuffer out;
-	out.PointSize = cb.point_size;
-	return out;
-}
-
-static GSDevice11::PSConstantBuffer convertCB(const GSHWDrawConfig::PSConstantBuffer& cb, int atst)
-{
-	GSDevice11::PSConstantBuffer out;
-	out.FogColor_AREF = GSVector4(GSVector4i::load(cb.fog_color_aref).u8to32());
-	if (atst == 1 || atst == 2) // Greater / Less alpha
-		out.FogColor_AREF.w -= 0.1f;
-	out.HalfTexel = cb.half_texel;
-	out.WH = cb.texture_size;
-	out.MinMax = cb.uv_min_max;
-	const GSVector4 ta_af(GSVector4i::load(cb.ta_af).u8to32());
-	out.MinF_TA = (GSVector4(out.MskFix) + 0.5f).xyxy(ta_af) / out.WH.xyxy(GSVector4(255, 255));
-	out.MskFix = GSVector4i::loadl(&cb.uv_msk_fix).u16to32();
-	out.ChannelShuffle = GSVector4i::load(cb.channel_shuffle_int).u8to32();
-	out.FbMask = GSVector4i::load(cb.fbmask_int).u8to32();
-	out.TC_OffsetHack = GSVector4(cb.tc_offset.x, cb.tc_offset.y).xyxy();
-	out.Af_MaxDepth = GSVector4(ta_af.a / 128.f, cb.max_depth * ldexpf(1, -32));
-
-	GSVector4i dither = GSVector4i::loadl(&cb.dither_matrix).u8to16();
-	const GSVector4i ditherLow = dither.sll16(13).sra16(13);
-	const GSVector4i ditherHi  = dither.sll16(9).sra16(5);
-	dither = ditherLow.blend8(ditherHi, GSVector4i(0xFF00FF00));
-
-	out.DitherMatrix[0] = GSVector4(dither.xxxx().i8to32());
-	out.DitherMatrix[1] = GSVector4(dither.yyyy().i8to32());
-	out.DitherMatrix[2] = GSVector4(dither.zzzz().i8to32());
-	out.DitherMatrix[3] = GSVector4(dither.wwww().i8to32());
-
-	return out;
-}
-
 static GSDevice11::OMBlendSelector convertSel(GSHWDrawConfig::ColorMaskSelector cm, GSHWDrawConfig::BlendState blend)
 {
 	GSDevice11::OMBlendSelector out;
@@ -1561,7 +1514,7 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 
 	if (config.destination_alpha != GSHWDrawConfig::DestinationAlphaMode::Off)
 	{
-		const GSVector4 src = GSVector4(config.scissor) / GSVector4(config.ds->GetSize()).xyxy();
+		const GSVector4 src = GSVector4(config.drawarea) / GSVector4(config.ds->GetSize()).xyxy();
 		const GSVector4 dst = src * 2.0f - 1.0f;
 
 		GSVertexPT1 vertices[] =
@@ -1579,10 +1532,10 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 	if (config.ps.hdr)
 	{
 		const GSVector2i size = config.rt->GetSize();
-		const GSVector4 dRect(config.scissor);
+		const GSVector4 dRect(config.drawarea);
 		const GSVector4 sRect = dRect / GSVector4(size.x, size.y).xyxy();
 		hdr_rt = CreateRenderTarget(size.x, size.y, GSTexture::Format::FloatColor);
-		hdr_rt->CommitRegion(GSVector2i(config.scissor.z, config.scissor.w));
+		hdr_rt->CommitRegion(GSVector2i(config.drawarea.z, config.drawarea.w));
 		// Warning: StretchRect must be called before BeginScene otherwise
 		// vertices will be overwritten. Trust me you don't want to do that.
 		StretchRect(config.rt, sRect, hdr_rt, dRect, ShaderConvert::COPY, false);
@@ -1618,14 +1571,10 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 		PSSetShaderResource(3, config.rt);
 	}
 
-	const VSConstantBuffer cb_vs = convertCB(config.cb_vs);
-	const GSConstantBuffer cb_gs = convertCBGS(config.cb_vs);
-	PSConstantBuffer cb_ps = convertCB(config.cb_ps, config.ps.atst);
-
 	SetupOM(config.depth, convertSel(config.colormask, config.blend), config.blend.factor);
-	SetupVS(config.vs, &cb_vs);
-	SetupGS(config.gs, &cb_gs);
-	SetupPS(config.ps, &cb_ps, config.sampler);
+	SetupVS(config.vs, &config.cb_vs);
+	SetupGS(config.gs);
+	SetupPS(config.ps, &config.cb_ps, config.sampler);
 
 	OMSetRenderTargets(hdr_rt ? hdr_rt : config.rt, config.ds, &config.scissor);
 
@@ -1634,11 +1583,17 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 	if (config.alpha_second_pass.enable)
 	{
 		preprocessSel(config.alpha_second_pass.ps);
-		if (config.cb_ps != config.alpha_second_pass.cb_ps)
+		if (config.cb_ps.FogColor_AREF.a != config.alpha_second_pass.ps_aref)
 		{
-			cb_ps = convertCB(config.alpha_second_pass.cb_ps, config.alpha_second_pass.ps.atst);
+			config.cb_ps.FogColor_AREF.a = config.alpha_second_pass.ps_aref;
+			SetupPS(config.alpha_second_pass.ps, &config.cb_ps, config.sampler);
 		}
-		SetupPS(config.alpha_second_pass.ps, &cb_ps, config.sampler);
+		else
+		{
+			// ps cbuffer hasn't changed, so don't bother checking
+			SetupPS(config.alpha_second_pass.ps, nullptr, config.sampler);
+		}
+
 		SetupOM(config.alpha_second_pass.depth, convertSel(config.alpha_second_pass.colormask, config.blend), config.blend.factor);
 
 		DrawIndexedPrimitive();
@@ -1649,7 +1604,7 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 	if (hdr_rt)
 	{
 		const GSVector2i size = config.rt->GetSize();
-		const GSVector4 dRect(config.scissor);
+		const GSVector4 dRect(config.drawarea);
 		const GSVector4 sRect = dRect / GSVector4(size.x, size.y).xyxy();
 		StretchRect(hdr_rt, sRect, config.rt, dRect, ShaderConvert::MOD_256, false);
 		Recycle(hdr_rt);
