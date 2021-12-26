@@ -252,14 +252,6 @@ int _GSopen(const WindowInfo& wi, const char* title, GSRendererType renderer, in
 		return -1;
 	}
 
-	if (renderer == GSRendererType::OGL_HW && theApp.GetConfigI("debug_glsl_shader") == 2)
-	{
-		printf("GS: test OpenGL shader. Please wait...\n\n");
-		static_cast<GSDeviceOGL*>(s_gs->m_dev)->SelfShaderTest();
-		printf("\nGS: test OpenGL shader done. It will now exit\n");
-		return -1;
-	}
-
 	return 0;
 }
 
@@ -1121,9 +1113,9 @@ void GSApp::Init()
 	m_default_configuration["CaptureWidth"]                               = "640";
 	m_default_configuration["crc_hack_level"]                             = std::to_string(static_cast<s8>(CRCHackLevel::Automatic));
 	m_default_configuration["CrcHacksExclusions"]                         = "";
-	m_default_configuration["debug_glsl_shader"]                          = "0";
 	m_default_configuration["debug_opengl"]                               = "0";
 	m_default_configuration["disable_hw_gl_draw"]                         = "0";
+	m_default_configuration["disable_shader_cache"]                       = "0";
 	m_default_configuration["dithering_ps2"]                              = "2";
 	m_default_configuration["dump"]                                       = "0";
 	m_default_configuration["extrathreads"]                               = "2";

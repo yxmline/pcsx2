@@ -19,11 +19,14 @@ target_sources(common PRIVATE
 	FastFormatString.cpp
 	FastJmp.cpp
 	GL/Context.cpp
+	GL/Program.cpp
+	GL/ShaderCache.cpp
 	GL/StreamBuffer.cpp
 	FileSystem.cpp
 	IniInterface.cpp
 	Mutex.cpp
 	Misc.cpp
+	MD5Digest.cpp
 	PathUtils.cpp
 	PrecompiledHeader.cpp
 	Perf.cpp
@@ -75,9 +78,13 @@ target_sources(common PRIVATE
 	FileSystem.h
 	General.h
 	GL/Context.h
+	GL/Program.h
+	GL/ShaderCache.h
 	GL/StreamBuffer.h
+	HashCombine.h
 	MemcpyFast.h
 	MemsetFast.inl
+	MD5Digest.h
 	Path.h
 	PageFaultSource.h
 	PrecompiledHeader.h

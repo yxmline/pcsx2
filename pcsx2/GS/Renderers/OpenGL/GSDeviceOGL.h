@@ -17,10 +17,12 @@
 
 #include "common/GL/Context.h"
 #include "common/GL/StreamBuffer.h"
+#include "common/GL/Program.h"
+#include "common/GL/ShaderCache.h"
+#include "common/HashCombine.h"
 #include "GS/Renderers/Common/GSDevice.h"
 #include "GSTextureOGL.h"
 #include "GSUniformBufferOGL.h"
-#include "GSShaderOGL.h"
 #include "GLState.h"
 #include "GS/GS.h"
 
@@ -181,17 +183,33 @@ public:
 	using OMDepthStencilSelector = GSHWDrawConfig::DepthStencilSelector;
 	using OMColorMaskSelector = GSHWDrawConfig::ColorMaskSelector;
 
-	struct alignas(32) MiscConstantBuffer
+	struct ProgramSelector
 	{
-		GSVector4i EMOD_AC;
+		VSSelector vs;
+		GSSelector gs;
+		PSSelector ps;
 
-		MiscConstantBuffer() { memset(this, 0, sizeof(*this)); }
+		__fi bool operator==(const ProgramSelector& p) const { return vs.key == p.vs.key && gs.key == p.gs.key && ps.key == p.ps.key; }
+		__fi bool operator!=(const ProgramSelector& p) const { return vs.key != p.vs.key || gs.key != p.gs.key || ps.key != p.ps.key; }
+	};
+
+	struct ProgramSelectorHash
+	{
+		__fi std::size_t operator()(const ProgramSelector& p) const noexcept
+		{
+			std::size_t h = 0;
+			HashCombine(h, p.vs.key, p.gs.key, p.ps.key);
+			return h;
+		}
 	};
 
 	static int m_shader_inst;
 	static int m_shader_reg;
 
 private:
+	// Increment this constant whenever shaders change, to invalidate user's program binary cache.
+	static constexpr u32 SHADER_VERSION = 1;
+
 	std::unique_ptr<GL::Context> m_gl_context;
 	int m_mipmap;
 	int m_upscale_multiplier;
@@ -221,38 +239,35 @@ private:
 
 	struct
 	{
-		GLuint ps[2]; // program object
-		GSUniformBufferOGL* cb; // uniform buffer object
+		GL::Program ps[2]; // program object
 	} m_merge_obj;
 
 	struct
 	{
-		GLuint ps[4]; // program object
-		GSUniformBufferOGL* cb; // uniform buffer object
+		GL::Program ps[4]; // program object
 	} m_interlace;
 
 	struct
 	{
-		GLuint vs; // program object
-		GLuint ps[(int)ShaderConvert::Count]; // program object
+		std::string vs;
+		GL::Program ps[static_cast<int>(ShaderConvert::Count)]; // program object
 		GLuint ln; // sampler object
 		GLuint pt; // sampler object
 		GSDepthStencilOGL* dss;
 		GSDepthStencilOGL* dss_write;
-		GSUniformBufferOGL* cb;
 	} m_convert;
 
 	struct
 	{
-		GLuint ps;
-		GSUniformBufferOGL* cb;
+		GL::Program ps;
 	} m_fxaa;
 
+#ifndef PCSX2_CORE
 	struct
 	{
-		GLuint ps;
-		GSUniformBufferOGL* cb;
+		GL::Program ps;
 	} m_shaderfx;
+#endif
 
 	struct
 	{
@@ -262,7 +277,7 @@ private:
 
 	struct
 	{
-		GLuint ps;
+		GL::Program ps;
 	} m_shadeboost;
 
 	struct
@@ -273,18 +288,15 @@ private:
 		GLuint timer() { return timer_query[last_query]; }
 	} m_profiler;
 
-	GLuint m_vs[1 << 1];
-	GLuint m_gs[1 << 3];
 	GLuint m_ps_ss[1 << 7];
 	GSDepthStencilOGL* m_om_dss[1 << 5];
-	std::unordered_map<u64, GLuint> m_ps;
-	GLuint m_apitrace;
+	std::unordered_map<ProgramSelector, GL::Program, ProgramSelectorHash> m_programs;
+	GL::ShaderCache m_shader_cache;
 
 	GLuint m_palette_ss;
 
 	GSHWDrawConfig::VSConstantBuffer m_vs_cb_cache;
 	GSHWDrawConfig::PSConstantBuffer m_ps_cb_cache;
-	MiscConstantBuffer m_misc_cb_cache;
 
 	std::unique_ptr<GSTexture> m_font;
 	AlignedBuffer<u8, 32> m_download_buffer;
@@ -307,8 +319,6 @@ private:
 	void DrawStretchRect(const GSVector4& sRect, const GSVector4& dRect, const GSVector2i& ds);
 
 public:
-	GSShaderOGL* m_shader;
-
 	GSDeviceOGL();
 	virtual ~GSDeviceOGL();
 
@@ -342,9 +352,9 @@ public:
 	void BlitRect(GSTexture* sTex, const GSVector4i& r, const GSVector2i& dsize, bool at_origin, bool linear);
 
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader = ShaderConvert::COPY, bool linear = true) final;
-	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, bool linear = true);
+	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, const GL::Program& ps, bool linear = true);
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, bool red, bool green, bool blue, bool alpha) final;
-	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, GLuint ps, int bs, OMColorMaskSelector cms, bool linear = true);
+	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, const GL::Program& ps, int bs, OMColorMaskSelector cms, bool linear = true);
 
 	void RenderHW(GSHWDrawConfig& config) final;
 	void SendHWDraw(const GSHWDrawConfig& config);
@@ -368,17 +378,15 @@ public:
 	bool HasDepthSparse() final { return GLLoader::found_compatible_sparse_depth; }
 
 	bool CreateTextureFX();
-	GLuint CompileVS(VSSelector sel);
-	GLuint CompileGS(GSSelector sel);
-	GLuint CompilePS(PSSelector sel);
+	std::string GetShaderSource(const std::string_view& entry, GLenum type, const std::string_view& common_header, const std::string_view& glsl_h_code, const std::string_view& macro_sel);
+	std::string GenGlslHeader(const std::string_view& entry, GLenum type, const std::string_view& macro);
+	std::string GetVSSource(VSSelector sel);
+	std::string GetGSSource(GSSelector sel);
+	std::string GetPSSource(PSSelector sel);
 	GLuint CreateSampler(PSSamplerSelector sel);
 	GSDepthStencilOGL* CreateDepthStencil(OMDepthStencilSelector dssel);
 
-	void SelfShaderTestPrint(const std::string& test, int& nb_shader);
-	void SelfShaderTestRun(const std::string& dir, const std::string& file, const PSSelector& sel, int& nb_shader);
-	void SelfShaderTest();
-
-	void SetupPipeline(const VSSelector& vsel, const GSSelector& gsel, const PSSelector& psel);
+	void SetupPipeline(const ProgramSelector& psel);
 	void SetupSampler(PSSamplerSelector ssel);
 	void SetupOM(OMDepthStencilSelector dssel);
 	GLuint GetSamplerID(PSSamplerSelector ssel);

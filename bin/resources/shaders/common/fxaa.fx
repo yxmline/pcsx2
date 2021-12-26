@@ -12,29 +12,14 @@
 							 [GLOBALS|FUNCTIONS]
 ------------------------------------------------------------------------------*/
 #if (FXAA_GLSL_130 == 1)
-in SHADER
-{
-    vec4 p;
-    vec2 t;
-    vec4 c;
-} PSin;
+
+in vec2 PSin_t;
 
 layout(location = 0) out vec4 SV_Target0;
-
-layout(std140, binding = 14) uniform cb14
-{
-    vec2 _xyFrame;
-    vec4 _rcpFrame;
-};
 
 #elif (SHADER_MODEL >= 0x400)
 Texture2D Texture : register(t0);
 SamplerState TextureSampler : register(s0);
-
-cbuffer cb0
-{
-	float4 _rcpFrame : register(c0);
-};
 
 struct VS_INPUT
 {
@@ -130,11 +115,6 @@ float RGBLuminance(float3 color)
 	const float3 lumCoeff = float3(0.2126729, 0.7151522, 0.0721750);
 	return dot(color.rgb, lumCoeff);
 }
-
-#if (FXAA_GLSL_130 == 0)
-#define PixelSize float2(_rcpFrame.x, _rcpFrame.y)
-#endif
-
 
 float3 RGBGammaToLinear(float3 color, float gamma)
 {
@@ -502,6 +482,7 @@ float4 FxaaPass(float4 FxaaColor : COLOR0, float2 uv0 : TEXCOORD0)
 	tex.tex = Texture;
 	tex.smpl = TextureSampler;
 
+	float2 PixelSize;
 	Texture.GetDimensions(PixelSize.x, PixelSize.y);
 	FxaaColor = FxaaPixelShader(uv0, tex, 1.0/PixelSize.xy, FxaaSubpixMax, FxaaEdgeThreshold, FxaaEdgeThresholdMin);
 
@@ -520,9 +501,9 @@ float4 FxaaPass(float4 FxaaColor : COLOR0, float2 uv0 : TEXCOORD0)
 
 void ps_main()
 {
-	vec4 color = texture(TextureSampler, PSin.t);
-	color      = PreGammaPass(color, PSin.t);
-	color      = FxaaPass(color, PSin.t);
+	vec4 color = texture(TextureSampler, PSin_t);
+	color      = PreGammaPass(color, PSin_t);
+	color      = FxaaPass(color, PSin_t);
 
 	SV_Target0 = color;
 }

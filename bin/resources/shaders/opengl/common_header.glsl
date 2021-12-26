@@ -44,17 +44,8 @@ out gl_PerVertex {
 // Performance note, some drivers (nouveau) will validate all Constant Buffers
 // even if only one was updated.
 
-#ifdef FRAGMENT_SHADER
-layout(std140, binding = 15) uniform cb15
-{
-    int EMODA;
-    int EMODC;
-    ivec2 pad_cb15;
-};
-#endif
-
 #if defined(VERTEX_SHADER) || defined(GEOMETRY_SHADER)
-layout(std140, binding = 20) uniform cb20
+layout(std140, binding = 1) uniform cb20
 {
     vec2  VertexScale;
     vec2  VertexOffset;
@@ -69,7 +60,7 @@ layout(std140, binding = 20) uniform cb20
 #endif
 
 #if defined(VERTEX_SHADER) || defined(FRAGMENT_SHADER)
-layout(std140, binding = 21) uniform cb21
+layout(std140, binding = 0) uniform cb21
 {
     vec3 FogColor;
     float AREF;
