@@ -95,21 +95,25 @@ struct cdvdStruct
 	u8 nCommand;
 	u8 Ready;
 	u8 Error;
-	u8 PwOff;
+	u8 IntrStat;
 	u8 Status;
+	u8 StatusSticky;
 	u8 Type;
 	u8 sCommand;
 	u8 sDataIn;
 	u8 sDataOut;
 	u8 HowTo;
 
-	u8 Param[32];
-	u8 Result[32];
+	u8 NCMDParam[16];
+	u8 SCMDParam[16];
+	u8 SCMDResult[16];
 
-	u8 ParamC;
-	u8 ParamP;
-	u8 ResultC;
-	u8 ResultP;
+	u8 NCMDParamC;
+	u8 NCMDParamP;
+	u8 SCMDParamC;
+	u8 SCMDParamP;
+	u8 SCMDResultC;
+	u8 SCMDResultP;
 
 	u8 CBlockIndex;
 	u8 COffset;
@@ -148,12 +152,11 @@ struct cdvdStruct
 	u8 TrayTimeout;
 	u8 Action;        // the currently scheduled emulated action
 	u32 SeekToSector; // Holds the destination sector during seek operations.
+	u32 MaxSector;    // Current disc max sector.
 	u32 ReadTime;     // Avg. time to read one block of data (in Iop cycles)
 	bool Spinning;    // indicates if the Cdvd is spinning or needs a spinup delay
-	bool mediaChanged;
 	cdvdTrayTimer Tray;
 	u8 nextSectorsBuffered;
-	bool triggerDataReady;
 };
 
 extern cdvdStruct cdvd;
