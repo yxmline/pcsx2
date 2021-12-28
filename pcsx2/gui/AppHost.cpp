@@ -19,8 +19,12 @@
 #include "common/FileSystem.h"
 #include "common/Path.h"
 
-#include "AppConfig.h"
 #include "Host.h"
+#include "HostSettings.h"
+
+#include "gui/App.h"
+#include "gui/AppConfig.h"
+#include "gui/pxEvents.h"
 
 static auto OpenResourceCFile(const char* filename, const char* mode)
 {
@@ -67,13 +71,21 @@ std::optional<std::string> Host::ReadResourceFileToString(const char* filename)
 	return ret;
 }
 
-std::optional<std::string> Host::getResourceFilePath(const char* filename) 
+bool Host::GetBoolSettingValue(const char* section, const char* key, bool default_value /* = false */)
 {
-	const std::string full_filename(Path::CombineStdString(EmuFolders::Resources, filename));
-	if (!FileSystem::FileExists(full_filename.c_str()))
-	{
-		Console.Error("Resource file does not exist '%s'", filename);
-		return std::nullopt;
-	}
-	return full_filename;
+	return default_value;
 }
+
+std::string Host::GetStringSettingValue(const char* section, const char* key, const char* default_value /* = "" */)
+{
+	return default_value;
+}
+
+void Host::ReportErrorAsync(const std::string_view& title, const std::string_view& message)
+{
+	wxGetApp().PostEvent(pxMessageBoxEvent(
+		title.empty() ? wxString() : wxString::FromUTF8(title.data(), title.length()),
+		message.empty() ? wxString() : wxString::FromUTF8(message.data(), message.length()),
+		MsgButtons().OK()));
+}
+

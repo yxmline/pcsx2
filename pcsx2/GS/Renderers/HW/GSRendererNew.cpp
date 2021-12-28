@@ -560,10 +560,10 @@ void GSRendererNew::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 				sw_blending |= true;
 				[[fallthrough]];
 			case AccBlendLevel::Full:
-				sw_blending |= (ALPHA.A != ALPHA.B) && ((ALPHA.C == 0 && GetAlphaMinMax().max > 128) || (ALPHA.C == 2 && ALPHA.FIX > 128u));
+				sw_blending |= ALPHA.A != ALPHA.B && ALPHA.C == 0 && GetAlphaMinMax().max > 128;
 				[[fallthrough]];
 			case AccBlendLevel::High:
-				sw_blending |= (ALPHA.C == 1);
+				sw_blending |= ALPHA.C == 1 || (ALPHA.A != ALPHA.B && ALPHA.C == 2 && ALPHA.FIX > 128u);
 				[[fallthrough]];
 			case AccBlendLevel::Medium:
 				// Initial idea was to enable accurate blending for sprite rendering to handle
@@ -588,8 +588,6 @@ void GSRendererNew::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 	if (m_sw_blending != AccBlendLevel::None)
 	{
 		blend_mix &= !sw_blending;
-		// Do not enable if As > 128 or F > 128, hw blend clamps to 1
-		blend_mix &= !((ALPHA.C == 0 && GetAlphaMinMax().max > 128) || (ALPHA.C == 2 && ALPHA.FIX > 128u));
 		sw_blending |= blend_mix;
 	}
 
@@ -709,6 +707,7 @@ void GSRendererNew::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 		else if (blend_mix)
 		{
 			m_conf.blend = {blend_index, ALPHA.FIX, ALPHA.C == 2, false, true};
+			m_conf.ps.alpha_clamp = 1;
 
 			if (blend_mix1)
 			{
