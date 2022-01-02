@@ -146,15 +146,8 @@ int _GSopen(const WindowInfo& wi, const char* title, GSRendererType renderer, in
 	if (renderer == GSRendererType::Undefined)
 	{
 		renderer = static_cast<GSRendererType>(theApp.GetConfigI("Renderer"));
-#ifdef _WIN32
 		if (renderer == GSRendererType::Default)
-		{
-			if (D3D::ShouldPreferD3D())
-				renderer = GSRendererType::DX1011_HW;
-			else
-				renderer = GSRendererType::OGL_HW;
-		}
-#endif
+			renderer = GSUtil::GetPreferredRenderer();
 	}
 
 	if (threads == -1)
@@ -286,23 +279,14 @@ int GSopen2(const WindowInfo& wi, u32 flags)
 				break;
 #endif
 			case GSRendererType::OGL_SW:
-#ifdef _WIN32
 			{
 				const auto config_renderer = static_cast<GSRendererType>(theApp.GetConfigI("Renderer"));
 
 				if (current_renderer == config_renderer)
-				{
-					if (D3D::ShouldPreferD3D())
-						current_renderer = GSRendererType::DX1011_HW;
-					else
-						current_renderer = GSRendererType::OGL_HW;
-				}
+					current_renderer = GSUtil::GetPreferredRenderer();
 				else
 					current_renderer = config_renderer;
 			}
-#else
-				current_renderer = GSRendererType::OGL_HW;
-#endif
 			break;
 			case GSRendererType::OGL_HW:
 				current_renderer = GSRendererType::OGL_SW;
@@ -1091,7 +1075,6 @@ void GSApp::Init()
 	// Avoid to clutter the ini file with useless options
 #ifdef _WIN32
 	// Per OS option.
-	m_default_configuration["adapter_index"]                              = "0";
 	m_default_configuration["CaptureFileName"]                            = "";
 	m_default_configuration["CaptureVideoCodecDisplayName"]               = "";
 	m_default_configuration["debug_d3d"]                                  = "0";
@@ -1101,6 +1084,7 @@ void GSApp::Init()
 #else
 	m_default_configuration["linux_replay"]                               = "1";
 #endif
+	m_default_configuration["adapter_index"]                              = "-1";
 	m_default_configuration["aa1"]                                        = "1";
 	m_default_configuration["accurate_date"]                              = "1";
 	m_default_configuration["accurate_blending_unit"]                     = "1";
