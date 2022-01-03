@@ -16,6 +16,7 @@
 #include "PrecompiledHeader.h"
 #include "GSTexture11.h"
 #include "GS/GSPng.h"
+#include "GS/GSPerfMon.h"
 
 GSTexture11::GSTexture11(wil::com_ptr_nothrow<ID3D11Texture2D> texture, GSTexture::Format format)
 	: m_texture(std::move(texture)), m_layer(0)
@@ -44,6 +45,11 @@ GSTexture11::GSTexture11(wil::com_ptr_nothrow<ID3D11Texture2D> texture, GSTextur
 	m_max_layer = m_desc.MipLevels;
 }
 
+void* GSTexture11::GetNativeHandle() const
+{
+	return static_cast<ID3D11ShaderResourceView*>(*const_cast<GSTexture11*>(this));
+}
+
 bool GSTexture11::Update(const GSVector4i& r, const void* data, int pitch, int layer)
 {
 	if (layer >= m_max_layer)
@@ -51,6 +57,8 @@ bool GSTexture11::Update(const GSVector4i& r, const void* data, int pitch, int l
 
 	if (m_dev && m_texture)
 	{
+		g_perfmon.Put(GSPerfMon::TextureUploads, 1);
+
 		D3D11_BOX box = {(UINT)r.left, (UINT)r.top, 0U, (UINT)r.right, (UINT)r.bottom, 1U};
 		UINT subresource = layer; // MipSlice + (ArraySlice * MipLevels).
 

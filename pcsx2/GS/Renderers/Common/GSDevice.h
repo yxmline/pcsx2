@@ -21,11 +21,12 @@
 #include "GSVertex.h"
 #include "GS/GSAlignedClass.h"
 #include "GS/GSExtra.h"
-#include "GSOsdManager.h"
 #include <array>
 #ifdef _WIN32
 #include <dxgi.h>
 #endif
+
+class HostDisplay;
 
 enum class ShaderConvert
 {
@@ -48,7 +49,6 @@ enum class ShaderConvert
 	RGB5A1_TO_FLOAT16,
 	RGBA_TO_8I = 17,
 	YUV,
-	OSD,
 	Count
 };
 
@@ -164,7 +164,9 @@ struct alignas(16) GSHWDrawConfig
 			{
 				u8 fst : 1;
 				u8 tme : 1;
-				u8 _free : 6;
+				u8 iip : 1;
+				u8 point_size : 1;		///< Set when points need to be expanded without geometry shader.
+				u8 _free : 1;
 			};
 			u8 key;
 		};
@@ -470,7 +472,8 @@ struct alignas(16) GSHWDrawConfig
 	bool require_full_barrier; ///< Require texture barrier between all prims
 
 	DestinationAlphaMode destination_alpha;
-	bool datm;
+	bool datm : 1;
+	bool line_expand : 1;
 
 	struct AlphaSecondPass
 	{
@@ -494,6 +497,9 @@ public:
 		bool geometry_shader      : 1; ///< Supports geometry shader
 		bool image_load_store     : 1; ///< Supports atomic min and max on images (for use with prim tracking destination alpha algorithm)
 		bool texture_barrier      : 1; ///< Supports sampling rt and hopefully texture barrier
+		bool provoking_vertex_last: 1; ///< Supports using the last vertex in a primitive as the value for flat shading.
+		bool point_expand         : 1; ///< Supports point expansion in hardware without using geometry shaders.
+		bool line_expand          : 1; ///< Supports line expansion in hardware without using geometry shaders.
 		FeatureSupport()
 		{
 			memset(this, 0, sizeof(*this));
@@ -520,9 +526,8 @@ protected:
 	static const int m_NO_BLEND = 0;
 	static const int m_MERGE_BLEND = m_blendMap.size() - 1;
 
-	int m_vsync;
 	bool m_rbswapped;
-	GSTexture* m_backbuffer;
+	HostDisplay* m_display;
 	GSTexture* m_merge;
 	GSTexture* m_weavebob;
 	GSTexture* m_blend;
@@ -551,10 +556,10 @@ protected:
 	virtual u16 ConvertBlendEnum(u16 generic) = 0; // Convert blend factors/ops from the generic enum to DX11/OGl specific.
 
 public:
-	GSOsdManager m_osd;
-
 	GSDevice();
 	virtual ~GSDevice();
+
+	__fi HostDisplay* GetDisplay() const { return m_display; }
 
 	void Recycle(GSTexture* t);
 
@@ -565,14 +570,11 @@ public:
 		DontCare
 	};
 
-	virtual bool Create(const WindowInfo& wi);
-	virtual bool Reset(int w, int h);
-	virtual bool IsLost(bool update = false) { return false; }
-	virtual void Present(const GSVector4i& r, int shader);
-	virtual void Present(GSTexture* sTex, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader = ShaderConvert::COPY);
-	virtual void Flip() {}
+	virtual bool Create(HostDisplay* display);
+	virtual void Destroy();
 
-	virtual void SetVSync(int vsync) { m_vsync = vsync; }
+	virtual void ResetAPIState();
+	virtual void RestoreAPIState();
 
 	virtual void BeginScene() {}
 	virtual void EndScene();
@@ -620,7 +622,6 @@ public:
 	void FXAA();
 	void ShadeBoost();
 	void ExternalFX();
-	virtual void RenderOsd(GSTexture* dt) {};
 
 	bool ResizeTexture(GSTexture** t, GSTexture::Type type, int w, int h);
 	bool ResizeTexture(GSTexture** t, int w, int h);
@@ -628,8 +629,6 @@ public:
 	bool ResizeTarget(GSTexture** t);
 
 	bool IsRBSwapped() { return m_rbswapped; }
-	int GetBackbufferWidth() const { return m_backbuffer ? m_backbuffer->GetWidth() : 0; }
-	int GetBackbufferHeight() const { return m_backbuffer ? m_backbuffer->GetHeight() : 0; }
 
 	void AgePool();
 	void PurgePool();
@@ -667,3 +666,5 @@ struct GSAdapter
 	// TODO
 #endif
 };
+
+extern std::unique_ptr<GSDevice> g_gs_device;
