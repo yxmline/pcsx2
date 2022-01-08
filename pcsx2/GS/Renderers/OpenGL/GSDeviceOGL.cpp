@@ -18,6 +18,7 @@
 #include "GS/GSState.h"
 #include "GSDeviceOGL.h"
 #include "GLState.h"
+#include "GS/GSGL.h"
 #include "GS/GSUtil.h"
 #include "Host.h"
 #include "HostDisplay.h"
@@ -62,7 +63,6 @@ GSDeviceOGL::GSDeviceOGL()
 	memset(&m_om_dss, 0, sizeof(m_om_dss));
 	memset(&m_profiler, 0, sizeof(m_profiler));
 
-	m_mipmap = theApp.GetConfigI("mipmap");
 	m_upscale_multiplier = std::max(1, theApp.GetConfigI("upscale_multiplier"));
 
 	// Reset the debug file
@@ -82,8 +82,6 @@ GSDeviceOGL::~GSDeviceOGL()
 		m_debug_gl_file = NULL;
 	}
 #endif
-
-	GL_PUSH("GSDeviceOGL destructor");
 
 	// Clean vertex buffer state
 	if (m_vertex_array_object)
@@ -200,12 +198,12 @@ void GSDeviceOGL::GenerateProfilerData()
 	}
 }
 
-GSTexture* GSDeviceOGL::CreateSurface(GSTexture::Type type, int w, int h, GSTexture::Format fmt)
+GSTexture* GSDeviceOGL::CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format fmt)
 {
 	GL_PUSH("Create surface");
 
 	// A wrapper to call GSTextureOGL, with the different kind of parameters.
-	GSTextureOGL* t = new GSTextureOGL(type, w, h, fmt, m_fbo_read, m_mipmap > 1 || GSConfig.UserHacks_TriFilter != TriFiltering::Off);
+	GSTextureOGL* t = new GSTextureOGL(type, w, h, fmt, m_fbo_read, mipmap);
 
 	return t;
 }
@@ -239,6 +237,7 @@ bool GSDeviceOGL::Create(HostDisplay* display)
 	m_features.image_load_store = GLLoader::found_GL_ARB_shader_image_load_store && GLLoader::found_GL_ARB_clear_texture;
 	m_features.texture_barrier = true;
 	m_features.provoking_vertex_last = true;
+	m_features.prefer_new_textures = false;
 
 	GLint point_range[2] = {};
 	GLint line_range[2] = {};
@@ -752,6 +751,31 @@ void GSDeviceOGL::ClearRenderTarget(GSTexture* t, u32 c)
 	ClearRenderTarget(t, color);
 }
 
+void GSDeviceOGL::InvalidateRenderTarget(GSTexture* t)
+{
+	GSTextureOGL* T = static_cast<GSTextureOGL*>(t);
+	if (!T || T->HasBeenCleaned())
+		return;
+
+	if (GLAD_GL_VERSION_4_3 || GLAD_GL_ES_VERSION_3_0)
+	{
+		OMSetFBO(m_fbo);
+
+		if (T->GetType() == GSTexture::Type::DepthStencil || T->GetType() == GSTexture::Type::SparseDepthStencil)
+		{
+			OMAttachDs(T);
+			const GLenum attachments[] = {GL_DEPTH_STENCIL_ATTACHMENT};
+			glInvalidateFramebuffer(GL_DRAW_FRAMEBUFFER, std::size(attachments), attachments);
+		}
+		else
+		{
+			OMAttachRt(T);
+			const GLenum attachments[] = {GL_COLOR_ATTACHMENT0};
+			glInvalidateFramebuffer(GL_DRAW_FRAMEBUFFER, std::size(attachments), attachments);
+		}
+	}
+}
+
 void GSDeviceOGL::ClearDepth(GSTexture* t)
 {
 	if (!t)
@@ -925,7 +949,7 @@ void GSDeviceOGL::InitPrimDateTexture(GSTexture* rt, const GSVector4i& area)
 
 	// Create a texture to avoid the useless clean@0
 	if (m_date.t == NULL)
-		m_date.t = CreateTexture(rtsize.x, rtsize.y, GSTexture::Format::Int32);
+		m_date.t = CreateTexture(rtsize.x, rtsize.y, false, GSTexture::Format::Int32);
 
 	// Clean with the max signed value
 	const int max_int = 0x7FFFFFFF;
@@ -1586,6 +1610,16 @@ void GSDeviceOGL::PSSetSamplerState(GLuint ss)
 	}
 }
 
+void GSDeviceOGL::ClearSamplerCache()
+{
+	glDeleteSamplers(std::size(m_ps_ss), m_ps_ss);
+
+	for (u32 key = 0; key < std::size(m_ps_ss); key++)
+	{
+		m_ps_ss[key] = CreateSampler(PSSamplerSelector(key));
+	}
+}
+
 void GSDeviceOGL::OMAttachRt(GSTextureOGL* rt)
 {
 	GLuint id = 0;
@@ -2136,4 +2170,75 @@ u16 GSDeviceOGL::ConvertBlendEnum(u16 generic)
 		case OP_REV_SUBTRACT : return GL_FUNC_REVERSE_SUBTRACT;
 		default              : ASSERT(0); return 0;
 	}
+}
+
+void GSDeviceOGL::PushDebugGroup(const char* fmt, ...)
+{
+#ifdef ENABLE_OGL_DEBUG
+	if (!glPushDebugGroup)
+		return;
+
+	std::va_list ap;
+	va_start(ap, fmt);
+	const std::string buf(StringUtil::StdStringFromFormatV(fmt, ap));
+	va_end(ap);
+	if (!buf.empty())
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0xBAD, -1, buf.c_str());
+#endif
+}
+
+void GSDeviceOGL::PopDebugGroup()
+{
+#ifdef ENABLE_OGL_DEBUG
+	if (!glPopDebugGroup)
+		return;
+	
+	glPopDebugGroup();
+#endif
+}
+
+void GSDeviceOGL::InsertDebugMessage(DebugMessageCategory category, const char* fmt, ...)
+{
+#ifdef ENABLE_OGL_DEBUG
+	if (!glDebugMessageInsert)
+		return;
+
+	GLenum type, id, severity;
+	switch (category)
+	{
+	case GSDevice::DebugMessageCategory::Cache:
+			type = GL_DEBUG_TYPE_OTHER;
+			id = 0xFEAD;
+			severity = GL_DEBUG_SEVERITY_NOTIFICATION;
+		break;
+	case GSDevice::DebugMessageCategory::Reg:
+		type = GL_DEBUG_TYPE_OTHER;
+		id = 0xB0B0;
+		severity = GL_DEBUG_SEVERITY_NOTIFICATION;
+		break;
+	case GSDevice::DebugMessageCategory::Debug:
+		type = GL_DEBUG_TYPE_OTHER;
+		id = 0xD0D0;
+		severity = GL_DEBUG_SEVERITY_NOTIFICATION;
+		break;
+	case GSDevice::DebugMessageCategory::Message:
+		type = GL_DEBUG_TYPE_ERROR;
+		id = 0xDEAD;
+		severity = GL_DEBUG_SEVERITY_MEDIUM;
+		break;
+	case GSDevice::DebugMessageCategory::Performance:		
+	default:
+		type = GL_DEBUG_TYPE_PERFORMANCE;
+		id = 0xFEE1;
+		severity = GL_DEBUG_SEVERITY_NOTIFICATION;
+		break;
+	}
+
+	std::va_list ap;
+	va_start(ap, fmt);
+	const std::string buf(StringUtil::StdStringFromFormatV(fmt, ap));
+	va_end(ap);
+	if (!buf.empty())
+		glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, type, id, severity, buf.size(), buf.c_str());
+#endif
 }

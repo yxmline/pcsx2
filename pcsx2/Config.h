@@ -108,6 +108,7 @@ enum class GSRendererType : s8
 	Null = 11,
 	OGL = 12,
 	SW = 13,
+	VK = 14,
 };
 
 enum class GSInterlaceMode : u8
@@ -403,6 +404,7 @@ struct Pcsx2Config
 					UseDebugDevice : 1,
 					UseBlitSwapChain : 1,
 					DisableShaderCache : 1,
+					ThreadedPresentation : 1,
 					OsdShowMessages : 1,
 					OsdShowSpeed : 1,
 					OsdShowFPS : 1,
@@ -437,7 +439,8 @@ struct Pcsx2Config
 					SaveRT : 1,
 					SaveFrame : 1,
 					SaveTexture : 1,
-					SaveDepth : 1;
+					SaveDepth : 1,
+					PreloadTexture : 1;
 			};
 		};
 

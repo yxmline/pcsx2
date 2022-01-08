@@ -100,7 +100,7 @@ void GSRendererNew::SetupIA(const float& sx, const float& sy)
 			// the extra validation cost of the extra stage.
 			//
 			// Note: keep Geometry Shader in the replayer to ease debug.
-			if (g_gs_device->Features().geometry_shader && !m_vt.m_accurate_stq && (m_vertex.next > 32 || GLLoader::in_replayer)) // <=> 16 sprites (based on Shadow Hearts)
+			if (g_gs_device->Features().geometry_shader && !m_vt.m_accurate_stq && m_vertex.next > 32) // <=> 16 sprites (based on Shadow Hearts)
 			{
 				m_conf.gs.expand = true;
 
@@ -661,20 +661,6 @@ void GSRendererNew::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 		}
 	}
 
-	// GL42 interact very badly with sw blending. GL42 uses the primitiveID to find the primitive
-	// that write the bad alpha value. Sw blending will force the draw to run primitive by primitive
-	// (therefore primitiveID will be constant to 1).
-	// Switch DATE_GL42 with DATE_GL45 in such cases to ensure accuracy.
-	// No mix of COLCLIP + sw blend + DATE_GL42, neither sw fbmask + DATE_GL42.
-	// Note: Do the swap after colclip to avoid adding extra conditions.
-	if (sw_blending && DATE_GL42)
-	{
-		GL_PERF("DATE: Swap DATE_GL42 with DATE_GL45");
-		m_conf.require_full_barrier = true;
-		DATE_GL42 = false;
-		DATE_GL45 = true;
-	}
-
 	// For stat to optimize accurate option
 #if 0
 	GL_INS("BLEND_INFO: %d/%d/%d/%d. Clamp:%d. Prim:%d number %d (drawlist %d) (sw %d)",
@@ -758,6 +744,20 @@ void GSRendererNew::EmulateBlending(bool& DATE_GL42, bool& DATE_GL45)
 			m_conf.blend = {blend_index, ALPHA.FIX, ALPHA.C == 2, false, false};
 		}
 	}
+
+	// GL42 interact very badly with sw blending. GL42 uses the primitiveID to find the primitive
+	// that write the bad alpha value. Sw blending will force the draw to run primitive by primitive
+	// (therefore primitiveID will be constant to 1).
+	// Switch DATE_GL42 with DATE_GL45 in such cases to ensure accuracy.
+	// No mix of COLCLIP + sw blend + DATE_GL42, neither sw fbmask + DATE_GL42.
+	// Note: Do the swap in the end, saves the expensive draw splitting/barriers when mixed software blending is used.
+	if (sw_blending && DATE_GL42 && m_conf.require_full_barrier)
+	{
+		GL_PERF("DATE: Swap DATE_GL42 with DATE_GL45");
+		m_conf.require_full_barrier = true;
+		DATE_GL42 = false;
+		DATE_GL45 = true;
+	}
 }
 
 void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
@@ -773,7 +773,7 @@ void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
 
 	const bool need_mipmap = IsMipMapDraw();
 	const bool shader_emulated_sampler = tex->m_palette || cpsm.fmt != 0 || complex_wms_wmt || psm.depth;
-	const bool trilinear_manual = need_mipmap && m_mipmap == 2;
+	const bool trilinear_manual = need_mipmap && m_hw_mipmap == HWMipmapLevel::Full;
 
 	bool bilinear = m_vt.IsLinear();
 	int trilinear = 0;
@@ -782,11 +782,11 @@ void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
 	{
 		case TriFiltering::Forced:
 			trilinear = static_cast<u8>(GS_MIN_FILTER::Linear_Mipmap_Linear);
-			trilinear_auto = m_mipmap != 2;
+			trilinear_auto = !need_mipmap || m_hw_mipmap != HWMipmapLevel::Full;
 			break;
 
 		case TriFiltering::PS2:
-			if (need_mipmap && m_mipmap != 2)
+			if (need_mipmap && m_hw_mipmap != HWMipmapLevel::Full)
 			{
 				trilinear = m_context->TEX1.MMIN;
 				trilinear_auto = true;
@@ -948,7 +948,7 @@ void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
 	}
 	else if (trilinear_auto)
 	{
-		tex->m_texture->GenerateMipmap();
+		tex->m_texture->GenerateMipmapsIfNeeded();
 	}
 
 	// TC Offset Hack

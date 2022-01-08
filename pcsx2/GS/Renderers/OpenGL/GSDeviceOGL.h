@@ -24,6 +24,7 @@
 #include "GSTextureOGL.h"
 #include "GSUniformBufferOGL.h"
 #include "GLState.h"
+#include "GLLoader.h"
 #include "GS/GS.h"
 
 #ifdef ENABLE_OGL_DEBUG_MEM_BW
@@ -213,7 +214,6 @@ private:
 	// Increment this constant whenever shaders change, to invalidate user's program binary cache.
 	static constexpr u32 SHADER_VERSION = 1;
 
-	int m_mipmap;
 	int m_upscale_multiplier;
 
 	static FILE* m_debug_gl_file;
@@ -300,7 +300,7 @@ private:
 
 	AlignedBuffer<u8, 32> m_download_buffer;
 
-	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, GSTexture::Format format) final;
+	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format) final;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
@@ -336,6 +336,7 @@ public:
 
 	void ClearRenderTarget(GSTexture* t, const GSVector4& c) final;
 	void ClearRenderTarget(GSTexture* t, u32 c) final;
+	void InvalidateRenderTarget(GSTexture* t) final;
 	void ClearDepth(GSTexture* t) final;
 	void ClearStencil(GSTexture* t, u8 c) final;
 
@@ -345,6 +346,10 @@ public:
 	bool DownloadTexture(GSTexture* src, const GSVector4i& rect, GSTexture::GSMap& out_map) final;
 
 	void CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r) final;
+
+	void PushDebugGroup(const char* fmt, ...) final;
+	void PopDebugGroup() final;
+	void InsertDebugMessage(DebugMessageCategory category, const char* fmt, ...) final;
 
 	// BlitRect *does* mess with GL state, be sure to re-bind.
 	void BlitRect(GSTexture* sTex, const GSVector4i& r, const GSVector2i& dsize, bool at_origin, bool linear);
@@ -366,6 +371,7 @@ public:
 	void PSSetShaderResource(int i, GSTexture* sr);
 	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1);
 	void PSSetSamplerState(GLuint ss);
+	void ClearSamplerCache() final;
 
 	void OMSetDepthStencilState(GSDepthStencilOGL* dss);
 	void OMSetBlendState(u8 blend_index = 0, u8 blend_factor = 0, bool is_blend_constant = false, bool accumulation_blend = false, bool blend_mix = false);

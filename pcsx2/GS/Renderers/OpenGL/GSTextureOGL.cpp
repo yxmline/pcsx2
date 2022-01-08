@@ -19,6 +19,7 @@
 #include "GLState.h"
 #include "GS/GSPerfMon.h"
 #include "GS/GSPng.h"
+#include "GS/GSGL.h"
 
 #ifdef ENABLE_OGL_DEBUG_MEM_BW
 extern u64 g_real_texture_upload_byte;
@@ -171,7 +172,7 @@ namespace PboPool
 } // namespace PboPool
 
 GSTextureOGL::GSTextureOGL(Type type, int w, int h, Format format, GLuint fbo_read, bool mipmap)
-	: m_clean(false), m_generate_mipmap(true), m_r_x(0), m_r_y(0), m_r_w(0), m_r_h(0), m_layer(0)
+	: m_clean(false), m_r_x(0), m_r_y(0), m_r_w(0), m_r_h(0), m_layer(0)
 {
 	// OpenGL didn't like dimensions of size 0
 	m_size.x = std::max(1, w);
@@ -181,7 +182,7 @@ GSTextureOGL::GSTextureOGL(Type type, int w, int h, Format format, GLuint fbo_re
 	m_fbo_read = fbo_read;
 	m_texture_id = 0;
 	m_sparse = false;
-	m_max_layer = 1;
+	m_mipmap_levels = 1;
 	int gl_fmt = 0;
 
 	// Bunch of constant parameter
@@ -250,7 +251,7 @@ GSTextureOGL::GSTextureOGL(Type type, int w, int h, Format format, GLuint fbo_re
 	{
 		case Type::Texture:
 			// Only 32 bits input texture will be supported for mipmap
-			m_max_layer = mipmap && m_format == Format::Color ? (int)log2(std::max(w, h)) : 1;
+			m_mipmap_levels = mipmap && m_format == Format::Color ? (int)log2(std::max(w, h)) : 1;
 			break;
 		case Type::SparseRenderTarget:
 		case Type::SparseDepthStencil:
@@ -326,7 +327,7 @@ GSTextureOGL::GSTextureOGL(Type type, int w, int h, Format format, GLuint fbo_re
 		throw std::bad_alloc();
 	}
 
-	glTextureStorage2D(m_texture_id, m_max_layer + GL_TEX_LEVEL_0, gl_fmt, m_size.x, m_size.y);
+	glTextureStorage2D(m_texture_id, m_mipmap_levels, gl_fmt, m_size.x, m_size.y);
 }
 
 GSTextureOGL::~GSTextureOGL()
@@ -367,7 +368,7 @@ bool GSTextureOGL::Update(const GSVector4i& r, const void* data, int pitch, int 
 {
 	ASSERT(m_type != Type::DepthStencil && m_type != Type::Offscreen);
 
-	if (layer >= m_max_layer)
+	if (layer >= m_mipmap_levels)
 		return true;
 
 	// Default upload path for the texture is the Map/Unmap
@@ -430,14 +431,14 @@ bool GSTextureOGL::Update(const GSVector4i& r, const void* data, int pitch, int 
 	PboPool::EndTransfer();
 #endif
 
-	m_generate_mipmap = true;
+	m_needs_mipmaps_generated = true;
 
 	return true;
 }
 
 bool GSTextureOGL::Map(GSMap& m, const GSVector4i* _r, int layer)
 {
-	if (layer >= m_max_layer)
+	if (layer >= m_mipmap_levels)
 		return false;
 
 	GSVector4i r = _r ? *_r : GSVector4i(0, 0, m_size.x, m_size.y);
@@ -490,7 +491,7 @@ void GSTextureOGL::Unmap()
 
 		PboPool::EndTransfer();
 
-		m_generate_mipmap = true;
+		m_needs_mipmaps_generated = true;
 
 		GL_POP(); // PUSH is in Map
 	}
@@ -498,11 +499,8 @@ void GSTextureOGL::Unmap()
 
 void GSTextureOGL::GenerateMipmap()
 {
-	if (m_generate_mipmap && m_max_layer > 1)
-	{
-		glGenerateTextureMipmap(m_texture_id);
-		m_generate_mipmap = false;
-	}
+	ASSERT(m_mipmap_levels > 1);
+	glGenerateTextureMipmap(m_texture_id);
 }
 
 void GSTextureOGL::CommitPages(const GSVector2i& region, bool commit)

@@ -146,6 +146,7 @@ protected:
 	GSTextureCache* m_tc;
 	GSVector4i m_r;
 	GSTextureCache::Source* m_src;
+	HWMipmapLevel m_hw_mipmap;
 
 	virtual void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex) = 0;
 
@@ -165,6 +166,8 @@ protected:
 public:
 	GSRendererHW();
 	virtual ~GSRendererHW() override;
+
+	void Destroy() override;
 
 	void SetGameCRC(u32 crc, int options) override;
 	bool CanUpscale() override;
@@ -187,6 +190,8 @@ public:
 	void InvalidateVideoMem(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r) override;
 	void InvalidateLocalMem(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r, bool clut = false) override;
 	void Draw() override;
+
+	void PurgeTextureCache() override;
 
 	// Called by the texture cache to know if current texture is useful
 	virtual bool IsDummyTexture() const { return false; }

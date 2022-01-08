@@ -26,7 +26,7 @@ public:
 		int pitch;
 	};
 
-	enum class Type
+	enum class Type : u8
 	{
 		Invalid = 0,
 		RenderTarget = 1,
@@ -37,7 +37,7 @@ public:
 		SparseDepthStencil,
 	};
 
-	enum class Format
+	enum class Format : u8
 	{
 		Invalid = 0,  ///< Used for initialization
 		Color,        ///< Standard (RGBA8) color texture
@@ -49,14 +49,24 @@ public:
 		Int32,        ///< Int32 texture for date emulation
 	};
 
+	enum class State : u8
+	{
+		Dirty,
+		Cleared,
+		Invalidated
+	};
+
 protected:
 	GSVector2 m_scale;
 	GSVector2i m_size;
 	GSVector2i m_committed_size;
 	GSVector2i m_gpu_page_size;
+	int m_mipmap_levels;
 	Type m_type;
 	Format m_format;
+	State m_state;
 	bool m_sparse;
+	bool m_needs_mipmaps_generated;
 
 public:
 	GSTexture();
@@ -75,7 +85,7 @@ public:
 	virtual bool Map(GSMap& m, const GSVector4i* r = NULL, int layer = 0) = 0;
 	virtual void Unmap() = 0;
 	virtual void GenerateMipmap() {}
-	virtual bool Save(const std::string& fn) = 0;
+	virtual bool Save(const std::string& fn);
 	virtual u32 GetID() { return 0; }
 
 	GSVector2 GetScale() const { return m_scale; }
@@ -84,9 +94,31 @@ public:
 	int GetWidth() const { return m_size.x; }
 	int GetHeight() const { return m_size.y; }
 	GSVector2i GetSize() const { return m_size; }
+	int GetMipmapLevels() const { return m_mipmap_levels; }
+	bool IsMipmap() const { return m_mipmap_levels > 1; }
 
 	Type GetType() const { return m_type; }
 	Format GetFormat() const { return m_format; }
+
+	bool IsRenderTargetOrDepthStencil() const
+	{
+		return (m_type >= Type::RenderTarget && m_type <= Type::DepthStencil) ||
+			(m_type >= Type::SparseRenderTarget && m_type <= Type::SparseDepthStencil);
+	}
+	bool IsRenderTarget() const
+	{
+		return (m_type == Type::RenderTarget || m_type == Type::SparseRenderTarget);
+	}
+	bool IsDepthStencil() const
+	{
+		return (m_type == Type::DepthStencil || m_type == Type::SparseDepthStencil);
+	}
+
+	State GetState() const { return m_state; }
+	void SetState(State state) { m_state = state; }
+
+	void GenerateMipmapsIfNeeded();
+	void ClearMipmapGenerationFlag() { m_needs_mipmaps_generated = false; }
 
 	virtual void CommitPages(const GSVector2i& region, bool commit) {}
 	void CommitRegion(const GSVector2i& region);

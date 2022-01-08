@@ -38,8 +38,8 @@ GSState::GSState()
 {
 	// m_nativeres seems to be a hack. Unfortunately it impacts draw call number which make debug painful in the replayer.
 	// Let's keep it disabled to ease debug.
-	m_nativeres = theApp.GetConfigI("upscale_multiplier") == 1 || GLLoader::in_replayer;
-	m_mipmap = theApp.GetConfigI("mipmap");
+	m_nativeres = theApp.GetConfigI("upscale_multiplier") == 1;
+	m_mipmap = theApp.GetConfigB("mipmap");
 	m_NTSC_Saturation = theApp.GetConfigB("NTSC_Saturation");
 	if (theApp.GetConfigB("UserHacks"))
 	{
@@ -2555,6 +2555,15 @@ void GSState::GetTextureMinMax(GSVector4i& r, const GIFRegTEX0& TEX0, const GIFR
 	const int h = 1 << th;
 
 	GSVector4i tr(0, 0, w, h);
+
+	// don't bother checking when preload is on, since we're going to test the whole thing anyway
+	if (GSConfig.PreloadTexture && GSConfig.UseHardwareRenderer() &&
+      (GSConfig.GPUPaletteConversion ||
+       (w <= MAXIMUM_PRELOAD_TEXTURE_SIZE && h <= MAXIMUM_PRELOAD_TEXTURE_SIZE)))
+	{
+		r = tr;
+		return;
+	}
 
 	const int wms = CLAMP.WMS;
 	const int wmt = CLAMP.WMT;

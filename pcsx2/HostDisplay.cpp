@@ -106,6 +106,10 @@ std::string HostDisplay::GetFullscreenModeString(u32 width, u32 height, float re
 
 #include "Frontend/OpenGLHostDisplay.h"
 
+#ifdef ENABLE_VULKAN
+#include "Frontend/VulkanHostDisplay.h"
+#endif
+
 #ifdef _WIN32
 #include "Frontend/D3D11HostDisplay.h"
 #endif
@@ -115,13 +119,18 @@ std::unique_ptr<HostDisplay> HostDisplay::CreateDisplayForAPI(RenderAPI api)
 	switch (api)
 	{
 #ifdef _WIN32
-		case HostDisplay::RenderAPI::D3D11:
+		case RenderAPI::D3D11:
 			return std::make_unique<D3D11HostDisplay>();
 #endif
 
-		case HostDisplay::RenderAPI::OpenGL:
-		case HostDisplay::RenderAPI::OpenGLES:
+		case RenderAPI::OpenGL:
+		case RenderAPI::OpenGLES:
 			return std::make_unique<OpenGLHostDisplay>();
+
+#ifdef ENABLE_VULKAN
+		case RenderAPI::Vulkan:
+			return std::make_unique<VulkanHostDisplay>();
+#endif
 
 		default:
 			Console.Error("Unknown render API %u", static_cast<unsigned>(api));

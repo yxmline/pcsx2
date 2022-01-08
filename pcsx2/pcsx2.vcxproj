@@ -48,7 +48,7 @@
       <ForcedIncludeFiles>PrecompiledHeader.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <AdditionalOptions>/Zc:externConstexpr %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;LZMA_API_STATIC;BUILD_DX=1;SPU2X_CUBEB;DIRECTINPUT_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;LZMA_API_STATIC;BUILD_DX=1;ENABLE_VULKAN;SPU2X_CUBEB;DIRECTINPUT_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Debug))">PCSX2_DEBUG;PCSX2_DEVBUILD;_SECURE_SCL_=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Devel))">PCSX2_DEVEL;PCSX2_DEVBUILD;NDEBUG;_SECURE_SCL_=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Release))">NDEBUG;_SECURE_SCL_=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -305,12 +305,16 @@
     <ClCompile Include="DEV9\Win32\tap-win32.cpp" />
     <ClCompile Include="Frontend\D3D11HostDisplay.cpp" />
     <ClCompile Include="Frontend\ImGuiManager.cpp" />
+    <ClCompile Include="Frontend\imgui_impl_vulkan.cpp" />
     <ClCompile Include="Frontend\OpenGLHostDisplay.cpp" />
+    <ClCompile Include="Frontend\VulkanHostDisplay.cpp" />
     <ClCompile Include="GameDatabase.cpp" />
     <ClCompile Include="Gif_Logger.cpp" />
     <ClCompile Include="Gif_Unit.cpp" />
     <ClCompile Include="GS\Renderers\DX11\D3D.cpp" />
     <ClCompile Include="GS\Window\GSwxDialog.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\GSDeviceVK.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\GSTextureVK.cpp" />
     <ClCompile Include="gui\AppHost.cpp" />
     <ClCompile Include="gui\AppUserMode.cpp" />
     <ClCompile Include="gui\CheckedStaticBox.cpp" />
@@ -748,10 +752,13 @@
     <ClInclude Include="Frontend\D3D11HostDisplay.h" />
     <ClInclude Include="Frontend\ImGuiManager.h" />
     <ClInclude Include="Frontend\OpenGLHostDisplay.h" />
+    <ClInclude Include="Frontend\VulkanHostDisplay.h" />
     <ClInclude Include="GameDatabase.h" />
     <ClInclude Include="Gif_Unit.h" />
     <ClInclude Include="GS\Renderers\DX11\D3D.h" />
     <ClInclude Include="GS\Window\GSwxDialog.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\GSDeviceVK.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\GSTextureVK.h" />
     <ClInclude Include="gui\AppHost.h" />
     <ClInclude Include="gui\CheckedStaticBox.h" />
     <ClInclude Include="gui\i18n.h" />

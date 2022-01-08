@@ -266,6 +266,7 @@ const char* Pcsx2Config::GSOptions::GetRendererName(GSRendererType type)
 	case GSRendererType::Auto: return "Auto";
 	case GSRendererType::DX11: return "Direct3D 11";
 	case GSRendererType::OGL: return "OpenGL";
+	case GSRendererType::VK: return "Vulkan";
 	case GSRendererType::SW: return "Software";
 	case GSRendererType::Null: return "Null";
 	default: return "";
@@ -281,6 +282,7 @@ Pcsx2Config::GSOptions::GSOptions()
 	UseDebugDevice = false;
 	UseBlitSwapChain = false;
 	DisableShaderCache = false;
+	ThreadedPresentation = false;
 	OsdShowMessages = true;
 	OsdShowSpeed = false;
 	OsdShowFPS = false;
@@ -390,7 +392,8 @@ bool Pcsx2Config::GSOptions::RestartOptionsAreEqual(const GSOptions& right) cons
 		OpEqu(Adapter) &&
 		OpEqu(UseDebugDevice) &&
 		OpEqu(UseBlitSwapChain) &&
-		OpEqu(DisableShaderCache);
+		OpEqu(DisableShaderCache) &&
+		OpEqu(ThreadedPresentation);
 }
 
 void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
@@ -417,6 +420,7 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	// These are loaded from GSWindow in wx.
 	SettingsWrapEnumEx(AspectRatio, "AspectRatio", AspectRatioNames);
 	SettingsWrapEnumEx(FMVAspectRatioSwitch, "FMVAspectRatioSwitch", FMVAspectRatioSwitchNames);
+
 	SettingsWrapEntry(Zoom);
 	SettingsWrapEntry(StretchY);
 	SettingsWrapEntry(OffsetX);
@@ -467,6 +471,7 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 	GSSettingBool(UseDebugDevice);
 	GSSettingBool(UseBlitSwapChain);
 	GSSettingBoolEx(DisableShaderCache, "disable_shader_cache");
+	GSSettingBool(ThreadedPresentation);
 	GSSettingBool(OsdShowMessages);
 	GSSettingBool(OsdShowSpeed);
 	GSSettingBool(OsdShowFPS);
@@ -501,6 +506,7 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 	GSSettingBoolEx(SaveFrame, "savef");
 	GSSettingBoolEx(SaveTexture, "savet");
 	GSSettingBoolEx(SaveDepth, "savez");
+	GSSettingBoolEx(PreloadTexture, "preload_texture");
 
 	GSSettingIntEnumEx(InterlaceMode, "interlace");
 
@@ -576,7 +582,7 @@ void Pcsx2Config::GSOptions::MaskUserHacks()
 
 bool Pcsx2Config::GSOptions::UseHardwareRenderer() const
 {
-	return (Renderer == GSRendererType::DX11 || Renderer == GSRendererType::OGL);
+	return (Renderer == GSRendererType::DX11 || Renderer == GSRendererType::OGL || Renderer == GSRendererType::VK);
 }
 
 VsyncMode Pcsx2Config::GetEffectiveVsyncMode() const

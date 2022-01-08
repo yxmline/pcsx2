@@ -109,10 +109,9 @@ public:
 private:
 	float m_hack_topleft_offset;
 	int m_upscale_multiplier;
-	int m_mipmap;
 	int m_d3d_texsize;
 
-	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, GSTexture::Format format) final;
+	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format) final;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
@@ -297,6 +296,8 @@ public:
 	void SetupOM(OMDepthStencilSelector dssel, OMBlendSelector bsel, u8 afix);
 
 	void RenderHW(GSHWDrawConfig& config) final;
+
+	void ClearSamplerCache() final;
 
 	ID3D11Device* operator->() { return m_dev.get(); }
 	operator ID3D11Device*() { return m_dev.get(); }

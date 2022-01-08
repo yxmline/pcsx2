@@ -709,6 +709,17 @@ set(pcsx2GSHeaders
 	GS/Window/GSwxDialog.h
 	)
 
+if(USE_VULKAN)
+	list(APPEND pcsx2GSSources
+		GS/Renderers/Vulkan/GSDeviceVK.cpp
+		GS/Renderers/Vulkan/GSTextureVK.cpp
+	)
+	list(APPEND pcsx2GSHeaders
+		GS/Renderers/Vulkan/GSDeviceVK.h
+		GS/Renderers/Vulkan/GSTextureVK.h
+	)
+endif()
+
 if(WIN32)
 	list(APPEND pcsx2SPU2Sources
 		SPU2/Windows/CfgHelpers.cpp
@@ -884,6 +895,17 @@ set(pcsx2FrontendHeaders
 	Frontend/ImGuiManager.h
 	Frontend/OpenGLHostDisplay.h
 )
+
+if(USE_VULKAN)
+	list(APPEND pcsx2FrontendSources
+		Frontend/VulkanHostDisplay.cpp
+		Frontend/imgui_impl_vulkan.cpp
+	)
+	list(APPEND pcsx2FrontendHeaders
+		Frontend/imgui_impl_vulkan.h
+		Frontend/VulkanHostDisplay.h
+	)
+endif()
 
 if(WIN32)
 	list(APPEND pcsx2FrontendSources

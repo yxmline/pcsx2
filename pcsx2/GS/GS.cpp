@@ -19,6 +19,7 @@
 #include "GS/Window/GSwxDialog.h"
 #endif
 #include "GS.h"
+#include "GSGL.h"
 #include "GSUtil.h"
 #include "GSExtra.h"
 #include "Renderers/SW/GSRendererSW.h"
@@ -38,6 +39,10 @@
 #include "pcsx2/GS.h"
 #ifdef PCSX2_CORE
 #include "pcsx2/HostSettings.h"
+#endif
+
+#ifdef ENABLE_VULKAN
+#include "Renderers/Vulkan/GSDeviceVK.h"
 #endif
 
 #ifdef _WIN32
@@ -153,6 +158,9 @@ static HostDisplay::RenderAPI GetAPIForRenderer(GSRendererType renderer)
 #endif
 			return HostDisplay::RenderAPI::OpenGL;
 
+		case GSRendererType::VK:
+			return HostDisplay::RenderAPI::Vulkan;
+
 #ifdef _WIN32
 		case GSRendererType::DX11:
 		case GSRendererType::SW:
@@ -181,6 +189,12 @@ static bool DoGSOpen(GSRendererType renderer, u8* basemem)
 		case HostDisplay::RenderAPI::OpenGLES:
 			g_gs_device = std::make_unique<GSDeviceOGL>();
 			break;
+
+#ifdef ENABLE_VULKAN
+		case HostDisplay::RenderAPI::Vulkan:
+			g_gs_device = std::make_unique<GSDeviceVK>();
+			break;
+#endif
 
 		default:
 			Console.Error("Unknown render API %u", static_cast<unsigned>(display->GetRenderAPI()));
@@ -708,7 +722,8 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 			GSConfig.Adapter != old_config.Adapter ||
 			GSConfig.UseDebugDevice != old_config.UseDebugDevice ||
 			GSConfig.UseBlitSwapChain != old_config.UseBlitSwapChain ||
-			GSConfig.DisableShaderCache != old_config.DisableShaderCache
+			GSConfig.DisableShaderCache != old_config.DisableShaderCache ||
+			GSConfig.ThreadedPresentation != old_config.ThreadedPresentation
 		);
 		GSreopen(do_full_restart);
 		return;
@@ -716,7 +731,6 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 
 	// Options which aren't using the global struct yet, so we need to recreate all GS objects.
 	if (
-		GSConfig.GPUPaletteConversion != old_config.GPUPaletteConversion ||
 		GSConfig.ConservativeFramebuffer != old_config.ConservativeFramebuffer ||
 		GSConfig.AutoFlushSW != old_config.AutoFlushSW ||
 		GSConfig.PreloadFrameWithGSData != old_config.PreloadFrameWithGSData ||
@@ -739,9 +753,7 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 		GSConfig.SaveDepth != old_config.SaveDepth ||
 
 		GSConfig.UpscaleMultiplier != old_config.UpscaleMultiplier ||
-		GSConfig.HWMipmap != old_config.HWMipmap ||
 		GSConfig.CRCHack != old_config.CRCHack ||
-		GSConfig.MaxAnisotropy != old_config.MaxAnisotropy ||
 		GSConfig.SWExtraThreads != old_config.SWExtraThreads ||
 		GSConfig.SWExtraThreadsHeight != old_config.SWExtraThreadsHeight ||
 
@@ -766,6 +778,25 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 
 	// This is where we would do finer-grained checks in the future.
 	// For example, flushing the texture cache when mipmap settings change.
+
+	if (GSConfig.HWMipmap != old_config.HWMipmap || GSConfig.CRCHack != old_config.CRCHack)
+	{
+		// for automatic mipmaps, we need to reload the crc
+		s_gs->SetGameCRC(s_gs->GetGameCRC(), s_gs->GetGameCRCOptions());
+	}
+
+	// reload texture cache when trilinear filtering or mipmap options change
+	if (GSConfig.HWMipmap != old_config.HWMipmap ||
+		GSConfig.UserHacks_TriFilter != old_config.UserHacks_TriFilter ||
+		GSConfig.GPUPaletteConversion != old_config.GPUPaletteConversion)
+	{
+		s_gs->PurgeTextureCache();
+		s_gs->PurgePool();
+	}
+
+	// clear out the sampler cache when AF options change, since the anisotropy gets baked into them
+	if (GSConfig.MaxAnisotropy != old_config.MaxAnisotropy)
+		g_gs_device->ClearSamplerCache();
 }
 
 void GSSwitchRenderer(GSRendererType new_renderer)
@@ -1121,6 +1152,9 @@ void GSApp::Init()
 	m_gs_renderers.push_back(GSSetting(static_cast<u32>(GSRendererType::DX11), "Direct3D 11", ""));
 #endif
 	m_gs_renderers.push_back(GSSetting(static_cast<u32>(GSRendererType::OGL), "OpenGL", ""));
+#ifdef ENABLE_VULKAN
+	m_gs_renderers.push_back(GSSetting(static_cast<u32>(GSRendererType::VK), "Vulkan", ""));
+#endif
 	m_gs_renderers.push_back(GSSetting(static_cast<u32>(GSRendererType::SW), "Software", ""));
 
 	// The null renderer goes last, it has use for benchmarking purposes in a release build
@@ -1214,9 +1248,12 @@ void GSApp::Init()
 
 	// clang-format off
 	// Avoid to clutter the ini file with useless options
+#if defined(ENABLE_VULKAN) || defined(_WIN32)
+	m_default_configuration["Adapter"]																		= "";
+#endif
+
 #ifdef _WIN32
 	// Per OS option.
-	m_default_configuration["Adapter"]																		= "";
 	m_default_configuration["CaptureFileName"]                            = "";
 	m_default_configuration["CaptureVideoCodecDisplayName"]               = "";
 	m_default_configuration["dx_break_on_severity"]                       = "0";
@@ -1282,6 +1319,7 @@ void GSApp::Init()
 	m_default_configuration["paltex"]                                     = "0";
 	m_default_configuration["png_compression_level"]                      = std::to_string(Z_BEST_SPEED);
 	m_default_configuration["preload_frame_with_gs_data"]                 = "0";
+	m_default_configuration["preload_texture"]                            = "0";
 	m_default_configuration["Renderer"]                                   = std::to_string(static_cast<int>(GSRendererType::Auto));
 	m_default_configuration["resx"]                                       = "1024";
 	m_default_configuration["resy"]                                       = "1024";
@@ -1299,7 +1337,7 @@ void GSApp::Init()
 	m_default_configuration["shaderfx_conf"]                              = "shaders/GS_FX_Settings.ini";
 	m_default_configuration["shaderfx_glsl"]                              = "shaders/GS.fx";
 	m_default_configuration["skip_duplicate_frames"]                      = "0";
-	m_default_configuration["threaded_presentation"]                      = "0";
+	m_default_configuration["ThreadedPresentation"]                       = "0";
 	m_default_configuration["throttle_present_rate"]                      = "0";
 	m_default_configuration["TVShader"]                                   = "0";
 	m_default_configuration["upscale_multiplier"]                         = "1";

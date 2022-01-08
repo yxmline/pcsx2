@@ -15,6 +15,8 @@
 
 #include "PrecompiledHeader.h"
 #include "GSTexture.h"
+#include "GSDevice.h"
+#include "GS/GSPng.h"
 #include <bitset>
 
 GSTexture::GSTexture()
@@ -22,14 +24,60 @@ GSTexture::GSTexture()
 	, m_size(0, 0)
 	, m_committed_size(0, 0)
 	, m_gpu_page_size(0, 0)
+	, m_mipmap_levels(0)
 	, m_type(Type::Invalid)
 	, m_format(Format::Invalid)
+	, m_state(State::Dirty)
 	, m_sparse(false)
+	, m_needs_mipmaps_generated(true)
 	, last_frame_used(0)
 	, LikelyOffset(false)
 	, OffsetHack_modx(0.0f)
 	, OffsetHack_mody(0.0f)
 {
+}
+
+bool GSTexture::Save(const std::string& fn)
+{
+#ifdef PCSX2_DEVBUILD
+	GSPng::Format format = GSPng::RGB_A_PNG;
+#else
+	GSPng::Format format = GSPng::RGB_PNG;
+#endif
+	switch (m_format)
+	{
+		case Format::UNorm8:
+			format = GSPng::R8I_PNG;
+			break;
+		case Format::Color:
+			break;
+		default:
+			Console.Error("Format %d not saved to image", static_cast<int>(m_format));
+			return false;
+	}
+
+	GSMap map;
+	if (!g_gs_device->DownloadTexture(this, GSVector4i(0, 0, m_size.x, m_size.y), map))
+	{
+		Console.Error("(GSTextureVK) DownloadTexture() failed.");
+		return false;
+	}
+
+	const int compression = theApp.GetConfigI("png_compression_level");
+	bool success = GSPng::Save(format, fn, map.bits, m_size.x, m_size.y, map.pitch, compression);
+
+	g_gs_device->DownloadTextureComplete();
+
+	return success;
+}
+
+void GSTexture::GenerateMipmapsIfNeeded()
+{
+	if (!m_needs_mipmaps_generated || m_mipmap_levels <= 1)
+		return;
+
+	m_needs_mipmaps_generated = false;
+	GenerateMipmap();
 }
 
 void GSTexture::CommitRegion(const GSVector2i& region)
