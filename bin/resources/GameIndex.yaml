@@ -3666,12 +3666,12 @@ SCES-55661:
   name: "RA.ONE: The Game"
   region: "PAL-E"
   compat: 5
-SCES-55652:
+SCES-55662:
   name: "Chandragupta: Warrior Prince"
-  region: "I"
-SCES-55653:
+  region: "PAL-IN"
+SCES-55663:
   name: "Street Cricket Champions 2"
-  region: "I"
+  region: "PAL-IN"
 SCES-82034:
   name: "Xenosaga II - Jenseits von Gut und Bose [Disc 1]"
   region: "PAL-M3"
@@ -14957,6 +14957,8 @@ SLES-53804:
 SLES-53805:
   name: "Cocoto Funfair"
   region: "PAL-M5"
+  gameFixes:
+    - FpuNegDivHack # Fixes the cursor not being visible.
 SLES-53809:
   name: "K-1 Premium Dynamite!!"
   region: "PAL-E"
