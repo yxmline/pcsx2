@@ -285,21 +285,17 @@ RendererTab::RendererTab(wxWindow* parent)
 
 	auto* paltex_prereq = m_ui.addCheckBox(hw_checks_box, "GPU Palette Conversion", "paltex", IDC_PALTEX, hw_prereq);
 	auto aniso_prereq = [this, paltex_prereq]{ return m_is_hardware && paltex_prereq->GetValue() == false; };
-	m_ui.addCheckBox(hw_checks_box, "Preload Textures", "preload_texture", -1, hw_prereq);
+	m_ui.addCheckBox(hw_checks_box, "Preload Textures", "preload_texture", IDC_PRELOAD_TEXTURES, hw_prereq);
 
 	auto* hw_choice_grid = new wxFlexGridSizer(2, space, space);
 
 	m_internal_resolution = m_ui.addComboBoxAndLabel(hw_choice_grid, "Internal Resolution:", "upscale_multiplier", &theApp.m_gs_upscale_multiplier, -1, hw_prereq).first;
 
-	m_ui.addComboBoxAndLabel(hw_choice_grid, "Anisotropic Filtering:", "MaxAnisotropy",  &theApp.m_gs_max_anisotropy, IDC_AFCOMBO,   aniso_prereq);
-	m_ui.addComboBoxAndLabel(hw_choice_grid, "Dithering (PgDn):",      "dithering_ps2",  &theApp.m_gs_dithering,      IDC_DITHERING, hw_prereq);
-	m_ui.addComboBoxAndLabel(hw_choice_grid, "Mipmapping:",   "mipmap_hw",      &theApp.m_gs_hw_mipmapping,  IDC_MIPMAP_HW, hw_prereq);
-	m_ui.addComboBoxAndLabel(hw_choice_grid, "CRC Hack Level:",        "crc_hack_level", &theApp.m_gs_crc_level,      IDC_CRC_LEVEL, hw_prereq);
-
-	m_blend_mode = m_ui.addComboBoxAndLabel(hw_choice_grid, "Blending Accuracy:", "accurate_blending_unit", &theApp.m_gs_acc_blend_level, IDC_ACCURATE_BLEND_UNIT, hw_prereq);
-#ifdef _WIN32
-	m_blend_mode_d3d11 = m_ui.addComboBoxAndLabel(hw_choice_grid, "Blending Accuracy:", "accurate_blending_unit_d3d11", &theApp.m_gs_acc_blend_level_d3d11, IDC_ACCURATE_BLEND_UNIT_D3D11, hw_prereq);
-#endif
+	m_ui.addComboBoxAndLabel(hw_choice_grid, "Anisotropic Filtering:", "MaxAnisotropy",          &theApp.m_gs_max_anisotropy,  IDC_AFCOMBO,             aniso_prereq);
+	m_ui.addComboBoxAndLabel(hw_choice_grid, "Dithering (PgDn):",      "dithering_ps2",          &theApp.m_gs_dithering,       IDC_DITHERING,           hw_prereq);
+	m_ui.addComboBoxAndLabel(hw_choice_grid, "Mipmapping:",            "mipmap_hw",              &theApp.m_gs_hw_mipmapping,   IDC_MIPMAP_HW,           hw_prereq);
+	m_ui.addComboBoxAndLabel(hw_choice_grid, "CRC Hack Level:",        "crc_hack_level",         &theApp.m_gs_crc_level,       IDC_CRC_LEVEL,           hw_prereq);
+	m_ui.addComboBoxAndLabel(hw_choice_grid, "Blending Accuracy:",     "accurate_blending_unit", &theApp.m_gs_acc_blend_level, IDC_ACCURATE_BLEND_UNIT, hw_prereq);
 
 	hardware_box->Add(hw_checks_box, wxSizerFlags().Centre());
 	hardware_box->AddSpacer(space);
@@ -324,26 +320,6 @@ RendererTab::RendererTab(wxWindow* parent)
 	SetSizerAndFit(tab_box.outer);
 }
 
-void RendererTab::UpdateBlendMode(GSRendererType renderer)
-{
-#ifdef _WIN32
-	if (renderer == GSRendererType::DX11)
-	{
-		m_blend_mode_d3d11.first ->Show();
-		m_blend_mode_d3d11.second->Show();
-		m_blend_mode.first ->Hide();
-		m_blend_mode.second->Hide();
-	}
-	else
-	{
-		m_blend_mode_d3d11.first ->Hide();
-		m_blend_mode_d3d11.second->Hide();
-		m_blend_mode.first ->Show();
-		m_blend_mode.second->Show();
-	}
-#endif
-}
-
 HacksTab::HacksTab(wxWindow* parent)
 	: wxPanel(parent, wxID_ANY)
 	, m_ui(this)
@@ -354,7 +330,6 @@ HacksTab::HacksTab(wxWindow* parent)
 	auto hw_prereq = [this]{ return m_is_hardware; };
 	auto* hacks_check_box = m_ui.addCheckBox(tab_box.inner, "Enable HW Hacks", "UserHacks", -1, hw_prereq);
 	auto hacks_prereq = [this, hacks_check_box]{ return m_is_hardware && hacks_check_box->GetValue(); };
-	auto gl_or_vk_hacks_prereq = [this, hacks_check_box]{ return (m_is_ogl_hw || m_is_vk_hw) && hacks_check_box->GetValue(); };
 	auto upscale_hacks_prereq = [this, hacks_check_box]{ return !m_is_native_res && hacks_check_box->GetValue(); };
 
 	PaddedBoxSizer<wxStaticBoxSizer> rend_hacks_box   (wxVERTICAL, this, "Renderer Hacks");
@@ -384,7 +359,7 @@ HacksTab::HacksTab(wxWindow* parent)
 
 	// Renderer Hacks:
 	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Half Screen Fix:",     "UserHacks_Half_Bottom_Override", &theApp.m_gs_generic_list, IDC_HALF_SCREEN_TS, hacks_prereq);
-	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Trilinear Filtering:", "UserHacks_TriFilter",            &theApp.m_gs_trifilter,    IDC_TRI_FILTER,     gl_or_vk_hacks_prereq);
+	m_ui.addComboBoxAndLabel(rend_hack_choice_grid, "Trilinear Filtering:", "UserHacks_TriFilter",            &theApp.m_gs_trifilter,    IDC_TRI_FILTER,     hacks_prereq);
 
 	// Skipdraw Range
 	add_label(this, rend_hack_choice_grid, "Skipdraw Range:", IDC_SKIPDRAWHACK);
@@ -719,8 +694,6 @@ void Dialog::RendererChange()
 	m_adapter_select->Enable(!list.adapter_names.empty());
 
 #ifdef _WIN32
-	m_renderer_panel->UpdateBlendMode(renderer);
-
 	m_renderer_panel->Layout(); // The version of wx we use on Windows is dumb and something prevents relayout from happening to notebook pages
 #endif
 }
@@ -779,8 +752,6 @@ void Dialog::Update()
 		const bool is_upscale = m_renderer_panel->m_internal_resolution->GetSelection() != 0;
 		m_hacks_panel->m_is_native_res = !is_hw || !is_upscale;
 		m_hacks_panel->m_is_hardware = is_hw;
-		m_hacks_panel->m_is_ogl_hw = renderer == GSRendererType::OGL;
-		m_hacks_panel->m_is_vk_hw = renderer == GSRendererType::VK;
 		m_renderer_panel->m_is_hardware = is_hw;
 		m_renderer_panel->m_is_native_res = !is_hw || !is_upscale;
 		m_post_panel->m_is_vk_hw = renderer == GSRendererType::VK;

@@ -198,14 +198,10 @@ void GSDeviceOGL::GenerateProfilerData()
 	}
 }
 
-GSTexture* GSDeviceOGL::CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format fmt)
+GSTexture* GSDeviceOGL::CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format)
 {
 	GL_PUSH("Create surface");
-
-	// A wrapper to call GSTextureOGL, with the different kind of parameters.
-	GSTextureOGL* t = new GSTextureOGL(type, w, h, fmt, m_fbo_read, mipmap);
-
-	return t;
+	return new GSTextureOGL(type, width, height, levels, format, m_fbo_read);
 }
 
 bool GSDeviceOGL::Create(HostDisplay* display)
@@ -883,8 +879,8 @@ GLuint GSDeviceOGL::CreateSampler(PSSamplerSelector sel)
 			break;
 	}
 
-	//glSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, 0);
-	//glSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, 6);
+	glSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, -1000.0f);
+	glSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, sel.lodclamp ? 0.0f : 1000.0f);
 
 	if (sel.tau)
 		glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);

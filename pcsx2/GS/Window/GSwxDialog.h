@@ -105,17 +105,12 @@ namespace GSSettingsDialog
 	public:
 		GSUIElementHolder m_ui;
 		wxChoice* m_internal_resolution;
-		std::pair<wxChoice*, wxStaticText*> m_blend_mode;
-#ifdef _WIN32
-		std::pair<wxChoice*, wxStaticText*> m_blend_mode_d3d11;
-#endif
 		bool m_is_hardware = false;
 		bool m_is_native_res = false;
 
 		RendererTab(wxWindow* parent);
 		void Load() { m_ui.Load(); }
 		void Save() { m_ui.Save(); }
-		void UpdateBlendMode(GSRendererType renderer);
 		void DoUpdate() { m_ui.Update(); }
 	};
 
@@ -126,8 +121,6 @@ namespace GSSettingsDialog
 		wxSpinCtrl *skip_x_spin, *skip_y_spin;
 		bool m_is_hardware = false;
 		bool m_is_native_res = false;
-		bool m_is_ogl_hw = false;
-		bool m_is_vk_hw = false;
 
 		HacksTab(wxWindow* parent);
 		void Load() { m_ui.Load(); }

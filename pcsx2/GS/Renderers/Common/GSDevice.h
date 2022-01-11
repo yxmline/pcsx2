@@ -269,13 +269,12 @@ struct alignas(16) GSHWDrawConfig
 		{
 			struct
 			{
-				u8 tau   : 1;
-				u8 tav   : 1;
-				u8 biln  : 1;
-				u8 triln : 3;
-				u8 aniso : 1;
-
-				u8 _free : 1;
+				u8 tau      : 1;
+				u8 tav      : 1;
+				u8 biln     : 1;
+				u8 triln    : 3;
+				u8 aniso    : 1;
+				u8 lodclamp : 1;
 			};
 			u8 key;
 		};
@@ -287,6 +286,35 @@ struct alignas(16) GSHWDrawConfig
 			SamplerSelector out;
 			out.biln = 1;
 			return out;
+		}
+
+		/// Returns true if the effective minification filter is linear.
+		__fi bool IsMinFilterLinear() const
+		{
+			if (triln < static_cast<u8>(GS_MIN_FILTER::Nearest_Mipmap_Nearest))
+			{
+				// use the same filter as mag when mipmapping is off
+				return biln;
+			}
+			else
+			{
+				// Linear_Mipmap_Nearest or Linear_Mipmap_Linear
+				return (triln >= static_cast<u8>(GS_MIN_FILTER::Linear_Mipmap_Nearest));
+			}
+		}
+
+		/// Returns true if the effective magnification filter is linear.
+		__fi bool IsMagFilterLinear() const
+		{
+			// magnification uses biln regardless of mip mode (they're only used for minification)
+			return biln;
+		}
+
+		/// Returns true if the effective mipmap filter is linear.
+		__fi bool IsMipFilterLinear() const
+		{
+			return (triln == static_cast<u8>(GS_MIN_FILTER::Nearest_Mipmap_Linear) ||
+					triln == static_cast<u8>(GS_MIN_FILTER::Linear_Mipmap_Linear));
 		}
 	};
 	struct DepthStencilSelector
@@ -556,8 +584,8 @@ protected:
 	bool m_rbswapped;
 	FeatureSupport m_features;
 
-	virtual GSTexture* CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format) = 0;
-	GSTexture* FetchSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format, bool clear, bool prefer_reuse);
+	virtual GSTexture* CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format) = 0;
+	GSTexture* FetchSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format, bool clear, bool prefer_reuse);
 
 	virtual void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) = 0;
 	virtual void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset) = 0;

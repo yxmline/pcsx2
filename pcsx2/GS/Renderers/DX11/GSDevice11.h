@@ -111,7 +111,7 @@ private:
 	int m_upscale_multiplier;
 	int m_d3d_texsize;
 
-	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format) final;
+	GSTexture* CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format) final;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
@@ -234,6 +234,10 @@ protected:
 public:
 	GSDevice11();
 	virtual ~GSDevice11() {}
+
+	__fi static GSDevice11* GetInstance() { return static_cast<GSDevice11*>(g_gs_device.get()); }
+	__fi ID3D11Device* GetD3DDevice() const { return m_dev.get(); }
+	__fi ID3D11DeviceContext* GetD3DContext() const { return m_ctx.get(); }
 
 	bool SetFeatureLevel(D3D_FEATURE_LEVEL level, bool compat_mode);
 	void GetFeatureLevel(D3D_FEATURE_LEVEL& level) const { level = m_shader.level; }

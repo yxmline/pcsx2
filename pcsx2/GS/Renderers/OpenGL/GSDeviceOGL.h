@@ -288,7 +288,7 @@ private:
 		GLuint timer() { return timer_query[last_query]; }
 	} m_profiler;
 
-	GLuint m_ps_ss[1 << 7];
+	GLuint m_ps_ss[1 << 8];
 	GSDepthStencilOGL* m_om_dss[1 << 5];
 	std::unordered_map<ProgramSelector, GL::Program, ProgramSelectorHash> m_programs;
 	GL::ShaderCache m_shader_cache;
@@ -300,7 +300,7 @@ private:
 
 	AlignedBuffer<u8, 32> m_download_buffer;
 
-	GSTexture* CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format) final;
+	GSTexture* CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format) final;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE, const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;

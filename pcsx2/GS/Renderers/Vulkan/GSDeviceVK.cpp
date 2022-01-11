@@ -338,16 +338,15 @@ void GSDeviceVK::ClearStencil(GSTexture* t, u8 c)
 	static_cast<GSTextureVK*>(t)->TransitionToLayout(VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
-GSTexture* GSDeviceVK::CreateSurface(GSTexture::Type type, int w, int h, bool mipmap, GSTexture::Format format)
+GSTexture* GSDeviceVK::CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format)
 {
 	pxAssert(type != GSTexture::Type::Offscreen && type != GSTexture::Type::SparseRenderTarget &&
 			 type != GSTexture::Type::SparseDepthStencil);
 
-	const u32 width = std::max<u32>(1, std::min<u32>(w, g_vulkan_context->GetMaxImageDimension2D()));
-	const u32 height = std::max<u32>(1, std::min<u32>(h, g_vulkan_context->GetMaxImageDimension2D()));
-	const u32 layers = mipmap ? static_cast<u32>(log2(std::max(w, h))) : 1u;
+	const u32 clamped_width = static_cast<u32>(std::clamp<int>(1, width, g_vulkan_context->GetMaxImageDimension2D()));
+	const u32 clamped_height = static_cast<u32>(std::clamp<int>(1, height, g_vulkan_context->GetMaxImageDimension2D()));
 
-	return GSTextureVK::Create(type, width, height, layers, format).release();
+	return GSTextureVK::Create(type, clamped_width, clamped_height, levels, format).release();
 }
 
 bool GSDeviceVK::DownloadTexture(GSTexture* src, const GSVector4i& rect, GSTexture::GSMap& out_map)
@@ -952,20 +951,13 @@ VkSampler GSDeviceVK::GetSampler(GSHWDrawConfig::SamplerSelector ss)
 
 	const bool aniso = (ss.aniso && GSConfig.MaxAnisotropy > 1);
 
-	static constexpr std::array<VkSamplerMipmapMode, 6> mipmap_modes = {{
-		VK_SAMPLER_MIPMAP_MODE_NEAREST, // Nearest
-		VK_SAMPLER_MIPMAP_MODE_NEAREST, // Linear
-		VK_SAMPLER_MIPMAP_MODE_NEAREST, // Nearest_Mipmap_Nearest
-		VK_SAMPLER_MIPMAP_MODE_LINEAR, // Nearest_Mipmap_Linear
-		VK_SAMPLER_MIPMAP_MODE_NEAREST, // Linear_Mipmap_Nearest
-		VK_SAMPLER_MIPMAP_MODE_LINEAR, // Linear_Mipmap_Linear
-	}};
-
+	// See https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkSamplerCreateInfo.html#_description
+	// for the reasoning behind 0.25f here.
 	const VkSamplerCreateInfo ci = {
 		VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, nullptr, 0,
-		ss.biln ? VK_FILTER_LINEAR : VK_FILTER_NEAREST, // min
-		ss.biln ? VK_FILTER_LINEAR : VK_FILTER_NEAREST, // max
-		mipmap_modes[ss.triln], // mip
+		ss.IsMinFilterLinear() ? VK_FILTER_LINEAR : VK_FILTER_NEAREST, // min
+		ss.IsMagFilterLinear() ? VK_FILTER_LINEAR : VK_FILTER_NEAREST, // mag
+		ss.IsMipFilterLinear() ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST, // mip
 		static_cast<VkSamplerAddressMode>(
 			ss.tau ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE), // u
 		static_cast<VkSamplerAddressMode>(
@@ -976,8 +968,8 @@ VkSampler GSDeviceVK::GetSampler(GSHWDrawConfig::SamplerSelector ss)
 		aniso ? static_cast<float>(GSConfig.MaxAnisotropy) : 1.0f, // anisotropy
 		VK_FALSE, // compare enable
 		VK_COMPARE_OP_ALWAYS, // compare op
-		-1000.0f, // min lod
-		(ss.triln >= static_cast<u8>(GS_MIN_FILTER::Nearest_Mipmap_Nearest)) ? 1000.0f : 0.0f, // max lod
+		0.0f, // min lod
+		ss.lodclamp ? 0.25f : VK_LOD_CLAMP_NONE, // max lod
 		VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK, // border
 		VK_FALSE // unnormalized coordinates
 	};
