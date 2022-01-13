@@ -23134,8 +23134,8 @@ SLPM-65362:
   name: "NHK Tensai Bit-Kun - Guramon Battle"
   region: "NTSC-J"
 SLPM-65363:
- name: "Shoujo Yoshitsune Den (Special Version)"
- region: "NTSC-J"
+  name: "Shoujo Yoshitsune Den (Special Version)"
+  region: "NTSC-J"
 SLPM-65364:
   name: "Shoujo Yoshitsune Den"
   region: "NTSC-J"
