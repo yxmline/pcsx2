@@ -199,20 +199,12 @@ void GSRendererNew::EmulateTextureShuffleAndFbmask()
 			case AccBlendLevel::Ultra:
 			case AccBlendLevel::Full:
 			case AccBlendLevel::High:
-				// Fully enable Fbmask emulation like on opengl, note misses sw blending to work as opengl on some games (Genji).
-				// Debug
-				enable_fbmask_emulation = true;
-				break;
 			case AccBlendLevel::Medium:
-				// Enable Fbmask emulation excluding triangle class because it is quite slow.
-				// Exclude 0x80000000 because Genji needs sw blending, otherwise it breaks some effects.
-				enable_fbmask_emulation = ((m_vt.m_primclass != GS_TRIANGLE_CLASS) && (m_context->FRAME.FBMSK != 0x80000000));
+				enable_fbmask_emulation = true;
 				break;
 			case AccBlendLevel::Basic:
 				// Enable Fbmask emulation excluding triangle class because it is quite slow.
-				// Exclude 0x80000000 because Genji needs sw blending, otherwise it breaks some effects.
-				// Also exclude fbmask emulation on texture shuffle just in case, it is probably safe tho.
-				enable_fbmask_emulation = (!m_texture_shuffle && (m_vt.m_primclass != GS_TRIANGLE_CLASS) && (m_context->FRAME.FBMSK != 0x80000000));
+				enable_fbmask_emulation = (m_vt.m_primclass != GS_TRIANGLE_CLASS);
 				break;
 			case AccBlendLevel::Minimum:
 				break;
@@ -547,6 +539,9 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 	const bool blend_mix3 = !!(blend_flag & BLEND_MIX3);
 	bool blend_mix = (blend_mix1 || blend_mix2 || blend_mix3);
 
+	const bool alpha_c2_high_one = (ALPHA.C == 2 && ALPHA.FIX > 128u);
+	const bool alpha_c0_high_max_one = (ALPHA.C == 0 && GetAlphaMinMax().max > 128);
+
 	// Warning no break on purpose
 	// Note: the [[fallthrough]] attribute tell compilers not to complain about not having breaks.
 	bool sw_blending = false;
@@ -565,10 +560,10 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 				sw_blending |= true;
 				[[fallthrough]];
 			case AccBlendLevel::Full:
-				sw_blending |= ALPHA.A != ALPHA.B && ALPHA.C == 0 && GetAlphaMinMax().max > 128;
+				sw_blending |= ALPHA.A != ALPHA.B && alpha_c0_high_max_one;
 				[[fallthrough]];
 			case AccBlendLevel::High:
-				sw_blending |= ALPHA.C == 1 || (ALPHA.A != ALPHA.B && ALPHA.C == 2 && ALPHA.FIX > 128u);
+				sw_blending |= ALPHA.C == 1 || (ALPHA.A != ALPHA.B && alpha_c2_high_one);
 				[[fallthrough]];
 			case AccBlendLevel::Medium:
 				// Initial idea was to enable accurate blending for sprite rendering to handle
@@ -577,39 +572,59 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 				sw_blending |= m_vt.m_primclass == GS_SPRITE_CLASS && m_drawlist.size() < 100;
 				[[fallthrough]];
 			case AccBlendLevel::Basic:
+				// SW FBMASK, needs sw blend, avoid hitting accumulation mode,
+				// fixes shadows in Superman shadows of Apokolips.
+				// DATE_BARRIER already does full barrier so also makes more sense to do full sw blend.
+				accumulation_blend &= !m_conf.require_full_barrier;
 				sw_blending |= impossible_or_free_blend;
+				// Do not run BLEND MIX if sw blending is already present, it's less accurate
+				blend_mix &= !sw_blending;
+				sw_blending |= blend_mix;
 				[[fallthrough]];
 			case AccBlendLevel::Minimum:
-				/*sw_blending |= accumulation_blend*/;
+				break;
 		}
 	}
 	else
 	{
-		if (static_cast<u8>(GSConfig.AccurateBlendingUnit) >= static_cast<u8>(AccBlendLevel::Basic))
-			sw_blending |= accumulation_blend || blend_non_recursive;
-	}
+		// FBMASK already reads the fb so it is safe to enable sw blend when there is no overlap.
+		const bool fbmask_no_overlap = m_conf.require_one_barrier && m_conf.ps.fbmask && m_prim_overlap == PRIM_OVERLAP_NO;
 
-	// Do not run BLEND MIX if sw blending is already present, it's less accurate
-	if (GSConfig.AccurateBlendingUnit != AccBlendLevel::Minimum)
-	{
-		blend_mix &= !sw_blending;
-		sw_blending |= blend_mix;
+		switch (GSConfig.AccurateBlendingUnit)
+		{
+			case AccBlendLevel::Ultra:
+				sw_blending |= (m_prim_overlap == PRIM_OVERLAP_NO);
+				[[fallthrough]];
+			case AccBlendLevel::Full:
+				sw_blending |= (blend_mix && (alpha_c2_high_one || alpha_c0_high_max_one) && m_prim_overlap == PRIM_OVERLAP_NO);
+				[[fallthrough]];
+			case AccBlendLevel::High:
+				sw_blending |= (!blend_mix && m_prim_overlap == PRIM_OVERLAP_NO);
+				[[fallthrough]];
+			case AccBlendLevel::Medium:
+			case AccBlendLevel::Basic:
+				// Disable accumulation blend when there is fbmask with no overlap, will be faster.
+				accumulation_blend &= !fbmask_no_overlap;
+				sw_blending |= accumulation_blend || blend_non_recursive || fbmask_no_overlap;
+				// Do not run BLEND MIX if sw blending is already present, it's less accurate
+				blend_mix &= !sw_blending;
+				sw_blending |= blend_mix;
+				[[fallthrough]];
+			case AccBlendLevel::Minimum:
+				break;
+		}
 	}
 
 	// Color clip
 	if (m_env.COLCLAMP.CLAMP == 0)
 	{
-		// Safe FBMASK, avoid hitting accumulation mode on 16bit,
-		// fixes shadows in Superman shadows of Apokolips.
-		const bool sw_fbmask_colclip = !m_conf.require_one_barrier && m_conf.ps.fbmask;
 		bool free_colclip = false;
 		if (g_gs_device->Features().texture_barrier)
-			free_colclip = m_prim_overlap == PRIM_OVERLAP_NO || blend_non_recursive || sw_fbmask_colclip;
+			free_colclip = m_prim_overlap == PRIM_OVERLAP_NO || blend_non_recursive;
 		else
 			free_colclip = blend_non_recursive;
-		GL_DBG("COLCLIP Info (Blending: %d/%d/%d/%d, SW FBMASK: %d, OVERLAP: %d)",
-			ALPHA.A, ALPHA.B, ALPHA.C, ALPHA.D, sw_fbmask_colclip, m_prim_overlap);
 
+		GL_DBG("COLCLIP Info (Blending: %u/%u/%u/%u, OVERLAP: %d)", ALPHA.A, ALPHA.B, ALPHA.C, ALPHA.D, m_prim_overlap);
 		if (color_dest_blend)
 		{
 			// No overflow, disable colclip.
@@ -632,7 +647,7 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 			m_conf.ps.hdr = 1;
 			sw_blending   = true; // Enable sw blending for the HDR algo
 		}
-		else if (sw_blending && g_gs_device->Features().texture_barrier)
+		else if (sw_blending)
 		{
 			// A slow algo that could requires several passes (barely used)
 			GL_INS("COLCLIP SW mode ENABLED");
@@ -670,7 +685,7 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 			}
 			else
 			{
-				m_conf.ps.pabe = blend_non_recursive;
+				m_conf.ps.pabe = !(accumulation_blend || blend_mix);
 			}
 		}
 		else if (ALPHA.A == 0 && ALPHA.B == 1 && ALPHA.C == 0 && ALPHA.D == 1)
@@ -683,8 +698,8 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 
 	// For stat to optimize accurate option
 #if 0
-	GL_INS("BLEND_INFO: %d/%d/%d/%d. Clamp:%d. Prim:%d number %d (drawlist %d) (sw %d)",
-		ALPHA.A, ALPHA.B,  ALPHA.C, ALPHA.D, m_env.COLCLAMP.CLAMP, m_vt.m_primclass, m_vertex.next, m_drawlist.size(), sw_blending);
+	GL_INS("BLEND_INFO: %u/%u/%u/%u. Clamp:%u. Prim:%d number %u (drawlist %u) (sw %d)",
+		ALPHA.A, ALPHA.B, ALPHA.C, ALPHA.D, m_env.COLCLAMP.CLAMP, m_vt.m_primclass, m_vertex.next, m_drawlist.size(), sw_blending);
 #endif
 	if (color_dest_blend)
 	{
@@ -745,11 +760,10 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 			// Disable HW blending
 			m_conf.blend = {};
 
-			m_conf.require_full_barrier |= !blend_non_recursive;
-
-			// Only BLEND_NO_REC should hit this code path for now
-			if (!g_gs_device->Features().texture_barrier)
-				ASSERT(blend_non_recursive);
+			if (g_gs_device->Features().texture_barrier)
+				m_conf.require_full_barrier |= !blend_non_recursive;
+			else
+				m_conf.require_one_barrier |= !blend_non_recursive;
 		}
 
 		// Require the fix alpha vlaue
@@ -1225,11 +1239,7 @@ void GSRendererNew::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sour
 	// Upscaling hack to avoid various line/grid issues
 	MergeSprite(tex);
 
-	// Always check if primitive overlap as it is used in plenty of effects.
-	if (g_gs_device->Features().texture_barrier)
-		m_prim_overlap = PrimitiveOverlap();
-	else
-		m_prim_overlap = PRIM_OVERLAP_UNKNOW; // Prim overlap check is useless without texture barrier
+	m_prim_overlap = PrimitiveOverlap();
 
 	// Detect framebuffer read that will need special handling
 	if (g_gs_device->Features().texture_barrier && (m_context->FRAME.Block() == m_context->TEX0.TBP0) && PRIM->TME && GSConfig.AccurateBlendingUnit != AccBlendLevel::Minimum)
