@@ -7860,6 +7860,8 @@ SLES-50233:
 SLES-50243:
   name: "David Beckham Soccer"
   region: "PAL-M5"
+  gameFixes:
+    - SkipMPEGHack # Fixes game hang.
 SLES-50247:
   name: "Onimusha - Warlords"
   region: "PAL-M3"
@@ -10642,6 +10644,8 @@ SLES-51716:
 SLES-51717:
   name: "Boxing Champions"
   region: "PAL-E"
+  gameFixes:
+    - XGKickHack # Fixes graphical issues.
 SLES-51718:
   name: "League Series Baseball 2"
   region: "PAL-E"
@@ -20443,6 +20447,8 @@ SLPM-62193:
 SLPM-62197:
   name: "Simple 2000 Series Vol.07 - The Real Fist Fighter"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes graphical issues.
 SLPM-62198:
   name: "Simple 2000 Series Vol.04 - The Mahjong"
   region: "NTSC-J"
@@ -38816,6 +38822,15 @@ SLUS-21328:
   compat: 5
   clampModes:
     vuClampMode: 3  # Fixes bad geometry.
+  patches:
+    default:
+      content: |-
+        comment=Patch by Refraction
+        // Fix bad geometry
+        patch=1,EE,0016DDE4,word,4A80AADC
+        patch=1,EE,0016DDEC,word,4B7103BC
+        patch=1,EE,0016DDD0,word,4B00A29C
+        patch=1,EE,0016DDD8,word,4AF103BC
 SLUS-21329:
   name: "Karaoke Revolution Country - CMT Presents"
   region: "NTSC-U"
@@ -40324,9 +40339,12 @@ SLUS-21689:
   region: "NTSC-U"
   compat: 4
   patches:
-    default:
+    D0BA28BD:
       content: |-
-        comment= Horsez 2 needs EE cycle rate +2 or +3.
+        comment= patch to fix hang at first loading screen
+        //prafull's patch to fix hang at first loading screen
+        //Game also works with ee timing rate +2 or +3
+        patch=1,EE,002f6d70,word,00000000
   gameFixes:
     - VUKickstartHack # Fixes SPS.
 SLUS-21690:
