@@ -720,7 +720,7 @@ void ps_blend(inout vec4 Color, float As)
 #else
     // Needed for Cd * (As/Ad/F + 1) blending modes
 #if PS_CLR1 == 1
-    C.rgb = vec3(255.0f);
+    Color.rgb = vec3(255.0f);
 #elif PS_CLR1 > 1
     // PS_CLR1 2 Af, PS_CLR1 3 As
     // Cd*As or Cd*F
@@ -731,7 +731,6 @@ void ps_blend(inout vec4 Color, float As)
     float Alpha = As;
 #endif
 
-    Color.rgb /= vec3(255.0f);
     Color.rgb = max(vec3(0.0f), (Alpha - vec3(1.0f)));
     Color.rgb *= vec3(255.0f);
 #endif
