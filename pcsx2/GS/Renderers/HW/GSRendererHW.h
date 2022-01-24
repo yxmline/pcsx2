@@ -26,7 +26,6 @@ private:
 	int m_height;
 	int m_custom_width;
 	int m_custom_height;
-	int m_upscale_multiplier;
 	int m_userhacks_ts_half_bottom;
 
 	bool m_conservative_framebuffer;
@@ -60,10 +59,8 @@ private:
 	bool OI_JakGames(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* t);
 	bool OI_BurnoutGames(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* t);
 
-	void OO_MajokkoALaMode2();
 	void OO_BurnoutGames();
 
-	bool CU_MajokkoALaMode2();
 	bool CU_TalesOfAbyss();
 
 	class Hacks
@@ -183,7 +180,7 @@ public:
 	GSVector2 GetTextureScaleFactor() override;
 
 	void Reset() override;
-	void VSync(u32 field) override;
+	void VSync(u32 field, bool registers_written) override;
 
 	GSTexture* GetOutput(int i, int& y_offset) override;
 	GSTexture* GetFeedbackOutput() override;

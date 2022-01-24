@@ -35,6 +35,7 @@
 #ifndef PCSX2_CORE
 #include "gui/App.h"
 #else
+#include "PAD/Host/PAD.h"
 #include "VMManager.h"
 #endif
 
@@ -552,7 +553,10 @@ static __fi void VSyncStart(u32 sCycle)
 	}
 #endif
 
-	PerformanceMetrics::Update();
+#ifdef PCSX2_CORE
+	// Update vibration at the end of a frame.
+	PAD::Update();
+#endif
 
 	frameLimit(); // limit FPS
 	gsPostVsyncStart(); // MUST be after framelimit; doing so before causes funk with frame times!

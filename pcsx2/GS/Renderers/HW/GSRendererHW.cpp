@@ -35,7 +35,6 @@ GSRendererHW::GSRendererHW()
 	, m_lod(GSVector2i(0, 0))
 {
 	m_mipmap = (m_hw_mipmap >= HWMipmapLevel::Basic);
-	m_upscale_multiplier = std::max(0, theApp.GetConfigI("upscale_multiplier"));
 	m_conservative_framebuffer = theApp.GetConfigB("conservative_framebuffer");
 
 	if (theApp.GetConfigB("UserHacks"))
@@ -60,13 +59,13 @@ GSRendererHW::GSRendererHW()
 		m_userhacks_round_sprite_offset  = 0;
 	}
 
-	if (!m_upscale_multiplier) // Custom Resolution
+	if (!GSConfig.UpscaleMultiplier) // Custom Resolution
 	{
 		m_custom_width = m_width = theApp.GetConfigI("resx");
 		m_custom_height = m_height = theApp.GetConfigI("resy");
 	}
 
-	if (m_upscale_multiplier == 1) // hacks are only needed for upscaling issues.
+	if (GSConfig.UpscaleMultiplier == 1) // hacks are only needed for upscaling issues.
 	{
 		m_userhacks_round_sprite_offset = 0;
 		m_userhacks_align_sprite_X = false;
@@ -78,7 +77,7 @@ GSRendererHW::GSRendererHW()
 
 void GSRendererHW::SetScaling()
 {
-	if (!m_upscale_multiplier)
+	if (!GSConfig.UpscaleMultiplier)
 	{
 		CustomResolutionScaling();
 		return;
@@ -130,13 +129,13 @@ void GSRendererHW::SetScaling()
 		fb_height = fb_width < 1024 ? std::max(512, crtc_size.y) : 1024;
 	}
 
-	const int upscaled_fb_w = fb_width * m_upscale_multiplier;
-	const int upscaled_fb_h = fb_height * m_upscale_multiplier;
+	const int upscaled_fb_w = fb_width * GSConfig.UpscaleMultiplier;
+	const int upscaled_fb_h = fb_height * GSConfig.UpscaleMultiplier;
 	const bool good_rt_size = m_width >= upscaled_fb_w && m_height >= upscaled_fb_h;
 
 	// No need to resize for native/custom resolutions as default size will be enough for native and we manually get RT Buffer size for custom.
 	// don't resize until the display rectangle and register states are stabilized.
-	if (m_upscale_multiplier <= 1 || good_rt_size)
+	if (GSConfig.UpscaleMultiplier <= 1 || good_rt_size)
 		return;
 
 	m_tc->RemovePartial();
@@ -269,12 +268,12 @@ bool GSRendererHW::CanUpscale()
 	}
 
 	 // upscale ratio depends on the display size, with no output it may not be set correctly (ps2 logo to game transition)
-	return m_upscale_multiplier != 1 && m_regs->PMODE.EN != 0;
+	return GSConfig.UpscaleMultiplier != 1 && m_regs->PMODE.EN != 0;
 }
 
 int GSRendererHW::GetUpscaleMultiplier()
 {
-	return m_upscale_multiplier;
+	return GSConfig.UpscaleMultiplier;
 }
 
 GSVector2i GSRendererHW::GetCustomResolution()
@@ -292,7 +291,7 @@ void GSRendererHW::Reset()
 	GSRenderer::Reset();
 }
 
-void GSRendererHW::VSync(u32 field)
+void GSRendererHW::VSync(u32 field, bool registers_written)
 {
 	//Check if the frame buffer width or display width has changed
 	SetScaling();
@@ -304,7 +303,7 @@ void GSRendererHW::VSync(u32 field)
 		m_reset = false;
 	}
 
-	GSRenderer::VSync(field);
+	GSRenderer::VSync(field, registers_written);
 
 	m_tc->IncAge();
 
@@ -1755,17 +1754,14 @@ GSRendererHW::Hacks::Hacks()
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::Jak2, CRC::RegionCount, &GSRendererHW::OI_JakGames));
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::Jak3, CRC::RegionCount, &GSRendererHW::OI_JakGames));
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::JakX, CRC::RegionCount, &GSRendererHW::OI_JakGames));
-
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::BurnoutTakedown, CRC::RegionCount, &GSRendererHW::OI_BurnoutGames));
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::BurnoutRevenge, CRC::RegionCount, &GSRendererHW::OI_BurnoutGames));
 	m_oi_list.push_back(HackEntry<OI_Ptr>(CRC::BurnoutDominator, CRC::RegionCount, &GSRendererHW::OI_BurnoutGames));
 
-	m_oo_list.push_back(HackEntry<OO_Ptr>(CRC::MajokkoALaMode2, CRC::RegionCount, &GSRendererHW::OO_MajokkoALaMode2));
 	m_oo_list.push_back(HackEntry<OO_Ptr>(CRC::BurnoutTakedown, CRC::RegionCount, &GSRendererHW::OO_BurnoutGames));
 	m_oo_list.push_back(HackEntry<OO_Ptr>(CRC::BurnoutRevenge, CRC::RegionCount, &GSRendererHW::OO_BurnoutGames));
 	m_oo_list.push_back(HackEntry<OO_Ptr>(CRC::BurnoutDominator, CRC::RegionCount, &GSRendererHW::OO_BurnoutGames));
 
-	m_cu_list.push_back(HackEntry<CU_Ptr>(CRC::MajokkoALaMode2, CRC::RegionCount, &GSRendererHW::CU_MajokkoALaMode2));
 	m_cu_list.push_back(HackEntry<CU_Ptr>(CRC::TalesOfAbyss, CRC::RegionCount, &GSRendererHW::CU_TalesOfAbyss));
 }
 
@@ -2253,10 +2249,14 @@ bool GSRendererHW::OI_PointListPalette(GSTexture* rt, GSTexture* ds, GSTextureCa
 	const size_t n_vertices = m_vertex.next;
 	const int w = m_r.width();
 	const int h = m_r.height();
+	const bool is_copy = !PRIM->ABE || (
+		m_context->ALPHA.A == m_context->ALPHA.B // (A - B) == 0 in blending equation, makes C value irrelevant.
+		&& m_context->ALPHA.D == 0 // Copy source RGB(A) color into frame buffer.
+	);
 	if (m_vt.m_primclass == GS_POINT_CLASS && w <= 64 // Small draws.
 		&& h <= 64 // Small draws.
 		&& n_vertices <= 256 // Small draws.
-		&& PRIM->ABE // Alpha blending.
+		&& is_copy // Copy (no blending).
 		&& !PRIM->TME // No texturing please.
 		&& m_context->FRAME.PSM == PSM_PSMCT32 // Only 32-bit pixel format (CLUT format).
 		&& !PRIM->FGE // No FOG.
@@ -2270,8 +2270,6 @@ bool GSRendererHW::OI_PointListPalette(GSTexture* rt, GSTexture* ds, GSTextureCa
 		&& !m_env.PABE.PABE // No PABE.
 		&& m_context->FBA.FBA == 0 // No Alpha Correction.
 		&& m_context->FRAME.FBMSK == 0 // No frame buffer masking.
-		&& m_context->ALPHA.A == m_context->ALPHA.B // (A - B) == 0 in blending equation, makes C value irrelevant.
-		&& m_context->ALPHA.D == 0 // Copy source RGB(A) color into frame buffer.
 	)
 	{
 		const u32 FBP = m_context->FRAME.Block();
@@ -2396,24 +2394,6 @@ bool GSRendererHW::OI_BurnoutGames(GSTexture* rt, GSTexture* ds, GSTextureCache:
 
 // OO (others output?) hacks: invalidate extra local memory after the draw call
 
-void GSRendererHW::OO_MajokkoALaMode2()
-{
-	// palette readback
-
-	const u32 FBP = m_context->FRAME.Block();
-
-	if (!PRIM->TME && FBP == 0x03f40)
-	{
-		GIFRegBITBLTBUF BITBLTBUF;
-
-		BITBLTBUF.SBP = FBP;
-		BITBLTBUF.SBW = 1;
-		BITBLTBUF.SPSM = PSM_PSMCT32;
-
-		InvalidateLocalMem(BITBLTBUF, GSVector4i(0, 0, 16, 16));
-	}
-}
-
 void GSRendererHW::OO_BurnoutGames()
 {
 	const GIFRegTEX0& TEX0 = m_context->TEX0;
@@ -2450,15 +2430,6 @@ void GSRendererHW::OO_BurnoutGames()
 }
 
 // Can Upscale hacks: disable upscaling for some draw calls
-
-bool GSRendererHW::CU_MajokkoALaMode2()
-{
-	// palette should stay 16 x 16
-
-	const u32 FBP = m_context->FRAME.Block();
-
-	return FBP != 0x03f40;
-}
 
 bool GSRendererHW::CU_TalesOfAbyss()
 {

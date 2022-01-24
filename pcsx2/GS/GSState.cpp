@@ -38,7 +38,7 @@ GSState::GSState()
 {
 	// m_nativeres seems to be a hack. Unfortunately it impacts draw call number which make debug painful in the replayer.
 	// Let's keep it disabled to ease debug.
-	m_nativeres = theApp.GetConfigI("upscale_multiplier") == 1;
+	m_nativeres = GSConfig.UpscaleMultiplier == 1;
 	m_mipmap = theApp.GetConfigB("mipmap");
 	m_NTSC_Saturation = theApp.GetConfigB("NTSC_Saturation");
 	if (theApp.GetConfigB("UserHacks"))
@@ -69,7 +69,7 @@ GSState::GSState()
 	}
 #endif
 
-	m_crc_hack_level = theApp.GetConfigT<CRCHackLevel>("crc_hack_level");
+	m_crc_hack_level = GSConfig.CRCHack;
 	if (m_crc_hack_level == CRCHackLevel::Automatic)
 		m_crc_hack_level = GSUtil::GetRecommendedCRCHackLevel(GSConfig.Renderer);
 
@@ -1405,6 +1405,16 @@ void GSState::FlushPrim()
 	if (m_index.tail > 0)
 	{
 		GL_REG("FlushPrim ctxt %d", PRIM->CTXT);
+
+		// internal frame rate detection based on sprite blits to the display framebuffer
+		{
+			const u32 FRAME_FBP = m_context->FRAME.FBP;
+			if ((m_regs->DISP[0].DISPFB.FBP == FRAME_FBP && m_regs->PMODE.EN1) ||
+				(m_regs->DISP[1].DISPFB.FBP == FRAME_FBP && m_regs->PMODE.EN2))
+			{
+				g_perfmon.AddDisplayFramebufferSpriteBlit();
+			}
+		}
 
 		GSVertex buff[2];
 		s_n++;
