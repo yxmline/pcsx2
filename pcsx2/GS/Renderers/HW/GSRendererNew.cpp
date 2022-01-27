@@ -588,6 +588,10 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 	}
 	else
 	{
+		// Blend can be done on hw. As and F cases should be accurate.
+		// BLEND_C_CLR1 with Ad, BLEND_C_CLR4  Cs > 0.5f will require sw blend.
+		// BLEND_C_CLR1 with As/F, BLEND_C_CLR2_AF, BLEND_C_CLR3_AS can be done in hw.
+		const bool clr_blend = !!(blend_flag & (BLEND_C_CLR1 | BLEND_C_CLR2_AF | BLEND_C_CLR3_AS | BLEND_C_CLR4));
 		// Exclude triangles, breaks mgs3 on ultra blending.
 		const bool no_overlap_no_triangles = (m_prim_overlap == PRIM_OVERLAP_NO) && (m_vt.m_primclass != GS_TRIANGLE_CLASS);
 		// FBMASK already reads the fb so it is safe to enable sw blend when there is no overlap.
@@ -599,10 +603,10 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 				sw_blending |= no_overlap_no_triangles;
 				[[fallthrough]];
 			case AccBlendLevel::Full:
-				sw_blending |= (blend_mix && (alpha_c2_high_one || alpha_c0_high_max_one) && no_overlap_no_triangles);
+				sw_blending |= ((ALPHA.C == 1 || (blend_mix && (alpha_c2_high_one || alpha_c0_high_max_one))) && no_overlap_no_triangles);
 				[[fallthrough]];
 			case AccBlendLevel::High:
-				sw_blending |= (!blend_mix && no_overlap_no_triangles);
+				sw_blending |= (!(clr_blend || blend_mix) && no_overlap_no_triangles);
 				[[fallthrough]];
 			case AccBlendLevel::Medium:
 			case AccBlendLevel::Basic:
@@ -777,16 +781,20 @@ void GSRendererNew::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER)
 	{
 		if (blend_flag & BLEND_C_CLR1)
 		{
-			m_conf.ps.clr1 = 1;
+			m_conf.ps.clr_hw = 1;
 		}
 		else if (blend_flag & BLEND_C_CLR2_AF)
 		{
 			m_conf.cb_ps.TA_MaxDepth_Af.a = static_cast<float>(ALPHA.FIX) / 128.0f;
-			m_conf.ps.clr1 = 2;
+			m_conf.ps.clr_hw = 2;
 		}
-		else if (blend_flag & BLEND_C_CLR2_AS)
+		else if (blend_flag & BLEND_C_CLR3_AS)
 		{
-			m_conf.ps.clr1 = 3;
+			m_conf.ps.clr_hw = 3;
+		}
+		else if (blend_flag & BLEND_C_CLR4)
+		{
+			m_conf.ps.clr_hw = 4;
 		}
 
 		if (m_conf.ps.dfmt == 1 && ALPHA.C == 1)
