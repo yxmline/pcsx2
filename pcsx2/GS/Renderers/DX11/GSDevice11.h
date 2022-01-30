@@ -111,6 +111,9 @@ private:
 	// Increment this constant whenever shaders change, to invalidate user's shader cache.
 	static constexpr u32 SHADER_VERSION = 1;
 
+	static constexpr u32 MAX_TEXTURES = 3;
+	static constexpr u32 MAX_SAMPLERS = 2;
+
 	float m_hack_topleft_offset;
 	int m_d3d_texsize;
 
@@ -121,8 +124,6 @@ private:
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) final;
 	void DoExternalFX(GSTexture* sTex, GSTexture* dTex) final;
-	void BeforeDraw();
-	void AfterDraw();
 
 	u16 ConvertBlendEnum(u16 generic) final;
 
@@ -143,11 +144,10 @@ private:
 		ID3D11Buffer* vs_cb;
 		ID3D11GeometryShader* gs;
 		ID3D11Buffer* gs_cb;
-		std::array<ID3D11ShaderResourceView*, 16> ps_sr_views;
-		std::array<GSTexture11*, 16> ps_sr_texture;
+		std::array<ID3D11ShaderResourceView*, MAX_TEXTURES> ps_sr_views;
 		ID3D11PixelShader* ps;
 		ID3D11Buffer* ps_cb;
-		ID3D11SamplerState* ps_ss[3];
+		std::array<ID3D11SamplerState*, MAX_SAMPLERS> ps_ss;
 		GSVector2i viewport;
 		GSVector4i scissor;
 		ID3D11DepthStencilState* dss;
@@ -158,7 +158,6 @@ private:
 		GSTexture11* rt_texture;
 		GSTexture11* rt_ds;
 		ID3D11DepthStencilView* dsv;
-		uint16_t ps_sr_bitfield;
 	} m_state;
 
 
@@ -253,9 +252,10 @@ public:
 	bool DownloadTexture(GSTexture* src, const GSVector4i& rect, GSTexture::GSMap& out_map) final;
 	void DownloadTextureComplete() final;
 
-	void CloneTexture(GSTexture* src, GSTexture** dest);
+	void CloneTexture(GSTexture* src, GSTexture** dest, const GSVector4i& rect);
 
 	void CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r);
+	void CopyRect(GSTexture* sTex, const GSVector4i& sRect, GSTexture* dTex, u32 destX, u32 destY);
 
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader = ShaderConvert::COPY, bool linear = true) final;
 	void StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, ID3D11PixelShader* ps, ID3D11Buffer* ps_cb, bool linear = true);
@@ -278,7 +278,6 @@ public:
 
 	void PSSetShaderResources(GSTexture* sr0, GSTexture* sr1);
 	void PSSetShaderResource(int i, GSTexture* sr);
-	void PSSetShaderResourceView(int i, ID3D11ShaderResourceView* srv, GSTexture* sr);
 	void PSSetShader(ID3D11PixelShader* ps, ID3D11Buffer* ps_cb);
 	void PSUpdateShaderState();
 	void PSSetSamplerState(ID3D11SamplerState* ss0, ID3D11SamplerState* ss1);

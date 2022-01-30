@@ -30,9 +30,11 @@ public:
   ~SDLInputSource();
 
   bool Initialize(SettingsInterface& si) override;
+  void UpdateSettings(SettingsInterface& si) override;
   void Shutdown() override;
 
   void PollEvents() override;
+  std::vector<std::pair<std::string, std::string>> EnumerateDevices() override;
   std::vector<InputBindingKey> EnumerateMotors() override;
   void UpdateMotorState(InputBindingKey key, float intensity) override;
   void UpdateMotorState(InputBindingKey large_key, InputBindingKey small_key, float large_intensity, float small_intensity) override;
@@ -62,6 +64,11 @@ private:
 
   using ControllerDataVector = std::vector<ControllerData>;
 
+  bool InitializeSubsystem();
+  void ShutdownSubsystem();
+  void LoadSettings(SettingsInterface& si);
+  void SetHints();
+
   ControllerDataVector::iterator GetControllerDataForJoystickId(int id);
   ControllerDataVector::iterator GetControllerDataForPlayerId(int id);
   int GetFreePlayerId() const;
@@ -75,4 +82,5 @@ private:
   ControllerDataVector m_controllers;
 
   bool m_sdl_subsystem_initialized = false;
+  bool m_controller_enhanced_mode = false;
 };

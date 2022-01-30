@@ -74,20 +74,47 @@ bool SDLInputSource::Initialize(SettingsInterface& si)
 		Console.Error("Controller database resource is missing.");
 	}
 
-	const bool ds4_rumble_enabled = si.GetBoolValue("InputSources", "SDLControllerEnhancedMode", false);
-	if (ds4_rumble_enabled)
+	LoadSettings(si);
+	SetHints();
+	return InitializeSubsystem();
+}
+
+void SDLInputSource::UpdateSettings(SettingsInterface& si)
+{
+	const bool old_controller_enhanced_mode = m_controller_enhanced_mode;
+
+	LoadSettings(si);
+
+	if (m_controller_enhanced_mode != old_controller_enhanced_mode)
 	{
-		Console.WriteLn("Enabling PS4/PS5 enhanced mode.");
+		ShutdownSubsystem();
+		SetHints();
+		InitializeSubsystem();
+	}
+}
+
+void SDLInputSource::Shutdown()
+{
+	ShutdownSubsystem();
+}
+
+void SDLInputSource::LoadSettings(SettingsInterface& si)
+{
+	m_controller_enhanced_mode = si.GetBoolValue("InputSources", "SDLControllerEnhancedMode", false);
+}
+
+void SDLInputSource::SetHints()
+{
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-		SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "true");
-		SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "true");
+	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, m_controller_enhanced_mode ? "1" : "0");
 #endif
 #if SDL_VERSION_ATLEAST(2, 0, 16)
-		SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5, "true");
-		SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "true");
+	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, m_controller_enhanced_mode ? "1" : "0");
 #endif
-	}
+}
 
+bool SDLInputSource::InitializeSubsystem()
+{
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
 	{
 		Console.Error("SDL_InitSubSystem(SDL_INIT_JOYSTICK |SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) failed");
@@ -99,7 +126,7 @@ bool SDLInputSource::Initialize(SettingsInterface& si)
 	return true;
 }
 
-void SDLInputSource::Shutdown()
+void SDLInputSource::ShutdownSubsystem()
 {
 	while (!m_controllers.empty())
 		CloseGameController(m_controllers.begin()->joystick_id);
@@ -121,6 +148,24 @@ void SDLInputSource::PollEvents()
 		else
 			break;
 	}
+}
+
+std::vector<std::pair<std::string, std::string>> SDLInputSource::EnumerateDevices()
+{
+	std::vector<std::pair<std::string, std::string>> ret;
+
+	for (const ControllerData& cd : m_controllers)
+	{
+		std::string id(StringUtil::StdStringFromFormat("SDL-%d", cd.player_id));
+
+		const char* name = SDL_GameControllerName(cd.game_controller);
+		if (name)
+			ret.emplace_back(std::move(id), name);
+		else
+			ret.emplace_back(std::move(id), "Unknown Device");
+	}
+
+	return ret;
 }
 
 std::optional<InputBindingKey> SDLInputSource::ParseKeyString(
@@ -369,6 +414,9 @@ bool SDLInputSource::OpenGameController(int index)
 		Console.Warning("(SDLInputSource) Rumble is not supported on '%s'", SDL_GameControllerName(gcontroller));
 
 	m_controllers.push_back(std::move(cd));
+
+	const char* name = SDL_GameControllerName(cd.game_controller);
+	Host::OnInputDeviceConnected(StringUtil::StdStringFromFormat("SDL-%d", player_id), name ? name : "Unknown Device");
 	return true;
 }
 
@@ -382,7 +430,11 @@ bool SDLInputSource::CloseGameController(int joystick_index)
 		SDL_HapticClose(static_cast<SDL_Haptic*>(it->haptic));
 
 	SDL_GameControllerClose(static_cast<SDL_GameController*>(it->game_controller));
+
+	const int player_id = it->player_id;
 	m_controllers.erase(it);
+
+	Host::OnInputDeviceDisconnected(StringUtil::StdStringFromFormat("SDL-%d", player_id));
 	return true;
 }
 

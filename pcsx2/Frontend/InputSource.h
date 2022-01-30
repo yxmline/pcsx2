@@ -17,6 +17,7 @@
 
 #include <optional>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "common/Pcsx2Defs.h"
@@ -31,6 +32,7 @@ public:
 	virtual ~InputSource();
 
 	virtual bool Initialize(SettingsInterface& si) = 0;
+	virtual void UpdateSettings(SettingsInterface& si) = 0;
 	virtual void Shutdown() = 0;
 
 	virtual void PollEvents() = 0;
@@ -38,6 +40,9 @@ public:
 	virtual std::optional<InputBindingKey> ParseKeyString(
 		const std::string_view& device, const std::string_view& binding) = 0;
 	virtual std::string ConvertKeyToString(InputBindingKey key) = 0;
+
+	/// Enumerates available devices. Returns a pair of the prefix (e.g. SDL-0) and the device name.
+	virtual std::vector<std::pair<std::string, std::string>> EnumerateDevices() = 0;
 
 	/// Enumerates available vibration motors at the time of call.
 	virtual std::vector<InputBindingKey> EnumerateMotors() = 0;

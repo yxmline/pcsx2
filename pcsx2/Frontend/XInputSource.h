@@ -30,9 +30,11 @@ public:
   ~XInputSource();
 
   bool Initialize(SettingsInterface& si) override;
+  void UpdateSettings(SettingsInterface& si) override;
   void Shutdown() override;
 
   void PollEvents() override;
+  std::vector<std::pair<std::string, std::string>> EnumerateDevices() override;
   std::vector<InputBindingKey> EnumerateMotors() override;
   void UpdateMotorState(InputBindingKey key, float intensity) override;
   void UpdateMotorState(InputBindingKey large_key, InputBindingKey small_key, float large_intensity, float small_intensity) override;
