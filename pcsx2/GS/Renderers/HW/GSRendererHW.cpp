@@ -135,7 +135,7 @@ void GSRendererHW::SetScaling()
 
 	// No need to resize for native/custom resolutions as default size will be enough for native and we manually get RT Buffer size for custom.
 	// don't resize until the display rectangle and register states are stabilized.
-	if (GSConfig.UpscaleMultiplier <= 1 || good_rt_size)
+	if (good_rt_size)
 		return;
 
 	m_tc->RemovePartial();
@@ -293,9 +293,6 @@ void GSRendererHW::Reset()
 
 void GSRendererHW::VSync(u32 field, bool registers_written)
 {
-	//Check if the frame buffer width or display width has changed
-	SetScaling();
-
 	if (m_reset)
 	{
 		m_tc->RemoveAll();
@@ -307,6 +304,9 @@ void GSRendererHW::VSync(u32 field, bool registers_written)
 
 		m_reset = false;
 	}
+
+	//Check if the frame buffer width or display width has changed
+	SetScaling();
 
 	GSRenderer::VSync(field, registers_written);
 
@@ -1384,13 +1384,62 @@ void GSRendererHW::Draw()
 
 		m_context->offset.tex = m_mem.GetOffset(TEX0.TBP0, TEX0.TBW, TEX0.PSM);
 
-		GSVector4i r;
+		TextureMinMaxResult tmm = GetTextureMinMax(TEX0, MIP_CLAMP, m_vt.IsLinear());
 
-		GetTextureMinMax(r, TEX0, MIP_CLAMP, m_vt.IsLinear());
-
-		m_src = tex_psm.depth ? m_tc->LookupDepthSource(TEX0, env.TEXA, r) :
-			m_tc->LookupSource(TEX0, env.TEXA, r, m_hw_mipmap >= HWMipmapLevel::Basic ||
+		m_src = tex_psm.depth ? m_tc->LookupDepthSource(TEX0, env.TEXA, tmm.coverage) :
+			m_tc->LookupSource(TEX0, env.TEXA, tmm.coverage, m_hw_mipmap >= HWMipmapLevel::Basic ||
 				GSConfig.UserHacks_TriFilter == TriFiltering::Forced);
+
+		int tw = 1 << TEX0.TW;
+		int th = 1 << TEX0.TH;
+		// Texture clamp optimizations (try to move everything to sampler hardware)
+		if (m_context->CLAMP.WMS == CLAMP_REGION_CLAMP && MIP_CLAMP.MINU == 0 && MIP_CLAMP.MAXU == tw - 1)
+			m_context->CLAMP.WMS = CLAMP_CLAMP;
+		else if (m_context->CLAMP.WMS == CLAMP_REGION_REPEAT && MIP_CLAMP.MINU == tw - 1 && MIP_CLAMP.MAXU == 0)
+			m_context->CLAMP.WMS = CLAMP_REPEAT;
+		else if ((m_context->CLAMP.WMS & 2) && !(tmm.uses_boundary & TextureMinMaxResult::USES_BOUNDARY_U))
+			m_context->CLAMP.WMS = CLAMP_CLAMP;
+		if (m_context->CLAMP.WMT == CLAMP_REGION_CLAMP && MIP_CLAMP.MINV == 0 && MIP_CLAMP.MAXV == th - 1)
+			m_context->CLAMP.WMT = CLAMP_CLAMP;
+		else if (m_context->CLAMP.WMT == CLAMP_REGION_REPEAT && MIP_CLAMP.MINV == th - 1 && MIP_CLAMP.MAXV == 0)
+			m_context->CLAMP.WMT = CLAMP_REPEAT;
+		else if ((m_context->CLAMP.WMT & 2) && !(tmm.uses_boundary & TextureMinMaxResult::USES_BOUNDARY_V))
+			m_context->CLAMP.WMT = CLAMP_CLAMP;
+
+		// If m_src is from a target that isn't the same size as the texture, texture sample edge modes won't work quite the same way
+		// If the game actually tries to access stuff outside of the rendered target, it was going to get garbage anyways so whatever
+		// But the game could issue reads that wrap to valid areas, so move wrapping to the shader if wrapping is used
+		GSVector4i unscaled_size = GSVector4i(GSVector4(m_src->m_texture->GetSize()) / GSVector4(m_src->m_texture->GetScale()));
+		if (m_context->CLAMP.WMS == CLAMP_REPEAT && (tmm.uses_boundary & TextureMinMaxResult::USES_BOUNDARY_U) && unscaled_size.x != tw)
+		{
+			// Our shader-emulated region repeat doesn't upscale :(
+			// Try to avoid it if possible
+			// TODO: Upscale-supporting shader-emulated region repeat
+			if (unscaled_size.x < tw && m_vt.m_min.t.x > -(tw - unscaled_size.x) && m_vt.m_max.t.x < tw)
+			{
+				// Game only extends into data we don't have (but doesn't wrap around back onto good data), clamp seems like the most reasonable solution
+				m_context->CLAMP.WMS = CLAMP_CLAMP;
+			}
+			else
+			{
+				m_context->CLAMP.WMS = CLAMP_REGION_REPEAT;
+				m_context->CLAMP.MINU = (1 << m_context->TEX0.TW) - 1;
+				m_context->CLAMP.MAXU = 0;
+			}
+		}
+		if (m_context->CLAMP.WMT == CLAMP_REPEAT && (tmm.uses_boundary & TextureMinMaxResult::USES_BOUNDARY_V) && unscaled_size.y != th)
+		{
+			if (unscaled_size.y < th && m_vt.m_min.t.y > -(th - unscaled_size.y) && m_vt.m_max.t.y < th)
+			{
+				m_context->CLAMP.WMT = CLAMP_CLAMP;
+			}
+			else
+			{
+				m_context->CLAMP.WMT = CLAMP_REGION_REPEAT;
+				m_context->CLAMP.MINV = (1 << m_context->TEX0.TH) - 1;
+				m_context->CLAMP.MAXV = 0;
+			}
+		}
 
 		// Round 2
 		if (IsMipMapActive() && m_hw_mipmap == HWMipmapLevel::Full && !tex_psm.depth)
@@ -1413,9 +1462,9 @@ void GSRendererHW::Draw()
 				m_vt.m_min.t *= 0.5f;
 				m_vt.m_max.t *= 0.5f;
 
-				GetTextureMinMax(r, MIP_TEX0, MIP_CLAMP, m_vt.IsLinear());
+				tmm = GetTextureMinMax(MIP_TEX0, MIP_CLAMP, m_vt.IsLinear());
 
-				m_src->UpdateLayer(MIP_TEX0, r, layer - m_lod.x);
+				m_src->UpdateLayer(MIP_TEX0, tmm.coverage, layer - m_lod.x);
 			}
 
 			// we don't need to generate mipmaps since they were provided
