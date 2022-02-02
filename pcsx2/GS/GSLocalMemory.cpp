@@ -17,6 +17,7 @@
 #include "GSLocalMemory.h"
 #include "GS.h"
 #include "GSExtra.h"
+#include <xbyak/xbyak_util.h>
 #include <unordered_set>
 
 template <typename Fn>
@@ -268,6 +269,35 @@ GSLocalMemory::GSLocalMemory()
 	m_psm[PSM_PSMZ24].rtxbP = &GSLocalMemory::ReadTextureBlock24;
 	m_psm[PSM_PSMZ16].rtxbP = &GSLocalMemory::ReadTextureBlock16;
 	m_psm[PSM_PSMZ16S].rtxbP = &GSLocalMemory::ReadTextureBlock16;
+
+#if _M_SSE == 0x501
+	Xbyak::util::Cpu cpu;
+	bool slowVPGATHERDD;
+	if (cpu.has(Xbyak::util::Cpu::tINTEL))
+	{
+		// Slow on Haswell
+		// CPUID data from https://en.wikichip.org/wiki/intel/cpuid
+		slowVPGATHERDD = cpu.displayModel == 0x46 || cpu.displayModel == 0x45 || cpu.displayModel == 0x3c;
+	}
+	else
+	{
+		// Currently no Zen CPUs with fast VPGATHERDD
+		// Check https://uops.info/table.html as new CPUs come out for one that doesn't split it into like 40 µops
+		// Doing it manually is about 28 µops (8x xmm -> gpr, 6x extr, 8x load, 6x insr)
+		slowVPGATHERDD = true;
+	}
+	if (const char* over = getenv("SLOW_VPGATHERDD_OVERRIDE")) // Easy override for comparing on vs off
+	{
+		slowVPGATHERDD = over[0] == 'Y' || over[0] == 'y' || over[0] == '1';
+	}
+	if (slowVPGATHERDD)
+	{
+		m_psm[PSM_PSMT8].rtx = &GSLocalMemory::ReadTexture8HSW;
+		m_psm[PSM_PSMT8H].rtx = &GSLocalMemory::ReadTexture8HHSW;
+		m_psm[PSM_PSMT8].rtxb = &GSLocalMemory::ReadTextureBlock8HSW;
+		m_psm[PSM_PSMT8H].rtxb = &GSLocalMemory::ReadTextureBlock8HHSW;
+	}
+#endif
 
 	m_psm[PSM_PSGPU24].bpp = 16;
 	m_psm[PSM_PSMCT16].bpp = m_psm[PSM_PSMCT16S].bpp = 16;
@@ -689,6 +719,9 @@ void GSLocalMemory::WriteImageTopBottom(int l, int r, int y, int h, const u8* sr
 
 		if (h2 > 0)
 		{
+#if FAST_UNALIGNED
+			WriteImageColumn<psm, bsx, bsy, 0>(l, r, y, h2, src, srcpitch, BITBLTBUF);
+#else
 			size_t addr = (size_t)&src[l * trbpp >> 3];
 
 			if ((addr & 31) == 0 && (srcpitch & 31) == 0)
@@ -703,6 +736,7 @@ void GSLocalMemory::WriteImageTopBottom(int l, int r, int y, int h, const u8* sr
 			{
 				WriteImageColumn<psm, bsx, bsy, 0>(l, r, y, h2, src, srcpitch, BITBLTBUF);
 			}
+#endif
 
 			src += srcpitch * h2;
 			y += h2;
@@ -839,6 +873,9 @@ void GSLocalMemory::WriteImage(int& tx, int& ty, const u8* src, int len, GIFRegB
 
 				if (h2 > 0)
 				{
+#if FAST_UNALIGNED
+					WriteImageBlock<psm, bsx, bsy, 0>(la, ra, ty, h2, s, srcpitch, BITBLTBUF);
+#else
 					size_t addr = (size_t)&s[la * trbpp >> 3];
 
 					if ((addr & 31) == 0 && (srcpitch & 31) == 0)
@@ -853,6 +890,7 @@ void GSLocalMemory::WriteImage(int& tx, int& ty, const u8* src, int len, GIFRegB
 					{
 						WriteImageBlock<psm, bsx, bsy, 0>(la, ra, ty, h2, s, srcpitch, BITBLTBUF);
 					}
+#endif
 
 					s += srcpitch * h2;
 					ty += h2;
@@ -1434,7 +1472,7 @@ void GSLocalMemory::ReadTexture8(const GSOffset& off, const GSVector4i& r, u8* d
 
 void GSLocalMemory::ReadTexture4(const GSOffset& off, const GSVector4i& r, u8* dst, int dstpitch, const GIFRegTEXA& TEXA)
 {
-	const u64* pal = m_clut;
+	const u32* pal = m_clut;
 
 	foreachBlock(off.assertSizesMatch(swizzle4), this, r, dst, dstpitch, 32, [&](u8* read_dst, const u8* src)
 	{
@@ -1451,6 +1489,28 @@ void GSLocalMemory::ReadTexture8H(const GSOffset& off, const GSVector4i& r, u8* 
 		GSBlock::ReadAndExpandBlock8H_32(src, read_dst, dstpitch, pal);
 	});
 }
+
+#if _M_SSE == 0x501
+void GSLocalMemory::ReadTexture8HSW(const GSOffset& off, const GSVector4i& r, u8* dst, int dstpitch, const GIFRegTEXA& TEXA)
+{
+	const u32* pal = m_clut;
+
+	foreachBlock(off.assertSizesMatch(swizzle8), this, r, dst, dstpitch, 32, [&](u8* read_dst, const u8* src)
+	{
+		GSBlock::ReadAndExpandBlock8_32HSW(src, read_dst, dstpitch, pal);
+	});
+}
+
+void GSLocalMemory::ReadTexture8HHSW(const GSOffset& off, const GSVector4i& r, u8* dst, int dstpitch, const GIFRegTEXA& TEXA)
+{
+	const u32* pal = m_clut;
+
+	foreachBlock(off.assertSizesMatch(swizzle32), this, r, dst, dstpitch, 32, [&](u8* read_dst, const u8* src)
+	{
+		GSBlock::ReadAndExpandBlock8H_32HSW(src, read_dst, dstpitch, pal);
+	});
+}
+#endif
 
 void GSLocalMemory::ReadTexture4HL(const GSOffset& off, const GSVector4i& r, u8* dst, int dstpitch, const GIFRegTEXA& TEXA)
 {
@@ -1529,6 +1589,22 @@ void GSLocalMemory::ReadTextureBlock8H(u32 bp, u8* dst, int dstpitch, const GIFR
 
 	GSBlock::ReadAndExpandBlock8H_32(BlockPtr(bp), dst, dstpitch, m_clut);
 }
+
+#if _M_SSE == 0x501
+void GSLocalMemory::ReadTextureBlock8HSW(u32 bp, u8* dst, int dstpitch, const GIFRegTEXA& TEXA) const
+{
+	ALIGN_STACK(32);
+
+	GSBlock::ReadAndExpandBlock8_32HSW(BlockPtr(bp), dst, dstpitch, m_clut);
+}
+
+void GSLocalMemory::ReadTextureBlock8HHSW(u32 bp, u8* dst, int dstpitch, const GIFRegTEXA& TEXA) const
+{
+	ALIGN_STACK(32);
+
+	GSBlock::ReadAndExpandBlock8H_32HSW(BlockPtr(bp), dst, dstpitch, m_clut);
+}
+#endif
 
 void GSLocalMemory::ReadTextureBlock4HL(u32 bp, u8* dst, int dstpitch, const GIFRegTEXA& TEXA) const
 {
