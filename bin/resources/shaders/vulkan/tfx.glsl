@@ -1064,14 +1064,13 @@ void ps_blend(inout vec4 Color, float As)
 		#endif
 
 	#else
-		#if PS_CLR_HW == 1
+		#if PS_CLR_HW == 1 || PS_CLR_HW == 5
 			// Needed for Cd * (As/Ad/F + 1) blending modes
 			Color.rgb = vec3(255.0f);
-		#elif PS_CLR_HW == 2 || PS_CLR_HW == 3
-			// PS_CLR_HW 2 Af, PS_CLR_HW 3 As
-			// Cd*As or Cd*F
+		#elif PS_CLR_HW == 2 || PS_CLR_HW == 4
+			// Cd*As,Cd*Ad or Cd*F
 
-			#if PS_CLR_HW == 2
+			#if PS_BLEND_C == 2
 				float Alpha = Af;
 			#else
 				float Alpha = As;
@@ -1079,7 +1078,7 @@ void ps_blend(inout vec4 Color, float As)
 
 			Color.rgb = max(vec3(0.0f), (Alpha - vec3(1.0f)));
 			Color.rgb *= vec3(255.0f);
-		#elif PS_CLR_HW == 4
+		#elif PS_CLR_HW == 3
 			// Needed for Cs*Ad, Cs*Ad + Cd, Cd - Cs*Ad
 			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value
 
@@ -1164,7 +1163,12 @@ void main()
 	#endif
 
   // Must be done before alpha correction
+#if (PS_BLEND_C == 1 && PS_CLR_HW > 3)
+  vec4 RT = trunc(subpassLoad(RtSampler) * 255.0f + 0.1f);
+  float alpha_blend = (PS_DFMT == FMT_24) ? 1.0f : RT.a / 128.0f;
+#else
   float alpha_blend = C.a / 128.0f;
+#endif
 
   // Correct the ALPHA value based on the output format
 #if (PS_DFMT == FMT_16)

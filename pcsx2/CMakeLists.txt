@@ -1646,6 +1646,9 @@ foreach(path IN LISTS RESOURCE_FILES)
 	if (NOT WIN32 AND "${path}" MATCHES "/dx11/") # Don't include unneccessary stuff
 		continue()
 	endif()
+	if ((GETTEXT_FOUND OR NO_TRANSLATION OR PCSX2_CORE) AND "${path}" MATCHES "/locale/") # Generate locales with gettext instead of copying them from bin
+		continue()
+	endif()
 	pcsx2_resource(${path} ${CMAKE_SOURCE_DIR}/bin/resources/)
 endforeach()
 
@@ -1653,6 +1656,24 @@ if (NOT APPLE)
 	set_target_properties(PCSX2 PROPERTIES
 		OUTPUT_NAME pcsx2
 	)
+endif()
+
+if(APPLE AND NOT GETTEXT_FOUND AND NOT NO_TRANSLATION AND NOT PCSX2_CORE)
+	message(FATAL_ERROR "MacOS cannot use the precompiled translation files.  Please install gettext or disable translations with NO_TRANSLATION")
+endif()
+
+# Translation files
+# CMake is dumb and can't properly associate custom command outputs with targets if they're made in different directories
+# So this has to be here (and not in a CMakeLists.txt file in locales/)
+if(GETTEXT_FOUND AND NOT NO_TRANSLATION AND NOT PCSX2_CORE)
+	include(Translation)
+
+	file(GLOB_RECURSE PO_ICO_FILES  ${CMAKE_SOURCE_DIR}/locales/*/pcsx2_Iconized.po)
+	file(GLOB_RECURSE PO_MAIN_FILES ${CMAKE_SOURCE_DIR}/locales/*/pcsx2_Main.po)
+
+	# Macro to compile po file and install them
+	GETTEXT_CREATE_TRANSLATIONS_PCSX2(${CMAKE_SOURCE_DIR}/locales/templates/pcsx2_Iconized.pot ${PO_ICO_FILES})
+	GETTEXT_CREATE_TRANSLATIONS_PCSX2(${CMAKE_SOURCE_DIR}/locales/templates/pcsx2_Main.pot     ${PO_MAIN_FILES})
 endif()
 
 if (APPLE)

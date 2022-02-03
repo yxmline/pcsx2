@@ -212,6 +212,9 @@ GSPanel::GSPanel( wxWindow* parent )
 	}
 
 	Bind(wxEVT_SIZE, &GSPanel::OnResize, this);
+#if wxCHECK_VERSION(3, 1, 3)
+	Bind(wxEVT_DPI_CHANGED, &GSPanel::OnResize, this);
+#endif
 	Bind(wxEVT_KEY_UP, &GSPanel::OnKeyDownOrUp, this);
 	Bind(wxEVT_KEY_DOWN, &GSPanel::OnKeyDownOrUp, this);
 
@@ -337,6 +340,8 @@ std::optional<WindowInfo> GSPanel::GetWindowInfo()
 #endif // GTK_MAJOR_VERSION >= 3
 #elif defined(__WXOSX__)
 	ret.type = WindowInfo::Type::MacOS;
+	ret.surface_width  = static_cast<u32>(ret.surface_width  * ret.surface_scale);
+	ret.surface_height = static_cast<u32>(ret.surface_height * ret.surface_scale);
 	ret.window_handle = GetHandle();
 #endif
 
@@ -349,7 +354,7 @@ std::optional<WindowInfo> GSPanel::GetWindowInfo()
 	return ret;
 }
 
-void GSPanel::OnResize(wxSizeEvent& event)
+void GSPanel::OnResize(wxEvent& event)
 {
 	if( IsBeingDeleted() ) return;
 	event.Skip();
@@ -362,19 +367,24 @@ void GSPanel::OnResize(wxSizeEvent& event)
 	int width = gs_vp_size.GetWidth();
 	int height = gs_vp_size.GetHeight();
 
+	if (false
 #ifdef __WXGTK__
-	if (g_gs_window_info.type == WindowInfo::Type::X11)
+		|| g_gs_window_info.type == WindowInfo::Type::X11
+#endif
+#ifdef __APPLE__
+		|| g_gs_window_info.type == WindowInfo::Type::MacOS
+#endif
+	)
 	{
 		width = static_cast<int>(width * scale);
 		height = static_cast<int>(height * scale);
 	}
-#endif
 
 	g_gs_window_info.surface_width = width;
 	g_gs_window_info.surface_height = height;
 	g_gs_window_info.surface_scale = scale;
 
-	Host::GSWindowResized(width, height);
+	Host::GSWindowResized(width, height, scale);
 }
 
 void GSPanel::OnMouseEvent( wxMouseEvent& evt )

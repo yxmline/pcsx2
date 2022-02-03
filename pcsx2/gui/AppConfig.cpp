@@ -87,7 +87,7 @@ namespace PathDefs
 
 		const wxDirName& Langs()
 		{
-			static const wxDirName retval(L"Langs");
+			static const wxDirName retval(L"locale");
 			return retval;
 		}
 
@@ -190,7 +190,7 @@ namespace PathDefs
 #else
 		// Each linux distributions have his rules for path so we give them the possibility to
 		// change it with compilation flags. -- Gregory
-		return wxDirName(PCSX2_APP_DATADIR);
+		return wxDirName(PCSX2_APP_DATADIR).MakeAbsolute(AppRoot().ToString());
 #endif
 	}
 
@@ -202,7 +202,6 @@ namespace PathDefs
 	wxDirName GetBios()
 	{
 		return GetDocuments() + Base::Bios();
-		;
 	}
 
 	wxDirName GetCheats()
@@ -217,7 +216,11 @@ namespace PathDefs
 
 	wxDirName GetDocs()
 	{
+#if !defined(PCSX2_APP_DOCDIR)
 		return AppRoot() + Base::Docs();
+#else
+		return wxDirName(PCSX2_APP_DOCDIR).MakeAbsolute(AppRoot().ToString());
+#endif
 	}
 
 	wxDirName GetSavestates()
@@ -240,15 +243,6 @@ namespace PathDefs
 		return GetDocuments() + Base::Logs();
 	}
 
-	wxDirName GetLangs()
-	{
-#ifdef __APPLE__
-		return wxDirName(wxStandardPaths::Get().GetResourcesDir());
-#else
-		return AppRoot() + Base::Langs();
-#endif
-	}
-
 	wxDirName GetResources()
 	{
 		// ifdef is only needed here because mac doesn't put its resources in a subdirectory..
@@ -257,6 +251,11 @@ namespace PathDefs
 #else
 		return GetProgramDataDir() + Base::Resources();
 #endif
+	}
+
+	wxDirName GetLangs()
+	{
+		return GetResources() + Base::Langs();
 	}
 
 	wxDirName GetCache()

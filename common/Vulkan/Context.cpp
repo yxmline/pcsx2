@@ -101,13 +101,16 @@ namespace Vulkan
 		if (!SelectInstanceExtensions(&enabled_extensions, wi, enable_debug_utils))
 			return VK_NULL_HANDLE;
 
+		// Remember to manually update this every release. We don't pull in svnrev.h here, because
+		// it's only the major/minor version, and rebuilding the file every time something else changes
+		// is unnecessary.
 		VkApplicationInfo app_info = {};
 		app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 		app_info.pNext = nullptr;
-		app_info.pApplicationName = "DuckStation";
-		app_info.applicationVersion = VK_MAKE_VERSION(0, 1, 0);
-		app_info.pEngineName = "DuckStation";
-		app_info.engineVersion = VK_MAKE_VERSION(0, 1, 0);
+		app_info.pApplicationName = "PCSX2";
+		app_info.applicationVersion = VK_MAKE_VERSION(1, 7, 0);
+		app_info.pEngineName = "PCSX2";
+		app_info.engineVersion = VK_MAKE_VERSION(1, 7, 0);
 		app_info.apiVersion = VK_MAKE_VERSION(1, 1, 0);
 
 		VkInstanceCreateInfo instance_create_info = {};
@@ -1311,97 +1314,6 @@ namespace Vulkan
 			vkDestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger_callback, nullptr);
 			m_debug_messenger_callback = VK_NULL_HANDLE;
 		}
-	}
-
-	bool Context::GetMemoryType(u32 bits, VkMemoryPropertyFlags properties, u32* out_type_index)
-	{
-		for (u32 i = 0; i < VK_MAX_MEMORY_TYPES; i++)
-		{
-			if ((bits & (1 << i)) != 0)
-			{
-				u32 supported = m_device_memory_properties.memoryTypes[i].propertyFlags & properties;
-				if (supported == properties)
-				{
-					*out_type_index = i;
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	u32 Context::GetMemoryType(u32 bits, VkMemoryPropertyFlags properties)
-	{
-		u32 type_index = VK_MAX_MEMORY_TYPES;
-		if (!GetMemoryType(bits, properties, &type_index))
-		{
-			Console.Error("Unable to find memory type for %x:%x", bits, properties);
-			pxFailRel("Unable to find memory type");
-		}
-
-		return type_index;
-	}
-
-	u32 Context::GetUploadMemoryType(u32 bits, bool* is_coherent)
-	{
-		// Try for coherent memory first.
-		VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-
-		u32 type_index;
-		if (!GetMemoryType(bits, flags, &type_index))
-		{
-			Console.Warning("Vulkan: Failed to find a coherent memory type for uploads, this will affect performance.");
-
-			// Try non-coherent memory.
-			flags &= ~VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-			if (!GetMemoryType(bits, flags, &type_index))
-			{
-				// We shouldn't have any memory types that aren't host-visible.
-				pxFailRel("Unable to get memory type for upload.");
-				type_index = 0;
-			}
-		}
-
-		if (is_coherent)
-			*is_coherent = ((flags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) != 0);
-
-		return type_index;
-	}
-
-	u32 Context::GetReadbackMemoryType(u32 bits, bool* is_coherent, bool* is_cached)
-	{
-		// Try for cached and coherent memory first.
-		VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT |
-									  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-
-		u32 type_index;
-		if (!GetMemoryType(bits, flags, &type_index))
-		{
-			// For readbacks, caching is more important than coherency.
-			flags &= ~VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-			if (!GetMemoryType(bits, flags, &type_index))
-			{
-				Console.Warning("Vulkan: Failed to find a cached memory type for readbacks, this will affect "
-								"performance.");
-
-				// Remove the cached bit as well.
-				flags &= ~VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
-				if (!GetMemoryType(bits, flags, &type_index))
-				{
-					// We shouldn't have any memory types that aren't host-visible.
-					pxFailRel("Unable to get memory type for upload.");
-					type_index = 0;
-				}
-			}
-		}
-
-		if (is_coherent)
-			*is_coherent = ((flags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) != 0);
-		if (is_cached)
-			*is_cached = ((flags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) != 0);
-
-		return type_index;
 	}
 
 	VkRenderPass Context::CreateCachedRenderPass(RenderPassCacheKey key)
