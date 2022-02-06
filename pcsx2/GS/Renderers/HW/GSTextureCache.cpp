@@ -329,10 +329,9 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 					found_t = true;
 					break;
 				}
-				else if (texture_inside_rt && bw == t->m_TEX0.TBW && psm == PSM_PSMCT32 && t->m_TEX0.PSM == psm &&
+				else if (texture_inside_rt && psm == PSM_PSMCT32 && t->m_TEX0.PSM == psm &&
 					((t->m_TEX0.TBP0 < bp && t->m_end_block >= bp) || t_wraps))
 				{
-					// BW equality needed because CreateSource does not handle BW conversion.
 					// Only PSMCT32 to limit false hits.
 					// PSM equality needed because CreateSource does not handle PSM conversion.
 					// Only inclusive hit to limit false hits.
@@ -1345,7 +1344,7 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 		}
 		// width/height conversion
 
-		GSVector2 scale = dst->m_texture->GetScale();
+		GSVector2 scale = is_8bits ? GSVector2(1, 1) : dst->m_texture->GetScale();
 
 		GSVector4i sRect(0, 0, w, h);
 		const bool use_texture = shader == ShaderConvert::COPY;
