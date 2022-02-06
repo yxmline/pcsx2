@@ -2990,7 +2990,7 @@ SCES-53422:
   region: "PAL-M9"
 SCES-53449:
   name: "AFL Premiership 2005"
-  region: "PAL-E"
+  region: "PAL-A"
 SCES-53450:
   name: "Gaelic Football 2005"
   region: "PAL-E-GA"
@@ -3156,6 +3156,9 @@ SCES-54041:
         patch=0,EE,00131EB8,word,4B00682C
         patch=0,EE,00131EC4,word,484A8800
         patch=0,EE,00131EC8,word,4B0C682C
+SCES-54068:
+  name: "AFL Premiership 2006"
+  region: "PAL-A"
 SCES-54071:
   name: "Buzz! The Big Quiz"
   region: "PAL-Unk"
@@ -3168,6 +3171,9 @@ SCES-54077:
 SCES-54078:
   name: "SingStar Norsk på Norsk"
   region: "PAL-N"
+SCES-54094:
+  name: "EyeToy: Play Sports"
+  region: "PAL-M15"
 SCES-54128:
   name: "Deutsch Rock-Pop"
   region: "PAL-G"
@@ -3281,6 +3287,9 @@ SCES-54477:
     vuRoundMode: 0  # Fixes disappearing characters.
   clampModes:
     vuClampMode: 2  # Fixes SPS ingame.
+SCES-54496:
+  name: "Buzz! The Mega Quiz"
+  region: "PAL-E"
 SCES-54497:
   name: "Buzz! Le Mega Quiz"
   region: "PAL-F"
@@ -3353,6 +3362,9 @@ SCES-54625:
 SCES-54638:
   name: "Gaelic Games - Football 2"
   region: "PAL-E-GA"
+SCES-54639:
+  name: "AFL Premiership 2007"
+  region: "PAL-A"
 SCES-54641:
   name: "SingStar - Après-Ski Party 2"
   region: "PAL-G"
@@ -3440,6 +3452,9 @@ SCES-54909:
 SCES-54910:
   name: "SingStar Rock Ballads"
   region: "PAL-S"
+SCES-55038:
+  name: "EyeToy Play: Hero"
+  region: "PAL-M15"
 SCES-55056:
   name: "SingStar Summer Party"
   region: "PAL-E"
@@ -3461,6 +3476,9 @@ SCES-55062:
 SCES-55077:
   name: "SingStar Party Hits"
   region: "PAL-E"
+SCES-55083:
+  name: "EyeToy Play: PomPom Party"
+  region: "PAL-M15"
 SCES-55093:
   name: "Buzz! The Pop Quiz"
   region: "PAL-E"
@@ -15522,9 +15540,6 @@ SLES-54064:
 SLES-54066:
   name: "X-Men - The Official Game"
   region: "PAL-M4"
-SLES-54068:
-  name: "AFL Premiership 2006"
-  region: "PAL-Unk"
 SLES-54074:
   name: "Speedboat GP"
   region: "PAL-E"
@@ -16776,9 +16791,6 @@ SLES-54634:
 SLES-54635:
   name: "Top Trumps Adventures Vol. 2 - Dogs & Dinosaurs"
   region: "PAL-M5"
-SLES-54639:
-  name: "AFL Premiership 2007"
-  region: "PAL-Unk"
 SLES-54641:
   name: "International Cricket Captain III"
   region: "PAL-E"
@@ -28431,6 +28443,12 @@ SLPM-68513:
 SLPM-68516:
   name: "Metal Gear Solid 3 - Snake Eater [Shareholder Edition]"
   region: "NTSC-J"
+SLPM-69001:
+  name: "PictureParadise Club"
+  region: "NTSC-J"
+SLPM-69006:
+  name: "PictureParadise Club Vol. 2"
+  region: "NTSC-J"
 SLPM-74001:
   name: "Gungriffon Blaze [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -28870,6 +28888,9 @@ SLPS-20055:
   name: "Technictix"
   region: "NTSC-J"
   compat: 5
+SLPS-20056:
+  name: "Colorio: Hagaki Print"
+  region: "NTSC-J"
 SLPS-20057:
   name: "Dog of Bay"
   region: "NTSC-J"
@@ -28883,6 +28904,9 @@ SLPS-20059:
   region: "NTSC-J"
 SLPS-20060:
   name: "Dream Audition 2"
+  region: "NTSC-J"
+SLPS-20061:
+  name: "Mamimune * Mogacho no Print Hour"
   region: "NTSC-J"
 SLPS-20062:
   name: "Truck Kyousoukyoku"
@@ -29106,6 +29130,9 @@ SLPS-20199:
   region: "NTSC-J"
 SLPS-20202:
   name: "Coloball 2002"
+  region: "NTSC-J"
+SLPS-20207:
+  name: "Usagi: Yasei no Topai"
   region: "NTSC-J"
 SLPS-20208:
   name: "I am Small!"
@@ -30118,6 +30145,9 @@ SLPS-25104:
 SLPS-25105:
   name: "Kingdom Hearts"
   region: "NTSC-J"
+SLPS-25106:
+  name: "America Oudan Ultra-Quiz"
+  region: "NTSC-J"
 SLPS-25107:
   name: "Kengo 2"
   region: "NTSC-J"
@@ -30250,6 +30280,9 @@ SLPS-25147:
   region: "NTSC-J"
   clampModes:
     vuClampMode: 3 # Fixes SPS on menu.
+SLPS-25148:
+  name: "Panel Quiz Attack 25"
+  region: "NTSC-J"
 SLPS-25149:
   name: "Ever 17 - The Out of Infinity"
   region: "NTSC-J"
