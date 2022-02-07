@@ -36,6 +36,16 @@ private:
 	Vulkan::Texture m_texture;
 };
 
+static VkPresentModeKHR GetPreferredPresentModeForVsyncMode(VsyncMode mode)
+{
+	if (mode == VsyncMode::On)
+		return VK_PRESENT_MODE_FIFO_KHR;
+	else if (mode == VsyncMode::Adaptive)
+		return VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+	else
+		return VK_PRESENT_MODE_IMMEDIATE_KHR;
+}
+
 VulkanHostDisplay::VulkanHostDisplay() = default;
 
 VulkanHostDisplay::~VulkanHostDisplay()
@@ -85,7 +95,7 @@ bool VulkanHostDisplay::ChangeRenderWindow(const WindowInfo& new_wi)
 		return false;
 	}
 
-	m_swap_chain = Vulkan::SwapChain::Create(wi_copy, surface, false);
+	m_swap_chain = Vulkan::SwapChain::Create(wi_copy, surface, GetPreferredPresentModeForVsyncMode(m_vsync_mode));
 	if (!m_swap_chain)
 	{
 		Console.Error("Failed to create swap chain");
@@ -216,29 +226,33 @@ void VulkanHostDisplay::UpdateTexture(
 
 void VulkanHostDisplay::SetVSync(VsyncMode mode)
 {
-	if (!m_swap_chain)
+	if (!m_swap_chain || m_vsync_mode == mode)
 		return;
 
 	// This swap chain should not be used by the current buffer, thus safe to destroy.
 	g_vulkan_context->WaitForGPUIdle();
-	m_swap_chain->SetVSync(mode != VsyncMode::Off);
+	m_swap_chain->SetVSync(GetPreferredPresentModeForVsyncMode(mode));
+	m_vsync_mode = mode;
 }
 
 bool VulkanHostDisplay::CreateRenderDevice(
-	const WindowInfo& wi, std::string_view adapter_name, bool threaded_presentation, bool debug_device)
+	const WindowInfo& wi, std::string_view adapter_name, VsyncMode vsync, bool threaded_presentation, bool debug_device)
 {
 	// debug_device = true;
 
 	WindowInfo local_wi(wi);
 	if (!Vulkan::Context::Create(
-			adapter_name, &local_wi, &m_swap_chain, threaded_presentation, debug_device, debug_device))
+			adapter_name, &local_wi, &m_swap_chain, GetPreferredPresentModeForVsyncMode(vsync),
+			threaded_presentation, debug_device, debug_device))
 	{
 		Console.Error("Failed to create Vulkan context");
 		m_window_info = {};
 		return false;
 	}
 
+	// NOTE: This is assigned afterwards, because some platforms can modify the window info (e.g. Metal).
 	m_window_info = m_swap_chain ? m_swap_chain->GetWindowInfo() : local_wi;
+	m_vsync_mode = vsync;
 	return true;
 }
 
@@ -375,7 +389,7 @@ void VulkanHostDisplay::EndPresent()
 
 	g_vulkan_context->SubmitCommandBuffer(m_swap_chain->GetImageAvailableSemaphore(),
 		m_swap_chain->GetRenderingFinishedSemaphore(), m_swap_chain->GetSwapChain(),
-		m_swap_chain->GetCurrentImageIndex(), !m_swap_chain->IsVSyncEnabled());
+		m_swap_chain->GetCurrentImageIndex(), !m_swap_chain->IsPresentModeSynchronizing());
 	g_vulkan_context->MoveToNextCommandBuffer();
 }
 
