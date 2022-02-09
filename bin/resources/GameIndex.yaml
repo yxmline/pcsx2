@@ -48,6 +48,9 @@ PAPX-90223:
 PAPX-90231:
   name: "Kaitou Sly Cooper [Demo, Taikenban]"
   region: "NTSC-J"
+PAPX-90504:
+  name: "Gran Turismo Concept - Airtrek Turbo Special Edition [Demo]"
+  region: "NTSC-J"
 PAPX-90506:
   name: "Dark Chronicle[Demo, Taikenban]"
   region: "NTSC-J"
@@ -1321,6 +1324,9 @@ SCED-51279:
 SCED-51319:
   name: "Official PlayStation 2 Magazine Demo 27" # German
   region: "PAL-E-G"
+SCED-51352:
+  name: "Gran Turismo: Nissan Micra Edition"
+  region: "PAL-E"
 SCED-51359:
   name: "Official PlayStation 2 Magazine Demo 27"
   region: "PAL-M5"
@@ -1599,11 +1605,14 @@ SCED-52461:
 SCED-52549:
   name: "Official PlayStation 2 Magazine Demo 47"
   region: "PAL-M5"
+SCED-52578:
+  name: "Gran Turismo 4 BMW 1 Series Virtual Drive Dealership [Demo]"
+  region: "PAL-M5"
 SCED-52619:
   name: "Official PlayStation 2 Magazine Demo 48"
   region: "PAL-M5"
 SCED-52681:
-  name: "Gran Turismo 4 BMW 1 Series [Demo]"
+  name: "Gran Turismo 4 BMW 1 Series Virtual Drive [Demo]"
   region: "PAL-M11"
 SCED-52728:
   name: "Official PlayStation 2 Magazine Demo 49"
@@ -4100,6 +4109,9 @@ SCKA-30006:
   compat: 5
 SCPM-85101:
   name: "McDonald's Original Happy Disc"
+  region: "NTSC-J"
+SCPM-85301:
+  name: "Gran Turismo Concept - Copen Special Edition [Demo]"
   region: "NTSC-J"
 SCPS-11001:
   name: "I.Q. Remix"
@@ -9470,6 +9482,8 @@ SLES-51058:
   region: "PAL-E"
   gameFixes:
     - VUKickstartHack  # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0
 SLES-51060:
   name: "Butt Ugly Martians"
   region: "PAL-M5"
@@ -20046,7 +20060,9 @@ SLPM-61007:
   name: "Maken Shao [Trial]"
   region: "NTSC-J"
   gameFixes:
-    - VUKickstartHack # Fixes SPS. 
+    - VUKickstartHack # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0
 SLPM-61009:
   name: "Silent Hill 2 (Red Ribbon) [Trial]"
   region: "NTSC-J"
@@ -22544,6 +22560,8 @@ SLPM-65144:
   region: "NTSC-J"
   gameFixes:
     - VUKickstartHack # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0
 SLPM-65148:
   name: "Densha de Go! Ryojou-hen"
   region: "NTSC-J"
@@ -29976,12 +29994,16 @@ SLPS-25042:
   name: "Maken Shao [Limited Edition]"
   region: "NTSC-J"
   gameFixes:
-    - VUKickstartHack # Fixes SPS. 
+    - VUKickstartHack # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0
 SLPS-25043:
   name: "Maken Shao"
   region: "NTSC-J"
   gameFixes:
     - VUKickstartHack # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0
 SLPS-25044:
   name: "Evergrace 2"
   region: "NTSC-J"
