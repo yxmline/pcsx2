@@ -17,18 +17,18 @@
 
 #include <QtWidgets/QWidget>
 
-#include "ui_GameFixSettingsWidget.h"
+#include "ui_MemoryCardSettingsWidget.h"
 
 class SettingsDialog;
 
-class GameFixSettingsWidget : public QWidget
+class MemoryCardSettingsWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	GameFixSettingsWidget(SettingsDialog* dialog, QWidget* parent);
-	~GameFixSettingsWidget();
+	MemoryCardSettingsWidget(SettingsDialog* dialog, QWidget* parent);
+	~MemoryCardSettingsWidget();
 
 private:
-	Ui::GameFixSettingsWidget m_ui;
+	Ui::MemoryCardSettingsWidget m_ui;
 };

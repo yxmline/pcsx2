@@ -17,18 +17,25 @@
 
 #include <QtWidgets/QWidget>
 
-#include "ui_GameFixSettingsWidget.h"
+#include "ui_GameSummaryWidget.h"
+
+namespace GameList
+{
+	struct Entry;
+}
 
 class SettingsDialog;
 
-class GameFixSettingsWidget : public QWidget
+class GameSummaryWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	GameFixSettingsWidget(SettingsDialog* dialog, QWidget* parent);
-	~GameFixSettingsWidget();
+	GameSummaryWidget(const GameList::Entry* entry, SettingsDialog* dialog, QWidget* parent);
+	~GameSummaryWidget();
 
 private:
-	Ui::GameFixSettingsWidget m_ui;
+	void populateUi(const GameList::Entry* entry);
+
+	Ui::GameSummaryWidget m_ui;
 };

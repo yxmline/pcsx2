@@ -26,12 +26,14 @@
 #include "SettingWidgetBinder.h"
 #include "SettingsDialog.h"
 
-BIOSSettingsWidget::BIOSSettingsWidget(QWidget* parent, SettingsDialog* dialog)
+BIOSSettingsWidget::BIOSSettingsWidget(SettingsDialog* dialog, QWidget* parent)
 	: QWidget(parent)
 {
+	SettingsInterface* sif = dialog->getSettingsInterface();
+
 	m_ui.setupUi(this);
 
-	SettingWidgetBinder::BindWidgetToBoolSetting(m_ui.fastBoot, "EmuCore", "EnableFastBoot", true);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.fastBoot, "EmuCore", "EnableFastBoot", true);
 
 	dialog->registerWidgetHelp(m_ui.fastBoot, tr("Fast Boot"), tr("Unchecked"),
 		tr("Patches the BIOS to skip the console's boot animation."));
@@ -129,6 +131,9 @@ void BIOSSettingsWidget::listRefreshed(const QVector<BIOSInfo>& items)
 				break;
 
 			case 5: // HK
+				item->setIcon(0, QIcon(QStringLiteral(":/icons/flag-hk.png")));
+				break;
+
 			case 6: // Free
 			case 0: // T10K
 			case 1: // Test

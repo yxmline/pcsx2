@@ -17,18 +17,18 @@
 
 #include <QtWidgets/QWidget>
 
-#include "ui_GameFixSettingsWidget.h"
+#include "ui_AudioSettingsWidget.h"
 
 class SettingsDialog;
 
-class GameFixSettingsWidget : public QWidget
+class AudioSettingsWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	GameFixSettingsWidget(SettingsDialog* dialog, QWidget* parent);
-	~GameFixSettingsWidget();
+	AudioSettingsWidget(SettingsDialog* dialog, QWidget* parent);
+	~AudioSettingsWidget();
 
 private:
-	Ui::GameFixSettingsWidget m_ui;
+	Ui::AudioSettingsWidget m_ui;
 };

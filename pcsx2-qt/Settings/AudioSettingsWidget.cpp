@@ -13,22 +13,23 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "PrecompiledHeader.h"
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QMessageBox>
+#include <algorithm>
 
-#include "ui_GameFixSettingsWidget.h"
+#include "AudioSettingsWidget.h"
+#include "EmuThread.h"
+#include "QtUtils.h"
+#include "SettingWidgetBinder.h"
+#include "SettingsDialog.h"
 
-class SettingsDialog;
-
-class GameFixSettingsWidget : public QWidget
+AudioSettingsWidget::AudioSettingsWidget(SettingsDialog* dialog, QWidget* parent)
+	: QWidget(parent)
 {
-	Q_OBJECT
+	SettingsInterface* sif = dialog->getSettingsInterface();
 
-public:
-	GameFixSettingsWidget(SettingsDialog* dialog, QWidget* parent);
-	~GameFixSettingsWidget();
+	m_ui.setupUi(this);
+}
 
-private:
-	Ui::GameFixSettingsWidget m_ui;
-};
+AudioSettingsWidget::~AudioSettingsWidget() = default;
