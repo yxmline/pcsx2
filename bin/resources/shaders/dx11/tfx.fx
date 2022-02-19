@@ -49,7 +49,7 @@
 #define PS_BLEND_B 0
 #define PS_BLEND_C 0
 #define PS_BLEND_D 0
-#define PS_ALPHA_CLAMP 0
+#define PS_BLEND_MIX 0
 #define PS_PABE 0
 #define PS_DITHER 0
 #define PS_ZCLAMP 0
@@ -390,7 +390,7 @@ float4 sample_depth(float2 st, float2 pos)
 	}
 	else if (PS_DEPTH_FMT == 1)
 	{
-		// Based on ps_main11 of convert
+		// Based on ps_convert_float32_rgba8 of convert
 
 		// Convert a FLOAT32 depth texture into a RGBA color texture
 		uint d = uint(fetch_c(uv).r * exp2(32.0f));
@@ -398,11 +398,11 @@ float4 sample_depth(float2 st, float2 pos)
 	}
 	else if (PS_DEPTH_FMT == 2)
 	{
-		// Based on ps_main12 of convert
+		// Based on ps_convert_float16_rgb5a1 of convert
 
 		// Convert a FLOAT32 (only 16 lsb) depth into a RGB5A1 color texture
 		uint d = uint(fetch_c(uv).r * exp2(32.0f));
-		t = float4(uint4((d & 0x1Fu), ((d >> 5) & 0x1Fu), ((d >> 10) & 0x1Fu), (d >> 15) & 0x01u));
+		t = float4(uint4((d & 0x1Fu), ((d >> 5) & 0x1Fu), ((d >> 10) & 0x1Fu), (d >> 15) & 0x01u)) * float4(8.0f, 8.0f, 8.0f, 128.0f);
 	}
 	else if (PS_DEPTH_FMT == 3)
 	{
@@ -717,7 +717,7 @@ void ps_color_clamp_wrap(inout float3 C)
 			C = clamp(C, (float3)0.0f, (float3)255.0f);
 
 		// In 16 bits format, only 5 bits of color are used. It impacts shadows computation of Castlevania
-		if (PS_DFMT == FMT_16)
+		if (PS_DFMT == FMT_16 && (PS_HDR == 1 || PS_BLEND_MIX == 0))
 			C = (float3)((int3)C & (int3)0xF8);
 		else if (PS_COLCLIP == 1 && PS_HDR == 0)
 			C = (float3)((int3)C & (int3)0xFF);
@@ -749,7 +749,7 @@ void ps_blend(inout float4 Color, float As, float2 pos_xy)
 		float3 D = (PS_BLEND_D == 0) ? Cs : ((PS_BLEND_D == 1) ? Cd : (float3)0.0f);
 
 		// As/Af clamp alpha for Blend mix
-		if (PS_ALPHA_CLAMP)
+		if (PS_BLEND_MIX)
 			C = min(C, (float)1.0f);
 
 		Color.rgb = (PS_BLEND_A == PS_BLEND_B) ? D : trunc(((A - B) * C) + D);

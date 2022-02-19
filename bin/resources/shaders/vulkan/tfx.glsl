@@ -650,7 +650,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 	}
 	#elif (PS_DEPTH_FMT == 1)
 	{
-		// Based on ps_main11 of convert
+		// Based on ps_convert_float32_rgba8 of convert
 
 		// Convert a vec32 depth texture into a RGBA color texture
 		uint d = uint(fetch_c(uv).r * exp2(32.0f));
@@ -658,7 +658,7 @@ vec4 sample_depth(vec2 st, ivec2 pos)
 	}
 	#elif (PS_DEPTH_FMT == 2)
 	{
-		// Based on ps_main12 of convert
+		// Based on ps_convert_float16_rgb5a1 of convert
 
 		// Convert a vec32 (only 16 lsb) depth into a RGB5A1 color texture
 		uint d = uint(fetch_c(uv).r * exp2(32.0f));
@@ -973,7 +973,7 @@ void ps_color_clamp_wrap(inout vec3 C)
     // Warning: normally blending equation is mult(A, B) = A * B >> 7. GPU have the full accuracy
     // GS: Color = 1, Alpha = 255 => output 1
     // GPU: Color = 1/255, Alpha = 255/255 * 255/128 => output 1.9921875
-#if PS_DFMT == FMT_16
+#if PS_DFMT == FMT_16 && (PS_HDR == 1 || PS_BLEND_MIX == 0)
     // In 16 bits format, only 5 bits of colors are used. It impacts shadows computation of Castlevania
     C = vec3(ivec3(C) & ivec3(0xF8));
 #elif PS_COLCLIP == 1 && PS_HDR == 0
@@ -1046,7 +1046,7 @@ void ps_blend(inout vec4 Color, float As)
 		#endif
 
 		// As/Af clamp alpha for Blend mix
-		#if PS_ALPHA_CLAMP
+		#if PS_BLEND_MIX
 				C = min(C, 1.0f);
 		#endif
 
