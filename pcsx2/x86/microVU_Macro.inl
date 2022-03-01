@@ -327,6 +327,7 @@ void COP2_Interlock(bool mBitSync)
 
 	if (cpuRegs.code & 1)
 	{
+		s_nBlockInterlocked = true;
 		_freeX86reg(eax);
 		xMOV(eax, ptr32[&cpuRegs.cycle]);
 		xADD(eax, scaleblockcycles_clear());
@@ -339,10 +340,11 @@ void COP2_Interlock(bool mBitSync)
 		{
 			xSUB(eax, ptr32[&VU0.cycle]);
 			xSUB(eax, ptr32[&VU0.nextBlockCycles]);
-			xCMP(eax, 0);
+			xCMP(eax, 4);
 			xForwardJL32 skip;
 			xLoadFarAddr(arg1reg, CpuVU0);
-			xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+			xMOV(arg2reg, s_nBlockInterlocked);
+			xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg, arg2reg);
 			skip.SetTarget();
 
 			xFastCall((void*)_vu0WaitMicro);
@@ -383,11 +385,12 @@ static void recCFC2()
 		xForwardJZ32 skipvuidle;
 		xSUB(eax, ptr32[&VU0.cycle]);
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
-		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
+		xCMP(eax, 4);
 		xForwardJL32 skip;
 		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
-		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		xMOV(arg2reg, s_nBlockInterlocked);
+		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg, arg2reg);
 		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
@@ -445,11 +448,12 @@ static void recCTC2()
 		xForwardJZ32 skipvuidle;
 		xSUB(eax, ptr32[&VU0.cycle]);
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
-		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
+		xCMP(eax, 4);
 		xForwardJL32 skip;
 		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
-		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		xMOV(arg2reg, s_nBlockInterlocked);
+		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg, arg2reg);
 		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
@@ -547,11 +551,12 @@ static void recQMFC2()
 		xForwardJZ32 skipvuidle;
 		xSUB(eax, ptr32[&VU0.cycle]);
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
-		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
+		xCMP(eax, 4);
 		xForwardJL32 skip;
 		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
-		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		xMOV(arg2reg, s_nBlockInterlocked);
+		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg, arg2reg);
 		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
@@ -587,11 +592,12 @@ static void recQMTC2()
 		xForwardJZ32 skipvuidle;
 		xSUB(eax, ptr32[&VU0.cycle]);
 		xSUB(eax, ptr32[&VU0.nextBlockCycles]);
-		xCMP(eax, EmuConfig.Gamefixes.VUKickstartHack ? 8 : 0);
+		xCMP(eax, 4);
 		xForwardJL32 skip;
 		_cop2BackupRegs();
 		xLoadFarAddr(arg1reg, CpuVU0);
-		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg);
+		xMOV(arg2reg, s_nBlockInterlocked);
+		xFastCall((void*)BaseVUmicroCPU::ExecuteBlockJIT, arg1reg, arg2reg);
 		_cop2RestoreRegs();
 		skip.SetTarget();
 		skipvuidle.SetTarget();
