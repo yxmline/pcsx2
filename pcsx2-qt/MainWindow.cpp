@@ -16,6 +16,7 @@
 #include "PrecompiledHeader.h"
 
 #include <QtCore/QDateTime>
+#include <QtGui/QCloseEvent>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QProgressBar>
@@ -39,6 +40,7 @@
 #include "Settings/ControllerSettingsDialog.h"
 #include "Settings/GameListSettingsWidget.h"
 #include "Settings/InterfaceSettingsWidget.h"
+#include "SettingWidgetBinder.h"
 #include "svnrev.h"
 
 static constexpr char DISC_IMAGE_FILTER[] =
@@ -170,6 +172,21 @@ void MainWindow::connectSignals()
 	});
 	connect(m_ui.actionGridViewRefreshCovers, &QAction::triggered, m_game_list_widget, &GameListWidget::refreshGridCovers);
 
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableSystemConsole, "Logging", "EnableSystemConsole", false);
+	connect(m_ui.actionEnableSystemConsole, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
+#ifndef PCSX2_DEVBUILD
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableVerboseLogging, "Logging", "EnableVerbose", false);
+	connect(m_ui.actionEnableVerboseLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
+#else
+	// Dev builds always have verbose logging.
+	m_ui.actionEnableVerboseLogging->setChecked(true);
+	m_ui.actionEnableVerboseLogging->setEnabled(false);
+#endif
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableEEConsoleLogging, "Logging", "EnableEEConsole", false);
+	connect(m_ui.actionEnableEEConsoleLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableIOPConsoleLogging, "Logging", "EnableIOPConsole", false);
+	connect(m_ui.actionEnableIOPConsoleLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
+
 	// These need to be queued connections to stop crashing due to menus opening/closing and switching focus.
 	connect(m_game_list_widget, &GameListWidget::refreshProgress, this, &MainWindow::onGameListRefreshProgress);
 	connect(m_game_list_widget, &GameListWidget::refreshComplete, this, &MainWindow::onGameListRefreshComplete);
@@ -213,7 +230,7 @@ void MainWindow::connectVMThreadSignals(EmuThread* thread)
 void MainWindow::recreate()
 {
 	if (m_vm_valid)
-		g_emu_thread->shutdownVM(true, true);
+		g_emu_thread->shutdownVM(false, true, true);
 
 	close();
 	g_main_window = nullptr;
@@ -241,11 +258,8 @@ void MainWindow::setStyleFromSettings()
 		// Alternative white theme.
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
-		const QColor lighterGray(75, 75, 75);
-		const QColor darkGray(53, 53, 53);
-		const QColor gray(128, 128, 128);
 		const QColor black(25, 25, 25);
-		const QColor teal(0, 128, 128);	
+		const QColor teal(0, 128, 128);
 		const QColor tameTeal(160, 190, 185);
 		const QColor grayBlue(160, 180, 190);
 
@@ -279,18 +293,12 @@ void MainWindow::setStyleFromSettings()
 		// Alternative light theme.
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
-		const QColor lighterGray(75, 75, 75);
 		const QColor gray(150, 150, 150);
 		const QColor black(25, 25, 25);
-		const QColor darkPink(180, 80, 200);
 		const QColor pink(255, 174, 201);
 		const QColor brightPink(255, 230, 255);
 		const QColor congoPink(255, 127, 121);
-		const QColor yellow(255, 235, 180);
-		const QColor darkGreen(161, 240, 183);
-		const QColor green(221, 239, 226);
 		const QColor blue(221, 225, 239);
-		const QColor darkBlue(100, 95, 250);
 
 		QPalette standardPalette;
 		standardPalette.setColor(QPalette::Window, pink);
@@ -322,13 +330,10 @@ void MainWindow::setStyleFromSettings()
 		// Alternative light theme.
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
-		const QColor lighterGray(75, 75, 75);
-		const QColor gray(128, 128, 128);
 		const QColor black(25, 25, 25);
 		const QColor darkBlue(73, 97, 177);
 		const QColor blue(106, 156, 255);
 		const QColor lightBlue(130, 155, 241);
-		const QColor brightBlue(164, 184, 255);
 
 		QPalette standardPalette;
 		standardPalette.setColor(QPalette::Window, lightBlue);
@@ -394,7 +399,6 @@ void MainWindow::setStyleFromSettings()
 		// adapted from https://gist.github.com/QuantumCD/6245215
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
-		const QColor lighterGray(75, 75, 75);
 		const QColor darkGray(53, 53, 53);
 		const QColor gray(128, 128, 128);
 		const QColor black(25, 25, 25);
@@ -431,9 +435,6 @@ void MainWindow::setStyleFromSettings()
 		// Alternative dark theme.
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
-		const QColor lighterGray(75, 75, 75);
-		const QColor gray(128, 128, 128);
-		const QColor black(25, 25, 25);
 		const QColor darkRed(80, 45, 69);
 		const QColor purplishRed(120, 45, 69);
 		const QColor brightRed(200, 45, 69);
@@ -640,6 +641,25 @@ void MainWindow::invalidateSaveStateCache() { m_save_states_invalidated = true; 
 
 void MainWindow::reportError(const QString& title, const QString& message) { QMessageBox::critical(this, title, message); }
 
+bool MainWindow::confirmShutdown()
+{
+	if (!m_vm_valid || !QtHost::GetBaseBoolSettingValue("UI", "ConfirmShutdown", true))
+		return true;
+
+	ScopedVMPause pauser(m_vm_paused);
+
+	return (QMessageBox::question(g_main_window, tr("Confirm Shutdown"),
+				tr("Are you sure you want to shut down the virtual machine?\n\nAll unsaved progress will be lost.")) == QMessageBox::Yes);
+}
+
+void MainWindow::requestExit()
+{
+	if (!g_emu_thread->shutdownVM(true, true, false))
+		return;
+
+	close();
+}
+
 void Host::InvalidateSaveStateCache() { QMetaObject::invokeMethod(g_main_window, &MainWindow::invalidateSaveStateCache, Qt::QueuedConnection); }
 
 void MainWindow::onGameListRefreshProgress(const QString& status, int current, int total)
@@ -692,7 +712,7 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 		QAction* action = menu.addAction(tr("Properties..."));
 		action->setEnabled(!entry->serial.empty());
 		if (action->isEnabled())
-			connect(action, &QAction::triggered, [this, entry]() { SettingsDialog::openGamePropertiesDialog(entry, entry->crc); });
+			connect(action, &QAction::triggered, [entry]() { SettingsDialog::openGamePropertiesDialog(entry, entry->crc); });
 
 		action = menu.addAction(tr("Open Containing Directory..."));
 		connect(action, &QAction::triggered, [this, entry]() {
@@ -899,6 +919,11 @@ void MainWindow::onThemeChangedFromSettings()
 	g_main_window->doSettings();
 }
 
+void MainWindow::onLoggingOptionChanged()
+{
+	QtHost::UpdateLogging();
+}
+
 void MainWindow::onVMStarting()
 {
 	m_vm_valid = true;
@@ -961,7 +986,12 @@ void MainWindow::onGameChanged(const QString& path, const QString& serial, const
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-	g_emu_thread->shutdownVM(true, true);
+	if (!g_emu_thread->shutdownVM(true, true, true))
+	{
+		event->ignore();
+		return;
+	}
+
 	saveStateToConfig();
 	QMainWindow::closeEvent(event);
 }
@@ -1461,7 +1491,7 @@ void MainWindow::populateSaveStateMenu(QMenu* menu, const QString& serial, quint
 			timestamp = tr("Empty");
 
 		QString title(tr("Save Slot %1 (%2)").arg(i).arg(timestamp));
-		connect(menu->addAction(title), &QAction::triggered, [this, i]() { g_emu_thread->saveStateToSlot(i); });
+		connect(menu->addAction(title), &QAction::triggered, [i]() { g_emu_thread->saveStateToSlot(i); });
 	}
 }
 

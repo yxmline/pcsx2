@@ -54,6 +54,8 @@ public Q_SLOTS:
 	void refreshGameList(bool invalidate_cache);
 	void invalidateSaveStateCache();
 	void reportError(const QString& title, const QString& message);
+	bool confirmShutdown();
+	void requestExit();
 
 private Q_SLOTS:
 	DisplayWidget* createDisplay(bool fullscreen, bool render_to_main);
@@ -92,6 +94,7 @@ private Q_SLOTS:
 	void onToolsOpenDataDirectoryTriggered();
 	void onThemeChanged();
 	void onThemeChangedFromSettings();
+	void onLoggingOptionChanged();
 
 	void onVMStarting();
 	void onVMStarted();
@@ -104,7 +107,7 @@ private Q_SLOTS:
 	void recreate();
 
 protected:
-	void closeEvent(QCloseEvent* event);
+	void closeEvent(QCloseEvent* event) override;
 
 private:
 	enum : s32
