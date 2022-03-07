@@ -12079,6 +12079,8 @@ SLES-52510:
     eeRoundMode: 0
   clampModes:
     eeClampMode: 2
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLES-52511:
   name: "Headhunter - Redemption (EX)"
   region: "PAL-E"
@@ -19330,6 +19332,8 @@ SLKA-25227:
     eeRoundMode: 0
   clampModes:
     eeClampMode: 2
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLKA-25232:
   name: "Naruto Narutimett Hero International"
   region: "NTSC-K"
@@ -24262,6 +24266,8 @@ SLPM-65752:
     eeRoundMode: 0
   clampModes:
     eeClampMode: 2
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPM-65753:
   name: "Kessen [Koei Collection Series]"
   region: "NTSC-J"
@@ -25003,6 +25009,8 @@ SLPM-65990:
     eeRoundMode: 0
   clampModes:
     eeClampMode: 2
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPM-65991:
   name: "Anubis: Zone of the Enders Special Edition [Konami Dendou Collection]"
   region: "NTSC-J"
@@ -32586,6 +32594,8 @@ SLPS-25881:
 SLPS-25887:
   name: "Super Robot Taisen Z"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPS-25888:
   name: "Star Wars - The Force Unleashed"
   region: "NTSC-J"
@@ -37071,6 +37081,8 @@ SLUS-20961:
     eeRoundMode: 0
   clampModes:
     eeClampMode: 2
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLUS-20962:
   name: "Castle of Shikigami 2"
   region: "NTSC-U"
