@@ -116,7 +116,7 @@ void VMManager::SetState(VMState state)
 	SetTimerResolutionIncreased(state == VMState::Running);
 	s_state.store(state);
 
-	if (state == VMState::Paused || old_state == VMState::Paused)
+	if (state != VMState::Stopping && (state == VMState::Paused || old_state == VMState::Paused))
 	{
 		if (state == VMState::Paused)
 		{
@@ -1158,10 +1158,13 @@ void VMManager::ApplySettings()
 	}
 }
 
-void VMManager::ReloadGameSettings()
+bool VMManager::ReloadGameSettings()
 {
-	if (UpdateGameSettingsLayer())
-		ApplySettings();
+	if (!UpdateGameSettingsLayer())
+		return false;
+
+	ApplySettings();
+	return true;
 }
 
 static void HotkeyAdjustTargetSpeed(double delta)
