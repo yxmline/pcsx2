@@ -505,6 +505,8 @@ SCAJ-20079:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SCAJ-20080:
   name: "Kaena"
   region: "NTSC-Unk"
@@ -720,6 +722,8 @@ SCAJ-20135:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -3861,6 +3865,8 @@ SCKA-20025:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SCKA-20026:
   name: "Gungrave O.D."
   region: "NTSC-K"
@@ -3954,6 +3960,8 @@ SCKA-20051:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
   memcardFilters:
     - "SCKA-20051"
     - "SCKA-20025"
@@ -7146,7 +7154,7 @@ SLED-50117:
   name: "Metal Gear Solid 2 - Sons of Liberty [Demo] [Zone of the Enders Bonus Disc]"
   region: "PAL-E"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.  
+    - DMABusyHack # Fixes broken half-bottom artifacts.  
 SLED-50359:
   name: "Devil May Cry [Demo]"
   region: "PAL-E"
@@ -8126,17 +8134,17 @@ SLES-50383:
   region: "PAL-M3"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLES-50384:
   name: "Metal Gear Solid 2 - Sons of Liberty"
   region: "PAL-I"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLES-50385:
   name: "Metal Gear Solid 2 - Sons of Liberty"
   region: "PAL-S"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLES-50386:
   name: "Crash Bandicoot - Wrath of Cortex"
   region: "PAL-M6"
@@ -14998,6 +15006,8 @@ SLES-53828:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SLES-53829:
   name: "Raiden III"
   region: "PAL-E"
@@ -15134,6 +15144,8 @@ SLES-53903:
 SLES-53904:
   name: "DT Racer"
   region: "PAL-M5"
+  clampModes:
+    vuClampMode: 0 # Fixes black artifacts on tracks
 SLES-53906:
   name: "50cent - Bulletproof"
   region: "PAL-F"
@@ -18756,7 +18768,7 @@ SLES-82009:
   region: "PAL-M5"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLES-82010:
   name: "Metal Gear Solid 2, Document of"
   region: "PAL-E"
@@ -19639,7 +19651,7 @@ SLKA-35001:
   region: "NTSC-K"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLKA-35003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-K"
@@ -22250,12 +22262,12 @@ SLPM-65077:
   name: "Metal Gear Solid 2 - Sons of Liberty [Premium Package]"
   region: "NTSC-J"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLPM-65078:
   name: "Metal Gear Solid 2 - Sons of Liberty"
   region: "NTSC-J"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLPM-65080:
   name: "Tokimeki Memorial 3"
   region: "NTSC-J"
@@ -26665,7 +26677,7 @@ SLPM-66503:
   name: "Metal Gear Solid 2 [Mega Hits]"
   region: "NTSC-J"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLPM-66504:
   name: "Onimusha 2 [Mega Hits]"
   region: "NTSC-J"
@@ -27609,7 +27621,7 @@ SLPM-66792:
   name: "Metal Gear Solid 2 - Sons of Liberty [20th Anniversary Edition]"
   region: "NTSC-J"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLPM-66794:
   name: "Metal Gear Solid 3 - Snake Eater [20th Anniversary Edition]"
   region: "NTSC-J"
@@ -28179,7 +28191,7 @@ SLPM-67002:
   name: "Metal Gear Solid 2 - Substance"
   region: "NTSC-J"
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLPM-67003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-J"
@@ -30788,6 +30800,8 @@ SLPS-25360:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SLPS-25361:
   name: "Smash Court Professional Tournament 2"
   region: "NTSC-J"
@@ -31186,6 +31200,8 @@ SLPS-25467:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -32879,6 +32895,8 @@ SLPS-73210:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SLPS-73211:
   name: "Summon Night 3 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -33037,6 +33055,8 @@ SLPS-73240:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SLPS-73241:
   name: "Minna Daisuki Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -33044,6 +33064,8 @@ SLPS-73241:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
   memcardFilters:
     - "SCAJ-20135"
     - "SLPS-25467"
@@ -33673,7 +33695,7 @@ SLUS-20144:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLUS-20145:
   name: "Ring of Red"
   region: "NTSC-U"
@@ -35388,7 +35410,7 @@ SLUS-20554:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLUS-20555:
   name: "Reel Fishing 3"
   region: "NTSC-U"
@@ -37366,6 +37388,8 @@ SLUS-21008:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
 SLUS-21009:
   name: "Sega Classics Collection"
   region: "NTSC-U"
@@ -38314,6 +38338,8 @@ SLUS-21230:
     vuRoundMode: 0 # Fixes SPS.
   clampModes:
     vuClampMode: 3 # Fixes SPS.
+  speedHacks:
+    mvuFlagSpeedHack: 0 # Fixes performance and falling through floor and other gameplay.
   memcardFilters: # Allows import of constellations from Katamari Damacy.
     - "SLUS-21230"
     - "SLUS-21008"
@@ -41545,7 +41571,7 @@ SLUS-29003:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - EETimingHack # Fixes broken half-bottom artifacts.
+    - DMABusyHack # Fixes broken half-bottom artifacts.
 SLUS-29004:
   name: "Unison & Dead or Alive 2 Hardcore [Demo]"
   region: "NTSC-U"
