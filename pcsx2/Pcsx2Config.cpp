@@ -313,8 +313,9 @@ Pcsx2Config::GSOptions::GSOptions()
 	WrapGSMem = false;
 	Mipmap = true;
 	AA1 = true;
+	PointListPalette = false;
 
-	UserHacks = false;
+	ManualUserHacks = false;
 	UserHacks_AlignSpriteX = false;
 	UserHacks_AutoFlush = false;
 	UserHacks_CPUFBConversion = false;
@@ -385,8 +386,8 @@ bool Pcsx2Config::GSOptions::OptionsAreEqual(const GSOptions& right) const
 		OpEqu(SWExtraThreads) &&
 		OpEqu(SWExtraThreadsHeight) &&
 		OpEqu(TVShader) &&
-		OpEqu(SkipDraw) &&
-		OpEqu(SkipDrawOffset) &&
+		OpEqu(SkipDrawEnd) &&
+		OpEqu(SkipDrawStart) &&
 
 		OpEqu(UserHacks_HalfBottomOverride) &&
 		OpEqu(UserHacks_HalfPixelOffset) &&
@@ -513,7 +514,7 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 	GSSettingBoolEx(WrapGSMem, "wrap_gs_mem");
 	GSSettingBoolEx(Mipmap, "mipmap");
 	GSSettingBoolEx(AA1, "aa1");
-	GSSettingBoolEx(UserHacks, "UserHacks");
+	GSSettingBoolEx(ManualUserHacks, "UserHacks");
 	GSSettingBoolEx(UserHacks_AlignSpriteX, "UserHacks_align_sprite_X");
 	GSSettingBoolEx(UserHacks_AutoFlush, "UserHacks_AutoFlush");
 	GSSettingBoolEx(UserHacks_CPUFBConversion, "UserHacks_CPU_FB_Conversion");
@@ -555,8 +556,9 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 	GSSettingIntEx(SWExtraThreads, "extrathreads");
 	GSSettingIntEx(SWExtraThreadsHeight, "extrathreads_height");
 	GSSettingIntEx(TVShader, "TVShader");
-	GSSettingIntEx(SkipDraw, "UserHacks_SkipDraw");
-	GSSettingIntEx(SkipDrawOffset, "UserHacks_SkipDraw_Offset");
+	GSSettingIntEx(SkipDrawStart, "UserHacks_SkipDraw_Offset");
+	GSSettingIntEx(SkipDrawEnd, "UserHacks_SkipDraw");
+	SkipDrawEnd = std::max(SkipDrawStart, SkipDrawEnd);
 
 	GSSettingIntEx(UserHacks_HalfBottomOverride, "UserHacks_Half_Bottom_Override");
 	GSSettingIntEx(UserHacks_HalfPixelOffset, "UserHacks_HalfPixelOffset");
@@ -588,7 +590,7 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 
 void Pcsx2Config::GSOptions::MaskUserHacks()
 {
-	if (UserHacks)
+	if (ManualUserHacks)
 		return;
 
 	UserHacks_AlignSpriteX = false;
@@ -598,17 +600,31 @@ void Pcsx2Config::GSOptions::MaskUserHacks()
 	UserHacks_HalfPixelOffset = 0;
 	UserHacks_RoundSprite = 0;
 	PreloadFrameWithGSData = false;
+	WrapGSMem = false;
 	UserHacks_DisablePartialInvalidation = false;
 	UserHacks_DisableDepthSupport = false;
 	UserHacks_CPUFBConversion = false;
 	UserHacks_TextureInsideRt = false;
 	UserHacks_TCOffsetX = 0;
 	UserHacks_TCOffsetY = 0;
+	SkipDrawStart = 0;
+	SkipDrawEnd = 0;
 
 	// in wx, we put trilinear filtering behind user hacks, but not in qt.
 #ifndef PCSX2_CORE
 	UserHacks_TriFilter = TriFiltering::Off;
 #endif
+}
+
+void Pcsx2Config::GSOptions::MaskUpscalingHacks()
+{
+	if (UpscaleMultiplier == 1 || ManualUserHacks)
+		return;
+
+	UserHacks_AlignSpriteX = false;
+	UserHacks_MergePPSprite = false;
+	UserHacks_HalfPixelOffset = 0;
+	UserHacks_RoundSprite = 0;
 }
 
 bool Pcsx2Config::GSOptions::UseHardwareRenderer() const

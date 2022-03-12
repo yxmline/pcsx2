@@ -310,7 +310,6 @@ bool GSopen(const Pcsx2Config::GSOptions& config, GSRendererType renderer, u8* b
 
 	GSConfig = config;
 	GSConfig.Renderer = renderer;
-	GSConfig.MaskUserHacks();
 
 	if (!Host::AcquireHostDisplay(GetAPIForRenderer(renderer)))
 	{
@@ -723,7 +722,6 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 	Pcsx2Config::GSOptions old_config(std::move(GSConfig));
 	GSConfig = new_config;
 	GSConfig.Renderer = (GSConfig.Renderer == GSRendererType::Auto) ? GSUtil::GetPreferredRenderer() : GSConfig.Renderer;
-	GSConfig.MaskUserHacks();
 	if (!s_gs)
 		return;
 
@@ -758,21 +756,6 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 
 	// Options which aren't using the global struct yet, so we need to recreate all GS objects.
 	if (
-		GSConfig.ConservativeFramebuffer != old_config.ConservativeFramebuffer ||
-		GSConfig.AutoFlushSW != old_config.AutoFlushSW ||
-		GSConfig.PreloadFrameWithGSData != old_config.PreloadFrameWithGSData ||
-		GSConfig.WrapGSMem != old_config.WrapGSMem ||
-		GSConfig.Mipmap != old_config.Mipmap ||
-		GSConfig.AA1 != old_config.AA1 ||
-		GSConfig.UserHacks_AlignSpriteX != old_config.UserHacks_AlignSpriteX ||
-		GSConfig.UserHacks_AutoFlush != old_config.UserHacks_AutoFlush ||
-		GSConfig.UserHacks_CPUFBConversion != old_config.UserHacks_CPUFBConversion ||
-		GSConfig.UserHacks_DisableDepthSupport != old_config.UserHacks_DisableDepthSupport ||
-		GSConfig.UserHacks_DisablePartialInvalidation != old_config.UserHacks_DisablePartialInvalidation ||
-		GSConfig.UserHacks_DisableSafeFeatures != old_config.UserHacks_DisableSafeFeatures ||
-		GSConfig.UserHacks_MergePPSprite != old_config.UserHacks_MergePPSprite ||
-		GSConfig.UserHacks_WildHack != old_config.UserHacks_WildHack ||
-		GSConfig.UserHacks_TextureInsideRt != old_config.UserHacks_TextureInsideRt ||
 		GSConfig.DumpGSData != old_config.DumpGSData ||
 		GSConfig.SaveRT != old_config.SaveRT ||
 		GSConfig.SaveFrame != old_config.SaveFrame ||
@@ -783,12 +766,6 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 		GSConfig.CRCHack != old_config.CRCHack ||
 		GSConfig.SWExtraThreads != old_config.SWExtraThreads ||
 		GSConfig.SWExtraThreadsHeight != old_config.SWExtraThreadsHeight ||
-
-		GSConfig.UserHacks_HalfBottomOverride != old_config.UserHacks_HalfBottomOverride ||
-		GSConfig.UserHacks_HalfPixelOffset != old_config.UserHacks_HalfPixelOffset ||
-		GSConfig.UserHacks_RoundSprite != old_config.UserHacks_RoundSprite ||
-		GSConfig.UserHacks_TCOffsetX != old_config.UserHacks_TCOffsetX ||
-		GSConfig.UserHacks_TCOffsetY != old_config.UserHacks_TCOffsetY ||
 
 		GSConfig.ShadeBoost_Brightness != old_config.ShadeBoost_Brightness ||
 		GSConfig.ShadeBoost_Contrast != old_config.ShadeBoost_Contrast ||
@@ -806,17 +783,29 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 	// This is where we would do finer-grained checks in the future.
 	// For example, flushing the texture cache when mipmap settings change.
 
-	if (GSConfig.HWMipmap != old_config.HWMipmap || GSConfig.CRCHack != old_config.CRCHack)
+	if (GSConfig.CRCHack != old_config.CRCHack ||
+		GSConfig.PointListPalette != old_config.PointListPalette)
 	{
 		// for automatic mipmaps, we need to reload the crc
 		s_gs->SetGameCRC(s_gs->GetGameCRC(), s_gs->GetGameCRCOptions());
 	}
 
-	// reload texture cache when trilinear filtering or mipmap options change
-	if (GSConfig.HWMipmap != old_config.HWMipmap ||
+	// renderer-specific options (e.g. auto flush, TC offset)
+	s_gs->UpdateSettings(old_config);
+
+	// reload texture cache when trilinear filtering or TC options change
+	if (
+		(GSConfig.UseHardwareRenderer() && GSConfig.HWMipmap != old_config.HWMipmap) ||
+		GSConfig.ConservativeFramebuffer != old_config.ConservativeFramebuffer ||
 		GSConfig.TexturePreloading != old_config.TexturePreloading ||
 		GSConfig.UserHacks_TriFilter != old_config.UserHacks_TriFilter ||
-		GSConfig.GPUPaletteConversion != old_config.GPUPaletteConversion)
+		GSConfig.GPUPaletteConversion != old_config.GPUPaletteConversion ||
+		GSConfig.PreloadFrameWithGSData != old_config.PreloadFrameWithGSData ||
+		GSConfig.WrapGSMem != old_config.WrapGSMem ||
+		GSConfig.UserHacks_CPUFBConversion != old_config.UserHacks_CPUFBConversion ||
+		GSConfig.UserHacks_DisableDepthSupport != old_config.UserHacks_DisableDepthSupport ||
+		GSConfig.UserHacks_DisablePartialInvalidation != old_config.UserHacks_DisablePartialInvalidation ||
+		GSConfig.UserHacks_TextureInsideRt != old_config.UserHacks_TextureInsideRt)
 	{
 		s_gs->PurgeTextureCache();
 		s_gs->PurgePool();
@@ -1358,6 +1347,7 @@ void GSApp::Init()
 	m_default_configuration["override_GL_ARB_texture_barrier"]            = "-1";
 	m_default_configuration["paltex"]                                     = "0";
 	m_default_configuration["png_compression_level"]                      = std::to_string(Z_BEST_SPEED);
+	m_default_configuration["PointListPalette"]                           = "0";
 	m_default_configuration["PrecacheTextureReplacements"]                = "0";
 	m_default_configuration["preload_frame_with_gs_data"]                 = "0";
 	m_default_configuration["Renderer"]                                   = std::to_string(static_cast<int>(GSRendererType::Auto));

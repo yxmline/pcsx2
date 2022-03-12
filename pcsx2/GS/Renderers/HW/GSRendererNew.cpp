@@ -33,12 +33,12 @@ void GSRendererNew::SetupIA(const float& sx, const float& sy)
 {
 	GL_PUSH("IA");
 
-	if (m_userhacks_wildhack && !m_isPackedUV_HackFlag && PRIM->TME && PRIM->FST)
+	if (GSConfig.UserHacks_WildHack && !m_isPackedUV_HackFlag && PRIM->TME && PRIM->FST)
 	{
 		for (unsigned int i = 0; i < m_vertex.next; i++)
 			m_vertex.buff[i].UV &= 0x3FEF3FEF;
 	}
-	const bool unscale_pt_ln = m_userHacks_enabled_unscale_ptln && (GetUpscaleMultiplier() != 1);
+	const bool unscale_pt_ln = !GSConfig.UserHacks_DisableSafeFeatures && (GetUpscaleMultiplier() != 1);
 	const GSDevice::FeatureSupport features = g_gs_device->Features();
 
 	switch (m_vt.m_primclass)
@@ -956,7 +956,7 @@ void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
 
 	const bool need_mipmap = IsMipMapDraw();
 	const bool shader_emulated_sampler = tex->m_palette || cpsm.fmt != 0 || complex_wms_wmt || psm.depth;
-	const bool trilinear_manual = need_mipmap && m_hw_mipmap == HWMipmapLevel::Full;
+	const bool trilinear_manual = need_mipmap && GSConfig.HWMipmap == HWMipmapLevel::Full;
 
 	bool bilinear = m_vt.IsLinear();
 	int trilinear = 0;
@@ -965,11 +965,11 @@ void GSRendererNew::EmulateTextureSampler(const GSTextureCache::Source* tex)
 	{
 		case TriFiltering::Forced:
 			trilinear = static_cast<u8>(GS_MIN_FILTER::Linear_Mipmap_Linear);
-			trilinear_auto = !need_mipmap || m_hw_mipmap != HWMipmapLevel::Full;
+			trilinear_auto = !need_mipmap || GSConfig.HWMipmap != HWMipmapLevel::Full;
 			break;
 
 		case TriFiltering::PS2:
-			if (need_mipmap && m_hw_mipmap != HWMipmapLevel::Full)
+			if (need_mipmap && GSConfig.HWMipmap != HWMipmapLevel::Full)
 			{
 				trilinear = m_context->TEX1.MMIN;
 				trilinear_auto = true;

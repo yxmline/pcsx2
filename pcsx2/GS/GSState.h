@@ -123,7 +123,7 @@ class GSState : public GSAlignedClass<32>
 	template<bool auto_flush, bool index_swap>
 	void SetPrimHandlers();
 
-	int m_version;
+	u32 m_version;
 	int m_sssize;
 
 	struct GSTransferBuffer
@@ -149,14 +149,11 @@ protected:
 	bool IsBadFrame();
 	void SetupCrcHack();
 
-	bool m_userhacks_wildhack;
 	bool m_isPackedUV_HackFlag;
 	CRCHackLevel m_crc_hack_level;
 	GetSkipCount m_gsc;
 	int m_skip;
 	int m_skip_offset;
-	bool m_userhacks_auto_flush;
-	bool tex_flushed;
 
 	GSVertex m_v;
 	float m_q;
@@ -164,6 +161,7 @@ protected:
 	GSVector4i m_ofxy;
 
 	bool m_scanmask_used;
+	bool tex_flushed;
 
 	struct
 	{
@@ -245,6 +243,8 @@ public:
 	int s_savel;
 	std::string m_dump_root;
 
+	static constexpr u32 STATE_VERSION = 8;
+
 	enum PRIM_OVERLAP
 	{
 		PRIM_OVERLAP_UNKNOW,
@@ -273,6 +273,8 @@ public:
 	float GetTvRefreshRate();
 
 	virtual void Reset();
+	virtual void UpdateSettings(const Pcsx2Config::GSOptions& old_config);
+
 	void Flush();
 	void FlushPrim();
 	void FlushWrite();

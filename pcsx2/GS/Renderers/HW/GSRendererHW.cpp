@@ -25,10 +25,8 @@ GSRendererHW::GSRendererHW()
 	, m_height(default_rt_size.y)
 	, m_custom_width(1024)
 	, m_custom_height(1024)
-	, m_userhacks_ts_half_bottom(-1)
 	, m_tc(new GSTextureCache(this))
 	, m_src(nullptr)
-	, m_hw_mipmap(GSConfig.HWMipmap)
 	, m_userhacks_tcoffset(false)
 	, m_userhacks_tcoffset_x(0)
 	, m_userhacks_tcoffset_y(0)
@@ -36,42 +34,13 @@ GSRendererHW::GSRendererHW()
 	, m_reset(false)
 	, m_lod(GSVector2i(0, 0))
 {
-	m_mipmap = (m_hw_mipmap >= HWMipmapLevel::Basic);
-	m_conservative_framebuffer = theApp.GetConfigB("conservative_framebuffer");
-
-	if (theApp.GetConfigB("UserHacks"))
-	{
-		m_userhacks_enabled_gs_mem_clear = !theApp.GetConfigB("UserHacks_Disable_Safe_Features");
-		m_userHacks_enabled_unscale_ptln = !theApp.GetConfigB("UserHacks_Disable_Safe_Features");
-		m_userhacks_align_sprite_X       = theApp.GetConfigB("UserHacks_align_sprite_X");
-		m_userHacks_merge_sprite         = theApp.GetConfigB("UserHacks_merge_pp_sprite");
-		m_userhacks_ts_half_bottom       = theApp.GetConfigI("UserHacks_Half_Bottom_Override");
-		m_userhacks_round_sprite_offset  = theApp.GetConfigI("UserHacks_round_sprite_offset");
-		m_userhacks_tcoffset_x           = theApp.GetConfigI("UserHacks_TCOffsetX") / -1000.0f;
-		m_userhacks_tcoffset_y           = theApp.GetConfigI("UserHacks_TCOffsetY") / -1000.0f;
-		m_userhacks_tcoffset             = m_userhacks_tcoffset_x < 0.0f || m_userhacks_tcoffset_y < 0.0f;
-	}
-	else
-	{
-		m_userhacks_enabled_gs_mem_clear = true;
-		m_userHacks_enabled_unscale_ptln = true;
-		m_userhacks_align_sprite_X       = false;
-		m_userHacks_merge_sprite         = false;
-		m_userhacks_ts_half_bottom       = -1;
-		m_userhacks_round_sprite_offset  = 0;
-	}
+	m_mipmap = (GSConfig.HWMipmap >= HWMipmapLevel::Basic);
+	SetTCOffset();
 
 	if (!GSConfig.UpscaleMultiplier) // Custom Resolution
 	{
 		m_custom_width = m_width = theApp.GetConfigI("resx");
 		m_custom_height = m_height = theApp.GetConfigI("resy");
-	}
-
-	if (GSConfig.UpscaleMultiplier == 1) // hacks are only needed for upscaling issues.
-	{
-		m_userhacks_round_sprite_offset = 0;
-		m_userhacks_align_sprite_X = false;
-		m_userHacks_merge_sprite = false;
 	}
 
 	m_dump_root = root_hw;
@@ -127,7 +96,7 @@ void GSRendererHW::SetScaling()
 	//
 	// m_large_framebuffer has been inverted to m_conservative_framebuffer, it isn't an option that benefits being enabled all the time for everyone.
 	int fb_height = 1280;
-	if (m_conservative_framebuffer)
+	if (GSConfig.ConservativeFramebuffer)
 	{
 		fb_height = fb_width < 1024 ? std::max(512, crtc_size.y) : 1024;
 	}
@@ -183,6 +152,13 @@ void GSRendererHW::CustomResolutionScaling()
 	printf("Frame buffer size set to  %dx%d (%dx%d)\n", scissored_buffer_size.x, scissored_buffer_size.y, m_width, m_height);
 }
 
+void GSRendererHW::SetTCOffset()
+{
+	m_userhacks_tcoffset_x = std::max<s32>(GSConfig.UserHacks_TCOffsetX, 0) / -1000.0f;
+	m_userhacks_tcoffset_y = std::max<s32>(GSConfig.UserHacks_TCOffsetY, 0) / -1000.0f;
+	m_userhacks_tcoffset = m_userhacks_tcoffset_x < 0.0f || m_userhacks_tcoffset_y < 0.0f;
+}
+
 GSRendererHW::~GSRendererHW()
 {
 	delete m_tc;
@@ -206,63 +182,6 @@ void GSRendererHW::SetGameCRC(u32 crc, int options)
 	GSRenderer::SetGameCRC(crc, options);
 
 	m_hacks.SetGameCRC(m_game);
-
-	// Code for Automatic Mipmapping. Relies on game CRCs.
-	m_hw_mipmap = GSConfig.HWMipmap;
-	m_mipmap = (m_hw_mipmap >= HWMipmapLevel::Basic);
-	if (m_hw_mipmap == HWMipmapLevel::Automatic)
-	{
-		switch (CRC::Lookup(crc).title)
-		{
-			case CRC::AceCombatZero:
-			case CRC::AceCombat4:
-			case CRC::AceCombat5:
-			case CRC::ApeEscape2:
-			case CRC::Barnyard:
-			case CRC::BrianLaraInternationalCricket:
-			case CRC::DarkCloud:
-			case CRC::DestroyAllHumans:
-			case CRC::DestroyAllHumans2:
-			case CRC::FIFA03:
-			case CRC::FIFA04:
-			case CRC::FIFA05:
-			case CRC::HarryPotterATCOS:
-			case CRC::HarryPotterATGOF:
-			case CRC::HarryPotterATHBP:
-			case CRC::HarryPotterATPOA:
-			case CRC::HarryPotterOOTP:
-			case CRC::ICO:
-			case CRC::Jak1:
-			case CRC::Jak3:
-			case CRC::JurassicPark:
-			case CRC::LegacyOfKainDefiance:
-			case CRC::NicktoonsUnite:
-			case CRC::Persona3:
-			case CRC::ProjectSnowblind:
-			case CRC::Quake3Revolution:
-			case CRC::RatchetAndClank:
-			case CRC::RatchetAndClank2:
-			case CRC::RatchetAndClank3:
-			case CRC::RatchetAndClank4:
-			case CRC::RatchetAndClank5:
-			case CRC::RickyPontingInternationalCricket:
-			case CRC::Shox:
-			case CRC::SlamTennis:
-			case CRC::SoTC:
-			case CRC::SoulReaver2:
-			case CRC::TheIncredibleHulkUD:
-			case CRC::TombRaiderAnniversary:
-			case CRC::TribesAerialAssault:
-			case CRC::Whiplash:
-				m_hw_mipmap = HWMipmapLevel::Basic;
-				m_mipmap = true;
-				break;
-			default:
-				m_hw_mipmap = HWMipmapLevel::Off;
-				m_mipmap = false;
-				break;
-		}
-	}
 
 	GSTextureReplacements::GameChanged();
 }
@@ -295,6 +214,13 @@ void GSRendererHW::Reset()
 	m_reset = true;
 
 	GSRenderer::Reset();
+}
+
+void GSRendererHW::UpdateSettings(const Pcsx2Config::GSOptions& old_config)
+{
+	GSRenderer::UpdateSettings(old_config);
+	m_mipmap = (GSConfig.HWMipmap >= HWMipmapLevel::Basic);
+	SetTCOffset();
 }
 
 void GSRendererHW::VSync(u32 field, bool registers_written)
@@ -544,7 +470,7 @@ void GSRendererHW::ConvertSpriteTextureShuffle(bool& write_ba, bool& read_ba)
 	read_ba = (tex_pos > 112 && tex_pos < 144);
 
 	bool half_bottom = false;
-	switch (m_userhacks_ts_half_bottom)
+	switch (GSConfig.UserHacks_HalfBottomOverride)
 	{
 		case 0:
 			// Force Disabled.
@@ -774,7 +700,7 @@ GSVector4i GSRendererHW::ComputeBoundingBox(const GSVector2& rtscale, const GSVe
 void GSRendererHW::MergeSprite(GSTextureCache::Source* tex)
 {
 	// Upscaling hack to avoid various line/grid issues
-	if (m_userHacks_merge_sprite && tex && tex->m_target && (m_vt.m_primclass == GS_SPRITE_CLASS))
+	if (GSConfig.UserHacks_MergePPSprite && tex && tex->m_target && (m_vt.m_primclass == GS_SPRITE_CLASS))
 	{
 		if (PRIM->FST && GSLocalMemory::m_psm[tex->m_TEX0.PSM].fmt < 2 && ((m_vt.m_eq.value & 0xCFFFF) == 0xCFFFF))
 		{
@@ -1445,7 +1371,7 @@ void GSRendererHW::Draw()
 
 			// upload the full chain (with offset) for the hash cache, in case some other texture uses more levels
 			// for basic mipmapping, we can get away with just doing the base image, since all the mips get generated anyway.
-			hash_lod_range = GSVector2i(m_lod.x, (m_hw_mipmap == HWMipmapLevel::Full) ? mxl : m_lod.x);
+			hash_lod_range = GSVector2i(m_lod.x, (GSConfig.HWMipmap == HWMipmapLevel::Full) ? mxl : m_lod.x);
 
 			MIP_CLAMP.MINU >>= m_lod.x;
 			MIP_CLAMP.MINV >>= m_lod.x;
@@ -1470,7 +1396,7 @@ void GSRendererHW::Draw()
 		TextureMinMaxResult tmm = GetTextureMinMax(TEX0, MIP_CLAMP, m_vt.IsLinear());
 
 		m_src = tex_psm.depth ? m_tc->LookupDepthSource(TEX0, env.TEXA, tmm.coverage) :
-			m_tc->LookupSource(TEX0, env.TEXA, tmm.coverage, (m_hw_mipmap >= HWMipmapLevel::Basic ||
+			m_tc->LookupSource(TEX0, env.TEXA, tmm.coverage, (GSConfig.HWMipmap >= HWMipmapLevel::Basic ||
 				GSConfig.UserHacks_TriFilter == TriFiltering::Forced) ? &hash_lod_range : nullptr);
 
 		int tw = 1 << TEX0.TW;
@@ -1525,7 +1451,7 @@ void GSRendererHW::Draw()
 		}
 
 		// Round 2
-		if (IsMipMapActive() && m_hw_mipmap == HWMipmapLevel::Full && !tex_psm.depth && !m_src->m_from_hash_cache)
+		if (IsMipMapActive() && GSConfig.HWMipmap == HWMipmapLevel::Full && !tex_psm.depth && !m_src->m_from_hash_cache)
 		{
 			// Upload remaining texture layers
 			const GSVector4 tmin = m_vt.m_min.t;
@@ -1732,7 +1658,7 @@ void GSRendererHW::Draw()
 		return;
 	}
 
-	if (m_userhacks_enabled_gs_mem_clear)
+	if (!GSConfig.UserHacks_DisableSafeFeatures)
 	{
 		// Constant Direct Write without texture/test/blending (aka a GS mem clear)
 		if ((m_vt.m_primclass == GS_SPRITE_CLASS) && !PRIM->TME // Direct write
@@ -1758,7 +1684,7 @@ void GSRendererHW::Draw()
 		GSVertex* v = &m_vertex.buff[0];
 
 		// Hack to avoid vertical black line in various games (ace combat/tekken)
-		if (m_userhacks_align_sprite_X)
+		if (GSConfig.UserHacks_AlignSpriteX)
 		{
 			// Note for performance reason I do the check only once on the first
 			// primitive
@@ -1784,7 +1710,7 @@ void GSRendererHW::Draw()
 		// Noting to do if no texture is sampled
 		if (PRIM->FST && draw_sprite_tex)
 		{
-			if ((m_userhacks_round_sprite_offset > 1) || (m_userhacks_round_sprite_offset == 1 && !m_vt.IsLinear()))
+			if ((GSConfig.UserHacks_RoundSprite > 1) || (GSConfig.UserHacks_RoundSprite == 1 && !m_vt.IsLinear()))
 			{
 				if (m_vt.IsLinear())
 					RoundSpriteOffset<true>();
@@ -1909,9 +1835,10 @@ void GSRendererHW::Hacks::SetGameCRC(const CRC::Game& game)
 	m_oo = m_oo_map[hash];
 	m_cu = m_cu_map[hash];
 
-	if (game.flags & CRC::PointListPalette)
+	if (GSConfig.PointListPalette)
 	{
-		ASSERT(m_oi == NULL);
+		if (m_oi)
+			Console.Warning("Overriding m_oi with PointListPalette");
 
 		m_oi = &GSRendererHW::OI_PointListPalette;
 	}

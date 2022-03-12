@@ -27,12 +27,6 @@ private:
 	int m_height;
 	int m_custom_width;
 	int m_custom_height;
-	int m_userhacks_ts_half_bottom;
-
-	bool m_conservative_framebuffer;
-	bool m_userhacks_align_sprite_X;
-	bool m_userhacks_enabled_gs_mem_clear;
-	bool m_userHacks_merge_sprite;
 
 	static constexpr float SSR_UV_TOLERANCE = 1.0f;
 
@@ -144,12 +138,10 @@ protected:
 	GSTextureCache* m_tc;
 	GSVector4i m_r;
 	GSTextureCache::Source* m_src;
-	HWMipmapLevel m_hw_mipmap;
 
 	virtual void DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Source* tex) = 0;
 
-	int m_userhacks_round_sprite_offset;
-	bool m_userHacks_enabled_unscale_ptln;
+	void SetTCOffset();
 
 	bool m_userhacks_tcoffset;
 	float m_userhacks_tcoffset_x;
@@ -185,6 +177,7 @@ public:
 	GSVector2i GetTargetSize();
 
 	void Reset() override;
+	void UpdateSettings(const Pcsx2Config::GSOptions& old_config) override;
 	void VSync(u32 field, bool registers_written) override;
 
 	GSTexture* GetOutput(int i, int& y_offset) override;
