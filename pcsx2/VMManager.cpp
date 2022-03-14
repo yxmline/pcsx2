@@ -35,6 +35,7 @@
 #include "Elfheader.h"
 #include "FW.h"
 #include "GS.h"
+#include "GSDumpReplayer.h"
 #include "HostDisplay.h"
 #include "HostSettings.h"
 #include "IopBios.h"
@@ -74,6 +75,9 @@ namespace VMManager
 	static void CheckForSPU2ConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForDEV9ConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForMemoryCardConfigChanges(const Pcsx2Config& old_config);
+
+	static bool AutoDetectSource(const std::string& filename);
+	static bool ApplyBootParameters(const VMBootParameters& params);
 	static void UpdateRunningGame(bool force);
 
 	static std::string GetCurrentSaveStateFileName(s32 slot);
@@ -221,6 +225,10 @@ void VMManager::LoadSettings()
 	// Remove any user-specified hacks in the config (we don't want stale/conflicting values when it's globally disabled).
 	EmuConfig.GS.MaskUserHacks();
 	EmuConfig.GS.MaskUpscalingHacks();
+
+	// Force MTVU off when playing back GS dumps, it doesn't get used.
+	if (GSDumpReplayer::IsReplayingDump())
+		EmuConfig.Speedhacks.vuThread = false;
 
 	if (HasValidVM())
 		ApplyGameFixes();
@@ -454,11 +462,20 @@ void VMManager::UpdateRunningGame(bool force)
 	// we have the CRC but we're still at the bios and the settings are changed
 	// (e.g. the user presses TAB to speed up emulation), we don't want to apply the
 	// settings as if the game is already running (title, loadeding patches, etc).
-	bool ingame = (ElfCRC && (g_GameLoading || g_GameStarted));
-	const u32 new_crc = ingame ? ElfCRC : 0;
-	const std::string crc_string(StringUtil::StdStringFromFormat("%08X", new_crc));
+	u32 new_crc;
+	std::string new_serial;
+	if (!GSDumpReplayer::IsReplayingDump())
+	{
+		const bool ingame = (ElfCRC && (g_GameLoading || g_GameStarted));
+		new_crc = ingame ? ElfCRC : 0;
+		new_serial = ingame ? SysGetDiscID().ToStdString() : SysGetBiosDiscID().ToStdString();
+	}
+	else
+	{
+		new_crc = GSDumpReplayer::GetDumpCRC();
+		new_serial = GSDumpReplayer::GetDumpSerial();
+	}
 
-	std::string new_serial(ingame ? SysGetDiscID().ToStdString() : SysGetBiosDiscID().ToStdString());
 	if (!force && s_game_crc == new_crc && s_game_serial == new_serial)
 		return;
 
@@ -488,7 +505,7 @@ void VMManager::UpdateRunningGame(bool force)
 	ApplySettings();
 
 	ForgetLoadedPatches();
-	LoadPatches(crc_string, true, false);
+	LoadPatches(StringUtil::StdStringFromFormat("%08X", new_crc), true, false);
 	GetMTGS().SendGameCRC(new_crc);
 
 	Host::OnGameChanged(s_disc_path, s_game_serial, s_game_name, s_game_crc);
@@ -505,30 +522,86 @@ static LimiterModeType GetInitialLimiterMode()
 	return EmuConfig.GS.FrameLimitEnable ? LimiterModeType::Nominal : LimiterModeType::Unlimited;
 }
 
-static void ApplyBootParameters(const VMBootParameters& params)
+bool VMManager::AutoDetectSource(const std::string& filename)
+{
+	if (!filename.empty())
+	{
+		if (!FileSystem::FileExists(filename.c_str()))
+		{
+			Host::ReportFormattedErrorAsync("Error", "Requested filename '%s' does not exist.", filename.c_str());
+			return false;
+		}
+
+		const std::string display_name(FileSystem::GetDisplayNameFromPath(filename));
+		if (IsGSDumpFileName(display_name))
+		{
+			CDVDsys_ChangeSource(CDVD_SourceType::NoDisc);
+			return GSDumpReplayer::Initialize(filename.c_str());
+		}
+		else if (IsElfFileName(display_name))
+		{
+			// alternative way of booting an elf, change the elf override, and use no disc.
+			CDVDsys_ChangeSource(CDVD_SourceType::NoDisc);
+			s_elf_override = filename;
+			return true;
+		}
+		else
+		{
+			// TODO: Maybe we should check if it's a valid iso here...
+			CDVDsys_SetFile(CDVD_SourceType::Iso, filename);
+			CDVDsys_ChangeSource(CDVD_SourceType::Iso);
+			s_disc_path = filename;
+			return true;
+		}
+	}
+	else
+	{
+		// make sure we're not fast booting when we have no filename
+		CDVDsys_ChangeSource(CDVD_SourceType::NoDisc);
+		EmuConfig.UseBOOT2Injection = false;
+		return true;
+	}
+}
+
+bool VMManager::ApplyBootParameters(const VMBootParameters& params)
 {
 	const bool default_fast_boot = Host::GetBoolSettingValue("EmuCore", "EnableFastBoot", true);
-	EmuConfig.UseBOOT2Injection =
-		(params.source_type != CDVD_SourceType::NoDisc && params.fast_boot.value_or(default_fast_boot));
+	EmuConfig.UseBOOT2Injection = params.fast_boot.value_or(default_fast_boot);
+	s_elf_override = params.elf_override;
+	s_disc_path.clear();
 
-	CDVDsys_SetFile(CDVD_SourceType::Iso, params.source);
-	CDVDsys_ChangeSource(params.source_type);
-
-	if (!params.elf_override.empty())
+	if (params.source_type.has_value())
 	{
-		Hle_SetElfPath(params.elf_override.c_str());
-		s_elf_override = std::move(params.elf_override);
+		if (params.source_type.value() == CDVD_SourceType::Iso && !FileSystem::FileExists(params.filename.c_str()))
+		{
+			Host::ReportFormattedErrorAsync("Error", "Requested filename '%s' does not exist.", params.filename.c_str());
+			return false;
+		}
+
+		// Use specified source type.
+		CDVDsys_SetFile(params.source_type.value(), params.filename);
+		CDVDsys_ChangeSource(params.source_type.value());
+	}
+	else
+	{
+		// Automatic type detection of boot parameter based on filename.
+		if (!AutoDetectSource(params.filename))
+			return false;
+	}
+
+	if (!s_elf_override.empty())
+	{
+		if (!FileSystem::FileExists(s_elf_override.c_str()))
+		{
+			Host::ReportFormattedErrorAsync("Error", "Requested boot ELF '%s' does not exist.", s_elf_override.c_str());
+			return false;
+		}
+
+		Hle_SetElfPath(s_elf_override.c_str());
 		EmuConfig.UseBOOT2Injection = true;
 	}
-	else
-	{
-		std::string().swap(s_elf_override);
-	}
 
-	if (params.source_type == CDVD_SourceType::Iso)
-		s_disc_path = params.source;
-	else
-		s_disc_path.clear();
+	return true;
 }
 
 bool VMManager::Initialize(const VMBootParameters& boot_params)
@@ -544,7 +617,10 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	};
 
 	LoadSettings();
-	ApplyBootParameters(boot_params);
+
+	if (!ApplyBootParameters(boot_params))
+		return false;
+
 	EmuConfig.LimiterMode = GetInitialLimiterMode();
 
 	Console.WriteLn("Allocating memory map...");
@@ -661,17 +737,18 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	frameLimitReset();
 	cpuReset();
 
+	Console.WriteLn("VM subsystems initialized in %.2f ms", init_timer.GetTimeMilliseconds());
+	s_state.store(VMState::Paused);
+	Host::OnVMStarted();
+
 	UpdateRunningGame(true);
 
 	SetEmuThreadAffinities(true);
 
 	PerformanceMetrics::Clear();
-	Console.WriteLn("VM subsystems initialized in %.2f ms", init_timer.GetTimeMilliseconds());
-	s_state.store(VMState::Paused);
-	Host::OnVMStarted();
 
 	// do we want to load state?
-	if (!boot_params.save_state.empty())
+	if (!GSDumpReplayer::IsReplayingDump() && !boot_params.save_state.empty())
 	{
 		if (!DoLoadState(boot_params.save_state.c_str()))
 		{
@@ -692,11 +769,15 @@ void VMManager::Shutdown(bool allow_save_resume_state /* = true */)
 		vu1Thread.WaitVU();
 	GetMTGS().WaitGS();
 
-	if (allow_save_resume_state && ShouldSaveResumeState())
+	if (!GSDumpReplayer::IsReplayingDump() && allow_save_resume_state && ShouldSaveResumeState())
 	{
 		std::string resume_file_name(GetCurrentSaveStateFileName(-1));
 		if (!resume_file_name.empty() && !DoSaveState(resume_file_name.c_str(), -1))
 			Console.Error("Failed to save resume state");
+	}
+	else if (GSDumpReplayer::IsReplayingDump())
+	{
+		GSDumpReplayer::Shutdown();
 	}
 
 	{
@@ -790,6 +871,9 @@ std::string VMManager::GetCurrentSaveStateFileName(s32 slot)
 
 bool VMManager::DoLoadState(const char* filename)
 {
+	if (GSDumpReplayer::IsReplayingDump())
+		return false;
+
 	try
 	{
 		Host::OnSaveStateLoading(filename);
@@ -808,6 +892,9 @@ bool VMManager::DoLoadState(const char* filename)
 
 bool VMManager::DoSaveState(const char* filename, s32 slot_for_message)
 {
+	if (GSDumpReplayer::IsReplayingDump())
+		return false;
+
 	try
 	{
 		std::unique_ptr<ArchiveEntryList> elist = std::make_unique<ArchiveEntryList>(new VmStateBuffer(L"Zippable Savestate"));
@@ -913,29 +1000,12 @@ bool VMManager::ChangeDisc(std::string path)
 
 bool VMManager::IsElfFileName(const std::string& path)
 {
-	const std::string::size_type pos = path.rfind('.');
-	if (pos == std::string::npos)
-		return false;
-
-	return (StringUtil::Strcasecmp(&path[pos], ".elf") == 0);
+	return StringUtil::EndsWithNoCase(path, ".elf");
 }
 
-void VMManager::SetBootParametersForPath(const std::string& path, VMBootParameters* params)
+bool VMManager::IsGSDumpFileName(const std::string& path)
 {
-	if (IsElfFileName(path))
-	{
-		params->elf_override = path;
-		params->source_type = CDVD_SourceType::NoDisc;
-	}
-	else if (!path.empty())
-	{
-		params->source_type = CDVD_SourceType::Iso;
-		params->source = path;
-	}
-	else
-	{
-		params->source_type = CDVD_SourceType::NoDisc;
-	}
+	return (StringUtil::EndsWithNoCase(path, ".gs") || StringUtil::EndsWithNoCase(path, ".gs.xz"));
 }
 
 void VMManager::Execute()

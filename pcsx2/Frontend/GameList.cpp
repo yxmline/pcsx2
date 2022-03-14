@@ -123,19 +123,19 @@ void GameList::FillBootParametersForEntry(VMBootParameters* params, const Entry*
 {
 	if (entry->type == GameList::EntryType::PS1Disc || entry->type == GameList::EntryType::PS2Disc)
 	{
-		params->source = entry->path;
+		params->filename = entry->path;
 		params->source_type = CDVD_SourceType::Iso;
 		params->elf_override.clear();
 	}
 	else if (entry->type == GameList::EntryType::ELF)
 	{
-		params->source.clear();
+		params->filename.clear();
 		params->source_type = CDVD_SourceType::NoDisc;
 		params->elf_override = entry->path;
 	}
 	else
 	{
-		params->source.clear();
+		params->filename.clear();
 		params->source_type = CDVD_SourceType::NoDisc;
 		params->elf_override.clear();
 	}
@@ -562,6 +562,17 @@ const GameList::Entry* GameList::GetEntryForPath(const char* path)
 	for (const Entry& entry : m_entries)
 	{
 		if (entry.path.size() == path_length && StringUtil::Strcasecmp(entry.path.c_str(), path) == 0)
+			return &entry;
+	}
+
+	return nullptr;
+}
+
+const GameList::Entry* GameList::GetEntryByCRC(u32 crc)
+{
+	for (const Entry& entry : m_entries)
+	{
+		if (entry.crc == crc)
 			return &entry;
 	}
 
