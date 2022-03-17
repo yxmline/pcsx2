@@ -16,6 +16,7 @@
 #include "PrecompiledHeader.h"
 
 #include <chrono>
+#include <vector>
 
 #include "PerformanceMetrics.h"
 #include "System.h"
@@ -57,6 +58,19 @@ static float s_gs_thread_time = 0.0f;
 static float s_vu_thread_usage = 0.0f;
 static float s_vu_thread_time = 0.0f;
 
+struct GSSWThreadStats
+{
+	Common::ThreadCPUTimer timer;
+	double usage = 0.0;
+	double time = 0.0;
+};
+std::vector<GSSWThreadStats> s_gs_sw_threads;
+
+static float s_average_gpu_time = 0.0f;
+static float s_accumulated_gpu_time = 0.0f;
+static float s_gpu_usage = 0.0f;
+static u32 s_presents_since_last_update = 0;
+
 void PerformanceMetrics::Clear()
 {
 	Reset();
@@ -74,6 +88,9 @@ void PerformanceMetrics::Clear()
 	s_vu_thread_usage = 0.0f;
 	s_vu_thread_time = 0.0f;
 
+	s_average_gpu_time = 0.0f;
+	s_gpu_usage = 0.0f;
+
 	s_frame_number = 0;
 }
 
@@ -84,6 +101,9 @@ void PerformanceMetrics::Reset()
 	s_gs_privileged_register_writes_since_last_update = 0;
 	s_average_frame_time_accumulator = 0.0f;
 	s_worst_frame_time_accumulator = 0.0f;
+
+	s_accumulated_gpu_time = 0.0f;
+	s_presents_since_last_update = 0;
 
 	s_last_update_time.Reset();
 	s_last_frame_time.Reset();
@@ -115,6 +135,9 @@ void PerformanceMetrics::Update(bool gs_register_write, bool fb_blit)
 	s_average_frame_time = s_average_frame_time_accumulator / static_cast<float>(s_frames_since_last_update);
 	s_average_frame_time_accumulator = 0.0f;
 	s_fps = static_cast<float>(s_frames_since_last_update) / time;
+	s_average_gpu_time = s_accumulated_gpu_time / static_cast<float>(s_frames_since_last_update);
+	s_gpu_usage = s_accumulated_gpu_time / (time * 10.0f);
+	s_accumulated_gpu_time = 0.0f;
 
 	// prefer privileged register write based framerate detection, it's less likely to have false positives
 	if (s_gs_privileged_register_writes_since_last_update > 0)
@@ -138,6 +161,12 @@ void PerformanceMetrics::Update(bool gs_register_write, bool fb_blit)
 
 	s_cpu_thread_timer.GetUsageInMillisecondsAndReset(ticks_diff, &s_cpu_thread_time, &s_cpu_thread_usage);
 	s_cpu_thread_time /= static_cast<double>(s_frames_since_last_update);
+
+	for (GSSWThreadStats& thread : s_gs_sw_threads)
+	{
+		thread.timer.GetUsageInMillisecondsAndReset(ticks_diff, &thread.time, &thread.usage);
+		thread.time /= static_cast<double>(s_frames_since_last_update);
+	}
 
 	const u64 gs_time = GetMTGS().GetCpuTime();
 	const u64 vu_time = THREAD_VU1 ? vu1Thread.GetCpuTime() : 0;
@@ -164,11 +193,29 @@ void PerformanceMetrics::Update(bool gs_register_write, bool fb_blit)
 
 	s_last_update_time.ResetTo(now_ticks);
 	s_frames_since_last_update = 0;
+	s_presents_since_last_update = 0;
+}
+
+void PerformanceMetrics::OnGPUPresent(float gpu_time)
+{
+	s_accumulated_gpu_time += gpu_time;
+	s_presents_since_last_update++;
 }
 
 void PerformanceMetrics::SetCPUThreadTimer(Common::ThreadCPUTimer timer)
 {
 	s_cpu_thread_timer = std::move(timer);
+}
+
+void PerformanceMetrics::SetGSSWThreadCount(u32 count)
+{
+	s_gs_sw_threads.clear();
+	s_gs_sw_threads.resize(count);
+}
+
+void PerformanceMetrics::SetGSSWThreadTimer(u32 index, Common::ThreadCPUTimer timer)
+{
+	s_gs_sw_threads[index].timer = std::move(timer);
 }
 
 void PerformanceMetrics::SetVerticalFrequency(float rate)
@@ -244,4 +291,29 @@ float PerformanceMetrics::GetVUThreadUsage()
 float PerformanceMetrics::GetVUThreadAverageTime()
 {
 	return s_vu_thread_time;
+}
+
+u32 PerformanceMetrics::GetGSSWThreadCount()
+{
+	return static_cast<u32>(s_gs_sw_threads.size());
+}
+
+double PerformanceMetrics::GetGSSWThreadUsage(u32 index)
+{
+	return s_gs_sw_threads[index].usage;
+}
+
+double PerformanceMetrics::GetGSSWThreadAverageTime(u32 index)
+{
+	return s_gs_sw_threads[index].time;
+}
+
+float PerformanceMetrics::GetGPUUsage()
+{
+	return s_gpu_usage;
+}
+
+float PerformanceMetrics::GetGPUAverageTime()
+{
+	return s_average_gpu_time;
 }

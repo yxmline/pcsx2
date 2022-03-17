@@ -492,6 +492,9 @@ SCAJ-20070:
 SCAJ-20072:
   name: "Ghost in the Shell - Stand Alone Complex"
   region: "NTSC-Unk"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes texture and lighting misalignment.
+    mergeSprite: 1 # Fixes most vertical lines and lighting misalignment.
 SCAJ-20073:
   name: "Jak and Daxter II"
   region: "NTSC-Unk"
@@ -563,7 +566,9 @@ SCAJ-20086:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Disc1of2]"
   region: "NTSC-Unk"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -575,7 +580,9 @@ SCAJ-20087:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Disc2of2]"
   region: "NTSC-Unk"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -633,6 +640,8 @@ SCAJ-20101:
 SCAJ-20102:
   name: "Tales of Symphonia"
   region: "NTSC-Unk"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCAJ-20104:
   name: "Ace Combat 5 - The Unsung War"
   region: "NTSC-Unk"
@@ -814,6 +823,8 @@ SCAJ-20138:
 SCAJ-20139:
   name: "Zero - Shisei no Koe" # Fatal Frame - Rei - Irezumi no Sei
   region: "NTSC-Unk"
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces blurriness.
 SCAJ-20140:
   name: "Bleach - Erabareshi Tamashi"
   region: "NTSC-Unk"
@@ -990,13 +1001,17 @@ SCAJ-20179:
   region: "NTSC-Unk"
   gsHWFixes:
     textureInsideRT: 1
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
+    roundSprite: 2 # Fixes font artifacts.
 SCAJ-20180:
   name: "Xenosaga Episode III - Also Sprach Zarathustra [Disc2of2]"
   region: "NTSC-Unk"
   gsHWFixes:
     textureInsideRT: 1
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
+    roundSprite: 2 # Fixes font artifacts.
 SCAJ-20181:
   name: "Minna no Tennis"
   region: "NTSC-Unk"
@@ -1111,7 +1126,9 @@ SCAJ-30001:
   region: "NTSC-Unk"
   compat: 5
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Removes puppet lines shadows.
+    roundSprite: 2 # Fixes font artifacts.
 SCAJ-30002:
   name: "Wild ARMs - Alter Code F"
   region: "NTSC-J"
@@ -4162,6 +4179,9 @@ SCKA-20027:
   name: "Ghost in the Shell - Stand Alone Complex"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes texture and lighting misalignment.
+    mergeSprite: 1 # Fixes most vertical lines and lighting misalignment.
 SCKA-20028:
   name: "Ico [PlayStation2 Big Hit Series]"
   region: "NTSC-K"
@@ -5787,7 +5807,9 @@ SCPS-55901:
   name: "Xenosaga Episode I - Der Wille zur Macht"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Removes puppet lines shadows.
+    roundSprite: 2 # Fixes font artifacts.
   patches:
     A3D63039:
       content: |-
@@ -9131,7 +9153,7 @@ SLES-50545:
   name: "SSX Tricky"
   region: "PAL-M3"
   roundModes:
-    eeRoundMode: 0 # Fixes riders vanish into the floor
+    eeRoundMode: 0 # Fixes riders vanish into the floor.
 SLES-50546:
   name: "LMA Manager 2002"
   region: "PAL-E"
@@ -11332,9 +11354,13 @@ SLES-51668:
 SLES-51670:
   name: "Alter Echo"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes side borders.
 SLES-51671:
   name: "Alter Echo"
   region: "PAL-M5"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes side borders.
 SLES-51675:
   name: "Psyvariar - Complete Edition"
   region: "PAL-M4"
@@ -11891,8 +11917,9 @@ SLES-51917:
   roundModes:
     eeRoundMode: 0  # Fixes SPS with water in some places.
   gsHWFixes:
-    textureInsideRT: 1
-    autoFlush: 1
+    textureInsideRT: 1 # Fixes the shape of shadows.
+    autoFlush: 1 # Fixes water rendering.
+    halfPixelOffset: 3 # Fixes bloom misalignment, needs this harsh offset for autoflush.
 SLES-51918:
   name: "Prince of Persia - The Sands of Time"
   region: "PAL-M5"
@@ -14165,6 +14192,9 @@ SLES-53017:
 SLES-53020:
   name: "Ghost in the Shell - Stand Alone Complex"
   region: "PAL-M5"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes texture and lighting misalignment.
+    mergeSprite: 1 # Fixes most vertical lines and lighting misalignment.
   patches:
     BF6F101F:
       content: |-
@@ -16021,6 +16051,8 @@ SLES-53825:
   name: "Project Zero 3 - The Tormented"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces blurriness.
 SLES-53826:
   name: "Tom Clancy's Splinter Cell - Double Agent"
   region: "PAL-M5"
@@ -16710,6 +16742,8 @@ SLES-54164:
   name: "DragonBall Z Budokai - Tenkaichi 2"
   region: "PAL-M6"
   compat: 5
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLES-54165:
   name: "One Piece - Grand Adventure"
   region: "PAL-E"
@@ -17461,6 +17495,7 @@ SLES-54464:
   region: "PAL-E"
   compat: 5
   gsHWFixes:
+    roundSprite: 1 # Fixes HUD artifacts.
     wildArmsHack: 1 # Lessens the bloom misalignment but still an issue.
 SLES-54465:
   name: "CSI: 3 Dimensions of Murder"
@@ -19029,7 +19064,7 @@ SLES-55169:
   name: "Monster Lab"
   region: "PAL-M5"
   gsHWFixes:
-    cpuFramebufferConversion: 1
+    cpuFramebufferConversion: 1 # Fixes black with rainbow screen.
 SLES-55170:
   name: "Margot's Word Brain"
   region: "PAL-M5"
@@ -20080,7 +20115,9 @@ SLES-82034:
   name: "Xenosaga Episode II [Disc1of2]"
   region: "PAL-M3"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLES-82034"
     - "SCES-82034"
@@ -20088,7 +20125,9 @@ SLES-82035:
   name: "Xenosaga Episode II [Disc2of2]"
   region: "PAL-M3"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLES-82034"
     - "SCES-82034"
@@ -21331,7 +21370,9 @@ SLPM-61147:
   region: "NTSC-J"
   gsHWFixes:
     textureInsideRT: 1
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
+    roundSprite: 2 # Fixes font artifacts.
 SLPM-62001:
   name: "Drum Mania"
   region: "NTSC-J"
@@ -22973,6 +23014,7 @@ SLPM-62652:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
+    roundSprite: 1 # Fixes HUD artifacts.
     wildArmsHack: 1 # Lessens the bloom misalignment but still an issue.
 SLPM-62653:
   name: "Psikyo Shooting Collection Vol.1 - Strikers 1945 1&2 [Taito The Best]"
@@ -31606,7 +31648,7 @@ SLPS-25078:
   name: "SSX Tricky"
   region: "NTSC-J"
   roundModes:
-    eeRoundMode: 0 # Fixes riders vanish into the floor
+    eeRoundMode: 0 # Fixes riders vanish into the floor.
 SLPS-25079:
   name: "Madden NFL 2002"
   region: "NTSC-J"
@@ -32471,7 +32513,9 @@ SLPS-25366:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Premium Box] [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -32483,7 +32527,9 @@ SLPS-25367:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Premium Box] [Disc2of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -32495,7 +32541,9 @@ SLPS-25368:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters: # Allows import of Xenosaga I, Xenosaga I Reloaded, and Xenosaga Freaks data.
     - "SLPS-29001"
     - "SLPS-29002"
@@ -32507,7 +32555,9 @@ SLPS-25369:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [Disc2of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -32611,6 +32661,8 @@ SLPS-25400:
   name: "Tales of Symphonia"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-25401:
   name: "Magna Carta"
   region: "NTSC-J"
@@ -33443,7 +33495,9 @@ SLPS-25640:
   compat: 5
   gsHWFixes:
     textureInsideRT: 1
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters: # Allows import of Xenosaga II save data.
     - "SLPS-25640"
     - "SLPS-25368"
@@ -33453,7 +33507,9 @@ SLPS-25641:
   compat: 5
   gsHWFixes:
     textureInsideRT: 1
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-25640"
     - "SLPS-25368"
@@ -34615,6 +34671,8 @@ SLPS-73216:
 SLPS-73217:
   name: "Tales of Symphonia [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-73218:
   name: "Ace Combat 5 - The Unsung War [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -34647,7 +34705,9 @@ SLPS-73224:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [PlayStation 2 The Best] [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -34659,7 +34719,9 @@ SLPS-73225:
   name: "Xenosaga Episode II - Jenseits von Gut und Bose [PlayStation 2 The Best] [Disc2of2]"
   region: "NTSC-J"
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes shadows in cutscenes.
+    halfPixelOffset: 2 # Fixes lighting misalignment and shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLPS-29001"
     - "SLPS-29002"
@@ -34899,6 +34961,8 @@ SLPS-73404:
 SLPS-73405:
   name: "Zero [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces blurriness.
 SLPS-73406:
   name: "Dead or Alive 2 - Hardcore [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -36210,7 +36274,7 @@ SLUS-20326:
   region: "NTSC-U"
   compat: 5
   roundModes:
-    eeRoundMode: 0 # Fixes riders vanish into the floor
+    eeRoundMode: 0 # Fixes riders vanish into the floor.
 SLUS-20327:
   name: "Aggressive Inline"
   region: "NTSC-U"
@@ -36817,6 +36881,8 @@ SLUS-20465:
   name: "Alter Echo"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes side borders.
 SLUS-20466:
   name: "Gravenville - Ghost Master"
   region: "NTSC-U"
@@ -38129,8 +38195,9 @@ SLUS-20763:
   roundModes:
     eeRoundMode: 0  # Fixes SPS with water in some places.
   gsHWFixes:
-    textureInsideRT: 1
-    autoFlush: 1
+    textureInsideRT: 1 # Fixes the shape of shadows.
+    autoFlush: 1 # Fixes water rendering.
+    halfPixelOffset: 3 # Fixes bloom misalignment, needs this harsh offset for autoflush.
 SLUS-20764:
   name: "Bombastic"
   region: "NTSC-U"
@@ -39225,6 +39292,9 @@ SLUS-21006:
   name: "Ghost in the Shell - Stand Alone Complex"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes texture and lighting misalignment.
+    mergeSprite: 1 # Fixes most vertical lines and lighting misalignment.
   patches:
     default:
       content: |-
@@ -40379,6 +40449,8 @@ SLUS-21244:
   name: "Fatal Frame 3 - The Tormented"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces blurriness.
 SLUS-21245:
   name: "Suikoden Tactics"
   region: "NTSC-U"
@@ -41387,6 +41459,8 @@ SLUS-21441:
   name: "Dragon Ball Z - Budokai Tenkaichi 2"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLUS-21442:
   name: "Super Dragon Ball Z"
   region: "NTSC-U"
@@ -43021,7 +43095,7 @@ SLUS-21838:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    cpuFramebufferConversion: 1
+    cpuFramebufferConversion: 1 # Fixes black with rainbow screen.
 SLUS-21839:
   name: "Ski and Shoot"
   region: "NTSC-U"
@@ -43792,6 +43866,8 @@ SLUS-29055:
 SLUS-29056:
   name: "Alter Echo [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes side borders.
 SLUS-29057:
   name: "Sphinx and the Shadow of Set [Demo]"
   region: "NTSC-U"
@@ -43864,8 +43940,9 @@ SLUS-29082:
   roundModes:
     eeRoundMode: 0  # Fixes SPS with water in some places.
   gsHWFixes:
-    textureInsideRT: 1
-    autoFlush: 1
+    textureInsideRT: 1 # Fixes the shape of shadows.
+    autoFlush: 1 # Fixes water rendering.
+    halfPixelOffset: 3 # Fixes bloom misalignment, needs this harsh offset for autoflush.
 SLUS-29083:
   name: "Maximo vs. The Army of Zin [Demo]"
   region: "NTSC-U"
@@ -43953,6 +44030,9 @@ SLUS-29118:
 SLUS-29123:
   name: "Ghost in the Shell - Stand Alone Complex [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes texture and lighting misalignment.
+    mergeSprite: 1 # Fixes most vertical lines and lighting misalignment.
 SLUS-29124:
   name: "Fight Club [Demo]"
   region: "NTSC-U"

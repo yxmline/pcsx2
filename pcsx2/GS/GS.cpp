@@ -147,6 +147,9 @@ void GSclose()
 		g_gs_device.reset();
 	}
 
+	if (HostDisplay* display = Host::GetHostDisplay(); display)
+		display->SetGPUTimingEnabled(false);
+
 	Host::ReleaseHostDisplay();
 }
 
@@ -238,6 +241,7 @@ static bool DoGSOpen(GSRendererType renderer, u8* basemem)
 	s_gs->SetRegsMem(basemem);
 
 	display->SetVSync(EmuConfig.GetEffectiveVsyncMode());
+	display->SetGPUTimingEnabled(GSConfig.OsdShowGPU);
 	return true;
 }
 
@@ -657,21 +661,16 @@ void GSgetStats(std::string& info)
 
 	if (GSConfig.Renderer == GSRendererType::SW)
 	{
-		float sum = 0.0f;
-		for (int i = GSPerfMon::WorkerDraw0; i < GSPerfMon::TimerLast; i++)
-			sum += pm.GetTimer(static_cast<GSPerfMon::timer_t>(i));
-
 		const double fps = GetVerticalFrequency();
 		const double fillrate = pm.Get(GSPerfMon::Fillrate);
-		info = format("%s SW | %d S | %d P | %d D | %.2f U | %.2f D | %.2f mpps | %d%% WCPU",
+		info = format("%s SW | %d S | %d P | %d D | %.2f U | %.2f D | %.2f mpps",
 			api_name,
 			(int)pm.Get(GSPerfMon::SyncPoint),
 			(int)pm.Get(GSPerfMon::Prim),
 			(int)pm.Get(GSPerfMon::Draw),
 			pm.Get(GSPerfMon::Swizzle) / 1024,
 			pm.Get(GSPerfMon::Unswizzle) / 1024,
-			fps * fillrate / (1024 * 1024),
-			static_cast<int>(std::lround(sum)));
+			fps * fillrate / (1024 * 1024));
 	}
 	else if (GSConfig.Renderer == GSRendererType::Null)
 	{
@@ -824,6 +823,12 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 		GSConfig.DumpReplaceableTextures != old_config.DumpReplaceableTextures)
 	{
 		s_gs->PurgeTextureCache();
+	}
+
+	if (GSConfig.OsdShowGPU != old_config.OsdShowGPU)
+	{
+		if (HostDisplay* display = Host::GetHostDisplay(); display)
+			display->SetGPUTimingEnabled(GSConfig.OsdShowGPU);
 	}
 }
 
@@ -1330,6 +1335,7 @@ void GSApp::Init()
 	m_default_configuration["OsdShowSpeed"]                               = "0";
 	m_default_configuration["OsdShowFPS"]                                 = "0";
 	m_default_configuration["OsdShowCPU"]                                 = "0";
+	m_default_configuration["OsdShowGPU"]                                 = "0";
 	m_default_configuration["OsdShowResolution"]                          = "0";
 	m_default_configuration["OsdShowGSStats"]                             = "0";
 	m_default_configuration["OsdShowIndicators"]                          = "1";
