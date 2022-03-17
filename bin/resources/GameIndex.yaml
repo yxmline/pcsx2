@@ -333,6 +333,8 @@ SCAJ-20023:
   region: "NTSC-Unk"
   clampModes:
     vuClampMode: 2  # Respawn issues, SPS.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCAJ-20024:
   name: ".hack//Quarantine Part 4"
   region: "NTSC-Unk"
@@ -636,6 +638,8 @@ SCAJ-20104:
   region: "NTSC-Unk"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SCAJ-20105:
   name: "Armored Core - Nine breaker"
   region: "NTSC-Unk"
@@ -791,6 +795,8 @@ SCAJ-20136:
   region: "NTSC-Unk"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SCAJ-20137:
   name: "Musashiden II - Blademaster"
   region: "NTSC-Unk"
@@ -889,6 +895,8 @@ SCAJ-20159:
   region: "NTSC-Ch-E-J"
   gameFixes:
     - EETimingHack # Fixes bad colours on character select when in Progressive Scan.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCAJ-20160:
   name: "Yoshitsuneki"
   region: "NTSC-Unk"
@@ -946,6 +954,8 @@ SCAJ-20173:
   region: "NTSC-Unk"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -1013,7 +1023,8 @@ SCAJ-20190:
   name: "God of War II"
   region: "NTSC-Unk"
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCAJ-20191:
   name: "Super Robot Taisen OG - Original Generations Gaiden [Limited Edition]"
   region: "NTSC-Unk"
@@ -1168,7 +1179,8 @@ SCAJ-30011:
   name: "God of War II"
   region: "NTSC-E"
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCCS-40001:
   name: "Ape Escape 2"
   region: "NTSC-C"
@@ -2332,6 +2344,10 @@ SCES-50410:
   name: "Ace Combat - Distant Thunder"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SCES-50411:
   name: "Vampire Night"
   region: "PAL-M5"
@@ -2773,6 +2789,8 @@ SCES-51618:
 SCES-51635:
   name: "Brave - The Search for Spirit Dancer"
   region: "PAL-M5"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes lighting/shadows.
 SCES-51648:
   name: "Everquest - Online Adventures"
   region: "PAL-E-I"
@@ -2954,6 +2972,10 @@ SCES-52424:
   name: "Ace Combat - Squadron Leader"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   patches:
     1D54FEA9:
       content: |-
@@ -3217,6 +3239,8 @@ SCES-53312:
   compat: 5
   roundModes:
     vuRoundMode: 3
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCES-53315:
   name: "EyeToy - Play 3"
   region: "PAL-M12"
@@ -3259,6 +3283,8 @@ SCES-53409:
     vuRoundMode: 0  # Fixes game engine issue with bombs and ladders.
   clampModes:
     vuClampMode: 2  # Fixes bugged camera.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCES-53422:
   name: "Stuart Little 3 - Big Photo Adventure"
   region: "PAL-M9"
@@ -3418,6 +3444,10 @@ SCES-54025:
 SCES-54041:
   name: "Ace Combat - The Belkan War"
   region: "PAL-M5"
+  gsHWFixes:
+    mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   memcardFilters: # Reads AC4 and 5 saves for bonus unlockables.
     - "SCES-54041"
     - "SCES-50410"
@@ -3479,7 +3509,8 @@ SCES-54206:
   region: "PAL-M6"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCES-54219:
   name: "Buzz! Junior - Jungle Party"
   region: "PAL-M7"
@@ -4088,6 +4119,8 @@ SCKA-20016:
   compat: 5
   clampModes:
     vuClampMode: 2  # Respawn issues, Fixes SPS.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCKA-20018:
   name: "The Getaway"
   region: "NTSC-K"
@@ -4264,6 +4297,8 @@ SCKA-20059:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes bad colours on character select when in Progressive Scan.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SCKA-20060:
   name: "Ratchet - Deadlocked"
   region: "NTSC-K"
@@ -4306,6 +4341,8 @@ SCKA-20070:
   region: "NTSC-K"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   patches:
     2799A4E5:
       content: |-
@@ -4434,7 +4471,8 @@ SCKA-30006:
   region: "NTSC-K"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCPM-85101:
   name: "McDonald's Original Happy Disc"
   region: "NTSC-J"
@@ -6523,6 +6561,8 @@ SCUS-97316:
   name: "Sly 2 - Band of Thieves"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97317:
   name: "NFL GameDay 2004 [Demo]"
   region: "NTSC-U"
@@ -6834,6 +6874,8 @@ SCUS-97414:
 SCUS-97415:
   name: "Sly 2 - Band of Thieves [E3 Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97416:
   name: "Rise of the Kasai"
   region: "NTSC-U"
@@ -6976,6 +7018,8 @@ SCUS-97456:
 SCUS-97457:
   name: "Sly 2 - Band of Thieves [Retail Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97460:
   name: "MLB 2006 [Demo]"
   region: "NTSC-U"
@@ -6994,6 +7038,8 @@ SCUS-97464:
     vuRoundMode: 0  # Fixes game engine issue with bombs and ladders.
   clampModes:
     vuClampMode: 2  # Fixes bugged camera.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97465:
   name: "Ratchet - Deadlocked"
   region: "NTSC-U"
@@ -7076,12 +7122,14 @@ SCUS-97481:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCUS-97482:
   name: "God of War II - The Colossus Battle [Demo]"
   region: "NTSC-U"
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SCUS-97483:
   name: "Gran Turismo 4 MX-5 Edition [Demo]"
   region: "NTSC-U"
@@ -7096,6 +7144,8 @@ SCUS-97484:
     vuRoundMode: 0  # Fixes game engine issue with bombs and ladders.
   clampModes:
     vuClampMode: 2  # Fixes bugged camera.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97485:
   name: "Ratchet - Deadlocked [Regular Demo]"
   region: "NTSC-U"
@@ -7253,6 +7303,8 @@ SCUS-97518:
 SCUS-97519:
   name: "Sly 2 - Band of Thieves [Greatest Hits]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97520:
   name: "Syphon Filter - The Omega Strain [Greatest Hits]"
   region: "NTSC-U"
@@ -7266,6 +7318,8 @@ SCUS-97527:
     vuRoundMode: 0  # Fixes game engine issue with bombs and ladders.
   clampModes:
     vuClampMode: 2  # Fixes bugged camera.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCUS-97528:
   name: "PlayStation Underground Demo Disc - Holiday 2005 [T-Rated]"
   region: "NTSC-U"
@@ -7670,6 +7724,8 @@ SLAJ-25068:
 SLAJ-25072:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-Unk"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLAJ-25073:
   name: "Resident Evil 4"
   region: "NTSC-Unk"
@@ -7816,6 +7872,8 @@ SLED-51342:
 SLED-51901:
   name: "Soul Calibur II [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLED-52375:
   name: "Fight Night 2004 [Demo]"
   region: "PAL-E"
@@ -7900,6 +7958,8 @@ SLED-53745:
 SLED-53845:
   name: "Matrix, The - Path of Neo [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLED-53937:
   name: "Black [Demo]"
   region: "PAL-M5"
@@ -10749,10 +10809,14 @@ SLES-51347:
   name: "Die Hard - Vendetta"
   region: "PAL-M4"
   compat: 5
+  gsHWFixes:
+    mipmap: 1 # Reduces noisey textures.
 SLES-51348:
   name: "Die Hard - Vendetta"
   region: "PAL-E-G"
   compat: 5
+  gsHWFixes:
+    mipmap: 1 # Reduces noisey textures.
 SLES-51349:
   name: "Evolution Skateboarding"
   region: "PAL-M3"
@@ -11002,6 +11066,8 @@ SLES-51473:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes smoke effects.
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes fog misalignment.
 SLES-51474:
   name: "Blood Rayne"
   region: "PAL-M4"
@@ -11504,6 +11570,8 @@ SLES-51799:
   compat: 5
   clampModes:
     vuClampMode: 2  # Respawn issues, Fixes SPS.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLES-51800:
   name: "Smash Cars Racing"
   region: "PAL-M5"
@@ -13747,6 +13815,9 @@ SLES-52882:
   name: "Stolen"
   region: "PAL-M5"
   compat: 4
+  gsHWFixes:
+    fastTextureInvalidation: 1 # Improves performance.
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-52884:
   name: "Duel Masters"
   region: "PAL-M5"
@@ -14980,6 +15051,8 @@ SLES-53461:
 SLES-53462:
   name: "Matrix, The - Path of Neo"
   region: "PAL-M5"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53463:
   name: "NHL '06"
   region: "PAL-E"
@@ -15640,30 +15713,46 @@ SLES-53705:
   name: "King Kong, Peter Jackson's - The Official Game of the Movie"
   region: "PAL-PL-E"
 SLES-53706:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53707:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53708:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53709:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-DU-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53710:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-S"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53712:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-M3"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53713:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-PL"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53715:
-  name: "Disney's The Chronicles of Narnia - The Lion, The Witch, and The Wardrobe"
+  name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "PAL-R"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLES-53716:
   name: "Without Warning"
   region: "PAL-M5"
@@ -15796,6 +15885,8 @@ SLES-53758:
 SLES-53759:
   name: "Matrix, The - Path of Neo"
   region: "PAL-M5"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53760:
   name: "Rugby Challenge 2006"
   region: "PAL-M5"
@@ -15872,6 +15963,8 @@ SLES-53799:
   name: "Matrix, The - Path of Neo"
   region: "PAL-M4"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53800:
   name: "Rampage - Total Destruction"
   region: "PAL-M5"
@@ -15957,6 +16050,8 @@ SLES-53829:
 SLES-53830:
   name: "Psychonauts"
   region: "PAL-M3"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom.
 SLES-53831:
   name: "BloodRayne 2"
   region: "PAL-M5"
@@ -16676,21 +16771,24 @@ SLES-54182:
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLES-54183:
   name: "Scarface - The World is Yours"
   region: "PAL-G"
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLES-54184:
   name: "Scarface - The World is Yours"
   region: "PAL-R"
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLES-54185:
   name: "Dirge of Cerberus - Final Fantasy VII"
   region: "PAL-M5"
@@ -16890,7 +16988,8 @@ SLES-54271:
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLES-54305:
   name: "Demon Chaos"
   region: "PAL-M5"
@@ -16929,6 +17028,8 @@ SLES-54317:
   name: "Ghost Rider"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    mergeSprite: 1 # Fixes alignment on fire effects.
 SLES-54319:
   name: "Biker Mice from Mars"
   region: "PAL-M5"
@@ -17309,6 +17410,8 @@ SLES-54454:
 SLES-54455:
   name: "Thrillville"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom effects.
 SLES-54456:
   name: "Beverly Hills Cop"
   region: "PAL-M11"
@@ -17455,9 +17558,13 @@ SLES-54513:
 SLES-54516:
   name: "Thrillville"
   region: "PAL-F-G"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom effects.
 SLES-54517:
   name: "Thrillville"
   region: "PAL-M3"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom effects.
 SLES-54518:
   name: "Clumsy Shumsy"
   region: "PAL-E"
@@ -17479,7 +17586,8 @@ SLES-54534:
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLES-54536:
   name: "Big Idea's VeggieTales - LarryBoy and the Bad Apple"
   region: "PAL-I"
@@ -18096,9 +18204,13 @@ SLES-54805:
 SLES-54806:
   name: "Thrillville - Off the Rails"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-54807:
   name: "Thrillville - Off the Rails"
   region: "PAL-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-54809:
   name: "Charlotte's Web"
   region: "PAL-A"
@@ -18302,6 +18414,8 @@ SLES-54886:
 SLES-54887:
   name: "Thrillville - Verrückte Achterbahn"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-54888:
   name: "Pro Biker 2"
   region: "PAL-E"
@@ -18351,13 +18465,19 @@ SLES-54904:
   name: "Simpsons Game, The"
   region: "PAL-M4"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces misaligned cel shading but still an issue compared to native.
 SLES-54905:
   name: "Simpsons Game, The"
   region: "PAL-F"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces misaligned cel shading but still an issue compared to native.
 SLES-54906:
   name: "Simpsons Game, The"
   region: "PAL-I-S"
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces misaligned cel shading but still an issue compared to native.
 SLES-54913:
   name: "Pro Evolution Soccer 2008"
   region: "PAL-E-S"
@@ -18615,9 +18735,13 @@ SLES-55008:
 SLES-55010:
   name: "Thrillville - Fuori dai Binari"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-55011:
   name: "Thrillville - Fuera de Control"
   region: "PAL-S"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLES-55012:
   name: "Golden Compass, The"
   region: "PAL-M5"
@@ -18654,6 +18778,8 @@ SLES-55019:
 SLES-55020:
   name: "Die Simpsons - Das Spiel"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces misaligned cel shading but still an issue compared to native.
 SLES-55021:
   name: "Pro Evolution Soccer 2008"
   region: "PAL-F-G"
@@ -19657,6 +19783,8 @@ SLES-55565:
 SLES-55569:
   name: "Silent Hill - Shattered Memories"
   region: "PAL-M5"
+  gsHWFixes:
+    fastTextureInvalidation: 1 # Fixes missing graphics.
 SLES-55571:
   name: "Ghostbusters"
   region: "PAL-M6"
@@ -19871,6 +19999,8 @@ SLES-82009:
   compat: 5
   gameFixes:
     - DMABusyHack # Fixes broken half-bottom artifacts.
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLES-82010:
   name: "Metal Gear Solid 2, Document of"
   region: "PAL-E"
@@ -20029,53 +20159,77 @@ SLES-82039:
 SLES-82042:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of3]"
   region: "PAL-E-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLES-82043:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of3]"
   region: "PAL-E-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82042"
 SLES-82044:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of3]"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLES-82045:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of3]"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82044"
 SLES-82046:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of3]"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLES-82047:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of3]"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82046"
 SLES-82048:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of3]"
   region: "PAL-S"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLES-82049:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of3]"
   region: "PAL-S"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82048"
 SLES-82050:
   name: "Metal Gear Solid 3 - Subsistence [Disc3of3]"
   region: "PAL-E-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82042"
 SLES-82051:
   name: "Metal Gear Solid 3 - Subsistence [Disc3of3]"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82044"
 SLES-82052:
   name: "Metal Gear Solid 3 - Subsistence [Disc3of3]"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82046"
 SLES-82053:
   name: "Metal Gear Solid 3 - Subsistence [Disc3of3]"
   region: "PAL-S"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLES-82048"
 SLKA-15003:
@@ -20703,10 +20857,14 @@ SLKA-25353:
   name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc1of2]"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLKA-25354:
   name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc2of2]"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLKA-25353"
 SLKA-25359:
@@ -20797,6 +20955,8 @@ SLKA-35001:
   compat: 5
   gameFixes:
     - DMABusyHack # Fixes broken half-bottom artifacts.
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLKA-35003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-K"
@@ -21159,6 +21319,8 @@ SLPM-61133:
   region: "NTSC-J"
   gameFixes:
     - EETimingHack # Fixes bad colours on character select when in Progressive Scan.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLPM-61135:
   name: "Naruto - Narutimett Hero 3 [Trial Version]"
   region: "NTSC-J"
@@ -26686,6 +26848,8 @@ SLPM-66116:
 SLPM-66117:
   name: "Metal Gear Solid 3 - Subsistence [with Headset]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLPM-66122:
   name: "Kingdom Hearts [Ultimate Hits]"
   region: "NTSC-J"
@@ -26876,6 +27040,8 @@ SLPM-66176:
 SLPM-66177:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLPM-66178:
   name: "pop'n music 7 [Konami The Best]"
   region: "NTSC-J"
@@ -27013,26 +27179,36 @@ SLPM-66219:
 SLPM-66220:
   name: "Metal Gear Solid 3 - Subsistence [First Print Limited Edition] [Disc1of3]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66221:
   name: "Metal Gear Solid 3 - Subsistence [First Print Limited Edition] [Disc2of3]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66222:
   name: "Metal Gear Solid 3 - Subsistence [First Print Limited Edition] [Disc3of3]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66223:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of2]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66224:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of2]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66225:
@@ -29575,6 +29751,8 @@ SLPM-67002:
   region: "NTSC-J"
   gameFixes:
     - DMABusyHack # Fixes broken half-bottom artifacts.
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLPM-67003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-J"
@@ -29596,6 +29774,8 @@ SLPM-67007:
 SLPM-67008:
   name: "Metal Gear Solid 2 - Substance [Konami Dendou Collection]"
   region: "NTSC-J"
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLPM-67009:
   name: "Sakura Taisen V - Saraba Itoshiki Hito Yo"
   region: "NTSC-J"
@@ -29624,7 +29804,8 @@ SLPM-67013:
   name: "God of War II - The End Begins"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 2
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    roundSprite: 1 # Fixes chromatic effect.
 SLPM-67014:
   name: "SengokuMusou 2 Mushouden"
   region: "NTSC-J"
@@ -31340,6 +31521,8 @@ SLPS-25052:
   compat: 5
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-25053:
   name: "Eikan wa Kimi ni - Koushien no Hasha"
   region: "NTSC-J"
@@ -31871,6 +32054,8 @@ SLPS-25230:
   compat: 5
   clampModes:
     vuClampMode: 2  # Respawn issues, Fixes SPS.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-25231:
   name: "Myst III - Exile"
   region: "NTSC-J"
@@ -32491,6 +32676,8 @@ SLPS-25418:
   compat: 5
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   patches:
     86089F31:
       content: |-
@@ -33034,6 +33221,8 @@ SLPS-25577:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes bad colours on character select when in Progressive Scan.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-25578:
   name: "K-1 World Grand Prix 2005"
   region: "NTSC-J"
@@ -33187,6 +33376,8 @@ SLPS-25624:
 SLPS-25626:
   name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLPS-25627:
   name: "Mobile Suit Gundam Climax U.C."
   region: "NTSC-J"
@@ -33198,6 +33389,8 @@ SLPS-25629:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -34382,6 +34575,8 @@ SLPS-73205:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-73206:
   name: "Super Robot Taisen Alpha 2nd [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -34425,6 +34620,8 @@ SLPS-73218:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-73219:
   name: "Tales of Destiny 2 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -34622,6 +34819,8 @@ SLPS-73250:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -34712,6 +34911,8 @@ SLPS-73410:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
 SLPS-73411:
   name: "Armored Core 2 - Another Age [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -35278,6 +35479,8 @@ SLUS-20152:
   compat: 5
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   patches:
     A32F7CD0:
       content: |-
@@ -36516,6 +36719,8 @@ SLUS-20440:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes smoke effects.
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes fog misalignment.
 SLUS-20441:
   name: "NASCAR - Dirt to Daytona"
   region: "NTSC-U"
@@ -36999,6 +37204,8 @@ SLUS-20554:
   compat: 5
   gameFixes:
     - DMABusyHack # Fixes broken half-bottom artifacts.
+  gsHWFixes:
+    roundSprite: 2 # Fixes font artifacts.
 SLUS-20555:
   name: "Reel Fishing 3"
   region: "NTSC-U"
@@ -37394,10 +37601,14 @@ SLUS-20643:
   compat: 5
   clampModes:
     vuClampMode: 2  # Respawn issues, Fixes SPS.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLUS-20643BD:
   name: "Namco Transmission Demo Disc v1.03 [Soul Calibur II Pack-In]"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLUS-20644:
   name: "Armored Core - Silent Line"
   region: "NTSC-U"
@@ -38247,6 +38458,8 @@ SLUS-20851:
   compat: 5
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes font and HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   patches:
     39B574F0:
       content: |-
@@ -39387,6 +39600,8 @@ SLUS-21082:
   name: "Chronicles of Narnia, The - The Lion, The Witch and The Wardrobe"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lighting misalignment.
 SLUS-21083:
   name: "LEGO Star Wars: The Video Game"
   region: "NTSC-U"
@@ -39447,6 +39662,9 @@ SLUS-21099:
   name: "Stolen"
   region: "NTSC-U"
   compat: 4
+  gsHWFixes:
+    fastTextureInvalidation: 1 # Improves performance.
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLUS-21100:
   name: "NCAA March Madness 2005"
   region: "NTSC-U"
@@ -39510,7 +39728,8 @@ SLUS-21111:
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLUS-21112:
   name: "L.A. Rush"
   region: "NTSC-U"
@@ -39550,6 +39769,8 @@ SLUS-21120:
   name: "Psychonauts"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom.
 SLUS-21122:
   name: "Taito Legends"
   region: "NTSC-U"
@@ -39573,6 +39794,8 @@ SLUS-21127:
   name: "Brave - The Search for Spirit Dancer"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes lighting/shadows.
 SLUS-21128:
   name: "Blitz - The League"
   region: "NTSC-U"
@@ -39992,6 +40215,8 @@ SLUS-21216:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes bad colours on character select when in Progressive Scan.
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLUS-21217:
   name: "Incredibles, The - Rise of the Underminers"
   region: "NTSC-U"
@@ -40146,6 +40371,8 @@ SLUS-21243:
   name: "Metal Gear Solid 3 - Subsistence [Disc2of3]"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21244:
@@ -40298,6 +40525,8 @@ SLUS-21273:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fix effects upscaling.
 SLUS-21274:
   name: "OutRun 2006: Coast 2 Coast"
   region: "NTSC-U"
@@ -40440,6 +40669,8 @@ SLUS-21306:
   name: "Ghost Rider"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    mergeSprite: 1 # Fixes alignment on fire effects.
 SLUS-21307:
   name: "Ice Age 2 - The Meltdown"
   region: "NTSC-U"
@@ -40637,6 +40868,8 @@ SLUS-21346:
   compat: 5
   gsHWFixes:
     mipmap: 1
+    roundSprite: 2 # Fixes HUD artifacts.
+    alignSprite: 1 # Fixes vertical lines.
   memcardFilters:
     - "SLUS-21346"
     - "SLUS-20152"
@@ -40715,9 +40948,13 @@ SLUS-21359:
   name: "Metal Gear Solid 3 - Subsistence [Disc1of3]"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLUS-21360:
   name: "Metal Gear Solid 3 - Subsistence [Disc3of3]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21361:
@@ -40838,6 +41075,8 @@ SLUS-21380:
   compat: 5
   clampModes:
     vuClampMode: 3
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes fog line.
   patches:
     213DCAC9:
       content: |-
@@ -40991,6 +41230,8 @@ SLUS-21413:
   name: "Thrillville"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes misaligned bloom effects.
 SLUS-21414:
   name: "Delta Force: Black Hawk Down - Team Sabre"
   region: "NTSC-U"
@@ -41406,7 +41647,8 @@ SLUS-21492:
   gameFixes:
     - IbitHack
   gsHWFixes:
-    autoFlush: 1
+    autoFlush: 1 # Fixes post processing overlay.
+    roundSprite: 1 # Greatly reduces chromatic effect when upscaling.
 SLUS-21493:
   name: "Need for Speed - Carbon"
   region: "NTSC-U"
@@ -41791,6 +42033,8 @@ SLUS-21611:
   name: "Thrillville - Off the Rails"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom effects.
 SLUS-21612:
   name: "Legend of the Dragon"
   region: "NTSC-U"
@@ -42033,6 +42277,8 @@ SLUS-21665:
   name: "Simpsons Game, The"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Reduces misaligned cel shading but still an issue compared to native.
 SLUS-21666:
   name: "Mountain Bike Adrenaline"
   region: "NTSC-U"
@@ -43012,6 +43258,8 @@ SLUS-21899:
   name: "Silent Hill - Shattered Memories"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    fastTextureInvalidation: 1 # Fixes missing graphics.
 SLUS-21900:
   name: "Scooby-Doo! First Frights"
   region: "NTSC-U"
@@ -43316,6 +43564,10 @@ SLUS-28034:
 SLUS-28037:
   name: "Kya - Dark Lineage [Trade Demo]"
   region: "NTSC-U"
+  gameFixes:
+    - EETimingHack # Fixes smoke effects.
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes fog misalignment.
 SLUS-28039:
   name: "Rogue Ops [Trade Demo]"
   region: "NTSC-U"
@@ -43546,6 +43798,8 @@ SLUS-29057:
 SLUS-29058:
   name: "Soul Calibur II [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
 SLUS-29059:
   name: "Hunter the Reckoning - Wayward [Demo]"
   region: "NTSC-U"
@@ -44090,3 +44344,5 @@ TLES-54240:
 TLES-82043:
   name: "Metal Gear Solid Subsistence Beta Trial Code"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
