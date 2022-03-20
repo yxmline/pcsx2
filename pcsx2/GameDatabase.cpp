@@ -218,7 +218,7 @@ void GameDatabase::parseAndInsert(const std::string_view& serial, const c4::yml:
 			std::optional<s32> value = n.has_val() ? StringUtil::FromChars<s32>(std::string_view(n.val().data(), n.val().size())) : 1;
 			if (!id.has_value() || !value.has_value())
 			{
-				Console.Error("[GameDB] Invalid GS HW Fix: '%*s' specified for serial '%*s'. Dropping!",
+				Console.Error("[GameDB] Invalid GS HW Fix: '%.*s' specified for serial '%.*s'. Dropping!",
 					static_cast<int>(id_name.size()), id_name.data(),
 					static_cast<int>(serial.size()), serial.data());
 				continue;
@@ -465,15 +465,14 @@ void GameDatabase::initDatabase()
 	});
 	try
 	{
-		std::optional<std::vector<u8>> buf(Host::ReadResourceFile(GAMEDB_YAML_FILE_NAME));
+		auto buf = Host::ReadResourceFileToString(GAMEDB_YAML_FILE_NAME);
 		if (!buf.has_value())
 		{
 			Console.Error("[GameDB] Unable to open GameDB file, file does not exist.");
 			return;
 		}
 
-		const ryml::substr view = c4::basic_substring<char>(reinterpret_cast<char*>(buf->data()), buf->size());
-		ryml::Tree tree = ryml::parse(view);
+		ryml::Tree tree = ryml::parse_in_arena(c4::to_csubstr(buf.value()));
 		ryml::NodeRef root = tree.rootref();
 
 		for (const ryml::NodeRef& n : root.children())

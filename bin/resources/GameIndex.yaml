@@ -1134,6 +1134,8 @@ SCAJ-30001:
 SCAJ-30002:
   name: "Wild ARMs - Alter Code F"
   region: "NTSC-J"
+  gsHWFixes:
+    wildArmsHack: 1 # Fixes bugged lines in text in resolutions above native.
 SCAJ-30003:
   name: "Siren"
   region: "NTSC-Unk"
@@ -2324,7 +2326,6 @@ SCES-50295:
   compat: 5
   gsHWFixes:
     mipmap: 1
-  gsHWFixes:
     halfPixelOffset: 2 # Distance is less blurry, game has reduced LOD so it will still look blurry.
     trilinearFiltering: 2 # Remove blurriness in font and models.
 SCES-50300:
@@ -4665,7 +4666,6 @@ SCPS-15004:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
-  gsHWFixes:
     halfPixelOffset: 2 # Distance is less blurry, game has reduced LOD so it will still look blurry.
     trilinearFiltering: 2 # Remove blurriness in font and models.
 SCPS-15005:
@@ -5232,6 +5232,8 @@ SCPS-17001:
 SCPS-17002:
   name: "Wild ARMs - Alter Code F"
   region: "NTSC-J"
+  gsHWFixes:
+    wildArmsHack: 1 # Fixes bugged lines in text in resolutions above native.
 SCPS-17008:
   name: "Nike - Gran Turismo [Limited Edition - 8 inch]"
   region: "NTSC-J"
@@ -5252,7 +5254,7 @@ SCPS-17013:
     roundSprite: 1 # Fix minimap and field menu.
     preloadFrameData: 1 # Fixes corrupt textures especially on water.
     trilinearFiltering: 2 # Remove blurriness in font and models.
-    disablePartialInvalidation: 1 # Prevents UI and subtitles from disappearing. 
+    disablePartialInvalidation: 1 # Prevents UI and subtitles from disappearing.
   patches:
     CDEE4B19:
       content: |-
@@ -5309,7 +5311,6 @@ SCPS-19203:
   region: "NTSC-J"
   gsHWFixes:
     mipmap: 1
-  gsHWFixes:
     halfPixelOffset: 2 # Distance is less blurry, game has reduced LOD so it will still look blurry.
     trilinearFiltering: 2 # Remove blurriness in font and models..
 SCPS-19204:
@@ -5363,6 +5364,8 @@ SCPS-19215:
 SCPS-19251:
   name: "Wild ARMs - Alter Code F [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    wildArmsHack: 1 # Fixes bugged lines in text in resolutions above native.
 SCPS-19252:
   name: "Gran Turismo 4 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -5384,6 +5387,8 @@ SCPS-19252:
 SCPS-19253:
   name: "Wild ARMs - Alter Code F [PlayStation 2 The Best - Reprint]"
   region: "NTSC-J"
+  gsHWFixes:
+    wildArmsHack: 1 # Fixes bugged lines in text in resolutions above native.
 SCPS-19301:
   name: "Minna no Golf 4 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -5967,7 +5972,6 @@ SCUS-97111:
   compat: 5
   gsHWFixes:
     mipmap: 1
-  gsHWFixes:
     halfPixelOffset: 2 # Distance is less blurry, game has reduced LOD so it will still look blurry.
     trilinearFiltering: 2 # Remove blurriness in font and models.
 SCUS-97112:
@@ -6126,7 +6130,6 @@ SCUS-97152:
   region: "NTSC-U"
   gsHWFixes:
     mipmap: 1
-  gsHWFixes:
     halfPixelOffset: 2 # Distance is less blurry, game has reduced LOD so it will still look blurry.
     trilinearFiltering: 2 # Remove blurriness in font and models.
 SCUS-97153:
@@ -12150,6 +12153,9 @@ SLES-52008:
 SLES-52011:
   name: "Tak and The Power of Juju"
   region: "PAL-E"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-52015:
   name: "Les Chevaliers de Baphomet"
   region: "PAL-F"
@@ -12294,9 +12300,15 @@ SLES-52102:
 SLES-52103:
   name: "Tak & Le Pouvoir de Juju"
   region: "PAL-F"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-52104:
   name: "Tak and the Power of JuJu"
   region: "PAL-G"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-52106:
   name: "Cabela's Dangerous Hunts"
   region: "PAL-E"
@@ -12614,11 +12626,17 @@ SLES-52284:
   name: "Deadly Skies II"
   region: "PAL-M5"
 SLES-52286:
-  name: "Tak and The Poer of JuJu"
+  name: "Tak and The Power of JuJu"
   region: "PAL-S"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-52287:
-  name: "Tak and The Poer of JuJu"
+  name: "Tak and The Power of JuJu"
   region: "PAL-I"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-52288:
   name: "Tom Clancy's Rainbow Six 3"
   region: "PAL-M5"
@@ -14316,8 +14334,11 @@ SLES-53035:
   region: "PAL-E"
   compat: 5
 SLES-53036:
-  name: "Tak 2 - The Stuff of Dreams"
+  name: "Tak 2 - The Staff of Dreams"
   region: "PAL-M3"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-53037:
   name: "Super Monkey Ball Deluxe"
   region: "PAL-M5"
@@ -14523,6 +14544,9 @@ SLES-53127:
 SLES-53129:
   name: "Tak 2 - The Staff of Dreams"
   region: "PAL-F-G"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLES-53130:
   name: "World Championship Poker"
   region: "PAL-M5"
@@ -15041,6 +15065,7 @@ SLES-53417:
 SLES-53418:
   name: "Tak - The Great JuJu Challenge"
   region: "PAL-A"
+  compat: 5
 SLES-53419:
   name: "LA Rush"
   region: "PAL-M5"
@@ -15739,6 +15764,7 @@ SLES-53690:
 SLES-53695:
   name: "Tak - The Great Juju Challenge"
   region: "PAL-E-G"
+  compat: 5
 SLES-53696:
   name: "Zathura"
   region: "PAL-M6"
@@ -19553,6 +19579,9 @@ SLES-55375:
 SLES-55376:
   name: "Nickelodeon Tak and the Guardians of Gross"
   region: "PAL-E-G"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-55378:
   name: "RTL Biathlon 2009"
   region: "PAL-E-G"
@@ -23337,7 +23366,7 @@ SLPM-62761:
   name: "Choro Q - HG 2 [Atlus Best Collection]"
   region: "NTSC-J"
 SLPM-62762:
-  name: "Sangokushi VIII [with Poer-Up Kit] [Koei Selection Series]"
+  name: "Sangokushi VIII [with Power-Up Kit] [Koei Selection Series]"
   region: "NTSC-J"
 SLPM-62763:
   name: "Bomberman Land 3 [Hudson Best Version]"
@@ -37187,6 +37216,8 @@ SLUS-20519:
   name: "Tak and The Power of Juju"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLUS-20520:
   name: "Lord of the Rings, The - The Fellowship of the Ring"
   region: "NTSC-U"
@@ -38992,6 +39023,8 @@ SLUS-20937:
   name: "Wild ARMs - Alter Code F"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    wildArmsHack: 1 # Fixes bugged lines in text in resolutions above native.
 SLUS-20938:
   name: "Dynasty Warriors 4 - Empires"
   region: "NTSC-U"
@@ -39059,6 +39092,8 @@ SLUS-20952:
   name: "Tak 2 - The Staff of Dreams"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLUS-20953:
   name: "Shaman King - Power of Spirit"
   region: "NTSC-U"
@@ -42996,6 +43031,8 @@ SLUS-21797:
   name: "Tak - Guardians Of Gross"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLUS-21798:
   name: "Shepherd's Crossing"
   region: "NTSC-U"
@@ -43960,6 +43997,9 @@ SLUS-29065:
 SLUS-29067:
   name: "Tak and the Power of Juju [Demo]"
   region: "NTSC-U"
+  compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
 SLUS-29068:
   name: "Crash Nitro Kart [Demo]"
   region: "NTSC-U"
