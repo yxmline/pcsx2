@@ -51,10 +51,10 @@ public:
 				u32 wb : 1;
 				u32 wa : 1;
 				// Alpha blending
-				u32 blend_index : 7;
-				u32 abe : 1;
-				u32 accu_blend : 1;
-				u32 blend_mix : 1;
+				u32 blend_enable : 1;
+				u32 blend_op : 2;
+				u32 blend_src_factor : 4;
+				u32 blend_dst_factor : 4;
 			};
 
 			struct
@@ -66,7 +66,7 @@ public:
 			u32 key;
 		};
 
-		operator u32() { return key & 0x3fff; }
+		operator u32() { return key & 0x7fff; }
 
 		OMBlendSelector()
 			: key(0)
@@ -126,8 +126,6 @@ private:
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) final;
 	void DoExternalFX(GSTexture* sTex, GSTexture* dTex) final;
-
-	u16 ConvertBlendEnum(u16 generic) final;
 
 	wil::com_ptr_nothrow<ID3D11Device> m_dev;
 	wil::com_ptr_nothrow<ID3D11DeviceContext> m_ctx;
@@ -213,7 +211,7 @@ private:
 	std::unordered_map<u32, GSVertexShader11> m_vs;
 	wil::com_ptr_nothrow<ID3D11Buffer> m_vs_cb;
 	std::unordered_map<u32, wil::com_ptr_nothrow<ID3D11GeometryShader>> m_gs;
-	std::unordered_map<u64, wil::com_ptr_nothrow<ID3D11PixelShader>> m_ps;
+	std::unordered_map<PSSelector, wil::com_ptr_nothrow<ID3D11PixelShader>, GSHWDrawConfig::PSSelectorHash> m_ps;
 	wil::com_ptr_nothrow<ID3D11Buffer> m_ps_cb;
 	std::unordered_map<u32, wil::com_ptr_nothrow<ID3D11SamplerState>> m_ps_ss;
 	wil::com_ptr_nothrow<ID3D11SamplerState> m_palette_ss;
@@ -291,7 +289,7 @@ public:
 	bool CreateTextureFX();
 	void SetupVS(VSSelector sel, const GSHWDrawConfig::VSConstantBuffer* cb);
 	void SetupGS(GSSelector sel);
-	void SetupPS(PSSelector sel, const GSHWDrawConfig::PSConstantBuffer* cb, PSSamplerSelector ssel);
+	void SetupPS(const PSSelector& sel, const GSHWDrawConfig::PSConstantBuffer* cb, PSSamplerSelector ssel);
 	void SetupOM(OMDepthStencilSelector dssel, OMBlendSelector bsel, u8 afix);
 
 	void RenderHW(GSHWDrawConfig& config) final;

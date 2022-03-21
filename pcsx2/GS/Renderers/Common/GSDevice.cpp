@@ -498,20 +498,29 @@ GSAdapter::GSAdapter(const DXGI_ADAPTER_DESC1& desc_dxgi)
 // TODO
 #endif
 
-HWBlend GSDevice::GetBlend(size_t index)
-{
-	HWBlend blend = m_blendMap[index];
-	blend.op  = ConvertBlendEnum(blend.op);
-	blend.src = ConvertBlendEnum(blend.src);
-	blend.dst = ConvertBlendEnum(blend.dst);
-	return blend;
-}
-
-u16 GSDevice::GetBlendFlags(size_t index) { return m_blendMap[index].flags; }
-
 // clang-format off
 
-std::array<HWBlend, 3*3*3*3 + 1> GSDevice::m_blendMap =
+const std::array<u8, 16> GSDevice::m_replaceDualSrcBlendMap =
+{{
+	SRC_COLOR,        // SRC_COLOR
+	INV_SRC_COLOR,    // INV_SRC_COLOR
+	DST_COLOR,        // DST_COLOR
+	INV_DST_COLOR,    // INV_DST_COLOR
+	SRC_COLOR,        // SRC1_COLOR
+	INV_SRC_COLOR,    // INV_SRC1_COLOR
+	SRC_ALPHA,        // SRC_ALPHA
+	INV_SRC_ALPHA,    // INV_SRC_ALPHA
+	DST_ALPHA,        // DST_ALPHA
+	INV_DST_ALPHA,    // INV_DST_ALPHA
+	SRC_ALPHA,        // SRC1_ALPHA
+	INV_SRC_ALPHA,    // INV_SRC1_ALPHA
+	CONST_COLOR,      // CONST_COLOR
+	INV_CONST_COLOR,  // INV_CONST_COLOR
+	CONST_ONE,        // CONST_ONE
+	CONST_ZERO        // CONST_ZERO
+}};
+
+const std::array<HWBlend, 3*3*3*3> GSDevice::m_blendMap =
 {{
 	{ BLEND_NO_REC               , OP_ADD          , CONST_ONE       , CONST_ZERO}      , // 0000: (Cs - Cs)*As + Cs ==> Cs
 	{ BLEND_CD                   , OP_ADD          , CONST_ZERO      , CONST_ONE}       , // 0001: (Cs - Cs)*As + Cd ==> Cd
@@ -594,5 +603,4 @@ std::array<HWBlend, 3*3*3*3 + 1> GSDevice::m_blendMap =
 	{ BLEND_NO_REC               , OP_ADD          , CONST_ONE       , CONST_ZERO}      , // 2220: (0  -  0)*F  + Cs ==> Cs
 	{ BLEND_CD                   , OP_ADD          , CONST_ZERO      , CONST_ONE}       , // 2221: (0  -  0)*F  + Cd ==> Cd
 	{ BLEND_NO_REC               , OP_ADD          , CONST_ZERO      , CONST_ZERO}      , // 2222: (0  -  0)*F  +  0 ==> 0
-	{ 0                          , OP_ADD          , SRC_ALPHA       , INV_SRC_ALPHA}   , // extra for merge operation
 }};

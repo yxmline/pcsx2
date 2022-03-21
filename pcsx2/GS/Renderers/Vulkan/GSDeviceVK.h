@@ -27,14 +27,9 @@
 class GSDeviceVK final : public GSDevice
 {
 public:
-	struct PipelineSelector
+	struct alignas(8) PipelineSelector
 	{
-		GSHWDrawConfig::VSSelector vs;
-		GSHWDrawConfig::GSSelector gs;
 		GSHWDrawConfig::PSSelector ps;
-		GSHWDrawConfig::DepthStencilSelector dss;
-		GSHWDrawConfig::BlendState bs;
-		GSHWDrawConfig::ColorMaskSelector cms;
 
 		union
 		{
@@ -50,29 +45,25 @@ public:
 			u32 key;
 		};
 
-		__fi bool operator==(const PipelineSelector& p) const
-		{
-			return vs.key == p.vs.key && gs.key == p.gs.key && ps.key == p.ps.key && dss.key == p.dss.key &&
-				   bs.key == p.bs.key && cms.key == p.cms.key && key == p.key;
-		}
-		__fi bool operator!=(const PipelineSelector& p) const
-		{
-			return vs.key != p.vs.key || gs.key != p.gs.key || ps.key != p.ps.key || dss.key != p.dss.key ||
-				   bs.key != p.bs.key || cms.key != p.cms.key || key != p.key;
-		}
+		GSHWDrawConfig::VSSelector vs;
+		GSHWDrawConfig::GSSelector gs;
+		GSHWDrawConfig::DepthStencilSelector dss;
+		GSHWDrawConfig::ColorMaskSelector cms;
+		GSHWDrawConfig::BlendState bs;
 
-		PipelineSelector()
-			: key(0)
-		{
-		}
+		__fi bool operator==(const PipelineSelector& p) const { return (memcmp(this, &p, sizeof(p)) == 0); }
+		__fi bool operator!=(const PipelineSelector& p) const { return (memcmp(this, &p, sizeof(p)) != 0); }
+
+		__fi PipelineSelector() { memset(this, 0, sizeof(*this)); }
 	};
+	static_assert(sizeof(PipelineSelector) == 24, "Pipeline selector is 24 bytes");
 
 	struct PipelineSelectorHash
 	{
 		std::size_t operator()(const PipelineSelector& e) const noexcept
 		{
 			std::size_t hash = 0;
-			HashCombine(hash, e.vs.key, e.gs.key, e.ps.key, e.dss.key, e.cms.key, e.bs.key, e.key);
+			HashCombine(hash, e.vs.key, e.gs.key, e.ps.key_hi, e.ps.key_lo, e.dss.key, e.cms.key, e.bs.key, e.key);
 			return hash;
 		}
 	};
@@ -136,7 +127,7 @@ private:
 
 	std::unordered_map<u32, VkShaderModule> m_tfx_vertex_shaders;
 	std::unordered_map<u32, VkShaderModule> m_tfx_geometry_shaders;
-	std::unordered_map<u64, VkShaderModule> m_tfx_fragment_shaders;
+	std::unordered_map<GSHWDrawConfig::PSSelector, VkShaderModule, GSHWDrawConfig::PSSelectorHash> m_tfx_fragment_shaders;
 	std::unordered_map<PipelineSelector, VkPipeline, PipelineSelectorHash> m_tfx_pipelines;
 
 	VkRenderPass m_utility_color_render_pass_load = VK_NULL_HANDLE;
@@ -155,20 +146,23 @@ private:
 
 	std::string m_tfx_source;
 
+	VkFormat LookupNativeFormat(GSTexture::Format format) const;
+
 	GSTexture* CreateSurface(GSTexture::Type type, int width, int height, int levels, GSTexture::Format format) override;
 
 	void DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, GSVector4* dRect, const GSRegPMODE& PMODE,
 		const GSRegEXTBUF& EXTBUF, const GSVector4& c) final;
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset = 0) final;
 
-	u16 ConvertBlendEnum(u16 generic) final;
+	static VkBlendFactor ConvertBlendFactor(u8 generic);
+	static VkBlendOp ConvertBlendOp(u8 generic);
 
 	VkSampler GetSampler(GSHWDrawConfig::SamplerSelector ss);
 	void ClearSamplerCache() final;
 
 	VkShaderModule GetTFXVertexShader(GSHWDrawConfig::VSSelector sel);
 	VkShaderModule GetTFXGeometryShader(GSHWDrawConfig::GSSelector sel);
-	VkShaderModule GetTFXFragmentShader(GSHWDrawConfig::PSSelector sel);
+	VkShaderModule GetTFXFragmentShader(const GSHWDrawConfig::PSSelector& sel);
 	VkPipeline CreateTFXPipeline(const PipelineSelector& p);
 	VkPipeline GetTFXPipeline(const PipelineSelector& p);
 

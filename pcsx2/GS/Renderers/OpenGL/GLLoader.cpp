@@ -154,6 +154,8 @@ namespace GLLoader
 	bool mesa_driver = false;
 	bool in_replayer = false;
 
+	bool has_dual_source_blend = false;
+	bool found_framebuffer_fetch = false;
 	bool found_geometry_shader = true; // we require GL3.3 so geometry must be supported by default
 	bool found_GL_ARB_clear_texture = false;
 	// DX11 GPU
@@ -208,6 +210,7 @@ namespace GLLoader
 			vendor_id_amd = true;
 		else if (strstr(vendor, "NVIDIA Corporation"))
 			vendor_id_nvidia = true;
+
 #ifdef _WIN32
 		else if (strstr(vendor, "Intel"))
 			vendor_id_intel = true;
@@ -216,9 +219,10 @@ namespace GLLoader
 		mesa_driver = !vendor_id_nvidia && !vendor_id_amd;
 #endif
 
-		if (theApp.GetConfigI("override_geometry_shader") != -1)
+		if (GSConfig.OverrideGeometryShaders != -1)
 		{
-			found_geometry_shader = theApp.GetConfigB("override_geometry_shader");
+			found_geometry_shader = GSConfig.OverrideGeometryShaders != 0 &&
+									(GLAD_GL_VERSION_3_2 || GL_ARB_geometry_shader4 || GSConfig.OverrideGeometryShaders == 1);
 			GLExtension::Set("GL_ARB_geometry_shader4", found_geometry_shader);
 			fprintf(stderr, "Overriding geometry shaders detection\n");
 		}
@@ -286,6 +290,14 @@ namespace GLLoader
 			// Mandatory for the advance HW renderer effect. Unfortunately Mesa LLVMPIPE/SWR renderers doesn't support this extension.
 			// Rendering might be corrupted but it could be good enough for test/virtual machine.
 			optional("GL_ARB_texture_barrier");
+
+			has_dual_source_blend = GLAD_GL_VERSION_3_2 || GLAD_GL_ARB_blend_func_extended;
+			found_framebuffer_fetch = GLAD_GL_EXT_shader_framebuffer_fetch || GLAD_GL_ARM_shader_framebuffer_fetch;
+			if (found_framebuffer_fetch && GSConfig.DisableFramebufferFetch)
+			{
+				Console.Warning("Framebuffer fetch was found but is disabled. This will reduce performance.");
+				found_framebuffer_fetch = false;
+			}
 		}
 
 		if (vendor_id_amd)

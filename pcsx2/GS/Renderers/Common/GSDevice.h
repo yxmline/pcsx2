@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include "common/HashCombine.h"
 #include "common/WindowInfo.h"
 #include "GSFastList.h"
 #include "GSTexture.h"
@@ -127,12 +128,14 @@ enum HWBlendFlags
 	BLEND_C_CLR3    = 0x800,  // Multiply Cs by (255/128) to compensate for wrong Ad/255 value, should be Ad/128
 	BLEND_NO_REC    = 0x1000, // Doesn't require sampling of the RT as a texture
 	BLEND_ACCU      = 0x2000, // Allow to use a mix of SW and HW blending to keep the best of the 2 worlds
+	BLEND_DSB       = 0x4000, // Blend equation uses dual-source outputs (SRC_ALPHA1/INV_SRC_ALPHA1).
 };
 
 // Determines the HW blend function for DX11/OGL
 struct HWBlend
 {
-	u16 flags, op, src, dst;
+	u16 flags;
+	u8 op, src, dst;
 };
 
 struct alignas(16) GSHWDrawConfig
@@ -150,6 +153,7 @@ struct alignas(16) GSHWDrawConfig
 		Triangle,
 		Sprite,
 	};
+#pragma pack(push, 1)
 	struct GSSelector
 	{
 		union
@@ -182,6 +186,8 @@ struct alignas(16) GSHWDrawConfig
 		VSSelector(): key(0) {}
 		VSSelector(u8 k): key(k) {}
 	};
+#pragma pack(pop)
+#pragma pack(push, 4)
 	struct PSSelector
 	{
 		// Performance note: there are too many shader combinations
@@ -233,6 +239,10 @@ struct alignas(16) GSHWDrawConfig
 				u32 colclip     : 1;
 				u32 blend_mix   : 1;
 				u32 pabe        : 1;
+				u32 no_color    : 1; // disables color output entirely (depth only)
+				u32 no_color1   : 1; // disables second color output (when unnecessary)
+				u32 no_ablend   : 1; // output alpha blend in col0 (for no-DSB)
+				u32 only_alpha  : 1; // don't bother computing RGB
 
 				// Others ways to fetch the texture
 				u32 channel : 3;
@@ -255,19 +265,36 @@ struct alignas(16) GSHWDrawConfig
 
 				// Scan mask
 				u32 scanmsk : 2;
-
-				//u32 _free2 : 0;
 			};
 
-			u64 key;
+			struct
+			{
+				u64 key_lo;
+				u32 key_hi;
+			};
 		};
-		PSSelector(): key(0) {}
+		__fi PSSelector() : key_lo(0), key_hi(0) {}
+
+		__fi bool operator==(const PSSelector& rhs) const { return (key_lo == rhs.key_lo && key_hi == rhs.key_hi); }
+		__fi bool operator!=(const PSSelector& rhs) const { return (key_lo != rhs.key_lo || key_hi != rhs.key_hi); }
+		__fi bool operator<(const PSSelector& rhs) const { return (key_lo < rhs.key_lo || key_hi < rhs.key_hi); }
 
 		__fi bool IsFeedbackLoop() const
 		{
 			return tex_is_fb || fbmask || date > 0 || blend_a == 1 || blend_b == 1 || blend_c == 1 || blend_d == 1;
 		}
 	};
+#pragma pack(pop)
+	struct PSSelectorHash
+	{
+		std::size_t operator()(const PSSelector& p) const
+		{
+			std::size_t h = 0;
+			HashCombine(h, p.key_lo, p.key_hi);
+			return h;
+		}
+	};
+#pragma pack(push, 1)
 	struct SamplerSelector
 	{
 		union
@@ -284,7 +311,7 @@ struct alignas(16) GSHWDrawConfig
 			u8 key;
 		};
 		SamplerSelector(): key(0) {}
-		SamplerSelector(u32 k): key(k) {}
+		SamplerSelector(u8 k): key(k) {}
 		static SamplerSelector Point() { return SamplerSelector(); }
 		static SamplerSelector Linear()
 		{
@@ -338,7 +365,7 @@ struct alignas(16) GSHWDrawConfig
 			u8 key;
 		};
 		DepthStencilSelector(): key(0) {}
-		DepthStencilSelector(u32 k): key(k) {}
+		DepthStencilSelector(u8 k): key(k) {}
 		static DepthStencilSelector NoDepth()
 		{
 			DepthStencilSelector out;
@@ -366,8 +393,9 @@ struct alignas(16) GSHWDrawConfig
 			u8 key;
 		};
 		ColorMaskSelector(): key(0xF) {}
-		ColorMaskSelector(u32 c): key(0) { wrgba = c; }
+		ColorMaskSelector(u8 c): key(0) { wrgba = c; }
 	};
+#pragma pack(pop)
 	struct alignas(16) VSConstantBuffer
 	{
 		GSVector2 vertex_scale;
@@ -458,23 +486,25 @@ struct alignas(16) GSHWDrawConfig
 		{
 			struct
 			{
-				u8 index;
-				u8 factor;
-				bool is_constant     : 1;
-				bool is_accumulation : 1;
-				bool is_mixed_hw_sw  : 1;
+				u8 enable : 1;
+				u8 constant_enable : 1;
+				u8 op : 6;
+				u8 src_factor;
+				u8 dst_factor;
+				u8 constant;
 			};
 			u32 key;
 		};
 		BlendState(): key(0) {}
-		BlendState(u8 index, u8 factor, bool is_constant, bool is_accumulation, bool is_mixed_hw_sw)
+		BlendState(bool enable_, u8 src_factor_, u8 dst_factor_, u8 op_, bool constant_enable_, u8 constant_)
 			: key(0)
 		{
-			this->index = index;
-			this->factor = factor;
-			this->is_constant = is_constant;
-			this->is_accumulation = is_accumulation;
-			this->is_mixed_hw_sw = is_mixed_hw_sw;
+			enable = enable_;
+			constant_enable = constant_enable_;
+			src_factor = src_factor_;
+			dst_factor = dst_factor_;
+			op = op_;
+			constant = constant_;
 		}
 	};
 	enum class DestinationAlphaMode : u8
@@ -500,9 +530,9 @@ struct alignas(16) GSHWDrawConfig
 	GSVector4i drawarea; ///< Area in the framebuffer which will be modified.
 	Topology topology;  ///< Draw topology
 
+	alignas(8) PSSelector ps;
 	GSSelector gs;
 	VSSelector vs;
-	PSSelector ps;
 
 	BlendState blend;
 	SamplerSelector sampler;
@@ -516,14 +546,18 @@ struct alignas(16) GSHWDrawConfig
 	bool datm : 1;
 	bool line_expand : 1;
 
-	struct AlphaSecondPass
+	struct AlphaPass
 	{
+		alignas(8) PSSelector ps;
 		bool enable;
 		ColorMaskSelector colormask;
 		DepthStencilSelector depth;
-		PSSelector ps;
 		float ps_aref;
-	} alpha_second_pass;
+	};
+	static_assert(sizeof(AlphaPass) == 24, "alpha pass is 24 bytes");
+
+	AlphaPass alpha_second_pass;
+	AlphaPass alpha_third_pass;
 
 	VSConstantBuffer cb_vs;
 	PSConstantBuffer cb_ps;
@@ -532,6 +566,7 @@ struct alignas(16) GSHWDrawConfig
 class GSDevice : public GSAlignedClass<32>
 {
 public:
+	// clang-format off
 	struct FeatureSupport
 	{
 		bool broken_point_sampler : 1; ///< Issue with AMD cards, see tfx shader for details
@@ -544,32 +579,38 @@ public:
 		bool prefer_new_textures  : 1; ///< Allocate textures up to the pool size before reusing them, to avoid render pass restarts.
 		bool dxt_textures         : 1; ///< Supports DXTn texture compression, i.e. S3TC and BC1-3.
 		bool bptc_textures        : 1; ///< Supports BC6/7 texture compression.
+		bool framebuffer_fetch    : 1; ///< Can sample from the framebuffer without texture barriers.
+		bool dual_source_blend    : 1; ///< Can use alpha output as a blend factor.
+		bool stencil_buffer       : 1; ///< Supports stencil buffer, and can use for DATE.
 		FeatureSupport()
 		{
 			memset(this, 0, sizeof(*this));
 		}
 	};
+	// clang-format on
 
-private:
-	FastList<GSTexture*> m_pool;
-	static std::array<HWBlend, 3*3*3*3 + 1> m_blendMap;
-
-protected:
-	enum : u16
+	// clang-format off
+	enum : u8
 	{
 		// HW blend factors
-		SRC_COLOR,   INV_SRC_COLOR,    DST_COLOR,  INV_DST_COLOR,
-		SRC1_COLOR,  INV_SRC1_COLOR,   SRC_ALPHA,  INV_SRC_ALPHA,
-		DST_ALPHA,   INV_DST_ALPHA,    SRC1_ALPHA, INV_SRC1_ALPHA,
-		CONST_COLOR, INV_CONST_COLOR,  CONST_ONE,  CONST_ZERO,
-
+		SRC_COLOR, INV_SRC_COLOR, DST_COLOR, INV_DST_COLOR,
+		SRC1_COLOR, INV_SRC1_COLOR, SRC_ALPHA, INV_SRC_ALPHA,
+		DST_ALPHA, INV_DST_ALPHA, SRC1_ALPHA, INV_SRC1_ALPHA,
+		CONST_COLOR, INV_CONST_COLOR, CONST_ONE, CONST_ZERO,
+	};
+	enum : u8
+	{
 		// HW blend operations
 		OP_ADD, OP_SUBTRACT, OP_REV_SUBTRACT
 	};
+	// clang-format on
 
-	static const int m_NO_BLEND = 0;
-	static const int m_MERGE_BLEND = m_blendMap.size() - 1;
+private:
+	FastList<GSTexture*> m_pool;
+	static const std::array<HWBlend, 3*3*3*3> m_blendMap;
+	static const std::array<u8, 16> m_replaceDualSrcBlendMap;
 
+protected:
 	static constexpr u32 MAX_POOLED_TEXTURES = 300;
 
 	HostDisplay* m_display;
@@ -598,7 +639,6 @@ protected:
 	virtual void DoFXAA(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoShadeBoost(GSTexture* sTex, GSTexture* dTex) {}
 	virtual void DoExternalFX(GSTexture* sTex, GSTexture* dTex) {}
-	virtual u16 ConvertBlendEnum(u16 generic) = 0; // Convert blend factors/ops from the generic enum to DX11/OGl specific.
 
 public:
 	GSDevice();
@@ -697,10 +737,34 @@ public:
 
 	virtual void PrintMemoryUsage();
 
-	// Convert the GS blend equations to HW specific blend factors/ops
+	__fi static constexpr bool IsDualSourceBlendFactor(u8 factor)
+	{
+		return (factor == SRC1_ALPHA || factor == INV_SRC1_ALPHA
+			/*|| factor == SRC1_COLOR || factor == INV_SRC1_COLOR*/); // not used
+	}
+	__fi static constexpr bool IsConstantBlendFactor(u16 factor)
+	{
+		return (factor == CONST_COLOR || factor == INV_CONST_COLOR);
+	}
+
+	// Convert the GS blend equations to HW blend factors/ops
 	// Index is computed as ((((A * 3 + B) * 3) + C) * 3) + D. A, B, C, D taken from ALPHA register.
-	HWBlend GetBlend(size_t index);
-	u16 GetBlendFlags(size_t index);
+	__ri static HWBlend GetBlend(u32 index, bool replace_dual_src)
+	{
+		HWBlend ret = m_blendMap[index];
+		if (replace_dual_src)
+		{
+			ret.src = m_replaceDualSrcBlendMap[ret.src];
+			ret.dst = m_replaceDualSrcBlendMap[ret.dst];
+		}
+		return ret;
+	}
+	__ri static u16 GetBlendFlags(u32 index) { return m_blendMap[index].flags; }
+	__fi static bool IsDualSourceBlend(u32 index)
+	{
+		return (IsDualSourceBlendFactor(m_blendMap[index].src) ||
+				IsDualSourceBlendFactor(m_blendMap[index].dst));
+	}
 };
 
 struct GSAdapter

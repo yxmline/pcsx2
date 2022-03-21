@@ -22,6 +22,7 @@
 #include "GS/GSUtil.h"
 #include "Host.h"
 #include "HostDisplay.h"
+#include <cinttypes>
 #include <fstream>
 #include <sstream>
 
@@ -217,11 +218,14 @@ bool GSDeviceOGL::Create(HostDisplay* display)
 	m_features.broken_point_sampler = GLLoader::vendor_id_amd;
 	m_features.geometry_shader = GLLoader::found_geometry_shader;
 	m_features.image_load_store = GLLoader::found_GL_ARB_shader_image_load_store && GLLoader::found_GL_ARB_clear_texture;
-	m_features.texture_barrier = true;
+	m_features.texture_barrier = GSConfig.OverrideTextureBarriers != 0 || GLLoader::found_framebuffer_fetch;
 	m_features.provoking_vertex_last = true;
-	m_features.prefer_new_textures = false;
 	m_features.dxt_textures = GL_EXT_texture_compression_s3tc;
 	m_features.bptc_textures = GL_VERSION_4_2 || GL_ARB_texture_compression_bptc || GL_EXT_texture_compression_bptc;
+	m_features.prefer_new_textures = false;
+	m_features.framebuffer_fetch = GLLoader::found_framebuffer_fetch;
+	m_features.dual_source_blend = GLLoader::has_dual_source_blend && !GSConfig.DisableDualSourceBlend;
+	m_features.stencil_buffer = true;
 
 	GLint point_range[2] = {};
 	GLint line_range[2] = {};
@@ -553,8 +557,8 @@ bool GSDeviceOGL::Create(HostDisplay* display)
 	fprintf(stdout, "Available VRAM/RAM:%lldMB for textures\n", GLState::available_vram >> 20u);
 
 	// Basic to ensure structures are correctly packed
-	static_assert(sizeof(VSSelector) == 4, "Wrong VSSelector size");
-	static_assert(sizeof(PSSelector) == 8, "Wrong PSSelector size");
+	static_assert(sizeof(VSSelector) == 1, "Wrong VSSelector size");
+	static_assert(sizeof(PSSelector) == 12, "Wrong PSSelector size");
 	static_assert(sizeof(PSSamplerSelector) == 1, "Wrong PSSamplerSelector size");
 	static_assert(sizeof(OMDepthStencilSelector) == 1, "Wrong OMDepthStencilSelector size");
 	static_assert(sizeof(OMColorMaskSelector) == 1, "Wrong OMColorMaskSelector size");
@@ -978,6 +982,14 @@ std::string GSDeviceOGL::GenGlslHeader(const std::string_view& entry, GLenum typ
 	header += "#extension GL_ARB_shading_language_420pack: require\n";
 	// Need GL version 410
 	header += "#extension GL_ARB_separate_shader_objects: require\n";
+	if (m_features.framebuffer_fetch)
+	{
+		if (GLAD_GL_EXT_shader_framebuffer_fetch)
+			header += "#extension GL_EXT_shader_framebuffer_fetch : require\n";
+		else if (GLAD_GL_ARM_shader_framebuffer_fetch)
+			header += "#extension GL_ARM_shader_framebuffer_fetch : require\n";
+	}
+
 	if (GLLoader::found_GL_ARB_shader_image_load_store)
 	{
 		// Need GL version 420
@@ -987,6 +999,11 @@ std::string GSDeviceOGL::GenGlslHeader(const std::string_view& entry, GLenum typ
 	{
 		header += "#define DISABLE_GL42_image\n";
 	}
+
+	if (m_features.framebuffer_fetch)
+		header += "#define HAS_FRAMEBUFFER_FETCH 1\n";
+	else
+		header += "#define HAS_FRAMEBUFFER_FETCH 0\n";
 
 	if (GLLoader::vendor_id_amd || GLLoader::vendor_id_intel)
 		header += "#define BROKEN_DRIVER as_usual\n";
@@ -1057,10 +1074,10 @@ std::string GSDeviceOGL::GetGSSource(GSSelector sel)
 	return src;
 }
 
-std::string GSDeviceOGL::GetPSSource(PSSelector sel)
+std::string GSDeviceOGL::GetPSSource(const PSSelector& sel)
 {
 #ifdef PCSX2_DEVBUILD
-	Console.WriteLn("Compiling new pixel shader with selector 0x%" PRIX64, sel.key);
+	Console.WriteLn("Compiling new pixel shader with selector 0x%" PRIX64 "%08X", sel.key_hi, sel.key_lo);
 #endif
 
 	std::string macro = format("#define PS_FST %d\n", sel.fst)
@@ -1105,6 +1122,10 @@ std::string GSDeviceOGL::GetPSSource(PSSelector sel)
 		+ format("#define PS_PABE %d\n", sel.pabe)
 		+ format("#define PS_SCANMSK %d\n", sel.scanmsk)
 		+ format("#define PS_SCALE_FACTOR %d\n", GSConfig.UpscaleMultiplier)
+		+ format("#define PS_NO_COLOR %d\n", sel.no_color)
+		+ format("#define PS_NO_COLOR1 %d\n", sel.no_color1)
+		+ format("#define PS_NO_ABLEND %d\n", sel.no_ablend)
+		+ format("#define PS_ONLY_ALPHA %d\n", sel.only_alpha)
 	;
 
 	std::string src = GenGlslHeader("ps_main", GL_FRAGMENT_SHADER, macro);
@@ -1183,7 +1204,7 @@ void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture
 
 void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, const GL::Program& ps, bool linear)
 {
-	StretchRect(sTex, sRect, dTex, dRect, ps, m_NO_BLEND, OMColorMaskSelector(), linear);
+	StretchRect(sTex, sRect, dTex, dRect, ps, false, OMColorMaskSelector(), linear);
 }
 
 void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, bool red, bool green, bool blue, bool alpha)
@@ -1195,10 +1216,10 @@ void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture
 	cms.wb = blue;
 	cms.wa = alpha;
 
-	StretchRect(sTex, sRect, dTex, dRect, m_convert.ps[(int)ShaderConvert::COPY], m_NO_BLEND, cms, false);
+	StretchRect(sTex, sRect, dTex, dRect, m_convert.ps[(int)ShaderConvert::COPY], false, cms, false);
 }
 
-void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, const GL::Program& ps, int bs, OMColorMaskSelector cms, bool linear)
+void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, const GL::Program& ps, bool alpha_blend, OMColorMaskSelector cms, bool linear)
 {
 	ASSERT(sTex);
 
@@ -1244,7 +1265,7 @@ void GSDeviceOGL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture
 	else
 		OMSetDepthStencilState(m_convert.dss);
 
-	OMSetBlendState((u8)bs);
+	OMSetBlendState(alpha_blend, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD);
 	OMSetColorMaskState(cms);
 
 	// ************************************
@@ -1360,12 +1381,12 @@ void GSDeviceOGL::DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex,
 			// Blend with a constant alpha
 			m_merge_obj.ps[1].Bind();
 			m_merge_obj.ps[1].Uniform4fv(0, c.v);
-			StretchRect(sTex[0], sRect[0], dTex, dRect[0], m_merge_obj.ps[1], m_MERGE_BLEND, OMColorMaskSelector());
+			StretchRect(sTex[0], sRect[0], dTex, dRect[0], m_merge_obj.ps[1], true, OMColorMaskSelector());
 		}
 		else
 		{
 			// Blend with 2 * input alpha
-			StretchRect(sTex[0], sRect[0], dTex, dRect[0], m_merge_obj.ps[0], m_MERGE_BLEND, OMColorMaskSelector());
+			StretchRect(sTex[0], sRect[0], dTex, dRect[0], m_merge_obj.ps[0], true, OMColorMaskSelector());
 		}
 	}
 
@@ -1632,7 +1653,14 @@ void GSDeviceOGL::OMAttachDs(GSTextureOGL* ds)
 	if (GLState::ds != id)
 	{
 		GLState::ds = id;
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, id, 0);
+		if (ds && ds->IsDss())
+		{
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, id, 0);
+		}
+		else
+		{
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, id, 0);
+		}
 	}
 }
 
@@ -1661,9 +1689,9 @@ void GSDeviceOGL::OMSetColorMaskState(OMColorMaskSelector sel)
 	}
 }
 
-void GSDeviceOGL::OMSetBlendState(u8 blend_index, u8 blend_factor, bool is_blend_constant, bool accumulation_blend, bool blend_mix)
+void GSDeviceOGL::OMSetBlendState(bool enable, GLenum src_factor, GLenum dst_factor, GLenum op, bool is_constant, u8 constant)
 {
-	if (blend_index)
+	if (enable)
 	{
 		if (!GLState::blend)
 		{
@@ -1671,35 +1699,24 @@ void GSDeviceOGL::OMSetBlendState(u8 blend_index, u8 blend_factor, bool is_blend
 			glEnable(GL_BLEND);
 		}
 
-		if (is_blend_constant && GLState::bf != blend_factor)
+		if (is_constant && GLState::bf != constant)
 		{
-			GLState::bf = blend_factor;
-			const float bf = (float)blend_factor / 128.0f;
+			GLState::bf = constant;
+			const float bf = (float)constant / 128.0f;
 			glBlendColor(bf, bf, bf, bf);
 		}
 
-		HWBlend b = GetBlend(blend_index);
-		if (accumulation_blend)
+		if (GLState::eq_RGB != op)
 		{
-			b.src = GL_ONE;
-			b.dst = GL_ONE;
-		}
-		else if (blend_mix)
-		{
-			b.src = GL_ONE;
+			GLState::eq_RGB = op;
+			glBlendEquationSeparate(op, GL_FUNC_ADD);
 		}
 
-		if (GLState::eq_RGB != b.op)
+		if (GLState::f_sRGB != src_factor || GLState::f_dRGB != dst_factor)
 		{
-			GLState::eq_RGB = b.op;
-			glBlendEquationSeparate(b.op, GL_FUNC_ADD);
-		}
-
-		if (GLState::f_sRGB != b.src || GLState::f_dRGB != b.dst)
-		{
-			GLState::f_sRGB = b.src;
-			GLState::f_dRGB = b.dst;
-			glBlendFuncSeparate(b.src, b.dst, GL_ONE, GL_ZERO);
+			GLState::f_sRGB = src_factor;
+			GLState::f_dRGB = dst_factor;
+			glBlendFuncSeparate(src_factor, dst_factor, GL_ONE, GL_ZERO);
 		}
 	}
 	else
@@ -1803,6 +1820,18 @@ static GSDeviceOGL::VSSelector convertSel(const GSHWDrawConfig::VSSelector sel)
 	return out;
 }
 
+// clang-format off
+static constexpr std::array<GLenum, 16> s_gl_blend_factors = { {
+	GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR,
+	GL_SRC1_COLOR, GL_ONE_MINUS_SRC1_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+	GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_SRC1_ALPHA, GL_ONE_MINUS_SRC1_ALPHA,
+	GL_CONSTANT_COLOR, GL_ONE_MINUS_CONSTANT_COLOR, GL_ONE, GL_ZERO
+} };
+static constexpr std::array<GLenum, 3> s_gl_blend_ops = { {
+		GL_FUNC_ADD, GL_FUNC_SUBTRACT, GL_FUNC_REVERSE_SUBTRACT
+} };
+// clang-format on
+
 void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 {
 	if (!GLState::scissor.eq(config.scissor))
@@ -1874,7 +1903,9 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 	PSSetShaderResource(2, config.rt);
 
 	SetupSampler(config.sampler);
-	OMSetBlendState(config.blend.index, config.blend.factor, config.blend.is_constant, config.blend.is_accumulation, config.blend.is_mixed_hw_sw);
+	OMSetBlendState(config.blend.enable, s_gl_blend_factors[config.blend.src_factor],
+		s_gl_blend_factors[config.blend.dst_factor], s_gl_blend_ops[config.blend.op],
+		config.blend.constant_enable, config.blend.constant);
 	OMSetColorMaskState(config.colormask);
 	SetupOM(config.depth);
 
@@ -1891,8 +1922,10 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 
 	ProgramSelector psel;
 	psel.vs = convertSel(config.vs);
-	psel.ps = config.ps;
+	psel.ps.key_hi = config.ps.key_hi;
+	psel.ps.key_lo = config.ps.key_lo;
 	psel.gs.key = 0;
+	psel.pad = 0;
 	if (config.gs.expand)
 	{
 		psel.gs.iip = config.gs.iip;
@@ -1973,6 +2006,23 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 		SetupPipeline(psel);
 		OMSetColorMaskState(config.alpha_second_pass.colormask);
 		SetupOM(config.alpha_second_pass.depth);
+
+		SendHWDraw(config);
+	}
+	if (config.alpha_third_pass.enable)
+	{
+		// cbuffer will definitely be dirty if aref changes, no need to check it
+		if (config.cb_ps.FogColor_AREF.a != config.alpha_third_pass.ps_aref)
+		{
+			config.cb_ps.FogColor_AREF.a = config.alpha_third_pass.ps_aref;
+			WriteToStreamBuffer(m_fragment_uniform_stream_buffer.get(), g_ps_cb_index,
+				m_uniform_buffer_alignment, &config.cb_ps, sizeof(config.cb_ps));
+		}
+
+		psel.ps = config.alpha_third_pass.ps;
+		SetupPipeline(psel);
+		OMSetColorMaskState(config.alpha_third_pass.colormask);
+		SetupOM(config.alpha_third_pass.depth);
 
 		SendHWDraw(config);
 	}
@@ -2127,33 +2177,6 @@ void GSDeviceOGL::DebugOutputToFile(GLenum gl_source, GLenum gl_type, GLuint id,
 		ASSERT(0);
 	}
 #endif
-}
-
-u16 GSDeviceOGL::ConvertBlendEnum(u16 generic)
-{
-	switch (generic)
-	{
-		case SRC_COLOR       : return GL_SRC_COLOR;
-		case INV_SRC_COLOR   : return GL_ONE_MINUS_SRC_COLOR;
-		case DST_COLOR       : return GL_DST_COLOR;
-		case INV_DST_COLOR   : return GL_ONE_MINUS_DST_COLOR;
-		case SRC1_COLOR      : return GL_SRC1_COLOR;
-		case INV_SRC1_COLOR  : return GL_ONE_MINUS_SRC1_COLOR;
-		case SRC_ALPHA       : return GL_SRC_ALPHA;
-		case INV_SRC_ALPHA   : return GL_ONE_MINUS_SRC_ALPHA;
-		case DST_ALPHA       : return GL_DST_ALPHA;
-		case INV_DST_ALPHA   : return GL_ONE_MINUS_DST_ALPHA;
-		case SRC1_ALPHA      : return GL_SRC1_ALPHA;
-		case INV_SRC1_ALPHA  : return GL_ONE_MINUS_SRC1_ALPHA;
-		case CONST_COLOR     : return GL_CONSTANT_COLOR;
-		case INV_CONST_COLOR : return GL_ONE_MINUS_CONSTANT_COLOR;
-		case CONST_ONE       : return GL_ONE;
-		case CONST_ZERO      : return GL_ZERO;
-		case OP_ADD          : return GL_FUNC_ADD;
-		case OP_SUBTRACT     : return GL_FUNC_SUBTRACT;
-		case OP_REV_SUBTRACT : return GL_FUNC_REVERSE_SUBTRACT;
-		default              : ASSERT(0); return 0;
-	}
 }
 
 void GSDeviceOGL::PushDebugGroup(const char* fmt, ...)

@@ -1308,6 +1308,8 @@ void GSApp::Init()
 	m_default_configuration["CrcHacksExclusions"]                         = "";
 	m_default_configuration["disable_hw_gl_draw"]                         = "0";
 	m_default_configuration["disable_shader_cache"]                       = "0";
+	m_default_configuration["DisableDualSourceBlend"]                     = "0";
+	m_default_configuration["DisableFramebufferFetch"]                    = "0";
 	m_default_configuration["dithering_ps2"]                              = "2";
 	m_default_configuration["dump"]                                       = "0";
 	m_default_configuration["DumpReplaceableTextures"]                    = "0";
@@ -1340,7 +1342,6 @@ void GSApp::Init()
 	m_default_configuration["OsdShowGSStats"]                             = "0";
 	m_default_configuration["OsdShowIndicators"]                          = "1";
 	m_default_configuration["OsdScale"]                                   = "100";
-	m_default_configuration["override_geometry_shader"]                   = "-1";
 	m_default_configuration["override_GL_ARB_copy_image"]                 = "-1";
 	m_default_configuration["override_GL_ARB_clear_texture"]              = "-1";
 	m_default_configuration["override_GL_ARB_clip_control"]               = "-1";
@@ -1351,6 +1352,8 @@ void GSApp::Init()
 	m_default_configuration["override_GL_ARB_sparse_texture"]             = "-1";
 	m_default_configuration["override_GL_ARB_sparse_texture2"]            = "-1";
 	m_default_configuration["override_GL_ARB_texture_barrier"]            = "-1";
+	m_default_configuration["OverrideTextureBarriers"]                    = "-1";
+	m_default_configuration["OverrideGeometryShaders"]                    = "-1";
 	m_default_configuration["paltex"]                                     = "0";
 	m_default_configuration["png_compression_level"]                      = std::to_string(Z_BEST_SPEED);
 	m_default_configuration["PointListPalette"]                           = "0";
