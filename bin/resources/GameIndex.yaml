@@ -17717,7 +17717,7 @@ SLES-54452:
   name: "Chicken Little - 'As' en Accion"
   region: "PAL-S"
 SLES-54453:
-  name: "Chicken Little - Ace in Action"
+  name: "Chicken Little - Asso Spaziale!"
   region: "PAL-I"
 SLES-54454:
   name: "Disgaea 2: Cursed Memories"
@@ -18906,6 +18906,8 @@ SLES-54952:
 SLES-54953:
   name: "Totally Spies! Totally Party"
   region: "PAL-M6"
+  gameFixes:
+    - VUSyncHack # Partially fixes graphical issues also needs EE+3 to be fully fixed.
 SLES-54955:
   name: "Finkles World"
   region: "PAL-E"
@@ -43449,6 +43451,8 @@ SLUS-21794:
 SLUS-21795:
   name: "Totally Spies! Totally Party"
   region: "NTSC-U"
+  gameFixes:
+    - VUSyncHack # Partially fixes graphical issues also needs EE+3 to be fully fixed.
 SLUS-21796:
   name: "Dora the Explorer: Dora Saves the Snow Princess"
   region: "NTSC-U"
