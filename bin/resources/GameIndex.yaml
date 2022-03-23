@@ -22108,6 +22108,8 @@ SLPM-62207:
 SLPM-62209:
   name: "Gigantic Drive"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPM-62211:
   name: "18 Wheeler"
   region: "NTSC-J"
