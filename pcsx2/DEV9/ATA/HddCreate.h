@@ -15,14 +15,7 @@
 
 #pragma once
 
-#ifndef PCSX2_CORE
-#include <wx/progdlg.h>
-#endif
-
-#include <string>
-#include <thread>
 #include <atomic>
-#include <condition_variable>
 #include <chrono>
 
 class HddCreate
@@ -34,26 +27,24 @@ public:
 	std::atomic_bool errored{false};
 
 private:
-#ifndef PCSX2_CORE
-	wxProgressDialog* progressDialog;
-#endif
-	std::atomic_int written{0};
-
-	std::thread fileThread;
-
 	std::atomic_bool canceled{false};
-
-	std::mutex completedMutex;
-	std::condition_variable completedCV;
-	bool completed = false;
 
 	std::chrono::steady_clock::time_point lastUpdate;
 
 public:
+	HddCreate(){};
+
 	void Start();
 
+	virtual ~HddCreate(){};
+
+protected:
+	virtual void Init(){};
+	virtual void Cleanup(){};
+	virtual void SetFileProgress(u64 currentSize);
+	virtual void SetError();
+	void SetCanceled();
+
 private:
-	void SetFileProgress(int currentSize);
-	void SetError();
 	void WriteImage(fs::path hddPath, u64 reqSizeBytes);
 };

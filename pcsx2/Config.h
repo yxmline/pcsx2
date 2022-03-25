@@ -652,8 +652,38 @@ struct Pcsx2Config
 			PCAP_Switched = 2,
 			TAP = 3,
 		};
-
 		static const char* NetApiNames[];
+
+		enum struct DnsMode : int
+		{
+			Manual = 0,
+			Auto = 1,
+			Internal = 2,
+		};
+		static const char* DnsModeNames[];
+
+#ifdef PCSX2_CORE
+		struct HostEntry
+		{
+			std::string Url;
+			std::string Desc;
+			u8 Address[4]{};
+			bool Enabled;
+
+			bool operator==(const HostEntry& right) const
+			{
+				return OpEqu(Url) &&
+					   OpEqu(Desc) &&
+					   (*(int*)Address == *(int*)right.Address) &&
+					   OpEqu(Enabled);
+			}
+
+			bool operator!=(const HostEntry& right) const
+			{
+				return !this->operator==(right);
+			}
+		};
+#endif
 
 		bool EthEnable{false};
 		NetApi EthApi{NetApi::Unset};
@@ -668,8 +698,12 @@ struct Pcsx2Config
 		u8 DNS2[4]{};
 		bool AutoMask{true};
 		bool AutoGateway{true};
-		bool AutoDNS1{true};
-		bool AutoDNS2{true};
+		DnsMode ModeDNS1{DnsMode::Auto};
+		DnsMode ModeDNS2{DnsMode::Auto};
+
+#ifdef PCSX2_CORE
+		std::vector<HostEntry> EthHosts;
+#endif
 
 		bool HddEnable{false};
 		std::string HddFile;
@@ -699,8 +733,12 @@ struct Pcsx2Config
 
 				   OpEqu(AutoMask) &&
 				   OpEqu(AutoGateway) &&
-				   OpEqu(AutoDNS1) &&
-				   OpEqu(AutoDNS2) &&
+				   OpEqu(ModeDNS1) &&
+				   OpEqu(ModeDNS2) &&
+
+#ifdef PCSX2_CORE
+				   OpEqu(EthHosts) &&
+#endif
 
 				   OpEqu(HddEnable) &&
 				   OpEqu(HddFile) &&

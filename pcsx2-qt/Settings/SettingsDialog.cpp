@@ -26,14 +26,17 @@
 #include "SettingsDialog.h"
 
 #include "AdvancedSystemSettingsWidget.h"
+#include "AudioSettingsWidget.h"
 #include "BIOSSettingsWidget.h"
 #include "EmulationSettingsWidget.h"
 #include "GameSummaryWidget.h"
 #include "GameFixSettingsWidget.h"
 #include "GameListSettingsWidget.h"
 #include "GraphicsSettingsWidget.h"
+#include "DEV9SettingsWidget.h"
 #include "HotkeySettingsWidget.h"
 #include "InterfaceSettingsWidget.h"
+#include "MemoryCardSettingsWidget.h"
 #include "SystemSettingsWidget.h"
 
 #include <QtWidgets/QMessageBox>
@@ -114,11 +117,20 @@ void SettingsDialog::setupUi(const GameList::Entry* game)
 
 	addWidget(m_graphics_settings = new GraphicsSettingsWidget(this, m_ui.settingsContainer), tr("Graphics"), QStringLiteral("brush-line"),
 		tr("<strong>Graphics Settings</strong><hr>"));
-	addWidget(new QWidget(m_ui.settingsContainer), tr("Audio"), QStringLiteral("volume-up-line"),
+	addWidget(m_audio_settings = new AudioSettingsWidget(this, m_ui.settingsContainer), tr("Audio"), QStringLiteral("volume-up-line"),
 		tr("<strong>Audio Settings</strong><hr>These options control the audio output of the console. Mouse over an option for additional "
 		   "information."));
-	addWidget(
-		new QWidget(m_ui.settingsContainer), tr("Memory Cards"), QStringLiteral("sd-card-line"), tr("<strong>Memory Card Settings</strong><hr>"));
+
+	// for now, memory cards aren't settable per-game
+	if (!isPerGameSettings())
+	{
+		addWidget(m_memory_card_settings = new MemoryCardSettingsWidget(this, m_ui.settingsContainer), tr("Memory Cards"),
+			QStringLiteral("sd-card-line"), tr("<strong>Memory Card Settings</strong><hr>"));
+	}
+	
+	addWidget(m_dev9_settings = new DEV9SettingsWidget(this, m_ui.settingsContainer), tr("Network & HDD"), QStringLiteral("dashboard-line"),
+		tr("<strong>Network & HDD Settings</strong><hr>These options control the network connectivity and internal HDD storage of the console.<br><br>"
+		   "Mouse over an option for additional information."));
 
 	m_ui.settingsCategory->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	m_ui.settingsCategory->setCurrentRow(0);

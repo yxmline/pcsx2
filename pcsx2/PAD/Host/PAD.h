@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "PAD/Host/Global.h"
@@ -23,6 +24,7 @@
 
 class SettingsInterface;
 struct WindowInfo;
+enum class GenericInputBinding : u8;
 
 s32 PADinit();
 void PADshutdown();
@@ -43,6 +45,9 @@ namespace PAD
 		Count
 	};
 
+	/// Number of macro buttons per controller.
+	static constexpr u32 NUM_MACRO_BUTTONS_PER_CONTROLLER = 4;
+
 	/// Reloads configuration.
 	void LoadConfig(const SettingsInterface& si);
 
@@ -61,6 +66,13 @@ namespace PAD
 	/// Returns the vibration configuration for the specified controller type.
 	VibrationCapabilities GetControllerVibrationCapabilities(const std::string_view& type);
 
+	/// Performs automatic controller mapping with the provided list of generic mappings.
+	bool MapController(SettingsInterface& si, u32 controller,
+		const std::vector<std::pair<GenericInputBinding, std::string>>& mapping);
+
 	/// Sets the specified bind on a controller to the specified pressure (normalized to 0..1).
 	void SetControllerState(u32 controller, u32 bind, float value);
+
+	/// Sets the state of the specified macro button.
+	void SetMacroButtonState(u32 pad, u32 index, bool state);
 } // namespace PAD

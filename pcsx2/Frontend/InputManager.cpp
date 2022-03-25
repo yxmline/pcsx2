@@ -583,6 +583,18 @@ void InputManager::AddPadBindings(SettingsInterface& si, u32 pad_index, const ch
 		}
 	}
 
+	for (u32 macro_button_index = 0; macro_button_index < PAD::NUM_MACRO_BUTTONS_PER_CONTROLLER; macro_button_index++)
+	{
+		const std::vector<std::string> bindings(si.GetStringList(section.c_str(),
+			StringUtil::StdStringFromFormat("Macro%u", macro_button_index + 1).c_str()));
+		if (!bindings.empty())
+		{
+			AddBindings(bindings, InputButtonEventHandler{[pad_index, macro_button_index](bool state) {
+				PAD::SetMacroButtonState(pad_index, macro_button_index, state);
+			}});
+		}
+	}
+
 	const PAD::VibrationCapabilities vibcaps = PAD::GetControllerVibrationCapabilities(type);
 	if (vibcaps != PAD::VibrationCapabilities::NoVibration)
 	{
@@ -921,6 +933,61 @@ std::vector<InputBindingKey> InputManager::EnumerateMotors()
 	}
 
 	return ret;
+}
+
+static void GetKeyboardGenericBindingMapping(std::vector<std::pair<GenericInputBinding, std::string>>* mapping)
+{
+	mapping->emplace_back(GenericInputBinding::DPadUp, "Keyboard/Up");
+	mapping->emplace_back(GenericInputBinding::DPadRight, "Keyboard/Right");
+	mapping->emplace_back(GenericInputBinding::DPadDown, "Keyboard/Down");
+	mapping->emplace_back(GenericInputBinding::DPadLeft, "Keyboard/Left");
+	mapping->emplace_back(GenericInputBinding::LeftStickUp, "Keyboard/W");
+	mapping->emplace_back(GenericInputBinding::LeftStickRight, "Keyboard/D");
+	mapping->emplace_back(GenericInputBinding::LeftStickDown, "Keyboard/S");
+	mapping->emplace_back(GenericInputBinding::LeftStickLeft, "Keyboard/A");
+	mapping->emplace_back(GenericInputBinding::RightStickUp, "Keyboard/T");
+	mapping->emplace_back(GenericInputBinding::RightStickRight, "Keyboard/H");
+	mapping->emplace_back(GenericInputBinding::RightStickDown, "Keyboard/G");
+	mapping->emplace_back(GenericInputBinding::RightStickLeft, "Keyboard/F");
+	mapping->emplace_back(GenericInputBinding::Start, "Keyboard/Return");
+	mapping->emplace_back(GenericInputBinding::Select, "Keyboard/Backspace");
+	mapping->emplace_back(GenericInputBinding::Triangle, "Keyboard/I");
+	mapping->emplace_back(GenericInputBinding::Circle, "Keyboard/L");
+	mapping->emplace_back(GenericInputBinding::Cross, "Keyboard/K");
+	mapping->emplace_back(GenericInputBinding::Square, "Keyboard/J");
+	mapping->emplace_back(GenericInputBinding::L1, "Keyboard/Q");
+	mapping->emplace_back(GenericInputBinding::L2, "Keyboard/1");
+	mapping->emplace_back(GenericInputBinding::L3, "Keyboard/2");
+	mapping->emplace_back(GenericInputBinding::R1, "Keyboard/E");
+	mapping->emplace_back(GenericInputBinding::R2, "Keyboard/2");
+	mapping->emplace_back(GenericInputBinding::R3, "Keyboard/4");
+}
+
+static bool GetInternalGenericBindingMapping(const std::string_view& device, GenericInputBindingMapping* mapping)
+{
+	if (device == "Keyboard")
+	{
+		GetKeyboardGenericBindingMapping(mapping);
+		return true;
+	}
+
+	return false;
+}
+
+GenericInputBindingMapping InputManager::GetGenericBindingMapping(const std::string_view& device)
+{
+	GenericInputBindingMapping mapping;
+
+	if (!GetInternalGenericBindingMapping(device, &mapping))
+	{
+		for (u32 i = FIRST_EXTERNAL_INPUT_SOURCE; i < LAST_EXTERNAL_INPUT_SOURCE; i++)
+		{
+			if (s_input_sources[i] && s_input_sources[i]->GetGenericBindingMapping(device, &mapping))
+				break;
+		}
+	}
+
+	return mapping;
 }
 
 template <typename T>

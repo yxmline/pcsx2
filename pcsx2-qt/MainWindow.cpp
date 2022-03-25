@@ -27,6 +27,7 @@
 
 #include "pcsx2/CDVD/CDVDaccess.h"
 #include "pcsx2/Frontend/GameList.h"
+#include "pcsx2/GSDumpReplayer.h"
 #include "pcsx2/HostDisplay.h"
 
 #include "AboutDialog.h"
@@ -131,7 +132,7 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionChangeDiscFromGameList, &QAction::triggered, this, &MainWindow::onChangeDiscFromGameListActionTriggered);
 	connect(m_ui.menuChangeDisc, &QMenu::aboutToShow, this, &MainWindow::onChangeDiscMenuAboutToShow);
 	connect(m_ui.menuChangeDisc, &QMenu::aboutToHide, this, &MainWindow::onChangeDiscMenuAboutToHide);
-	connect(m_ui.actionPowerOff, &QAction::triggered, []() { g_emu_thread->shutdownVM(); });
+	connect(m_ui.actionPowerOff, &QAction::triggered, this, [this]() { requestShutdown(); });
 	connect(m_ui.actionLoadState, &QAction::triggered, this, [this]() { m_ui.menuLoadState->exec(QCursor::pos()); });
 	connect(m_ui.actionSaveState, &QAction::triggered, this, [this]() { m_ui.menuSaveState->exec(QCursor::pos()); });
 	connect(m_ui.actionExit, &QAction::triggered, this, &MainWindow::close);
@@ -145,7 +146,8 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionSystemSettings, &QAction::triggered, [this]() { doSettings("System"); });
 	connect(m_ui.actionGraphicsSettings, &QAction::triggered, [this]() { doSettings("Graphics"); });
 	connect(m_ui.actionAudioSettings, &QAction::triggered, [this]() { doSettings("Audio"); });
-	connect(m_ui.actionMemoryCardSettings, &QAction::triggered, [this]() { doSettings("Memory Card"); });
+	connect(m_ui.actionMemoryCardSettings, &QAction::triggered, [this]() { doSettings("Memory Cards"); });
+	connect(m_ui.actionDEV9Settings, &QAction::triggered, [this]() { doSettings("Network & HDD"); });
 	connect(
 		m_ui.actionControllerSettings, &QAction::triggered, [this]() { doControllerSettings(ControllerSettingsDialog::Category::GlobalSettings); });
 	connect(m_ui.actionHotkeySettings, &QAction::triggered, [this]() { doControllerSettings(ControllerSettingsDialog::Category::HotkeySettings); });
@@ -236,7 +238,7 @@ void MainWindow::connectVMThreadSignals(EmuThread* thread)
 void MainWindow::recreate()
 {
 	if (m_vm_valid)
-		g_emu_thread->shutdownVM(false, true, true);
+		requestShutdown(false, true, true);
 
 	close();
 	g_main_window = nullptr;
@@ -659,20 +661,38 @@ void MainWindow::reportError(const QString& title, const QString& message)
 	QMessageBox::critical(this, title, message);
 }
 
-bool MainWindow::confirmShutdown()
+bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_save_to_state /* = true */, bool block_until_done /* = false */)
 {
-	if (!m_vm_valid || !QtHost::GetBaseBoolSettingValue("UI", "ConfirmShutdown", true))
+	if (!VMManager::HasValidVM())
 		return true;
 
-	ScopedVMPause pauser(m_vm_paused);
+	// only confirm on UI thread because we need to display a msgbox
+	if (allow_confirm && !GSDumpReplayer::IsReplayingDump() && QtHost::GetBaseBoolSettingValue("UI", "ConfirmShutdown", true))
+	{
+		ScopedVMPause pauser(m_vm_paused);
+		if (QMessageBox::question(g_main_window, tr("Confirm Shutdown"),
+			tr("Are you sure you want to shut down the virtual machine?\n\nAll unsaved progress will be lost.")) != QMessageBox::Yes)
+		{
+			return false;
+		}
+	}
 
-	return (QMessageBox::question(g_main_window, tr("Confirm Shutdown"),
-				tr("Are you sure you want to shut down the virtual machine?\n\nAll unsaved progress will be lost.")) == QMessageBox::Yes);
+	g_emu_thread->shutdownVM(allow_save_to_state);
+
+	if (block_until_done)
+	{
+		// we need to yield here, since the display gets destroyed
+		while (VMManager::HasValidVM())
+			QApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 1);
+	}
+
+	return true;
 }
 
 void MainWindow::requestExit()
 {
-	if (!g_emu_thread->shutdownVM(true, true, false))
+	// this is block, because otherwise closeEvent() will also prompt
+	if (!requestShutdown(true, true, true))
 		return;
 
 	close();
@@ -1021,7 +1041,7 @@ void MainWindow::onGameChanged(const QString& path, const QString& serial, const
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-	if (!g_emu_thread->shutdownVM(true, true, true))
+	if (!requestShutdown(true, true, true))
 	{
 		event->ignore();
 		return;
