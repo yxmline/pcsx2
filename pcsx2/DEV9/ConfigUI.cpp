@@ -31,6 +31,7 @@
 #include "Config.h"
 #include "DEV9.h"
 #include "pcap_io.h"
+#include "sockets.h"
 #include "net.h"
 #include "PacketReader/IP/IP_Address.h"
 #include "gui/AppCoreThread.h"
@@ -138,6 +139,9 @@ public:
 		for (const AdapterEntry& adapter : TAPAdapter::GetAdapters())
 			addAdapter(adapter);
 #endif
+		for (const AdapterEntry& adapter : SocketAdapter::GetAdapters())
+			addAdapter(adapter);
+
 		std::sort(m_api_list.begin(), m_api_list.end());
 		for (auto& list : m_adapter_list)
 			std::sort(list.begin(), list.end(), [](const AdapterEntry& a, AdapterEntry& b){ return a.name < b.name; });
@@ -293,16 +297,40 @@ public:
 
 	void UpdateEnable()
 	{
+		AdapterOptions adapterOptions = AdapterOptions::None;
+		const int api = m_eth_adapter_api->GetSelection();
+		if (api)
+		{
+			const Pcsx2Config::DEV9Options::NetApi netApi = m_api_list[api - 1];
+			switch (netApi)
+			{
+#ifdef _WIN32
+				case Pcsx2Config::DEV9Options::NetApi::TAP:
+					adapterOptions = TAPAdapter::GetAdapterOptions();
+					break;
+#endif
+				case Pcsx2Config::DEV9Options::NetApi::PCAP_Bridged:
+				case Pcsx2Config::DEV9Options::NetApi::PCAP_Switched:
+					adapterOptions = PCAPAdapter::GetAdapterOptions();
+					break;
+				case Pcsx2Config::DEV9Options::NetApi::Sockets:
+					adapterOptions = SocketAdapter::GetAdapterOptions();
+					break;
+				default:
+					break;
+			}
+		}
+
 		bool eth_enable = m_eth_enable->GetValue();
 		bool hdd_enable = m_hdd_enable->GetValue();
-		bool dhcp_enable = eth_enable && m_intercept_dhcp->GetValue();
+		bool dhcp_enable = eth_enable && (m_intercept_dhcp->GetValue() || ((adapterOptions & AdapterOptions::DHCP_ForcedOn) == AdapterOptions::DHCP_ForcedOn));
 
 		m_eth_adapter_api->Enable(eth_enable);
 		m_eth_adapter->Enable(eth_enable);
-		m_intercept_dhcp->Enable(eth_enable);
-		m_ps2_address->Enable(dhcp_enable);
-		m_subnet_mask.setEnabled(dhcp_enable);
-		m_gateway_address.setEnabled(dhcp_enable);
+		m_intercept_dhcp->Enable(eth_enable      && ((adapterOptions & AdapterOptions::DHCP_ForcedOn)       == AdapterOptions::None));
+		m_ps2_address->Enable(dhcp_enable        && ((adapterOptions & AdapterOptions::DHCP_OverrideIP)     == AdapterOptions::None));
+		m_subnet_mask.setEnabled(dhcp_enable     && ((adapterOptions & AdapterOptions::DHCP_OverideSubnet)  == AdapterOptions::None));
+		m_gateway_address.setEnabled(dhcp_enable && ((adapterOptions & AdapterOptions::DHCP_OverideGateway) == AdapterOptions::None));
 		m_dns1_address.setEnabled(dhcp_enable);
 		m_dns2_address.setEnabled(dhcp_enable);
 		m_hdd_file->Enable(hdd_enable);
@@ -357,7 +385,10 @@ public:
 	void OnChoice(wxCommandEvent& ev)
 	{
 		if (ev.GetEventObject() == m_eth_adapter_api)
+		{
 			UpdateAdapters();
+			UpdateEnable();
+		}
 	}
 
 	void OnOK(wxCommandEvent& ev)

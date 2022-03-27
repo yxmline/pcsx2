@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2020  PCSX2 Dev Team
+ *  Copyright (C) 2002-2021  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -14,29 +14,19 @@
  */
 
 #pragma once
-#include <vector>
-#include <string>
-#include "..\net.h"
-using namespace std;
 
-class TAPAdapter : public NetAdapter
+#include "DEV9/Sessions/BaseSession.h"
+
+namespace Sessions
 {
-	HANDLE htap;
-	OVERLAPPED read, write;
-	HANDLE cancel;
-	bool isActive = false;
+	class UDP_BaseSession : public BaseSession
+	{
+	public:
+		UDP_BaseSession(ConnectionKey parKey, PacketReader::IP::IP_Address parAdapterIP)
+			: BaseSession(parKey, parAdapterIP)
+		{
+		}
 
-public:
-	TAPAdapter();
-	virtual bool blocks();
-	virtual bool isInitialised();
-	//gets a packet.rv :true success
-	virtual bool recv(NetPacket* pkt);
-	//sends the packet and deletes it when done (if successful).rv :true success
-	virtual bool send(NetPacket* pkt);
-	virtual void reloadSettings();
-	virtual void close();
-	virtual ~TAPAdapter();
-	static std::vector<AdapterEntry> GetAdapters();
-	static AdapterOptions GetAdapterOptions();
-};
+		virtual bool WillRecive(PacketReader::IP::IP_Address parDestIP) = 0;
+	};
+} // namespace Sessions

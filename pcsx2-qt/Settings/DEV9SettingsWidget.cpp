@@ -32,12 +32,14 @@
 #ifdef _WIN32
 #include "DEV9/Win32/tap.h"
 #endif
+#include "DEV9/sockets.h"
 
 static const char* s_api_name[] = {
 	QT_TRANSLATE_NOOP("DEV9SettingsWidget", " "),
 	QT_TRANSLATE_NOOP("DEV9SettingsWidget", "PCAP Bridged"),
 	QT_TRANSLATE_NOOP("DEV9SettingsWidget", "PCAP Switched"),
 	QT_TRANSLATE_NOOP("DEV9SettingsWidget", "TAP"),
+	QT_TRANSLATE_NOOP("DEV9SettingsWidget", "Sockets"),
 	nullptr,
 };
 
@@ -145,6 +147,8 @@ DEV9SettingsWidget::DEV9SettingsWidget(SettingsDialog* dialog, QWidget* parent)
 	for (const AdapterEntry& adapter : TAPAdapter::GetAdapters())
 		AddAdapter(adapter);
 #endif
+	for (const AdapterEntry& adapter : SocketAdapter::GetAdapters())
+		AddAdapter(adapter); 
 
 	std::sort(m_api_list.begin(), m_api_list.end());
 	for (auto& list : m_adapter_list)
@@ -160,7 +164,6 @@ DEV9SettingsWidget::DEV9SettingsWidget(SettingsDialog* dialog, QWidget* parent)
 	m_api_valuelist.push_back(nullptr);
 
 	//We replace the blank entry with one for global settings
-	Pcsx2Config::DEV9Options::NetApi baseAPI = Pcsx2Config::DEV9Options::NetApi::Unset;
 	if (m_dialog->isPerGameSettings())
 	{
 		const std::string valueAPI = QtHost::GetBaseStringSettingValue("DEV9/Eth", "EthApi", Pcsx2Config::DEV9Options::NetApiNames[static_cast<int>(Pcsx2Config::DEV9Options::NetApi::Unset)]);
@@ -168,12 +171,12 @@ DEV9SettingsWidget::DEV9SettingsWidget(SettingsDialog* dialog, QWidget* parent)
 		{
 			if (valueAPI == Pcsx2Config::DEV9Options::NetApiNames[i])
 			{
-				baseAPI = static_cast<Pcsx2Config::DEV9Options::NetApi>(i);
+				m_global_api = static_cast<Pcsx2Config::DEV9Options::NetApi>(i);
 				break;
 			}
 		}
 
-		std::vector<AdapterEntry> baseList = m_adapter_list[static_cast<u32>(baseAPI)];
+		std::vector<AdapterEntry> baseList = m_adapter_list[static_cast<u32>(m_global_api)];
 
 		std::string baseAdapter = " ";
 		const std::string valueGUID = QtHost::GetBaseStringSettingValue("DEV9/Eth", "EthDevice", "");
@@ -190,7 +193,7 @@ DEV9SettingsWidget::DEV9SettingsWidget(SettingsDialog* dialog, QWidget* parent)
 	}
 
 	if (m_dialog->isPerGameSettings())
-		m_ui.ethDevType->addItem(tr("Use Global Setting [%1]").arg(QString::fromUtf8(Pcsx2Config::DEV9Options::NetApiNames[static_cast<u32>(baseAPI)])));
+		m_ui.ethDevType->addItem(tr("Use Global Setting [%1]").arg(QString::fromUtf8(Pcsx2Config::DEV9Options::NetApiNames[static_cast<u32>(m_global_api)])));
 	else
 		m_ui.ethDevType->addItem(QString::fromUtf8(m_api_namelist[0]));
 
@@ -358,6 +361,8 @@ void DEV9SettingsWidget::onEthDeviceTypeChanged(int index)
 		m_ui.ethDev->clear();
 	}
 
+	Pcsx2Config::DEV9Options::NetApi selectedApi{Pcsx2Config::DEV9Options::NetApi ::Unset};
+
 	if (index > 0)
 	{
 		std::vector<AdapterEntry> list = m_adapter_list[static_cast<u32>(m_api_list[index])];
@@ -369,6 +374,8 @@ void DEV9SettingsWidget::onEthDeviceTypeChanged(int index)
 			if (list[i].guid == value)
 				m_ui.ethDev->setCurrentIndex(i);
 		}
+
+		selectedApi = m_api_list[index];
 	}
 
 	if (m_dialog->isPerGameSettings())
@@ -379,10 +386,34 @@ void DEV9SettingsWidget::onEthDeviceTypeChanged(int index)
 			m_ui.ethDev->addItem(tr("Use Global Setting [%1]").arg(QString::fromUtf8(list[0].name)));
 			m_ui.ethDev->setCurrentIndex(0);
 			m_ui.ethDev->setEnabled(false);
+
+			selectedApi = m_global_api;
 		}
 		else
 			m_ui.ethDev->setEnabled(true);
 	}
+
+	switch (selectedApi)
+	{
+#ifdef _WIN32
+		case Pcsx2Config::DEV9Options::NetApi::TAP:
+			m_adapter_options = TAPAdapter::GetAdapterOptions();
+			break;
+#endif
+		case Pcsx2Config::DEV9Options::NetApi::PCAP_Bridged:
+		case Pcsx2Config::DEV9Options::NetApi::PCAP_Switched:
+			m_adapter_options = PCAPAdapter::GetAdapterOptions();
+			break;
+		case Pcsx2Config::DEV9Options::NetApi::Sockets:
+			m_adapter_options = SocketAdapter::GetAdapterOptions();
+			break;
+		default:
+			m_adapter_options = AdapterOptions::None;
+			break;
+	}
+
+	m_ui.ethInterceptDHCP->setEnabled((m_adapter_options & AdapterOptions::DHCP_ForcedOn) == AdapterOptions::None);
+	onEthDHCPInterceptChanged(m_ui.ethInterceptDHCP->checkState());
 }
 
 void DEV9SettingsWidget::onEthDeviceChanged(int index)
@@ -403,17 +434,24 @@ void DEV9SettingsWidget::onEthDeviceChanged(int index)
 
 void DEV9SettingsWidget::onEthDHCPInterceptChanged(int state)
 {
-	const bool enabled = state == Qt::CheckState::PartiallyChecked ? QtHost::GetBaseBoolSettingValue("DEV9/Eth", "InterceptDHCP", false) : state;
+	const bool enabled = (state == Qt::CheckState::PartiallyChecked ? QtHost::GetBaseBoolSettingValue("DEV9/Eth", "InterceptDHCP", false) : state) ||
+		((m_adapter_options & AdapterOptions::DHCP_ForcedOn) == AdapterOptions::DHCP_ForcedOn);
 
-	m_ui.ethPS2Addr->setEnabled(enabled);
-	m_ui.ethPS2AddrLabel->setEnabled(enabled);
+	// clang-format off
+	const bool ipOverride = (m_adapter_options & AdapterOptions::DHCP_OverrideIP)     == AdapterOptions::DHCP_OverrideIP;
+	const bool snOverride = (m_adapter_options & AdapterOptions::DHCP_OverideSubnet)  == AdapterOptions::DHCP_OverideSubnet;
+	const bool gwOverride = (m_adapter_options & AdapterOptions::DHCP_OverideGateway) == AdapterOptions::DHCP_OverideGateway;
+	// clang-format on
 
-	m_ui.ethNetMaskLabel->setEnabled(enabled);
-	m_ui.ethNetMaskAuto->setEnabled(enabled);
+	m_ui.ethPS2Addr->setEnabled(enabled && !ipOverride);
+	m_ui.ethPS2AddrLabel->setEnabled(enabled && !ipOverride);
+
+	m_ui.ethNetMaskLabel->setEnabled(enabled && !snOverride);
+	m_ui.ethNetMaskAuto->setEnabled(enabled && !snOverride);
 	onEthAutoChanged(m_ui.ethNetMaskAuto, m_ui.ethNetMaskAuto->checkState(), m_ui.ethNetMask, "DEV9/Eth", "AutoMask");
 
-	m_ui.ethGatewayAddrLabel->setEnabled(enabled);
-	m_ui.ethGatewayAuto->setEnabled(enabled);
+	m_ui.ethGatewayAddrLabel->setEnabled(enabled && !gwOverride);
+	m_ui.ethGatewayAuto->setEnabled(enabled && !gwOverride);
 	onEthAutoChanged(m_ui.ethGatewayAuto, m_ui.ethGatewayAuto->checkState(), m_ui.ethGatewayAddr, "DEV9/Eth", "AutoGateway");
 
 	m_ui.ethDNS1AddrLabel->setEnabled(enabled);
