@@ -1,5 +1,20 @@
 //#version 420 // Keep it for editor detection
 
+#ifdef VERTEX_SHADER
+
+layout(location = 0) in vec4 a_pos;
+layout(location = 1) in vec2 a_tex;
+
+layout(location = 0) out vec2 v_tex;
+
+void main()
+{
+	gl_Position = vec4(a_pos.x, -a_pos.y, a_pos.z, a_pos.w);
+	v_tex = a_tex;
+}
+
+#endif
+
 /*
 ** Contrast, saturation, brightness
 ** Code of this function is from TGM's shader pack
@@ -11,13 +26,14 @@
 
 #ifdef FRAGMENT_SHADER
 
-uniform vec4 params;
+layout(push_constant) uniform cb0
+{
+	vec4 params;
+};
 
-in vec4 PSin_p;
-in vec2 PSin_t;
-in vec4 PSin_c;
-
-layout(location = 0) out vec4 SV_Target0;
+layout(set = 0, binding = 0) uniform sampler2D samp0;
+layout(location = 0) in vec2 v_tex;
+layout(location = 0) out vec4 o_col0;
 
 // For all settings: 1.0 = 100% 0.5=50% 1.5 = 150%
 vec4 ContrastSaturationBrightness(vec4 color)
@@ -45,10 +61,10 @@ vec4 ContrastSaturationBrightness(vec4 color)
 }
 
 
-void ps_main()
+void main()
 {
-    vec4 c = texture(TextureSampler, PSin_t);
-    SV_Target0 = ContrastSaturationBrightness(c);
+    vec4 c = texture(samp0, v_tex);
+    o_col0 = ContrastSaturationBrightness(c);
 }
 
 
