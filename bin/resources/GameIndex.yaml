@@ -424,6 +424,8 @@ SCAJ-20043:
 SCAJ-20044:
   name: "Tomb Raider - The Angel of Darkness"
   region: "NTSC-Unk"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
 SCAJ-20045:
   name: "Shadow Tower Abyss"
   region: "NTSC-Unk"
@@ -10763,6 +10765,8 @@ SLES-51227:
         // Fix ingame SPS by interchanging vclipw.xyz vf5, vf5w with cfc2.
         patch=1,EE,001db3a0,word,48489000
         patch=1,EE,001db3a4,word,4bc529ff
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
 SLES-51229:
   name: "Virtua Cop - Elite Edition"
   region: "PAL-M5"
@@ -16510,6 +16514,8 @@ SLES-53908:
   name: "Tomb Raider - Legend"
   region: "PAL-M8"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
   gsHWFixes:
     mipmap: 1 # Fixes distant characters and models but there are still some flickering textures.
 SLES-53909:
@@ -18267,6 +18273,8 @@ SLES-54674:
   name: "Lara Croft Tomb Raider - Anniversary"
   region: "PAL-M10"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
   gsHWFixes:
     mipmap: 1
 SLES-54675:
@@ -19334,15 +19342,23 @@ SLES-55138:
 SLES-55143:
   name: "The Chronicles of Narnia - Prince Caspian"
   region: "PAL-G-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55144:
   name: "The Chronicles of Narnia - Prince Caspian"
   region: "PAL-M6"
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55145:
   name: "The Chronicles of Narnia - Prince Caspian"
   region: "PAL-F-DU"
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55146:
   name: "The Chronicles of Narnia - Prince Caspian"
   region: "PAL-UK"
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55147:
   name: "Silent Hill - Origins"
   region: "PAL-M5"
@@ -19957,7 +19973,7 @@ SLES-55440:
   region: "PAL-M5"
   compat: 5
 SLES-55442:
-  name: "Tomb Raider Underworld"
+  name: "Tomb Raider - Underworld"
   region: "PAL-M8"
   compat: 5
 SLES-55443:
@@ -25847,6 +25863,8 @@ SLPM-65661:
 SLPM-65663:
   name: "Zwei!!"
   region: "NTSC-J"
+  gsHWFixes:
+    roundSprite: 1 # Fixes vertical lines.
 SLPM-65664:
   name: "Memories Off... Duet [SuperLite 2000 Series]"
   region: "NTSC-J"
@@ -27280,6 +27298,8 @@ SLPM-66101:
 SLPM-66102:
   name: "Zwei!! [Taito the Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    roundSprite: 1 # Fixes vertical lines.
 SLPM-66103:
   name: "WRC 3 [Spike the Best]"
   region: "NTSC-J"
@@ -28860,6 +28880,8 @@ SLPM-66557:
 SLPM-66558:
   name: "Tomb Raider - Legend"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
   gsHWFixes:
     mipmap: 1 # Fixes distant characters and models but there are still some flickering textures.
 SLPM-66559:
@@ -32685,6 +32707,8 @@ SLPS-25245:
 SLPS-25246:
   name: "Tomb Raider - The Angel of Darkness"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
 SLPS-25247:
   name: "R-Type Final"
   region: "NTSC-J"
@@ -34860,6 +34884,8 @@ SLPS-25855:
 SLPS-25856:
   name: "Tomb Raider - Anniversary"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
   gsHWFixes:
     mipmap: 1
 SLPS-25858:
@@ -34983,7 +35009,7 @@ SLPS-25917:
   name: "Sacred Blaze"
   region: "NTSC-J"
 SLPS-25927:
-  name: "Tomb Raider Underworld"
+  name: "Tomb Raider - Underworld"
   region: "NTSC-J"
 SLPS-25930:
   name: "Major League Baseball 2K9"
@@ -37489,6 +37515,8 @@ SLUS-20467:
         // Fix ingame SPS by interchanging vclipw.xyz vf5, vf5w with cfc2.
         patch=1,EE,001d90e0,word,48489000
         patch=1,EE,001d90e4,word,4bc529ff
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
 SLUS-20468:
   name: "Dynasty Tactics"
   region: "NTSC-U"
@@ -40875,6 +40903,10 @@ SLUS-21203:
   name: "Tomb Raider - Legend"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
+  gsHWFixes:
+    mipmap: 1 # Fixes distant characters and models but there are still some flickering textures.
 SLUS-21204:
   name: "Victorious Boxers 2 - Fighting Spirit"
   region: "NTSC-U"
@@ -42549,6 +42581,8 @@ SLUS-21555:
   name: "Tomb Raider - Anniversary"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes garbage pixels.
   gsHWFixes:
     mipmap: 1
 SLUS-21556:
@@ -43471,6 +43505,8 @@ SLUS-21756:
   name: "Chronicles of Narnia, The - Prince Caspian"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLUS-21757:
   name: "Kung Fu Panda"
   region: "NTSC-U"
@@ -43891,9 +43927,9 @@ SLUS-21857:
   name: "Short Track Racing - Trading Paint"
   region: "NTSC-U"
 SLUS-21858:
-  name: "Tomb Raider Underworld"
+  name: "Tomb Raider - Underworld"
   region: "NTSC-U"
-  compat: 4
+  compat: 5
 SLUS-21860:
   name: "Bigs 2, The"
   region: "NTSC-U"
