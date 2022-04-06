@@ -1098,6 +1098,7 @@ SCAJ-20190:
   name: "God of War II"
   region: "NTSC-Unk"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCAJ-20191:
@@ -1255,6 +1256,7 @@ SCAJ-30010:
   name: "God of War"
   region: "NTSC-E"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -1262,6 +1264,7 @@ SCAJ-30011:
   name: "God of War II"
   region: "NTSC-E"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCCS-40001:
@@ -2745,7 +2748,7 @@ SCES-51164:
   name: "Mark of Kri, The"
   region: "PAL-M5"
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SCES-51176:
   name: "Disney's Treasure Planet"
   region: "PAL-M4"
@@ -2806,6 +2809,7 @@ SCES-51533:
   name: "God of War"
   region: "PAL-Unk"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -3233,6 +3237,7 @@ SCES-53133:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -3594,6 +3599,7 @@ SCES-54206:
   region: "PAL-M6"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCES-54219:
@@ -4571,6 +4577,7 @@ SCKA-30002:
   region: "NTSC-K"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -4579,6 +4586,7 @@ SCKA-30006:
   region: "NTSC-K"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCPM-85101:
@@ -6182,7 +6190,7 @@ SCUS-97140:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
   patches:
     DBD09DD4:
       content: |-
@@ -6404,7 +6412,7 @@ SCUS-97201:
   name: "Mark of Kri, The"
   region: "NTSC-U"
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SCUS-97203:
   name: "Wild ARMs 3"
   region: "NTSC-U"
@@ -6484,7 +6492,7 @@ SCUS-97222:
   name: "Mark of Kri [Demo]"
   region: "NTSC-U"
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SCUS-97223:
   name: "NFL GameDay 2003 [Demo]"
   region: "NTSC-U"
@@ -6970,6 +6978,7 @@ SCUS-97399:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -7239,6 +7248,7 @@ SCUS-97467:
   name: "God of War [Demo]"
   region: "NTSC-U"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -7305,12 +7315,14 @@ SCUS-97481:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCUS-97482:
   name: "God of War II - The Colossus Battle [Demo]"
   region: "NTSC-U"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SCUS-97483:
@@ -8896,7 +8908,7 @@ SLES-50273:
   name: "Legion - The Legend of Excalibur"
   region: "PAL-M5"
   gsHWFixes:
-    preloadFrameData: 1
+    preloadFrameData: 1 # Reduces black ground textures.
 SLES-50274:
   name: "Arctic Thunder"
   region: "PAL-M3"
@@ -11376,6 +11388,8 @@ SLES-51547:
   region: "PAL-M5"
   clampModes:
     vuClampMode: 3 # Fixes SPS menus.
+  gameFixes:
+    - VUSyncHack # Fixes SPS in game.
 SLES-51548:
   name: "This is Football"
   region: "PAL-M3"
@@ -15819,7 +15833,7 @@ SLES-53621:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SLES-53623:
   name: "Spongebob SquarePants - Battle for Bikini Bottom"
   region: "PAL-F"
@@ -21720,6 +21734,9 @@ SLPM-60262:
 SLPM-60265:
   name: "10th Anniversary PlayStation & PlayStation 2 All-Soft Catalogue Special SaveData Collection [PS2 Disc]"
   region: "NTSC-J"
+SLPM-60266:
+  name: "Ponkotsu Roman Daikatsugeki Bumpy Trot [Trial]"
+  region: "NTSC-J"
 SLPM-60267:
   name: "Garouden Breakblow [Taikenban]"
   region: "NTSC-J"
@@ -24851,7 +24868,7 @@ SLPM-65310:
   name: "Mark of Kri, The"
   region: "NTSC-J"
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SLPM-65311:
   name: "Violet no Atelier - Gramnad no Renkinjutsushi"
   region: "NTSC-J"
@@ -27589,6 +27606,7 @@ SLPM-66167:
   name: "God of War"
   region: "NTSC-J"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -28158,7 +28176,7 @@ SLPM-66327:
   name: "Wallace and Gromit - The Curse of the Were-Rabbit"
   region: "NTSC-J"
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SLPM-66328:
   name: "Call of Duty 2 - Big Red One"
   region: "NTSC-J"
@@ -30434,6 +30452,7 @@ SLPM-67010:
   name: "God of War"
   region: "NTSC-J"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -30441,6 +30460,7 @@ SLPM-67011:
   name: "God of War [CapKore]"
   region: "NTSC-J"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -30448,6 +30468,7 @@ SLPM-67012:
   name: "God of War [Best Price]"
   region: "NTSC-J"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes depth lines and vertical lines and green fog bloom effect.
     roundSprite: 1 # Fixes vertical lines and minor ghosting.
     wrapGSMem: 1 # Fixes FMV when in progressive mode.
@@ -30455,6 +30476,7 @@ SLPM-67013:
   name: "God of War II - The End Begins"
   region: "NTSC-J"
   gsHWFixes:
+    alignSprite: 1 # Fixes water vertical lines.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     roundSprite: 1 # Fixes chromatic effect.
 SLPM-67014:
@@ -35878,7 +35900,7 @@ SLUS-20048:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    preloadFrameData: 1
+    preloadFrameData: 1 # Reduces black ground textures.
 SLUS-20049:
   name: "MLB Slugfest 2003"
   region: "NTSC-U"
@@ -41539,7 +41561,7 @@ SLUS-21312:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    interlace: 3 # Game requires bob delinterlacing when auto
+    deinterlace: 3 # Game requires bob deinterlacing when auto.
 SLUS-21313:
   name: "Friends - The One with all the Trivia"
   region: "NTSC-U"
@@ -43710,7 +43732,7 @@ SLUS-21787:
   gameFixes:
     - EETimingHack
 SLUS-21788:
-  name: "Ar tonelico Ii - Melody Of Metafalica"
+  name: "Ar tonelico II - Melody Of Metafalica"
   region: "NTSC-U"
   compat: 5
   roundModes:
