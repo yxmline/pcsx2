@@ -705,7 +705,6 @@ void GSDevice11::DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, 
 	if (feedback_write_2 || feedback_write_1 || sTex[0])
 	{
 		MergeConstantBuffer cb;
-		cb.BGColor = c;
 		cb.EMODA = EXTBUF.EMODA;
 		cb.EMODC = EXTBUF.EMODC;
 		m_ctx->UpdateSubresource(m_merge.cb.get(), 0, nullptr, &cb, 0, 0);
@@ -1348,6 +1347,16 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 
 	DrawIndexedPrimitive();
 
+	if (config.separate_alpha_pass)
+	{
+		GSHWDrawConfig::BlendState sap_blend = {};
+		SetHWDrawConfigForAlphaPass(&config.ps, &config.colormask, &sap_blend, &config.depth);
+		SetupOM(config.depth, convertSel(config.colormask, sap_blend), config.blend.constant);
+		SetupPS(config.ps, &config.cb_ps, config.sampler);
+
+		DrawIndexedPrimitive();
+	}
+
 	if (config.alpha_second_pass.enable)
 	{
 		preprocessSel(config.alpha_second_pass.ps);
@@ -1365,6 +1374,16 @@ void GSDevice11::RenderHW(GSHWDrawConfig& config)
 		SetupOM(config.alpha_second_pass.depth, convertSel(config.alpha_second_pass.colormask, config.blend), config.blend.constant);
 
 		DrawIndexedPrimitive();
+
+		if (config.second_separate_alpha_pass)
+		{
+			GSHWDrawConfig::BlendState sap_blend = {};
+			SetHWDrawConfigForAlphaPass(&config.alpha_second_pass.ps, &config.alpha_second_pass.colormask, &sap_blend, &config.alpha_second_pass.depth);
+			SetupOM(config.alpha_second_pass.depth, convertSel(config.alpha_second_pass.colormask, sap_blend), config.blend.constant);
+			SetupPS(config.alpha_second_pass.ps, &config.cb_ps, config.sampler);
+
+			DrawIndexedPrimitive();
+		}
 	}
 
 	EndScene();
