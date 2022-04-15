@@ -337,7 +337,8 @@ static void LoadPatches(const std::string& crc_string, bool show_messages, bool 
 	if (EmuConfig.EnablePatches)
 	{
 		const GameDatabaseSchema::GameEntry* game = GameDatabase::findGame(s_game_serial);
-		if (game && (patch_count = LoadPatchesFromGamesDB(crc_string, *game)) > 0)
+		const std::string* patches = game ? game->findPatch(s_game_crc) : nullptr;
+		if (patches && (patch_count = LoadPatchesFromString(*patches)) > 0)
 		{
 			PatchesCon->WriteLn(Color_Green, "(GameDB) Patches Loaded: %d", patch_count);
 			message.Write("%u game patches", patch_count);
@@ -348,7 +349,7 @@ static void LoadPatches(const std::string& crc_string, bool show_messages, bool 
 	int cheat_count = 0;
 	if (EmuConfig.EnableCheats)
 	{
-		cheat_count = LoadPatchesFromDir(StringUtil::UTF8StringToWxString(crc_string), EmuFolders::Cheats, L"Cheats");
+		cheat_count = LoadPatchesFromDir(crc_string, EmuFolders::Cheats, "Cheats", true);
 		if (cheat_count > 0)
 		{
 			PatchesCon->WriteLn(Color_Green, "Cheats Loaded: %d", cheat_count);
@@ -360,7 +361,7 @@ static void LoadPatches(const std::string& crc_string, bool show_messages, bool 
 	int ws_patch_count = 0;
 	if (EmuConfig.EnableWideScreenPatches && s_game_crc != 0)
 	{
-		if (ws_patch_count = LoadPatchesFromDir(StringUtil::UTF8StringToWxString(crc_string), EmuFolders::CheatsWS, L"Widescreen hacks"))
+		if (ws_patch_count = LoadPatchesFromDir(crc_string, EmuFolders::CheatsWS, "Widescreen hacks", false))
 		{
 			Console.WriteLn(Color_Gray, "Found widescreen patches in the cheats_ws folder --> skipping cheats_ws.zip");
 		}
@@ -376,7 +377,7 @@ static void LoadPatches(const std::string& crc_string, bool show_messages, bool 
 
 			if (!s_widescreen_cheats_data.empty())
 			{
-				ws_patch_count = LoadPatchesFromZip(StringUtil::UTF8StringToWxString(crc_string), wxT("cheats_ws.zip"), new wxMemoryInputStream(s_widescreen_cheats_data.data(), s_widescreen_cheats_data.size()));
+				ws_patch_count = LoadPatchesFromZip(crc_string, s_widescreen_cheats_data.data(), s_widescreen_cheats_data.size());
 				PatchesCon->WriteLn(Color_Green, "(Wide Screen Cheats DB) Patches Loaded: %d", ws_patch_count);
 			}
 		}
@@ -411,7 +412,7 @@ void VMManager::UpdateRunningGame(bool force)
 	{
 		const bool ingame = (ElfCRC && (g_GameLoading || g_GameStarted));
 		new_crc = ingame ? ElfCRC : 0;
-		new_serial = ingame ? SysGetDiscID().ToStdString() : SysGetBiosDiscID().ToStdString();
+		new_serial = ingame ? SysGetDiscID() : SysGetBiosDiscID();
 	}
 	else
 	{
@@ -510,6 +511,7 @@ bool VMManager::ApplyBootParameters(const VMBootParameters& params)
 {
 	const bool default_fast_boot = Host::GetBoolSettingValue("EmuCore", "EnableFastBoot", true);
 	EmuConfig.UseBOOT2Injection = params.fast_boot.value_or(default_fast_boot);
+
 	s_elf_override = params.elf_override;
 	s_disc_path.clear();
 
@@ -845,7 +847,7 @@ bool VMManager::DoLoadState(const char* filename)
 	try
 	{
 		Host::OnSaveStateLoading(filename);
-		SaveState_UnzipFromDisk(wxString::FromUTF8(filename));
+		SaveState_UnzipFromDisk(filename);
 		UpdateRunningGame(false);
 		Host::OnSaveStateLoaded(filename, true);
 		return true;
@@ -865,9 +867,8 @@ bool VMManager::DoSaveState(const char* filename, s32 slot_for_message)
 
 	try
 	{
-		std::unique_ptr<ArchiveEntryList> elist = std::make_unique<ArchiveEntryList>(new VmStateBuffer(L"Zippable Savestate"));
-		SaveState_DownloadState(elist.get());
-		SaveState_ZipToDisk(elist.release(), SaveState_SaveScreenshot(), wxString::FromUTF8(filename), slot_for_message);
+		std::unique_ptr<ArchiveEntryList> elist = SaveState_DownloadState();
+		SaveState_ZipToDisk(std::move(elist), SaveState_SaveScreenshot(), filename, slot_for_message);
 		Host::InvalidateSaveStateCache();
 		Host::OnSaveStateSaved(filename);
 		return true;

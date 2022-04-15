@@ -24,7 +24,9 @@
 #include "pcsx2/GS/GS.h"
 #include "pcsx2/GS/GSUtil.h"
 
+#ifdef ENABLE_VULKAN
 #include "Frontend/VulkanHostDisplay.h"
+#endif
 
 #ifdef _WIN32
 #include "Frontend/D3D11HostDisplay.h"
@@ -43,10 +45,18 @@ static constexpr RendererInfo s_renderer_info[] = {
 	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "Direct3D 11"),
 	GSRendererType::DX11,
 #endif
+#ifdef ENABLE_OPENGL
 	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "OpenGL"),
 	GSRendererType::OGL,
+#endif
+#ifdef ENABLE_VULKAN
 	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "Vulkan"),
 	GSRendererType::VK,
+#endif
+#ifdef __APPLE__
+	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "Metal"),
+	GSRendererType::Metal,
+#endif
 	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "Software"),
 	GSRendererType::SW,
 	QT_TRANSLATE_NOOP("GraphicsSettingsWidget", "Null"),
@@ -411,9 +421,11 @@ void GraphicsSettingsWidget::updateRendererDependentOptions()
 			break;
 #endif
 
+#ifdef ENABLE_VULKAN
 		case GSRendererType::VK:
 			modes = VulkanHostDisplay::StaticGetAdapterAndModeList(nullptr);
 			break;
+#endif
 
 		case GSRendererType::OGL:
 		case GSRendererType::SW:

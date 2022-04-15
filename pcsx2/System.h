@@ -163,10 +163,9 @@ extern void SysOutOfMemory_EmergencyResponse(uptr blocksize);
 
 extern u8 *SysMmapEx(uptr base, u32 size, uptr bounds, const char *caller="Unnamed");
 extern void vSyncDebugStuff( uint frame );
-extern void NTFS_CompressFile( const wxString& file, bool compressStatus=true );
 
-extern wxString SysGetBiosDiscID();
-extern wxString SysGetDiscID();
+extern std::string SysGetBiosDiscID();
+extern std::string SysGetDiscID();
 
 extern SysMainMemory& GetVmMemory();
 
@@ -187,6 +186,9 @@ extern SysMainMemory& GetVmMemory();
 // responded to the prompt.
 //
 
+#ifndef PCSX2_CORE
+#include <wx/string.h>
+
 namespace Msgbox
 {
 	extern bool	Alert( const wxString& text, const wxString& caption=_("PCSX2 Message"), int icon=wxICON_EXCLAMATION );
@@ -195,6 +197,7 @@ namespace Msgbox
 
 	extern int	Assertion( const wxString& text, const wxString& stacktrace );
 }
+#endif
 
 #ifdef _WIN32
 extern void CheckIsUserOnHighPerfPowerPlan();

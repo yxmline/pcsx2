@@ -699,10 +699,6 @@ set(pcsx2GSSources
 	GS/Renderers/SW/GSSetupPrimCodeGenerator.all.cpp
 	GS/Renderers/SW/GSTextureCacheSW.cpp
 	GS/Renderers/SW/GSTextureSW.cpp
-	GS/Renderers/OpenGL/GLLoader.cpp
-	GS/Renderers/OpenGL/GLState.cpp
-	GS/Renderers/OpenGL/GSDeviceOGL.cpp
-	GS/Renderers/OpenGL/GSTextureOGL.cpp
 	GS/Window/GSSetting.cpp
 	)
 
@@ -767,15 +763,27 @@ set(pcsx2GSHeaders
 	GS/Renderers/SW/GSTextureCacheSW.h
 	GS/Renderers/SW/GSTextureSW.h
 	GS/Renderers/SW/GSVertexSW.h
-	GS/Renderers/OpenGL/GLLoader.h
-	GS/Renderers/OpenGL/GLState.h
-	GS/Renderers/OpenGL/GSDeviceOGL.h
-	GS/Renderers/OpenGL/GSTextureOGL.h
-	GS/Renderers/OpenGL/GSUniformBufferOGL.h
 	GS/Window/GSCaptureDlg.h
 	GS/Window/GSDialog.h
 	GS/Window/GSSetting.h
 	)
+
+if(USE_OPENGL)
+	list(APPEND pcsx2GSSources
+		GS/Renderers/OpenGL/GLLoader.cpp
+		GS/Renderers/OpenGL/GLState.cpp
+		GS/Renderers/OpenGL/GSDeviceOGL.cpp
+		GS/Renderers/OpenGL/GSTextureOGL.cpp
+	)
+	list(APPEND pcsx2GSHeaders
+		GS/Renderers/OpenGL/GLLoader.h
+		GS/Renderers/OpenGL/GLState.h
+		GS/Renderers/OpenGL/GSDeviceOGL.h
+		GS/Renderers/OpenGL/GSTextureOGL.h
+		GS/Renderers/OpenGL/GSUniformBufferOGL.h
+	)
+	target_link_libraries(PCSX2_FLAGS INTERFACE glad)
+endif()
 
 if(USE_VULKAN)
 	list(APPEND pcsx2GSSources
@@ -984,14 +992,21 @@ set(pcsx2DebugToolsHeaders
 # Frontend sources
 set(pcsx2FrontendSources
 	Frontend/ImGuiManager.cpp
-	Frontend/OpenGLHostDisplay.cpp
 )
 
 # Frontend headers
 set(pcsx2FrontendHeaders
 	Frontend/ImGuiManager.h
-	Frontend/OpenGLHostDisplay.h
 )
+
+if(USE_OPENGL)
+	list(APPEND pcsx2FrontendSources
+		Frontend/OpenGLHostDisplay.cpp
+	)
+	list(APPEND pcsx2FrontendHeaders
+		Frontend/OpenGLHostDisplay.h
+	)
+endif()
 
 if(USE_VULKAN)
 	list(APPEND pcsx2FrontendSources
@@ -1094,6 +1109,7 @@ set(pcsx2GuiSources
 	gui/ExecutorThread.cpp
 	gui/FrameForGS.cpp
 	gui/GlobalCommands.cpp
+	gui/IniInterface.cpp
 	gui/i18n.cpp
 	gui/IsoDropTarget.cpp
 	gui/MainFrame.cpp
@@ -1157,6 +1173,7 @@ set(pcsx2GuiHeaders
 	gui/DriveList.h
 	gui/GSFrame.h
 	gui/i18n.h
+	gui/IniInterface.h
 	gui/IsoDropTarget.h
 	gui/MainFrame.h
 	gui/MSWstuff.h
@@ -1245,6 +1262,7 @@ if(NOT PCSX2_CORE)
 	)
 	list(APPEND pcsx2OSXSources
 		Linux/LnxConsolePipe.cpp
+		Darwin/DarwinKeyCodes.cpp
 	)
 	list(APPEND pcsx2FreeBSDSources
 		Linux/LnxConsolePipe.cpp
@@ -1377,7 +1395,6 @@ set(pcsx2WindowsSources
 	windows/FlatFileReaderWindows.cpp
 	windows/Optimus.cpp
 	windows/VCprojects/IopSif.cpp
-	windows/WinCompressNTFS.cpp
 	windows/WinConsolePipe.cpp
 	windows/WinKeyCodes.cpp
 	windows/WinPowerProfile.cpp
@@ -1579,11 +1596,11 @@ endif()
 
 target_link_libraries(PCSX2_FLAGS INTERFACE
 	common
-	glad
 	imgui
 	fmt::fmt
 	ryml
 	chdr-static
+	zip
 	wxWidgets::all
 	ZLIB::ZLIB
 	PkgConfig::SOUNDTOUCH

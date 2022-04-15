@@ -896,9 +896,6 @@
     <ClCompile Include="gui\Panels\VideoPanel.cpp">
       <Filter>AppHost\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="windows\WinCompressNTFS.cpp">
-      <Filter>AppHost\Win32</Filter>
-    </ClCompile>
     <ClCompile Include="windows\WinConsolePipe.cpp">
       <Filter>AppHost\Win32</Filter>
     </ClCompile>
@@ -1765,6 +1762,9 @@
     </ClCompile>
     <ClCompile Include="x86\iR5900Analysis.cpp">
       <Filter>System\Ps2\EmotionEngine\EE\Dynarec</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\IniInterface.cpp">
+      <Filter>AppHost</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2932,6 +2932,9 @@
     </ClInclude>
     <ClInclude Include="x86\iR5900Analysis.h">
       <Filter>System\Ps2\EmotionEngine\EE\Dynarec</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\IniInterface.h">
+      <Filter>AppHost</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

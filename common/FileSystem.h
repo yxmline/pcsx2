@@ -102,6 +102,12 @@ namespace FileSystem
 	/// Returns the file title (less the extension and path) from a filename.
 	std::string_view GetFileTitleFromPath(const std::string_view& path);
 
+	/// Splits a path into its components, handling both Windows and Unix separators.
+	std::vector<std::string_view> SplitWindowsPath(const std::string_view& path);
+
+	/// Splits a path into its components, only handling native separators.
+	std::vector<std::string_view> SplitNativePath(const std::string_view& path);
+
 	/// Returns a list of "root directories" (i.e. root/home directories on Linux, drive letters on Windows).
 	std::vector<std::string> GetRootDirectoryList();
 
@@ -168,5 +174,10 @@ namespace FileSystem
 
 	/// Sets the current working directory. Returns true if successful.
 	bool SetWorkingDirectory(const char* path);
+
+	/// Enables/disables NTFS compression on a file or directory.
+	/// Does not apply the compression flag recursively if called for a directory.
+	/// Does nothing and returns false on non-Windows platforms.
+	bool SetPathCompression(const char* path, bool enable);
 
 }; // namespace FileSystem

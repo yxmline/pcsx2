@@ -58,10 +58,8 @@
     <ClCompile Include="GL\ShaderCache.cpp" />
     <ClCompile Include="GL\StreamBuffer.cpp" />
     <ClCompile Include="FileSystem.cpp" />
-    <ClCompile Include="IniInterface.cpp" />
     <ClCompile Include="MD5Digest.cpp" />
     <ClCompile Include="ProgressCallback.cpp" />
-    <ClCompile Include="pxStreams.cpp" />
     <ClCompile Include="pxTranslate.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="SettingsWrapper.cpp" />
@@ -161,7 +159,6 @@
     <ClInclude Include="Vulkan\Texture.h" />
     <ClInclude Include="Vulkan\Util.h" />
     <ClInclude Include="WindowInfo.h" />
-    <ClInclude Include="wxBaseTools.h" />
     <ClInclude Include="Threading.h" />
     <ClInclude Include="PersistentThread.h" />
     <ClInclude Include="RwMutex.h" />
@@ -190,6 +187,7 @@
     <ClInclude Include="emitter\implement\simd_helpers.h" />
     <ClInclude Include="emitter\implement\simd_moremovs.h" />
     <ClInclude Include="emitter\implement\simd_shufflepack.h" />
+    <ClInclude Include="ZipHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\3rdparty\glad\glad.vcxproj">

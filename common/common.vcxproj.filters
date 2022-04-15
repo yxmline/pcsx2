@@ -25,9 +25,6 @@
     <ClCompile Include="emitter\groups.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IniInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="emitter\jmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -65,9 +62,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PrecompiledHeader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pxStreams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pxTranslate.cpp">
@@ -309,9 +303,6 @@
     <ClInclude Include="emitter\tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wxBaseTools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="emitter\x86emitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -419,6 +410,9 @@
     </ClInclude>
     <ClInclude Include="D3D11\ShaderCompiler.h">
       <Filter>Header Files\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="ZipHelpers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

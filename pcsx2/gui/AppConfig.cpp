@@ -16,8 +16,7 @@
 #include "PrecompiledHeader.h"
 #include "App.h"
 #include "MainFrame.h"
-
-#include "common/IniInterface.h"
+#include "IniInterface.h"
 #include "common/SettingsWrapper.h"
 #include "wxSettingsInterface.h"
 
@@ -544,12 +543,6 @@ void AppConfig::FolderOptions::Set(FoldersEnum_t folderidx, const wxString& src,
 
 			jNO_DEFAULT
 	}
-}
-
-wxString AppConfig::FullpathToSaveState(wxString serialName, wxString CRCvalue) const
-{
-	wxString Sstate_append = serialName + " - " + "(" + CRCvalue + ")";
-	return Path::Combine(Folders.Savestates, Sstate_append);
 }
 
 bool IsPortable()
