@@ -402,7 +402,7 @@ bool GSRenderer::Merge(int field)
 			}
 			else
 			{
-				const int field2 = scanmask ? 0 : 0 - ((static_cast<int>(GSConfig.InterlaceMode) - 1) & 1);
+				const int field2 = scanmask ? 0 : 1 - ((static_cast<int>(GSConfig.InterlaceMode) - 1) & 1);
 				const int offset = tex[1] ? tex[1]->GetScale().y : tex[0]->GetScale().y;
 				const int mode = scanmask ? 2 : ((static_cast<int>(GSConfig.InterlaceMode) - 1) >> 1);
 
@@ -786,7 +786,7 @@ void GSRenderer::KeyEvent(const HostKeyEvent& e)
 		{
 			case VK_F5:
 				GSConfig.InterlaceMode = static_cast<GSInterlaceMode>((static_cast<int>(GSConfig.InterlaceMode) + static_cast<int>(GSInterlaceMode::Count) + step) % static_cast<int>(GSInterlaceMode::Count));
-				theApp.SetConfig("interlace", static_cast<int>(GSConfig.InterlaceMode));
+				theApp.SetConfig("deinterlace", static_cast<int>(GSConfig.InterlaceMode));
 				printf("GS: Set deinterlace mode to %d (%s).\n", static_cast<int>(GSConfig.InterlaceMode), theApp.m_gs_deinterlace.at(static_cast<int>(GSConfig.InterlaceMode)).name.c_str());
 				return;
 			case VK_DELETE:
