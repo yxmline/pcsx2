@@ -73,6 +73,7 @@ enum class VsyncMode
 enum class AspectRatioType : u8
 {
 	Stretch,
+	RAuto4_3_3_2,
 	R4_3,
 	R16_9,
 	MaxCount
@@ -81,6 +82,7 @@ enum class AspectRatioType : u8
 enum class FMVAspectRatioSwitchType : u8
 {
 	Off,
+	RAuto4_3_3_2,
 	R4_3,
 	R16_9,
 	MaxCount
@@ -422,6 +424,7 @@ struct Pcsx2Config
 			struct
 			{
 				bool
+					PCRTCOffsets : 1,
 					IntegerScaling : 1,
 					LinearPresent : 1,
 					UseDebugDevice : 1,
@@ -494,7 +497,7 @@ struct Pcsx2Config
 		double FramerateNTSC{59.94};
 		double FrameratePAL{50.00};
 
-		AspectRatioType AspectRatio{AspectRatioType::R4_3};
+		AspectRatioType AspectRatio{AspectRatioType::RAuto4_3_3_2};
 		FMVAspectRatioSwitchType FMVAspectRatioSwitch{FMVAspectRatioSwitchType::Off};
 		GSInterlaceMode InterlaceMode{GSInterlaceMode::Automatic};
 
@@ -982,7 +985,7 @@ struct Pcsx2Config
 	std::string CurrentBlockdump;
 	std::string CurrentIRX;
 	std::string CurrentGameArgs;
-	AspectRatioType CurrentAspectRatio = AspectRatioType::R4_3;
+	AspectRatioType CurrentAspectRatio = AspectRatioType::RAuto4_3_3_2;
 	LimiterModeType LimiterMode = LimiterModeType::Nominal;
 
 	Pcsx2Config();

@@ -263,12 +263,14 @@ void Pcsx2Config::CpuOptions::LoadSave(SettingsWrapper& wrap)
 
 const char* Pcsx2Config::GSOptions::AspectRatioNames[] = {
 	"Stretch",
+	"Auto 4:3/3:2",
 	"4:3",
 	"16:9",
 	nullptr};
 
 const char* Pcsx2Config::GSOptions::FMVAspectRatioSwitchNames[] = {
 	"Off",
+	"Auto 4:3/3:2",
 	"4:3",
 	"16:9",
 	nullptr};
@@ -292,6 +294,7 @@ Pcsx2Config::GSOptions::GSOptions()
 {
 	bitset = 0;
 
+	PCRTCOffsets = false;
 	IntegerScaling = false;
 	LinearPresent = true;
 	UseDebugDevice = false;
@@ -501,6 +504,8 @@ void Pcsx2Config::GSOptions::ReloadIniSettings()
 
 	// Unfortunately, because code in the GS still reads the setting by key instead of
 	// using these variables, we need to use the old names. Maybe post 2.0 we can change this.
+
+	GSSettingBoolEx(PCRTCOffsets, "pcrtc_offsets");
 	GSSettingBool(IntegerScaling);
 	GSSettingBoolEx(LinearPresent, "linear_present");
 	GSSettingBool(UseDebugDevice);

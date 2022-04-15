@@ -874,6 +874,7 @@ void AppConfig::GSWindowOptions::LoadSave(IniInterface& ini)
 	static const wxChar* AspectRatioNames[] =
 		{
 			L"Stretch",
+			L"Auto 4:3/3:2 (Progressive)",
 			L"4:3",
 			L"16:9",
 			// WARNING: array must be NULL terminated to compute it size
@@ -886,6 +887,7 @@ void AppConfig::GSWindowOptions::LoadSave(IniInterface& ini)
 	static const wxChar* FMVAspectRatioSwitchNames[] =
 		{
 			L"Off",
+			L"Auto 4:3/3:2 (Progressive)",
 			L"4:3",
 			L"16:9",
 			// WARNING: array must be NULL terminated to compute it size

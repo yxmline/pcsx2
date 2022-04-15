@@ -41,7 +41,7 @@ GSRendererHW::GSRendererHW()
 
 void GSRendererHW::SetScaling()
 {
-	const GSVector2i crtc_size(GetDisplayRect().width(), GetDisplayRect().height());
+	const GSVector2i crtc_size(GetResolution());
 
 	// Details of (potential) perf impact of a big framebuffer
 	// 1/ extra memory
@@ -256,7 +256,7 @@ GSTexture* GSRendererHW::GetFeedbackOutput()
 	TEX0.TBW = m_regs->EXTBUF.EXBW;
 	TEX0.PSM = m_regs->DISP[m_regs->EXTBUF.FBIN & 1].DISPFB.PSM;
 
-	GSTextureCache::Target* rt = m_tc->LookupTarget(TEX0, GetTargetSize(), /*GetFrameRect(i).bottom*/ 0);
+	GSTextureCache::Target* rt = m_tc->LookupTarget(TEX0, GetTargetSize(), /*GetFrameRect(i).bottom*/ m_regs->DISP[m_regs->EXTBUF.FBIN & 1].DISPLAY.DH);
 
 	GSTexture* t = rt->m_texture;
 

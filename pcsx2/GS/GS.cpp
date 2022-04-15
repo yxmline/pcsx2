@@ -671,6 +671,13 @@ void GSsetFrameSkip(int frameskip)
 	s_gs->SetFrameSkip(frameskip);
 }
 
+GSVideoMode GSgetDisplayMode()
+{
+	GSRenderer* gs = s_gs.get();
+
+	return gs->GetVideoMode();
+}
+
 void GSgetInternalResolution(int* width, int* height)
 {
 	GSRenderer* gs = s_gs.get();
@@ -1359,6 +1366,7 @@ void GSApp::Init()
 	m_default_configuration["FMVSoftwareRendererSwitch"]                  = "0";
 	m_default_configuration["fxaa"]                                       = "0";
 	m_default_configuration["HWDisableReadbacks"]                         = "0";
+	m_default_configuration["pcrtc_offsets"]                              = "0";
 	m_default_configuration["IntegerScaling"]                             = "0";
 	m_default_configuration["deinterlace"]                                = "7";
 	m_default_configuration["conservative_framebuffer"]                   = "1";
@@ -1368,7 +1376,6 @@ void GSApp::Init()
 	m_default_configuration["MaxAnisotropy"]                              = "0";
 	m_default_configuration["mipmap"]                                     = "1";
 	m_default_configuration["mipmap_hw"]                                  = std::to_string(static_cast<int>(HWMipmapLevel::Automatic));
-	m_default_configuration["NTSC_Saturation"]                            = "1";
 	m_default_configuration["OsdShowMessages"]                            = "1";
 	m_default_configuration["OsdShowSpeed"]                               = "0";
 	m_default_configuration["OsdShowFPS"]                                 = "0";
