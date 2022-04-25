@@ -403,57 +403,12 @@ void GSwriteCSR(u32 csr)
 	}
 }
 
-void GSinitReadFIFO(u8* mem)
+void GSInitAndReadFIFO(u8* mem, u32 size)
 {
-	GL_PERF("Init Read FIFO1");
-	try
-	{
-		s_gs->InitReadFIFO(mem, 1);
-	}
-	catch (GSRecoverableError)
-	{
-	}
-	catch (const std::bad_alloc&)
-	{
-		fprintf(stderr, "GS: Memory allocation error\n");
-	}
-}
-
-void GSreadFIFO(u8* mem)
-{
-	try
-	{
-		s_gs->ReadFIFO(mem, 1);
-	}
-	catch (GSRecoverableError)
-	{
-	}
-	catch (const std::bad_alloc&)
-	{
-		fprintf(stderr, "GS: Memory allocation error\n");
-	}
-}
-
-void GSinitReadFIFO2(u8* mem, u32 size)
-{
-	GL_PERF("Init Read FIFO2");
+	GL_PERF("Init and read FIFO %u qwc", size);
 	try
 	{
 		s_gs->InitReadFIFO(mem, size);
-	}
-	catch (GSRecoverableError)
-	{
-	}
-	catch (const std::bad_alloc&)
-	{
-		fprintf(stderr, "GS: Memory allocation error\n");
-	}
-}
-
-void GSreadFIFO2(u8* mem, u32 size)
-{
-	try
-	{
 		s_gs->ReadFIFO(mem, size);
 	}
 	catch (GSRecoverableError)
@@ -1324,12 +1279,12 @@ void GSApp::Init()
 		GSSetting(CRCHackLevel::Aggressive, "Aggressive", ""),
 	};
 
-	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Minimum), "Minimum", "Fastest"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Minimum), "Minimum", ""));
 	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Basic), "Basic", "Recommended"));
 	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Medium), "Medium", ""));
 	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::High), "High", ""));
-	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Full), "Full", "Very Slow"));
-	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Ultra), "Ultra", "Ultra Slow"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Full), "Full", "Slow"));
+	m_gs_acc_blend_level.push_back(GSSetting(static_cast<u32>(AccBlendLevel::Maximum), "Maximum", "Very Slow"));
 
 	m_gs_tv_shaders.push_back(GSSetting(0, "None", ""));
 	m_gs_tv_shaders.push_back(GSSetting(1, "Scanline filter", ""));
