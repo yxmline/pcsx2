@@ -23,7 +23,7 @@ GSRendererHW::GSRendererHW()
 	: GSRenderer()
 	, m_width(default_rt_size.x)
 	, m_height(default_rt_size.y)
-	, m_tc(new GSTextureCache(this))
+	, m_tc(new GSTextureCache())
 	, m_src(nullptr)
 	, m_userhacks_tcoffset(false)
 	, m_userhacks_tcoffset_x(0)
@@ -160,6 +160,13 @@ void GSRendererHW::PurgeTextureCache()
 {
 	GSRenderer::PurgeTextureCache();
 	m_tc->RemoveAll();
+}
+
+bool GSRendererHW::IsPossibleTextureShuffle(GSTextureCache::Source* src) const
+{
+	return (PRIM->TME && m_vt.m_primclass == GS_SPRITE_CLASS &&
+		src->m_32_bits_fmt && GSLocalMemory::m_psm[src->m_TEX0.PSM].bpp == 16 &&
+		GSLocalMemory::m_psm[m_context->FRAME.PSM].bpp == 16);
 }
 
 void GSRendererHW::SetGameCRC(u32 crc, int options)
@@ -1571,7 +1578,7 @@ void GSRendererHW::Draw()
 						g_gs_device->CreateSparseRenderTarget(new_w, new_h, tex->GetFormat()) :
 						g_gs_device->CreateSparseDepthStencil(new_w, new_h, tex->GetFormat());
 					const GSVector4i r{ 0, 0, w, h };
-					g_gs_device->CopyRect(tex, t->m_texture, r);
+					g_gs_device->CopyRect(tex, t->m_texture, r, 0, 0);
 					g_gs_device->Recycle(tex);
 					t->m_texture->SetScale(up_s);
 					(is_rt ? rt_tex : ds_tex) = t->m_texture;
@@ -1708,6 +1715,11 @@ void GSRendererHW::Draw()
 	context->TEST = TEST;
 	context->FRAME = FRAME;
 	context->ZBUF = ZBUF;
+
+	//
+
+	// Temporary source *must* be invalidated before normal, because otherwise it'll be double freed.
+	m_tc->InvalidateTemporarySource();
 
 	//
 
@@ -2017,11 +2029,11 @@ bool GSRendererHW::OI_BlitFMV(GSTextureCache::Target* _rt, GSTextureCache::Sourc
 		const GSVector4i r_full(0, 0, tw, th);
 		if (GSTexture* rt = g_gs_device->CreateRenderTarget(tw, th, GSTexture::Format::Color))
 		{
-			g_gs_device->CopyRect(tex->m_texture, rt, r_full);
+			g_gs_device->CopyRect(tex->m_texture, rt, r_full, 0, 0);
 
 			g_gs_device->StretchRect(tex->m_texture, sRect, rt, dRect);
 
-			g_gs_device->CopyRect(rt, tex->m_texture, r_full);
+			g_gs_device->CopyRect(rt, tex->m_texture, r_full, 0, 0);
 
 			g_gs_device->Recycle(rt);
 		}

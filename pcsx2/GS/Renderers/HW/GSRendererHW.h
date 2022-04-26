@@ -154,6 +154,7 @@ public:
 	GSRendererHW();
 	virtual ~GSRendererHW() override;
 
+	__fi static GSRendererHW* GetInstance() { return static_cast<GSRendererHW*>(g_gs_renderer.get()); }
 	__fi GSTextureCache* GetTextureCache() const { return m_tc; }
 
 	void Destroy() override;
@@ -186,4 +187,7 @@ public:
 
 	// Called by the texture cache to know if current texture is useful
 	virtual bool IsDummyTexture() const { return false; }
+
+	// Called by the texture cache when optimizing the copy range for sources
+	bool IsPossibleTextureShuffle(GSTextureCache::Source* src) const;
 };
