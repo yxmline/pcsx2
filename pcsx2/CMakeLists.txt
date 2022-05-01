@@ -130,7 +130,6 @@ set(pcsx2Sources
 	Gif_Logger.cpp
 	Gif_Unit.cpp
 	GS.cpp
-	GSState.cpp
 	Host.cpp
 	HostDisplay.cpp
 	Hw.cpp
@@ -1416,7 +1415,6 @@ set(pcsx2x86Sources
 	x86/iCore.cpp
 	x86/iFPU.cpp
 	x86/iFPUd.cpp
-	x86/iMisc.cpp
 	x86/iMMI.cpp
 	x86/iR3000A.cpp
 	x86/iR3000Atables.cpp

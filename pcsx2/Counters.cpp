@@ -477,10 +477,10 @@ static __fi void DoFMVSwitch()
 			break;
 	}
 
-	if (EmuConfig.Gamefixes.SoftwareRendererFMVHack && EmuConfig.GS.UseHardwareRenderer())
+	if (EmuConfig.Gamefixes.SoftwareRendererFMVHack && GSConfig.UseHardwareRenderer())
 	{
 		// we don't use the sw toggle here, because it'll change back to auto if set to sw
-		GetMTGS().SwitchRenderer(new_fmv_state ? GSRendererType::SW : EmuConfig.GS.Renderer, false);
+		GetMTGS().SwitchRenderer(new_fmv_state ? GSRendererType::SW : GSConfig.Renderer, false);
 	}
 }
 
@@ -569,14 +569,6 @@ static __fi void VSyncStart(u32 sCycle)
 
 	if(EmuConfig.Trace.Enabled && EmuConfig.Trace.EE.m_EnableAll)
 		SysTrace.EE.Counters.Write( "    ================  EE COUNTER VSYNC START (frame: %d)  ================", g_FrameCount );
-
-	// EE Profiling and Debug code.
-	// FIXME: should probably be moved to VsyncInThread, and handled
-	// by UI implementations.  (ie, AppCoreThread in PCSX2-wx interface).
-	vSyncDebugStuff( g_FrameCount );
-
-	CpuVU0->Vsync();
-	CpuVU1->Vsync();
 
 	hwIntcIrq(INTC_VBLANK_S);
 	psxVBlankStart();
