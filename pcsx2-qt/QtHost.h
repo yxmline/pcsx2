@@ -42,6 +42,13 @@ namespace QtHost
 	void UpdateFolders();
 	void UpdateLogging();
 
+	/// Initializes early console logging (for printing command line arguments).
+	void InitializeEarlyConsole();
+
+	/// Sets batch mode (exit after game shutdown).
+	bool InBatchMode();
+	void SetBatchMode(bool enabled);
+
 	/// Executes a function on the UI thread.
 	void RunOnUIThread(const std::function<void()>& func, bool block = false);
 

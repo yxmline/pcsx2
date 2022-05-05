@@ -37,12 +37,6 @@
 #include "pcsx2/PerformanceMetrics.h"
 #include "pcsx2/VMManager.h"
 
-#include "pcsx2/Frontend/OpenGLHostDisplay.h"
-
-#ifdef _WIN32
-#include "pcsx2/Frontend/D3D11HostDisplay.h"
-#endif
-
 #include "DisplayWidget.h"
 #include "EmuThread.h"
 #include "MainWindow.h"
@@ -113,7 +107,7 @@ void EmuThread::startVM(std::shared_ptr<VMBootParameters> boot_params)
 
 	// create the display, this may take a while...
 	m_is_fullscreen = boot_params->fullscreen.value_or(QtHost::GetBaseBoolSettingValue("UI", "StartFullscreen", false));
-	m_is_rendering_to_main = !m_is_fullscreen && QtHost::GetBaseBoolSettingValue("UI", "RenderToMainWindow", true);
+	m_is_rendering_to_main = QtHost::GetBaseBoolSettingValue("UI", "RenderToMainWindow", true);
 	if (!VMManager::Initialize(*boot_params))
 		return;
 
@@ -143,16 +137,15 @@ void EmuThread::setVMPaused(bool paused)
 	VMManager::SetPaused(paused);
 }
 
-bool EmuThread::shutdownVM(bool allow_save_to_state /* = true */)
+void EmuThread::shutdownVM(bool allow_save_to_state /* = true */)
 {
 	const VMState state = VMManager::GetState();
 	if (state == VMState::Paused)
 		m_event_loop->quit();
 	else if (state != VMState::Running)
-		return true;
+		return;
 
 	VMManager::SetState(VMState::Stopping);
-	return true;
 }
 
 void EmuThread::loadState(const QString& filename)
