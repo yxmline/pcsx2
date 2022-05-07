@@ -611,7 +611,8 @@ SCAJ-20070:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SCAJ-20072:
   name: "Ghost in the Shell - Stand Alone Complex"
   region: "NTSC-Unk"
@@ -5949,7 +5950,8 @@ SCPS-55019:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SCPS-55020:
   name: "Kengo 2"
   region: "NTSC-J"
@@ -8297,6 +8299,8 @@ SLED-52929:
 SLED-53083:
   name: "Monster Hunter [Demo]"
   region: "PAL-M5"
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLED-53109:
   name: "Juiced [Demo]"
   region: "PAL-M5"
@@ -13916,6 +13920,8 @@ SLES-52707:
   name: "Monster Hunter"
   region: "PAL-M5"
   compat: 5
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLES-52709:
   name: "Ty the Tazmanian Tiger 2 - Bush Rescue"
   region: "PAL-M7"
@@ -20716,7 +20722,8 @@ SLES-82028:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SLES-82029:
   name: "Star Ocean 3 - Till the End of Time [Disc2of2]"
   region: "PAL-E"
@@ -20724,7 +20731,8 @@ SLES-82029:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
   memcardFilters:
     - "SLES-82028"
 SLES-82030:
@@ -24985,7 +24993,8 @@ SLPM-65209:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
   patches:
     BEC32D49:
       content: |-
@@ -25773,7 +25782,8 @@ SLPM-65438:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SLPM-65439:
   name: "Star Ocean 3 [Director's Cut] [Disc2of2]"
   region: "NTSC-J"
@@ -25781,7 +25791,8 @@ SLPM-65439:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
   memcardFilters:
     - "SLPM-65438"
 SLPM-65441:
@@ -25953,6 +25964,8 @@ SLPM-65494:
 SLPM-65495:
   name: "Monster Hunter"
   region: "NTSC-J"
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLPM-65496:
   name: "Hyper Street Fighter"
   region: "NTSC-J"
@@ -29249,7 +29262,8 @@ SLPM-66478:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SLPM-66479:
   name: "Star Ocean 3 - Till the End of Time [Ultimate Hits] [Disc2of2]"
   region: "NTSC-J"
@@ -29257,7 +29271,8 @@ SLPM-66479:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
   memcardFilters:
     - "SLPM-66478"
 SLPM-66480:
@@ -38408,7 +38423,8 @@ SLUS-20488:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
 SLUS-20489:
   name: "Whirl Tour"
   region: "NTSC-U"
@@ -40149,7 +40165,8 @@ SLUS-20891:
   gameFixes:
     - VuAddSubHack
   gsHWFixes:
-    roundSprite: 2 # Fixes door transition vertical lines and minimap artifacts.
+    halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
+    roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
   memcardFilters:
     - "SLUS-20488"
 SLUS-20892:
@@ -40181,6 +40198,8 @@ SLUS-20896:
   name: "Monster Hunter"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLUS-20897:
   name: "Swords of Yi"
   region: "NTSC-U"
@@ -45604,6 +45623,8 @@ SLUS-29108:
 SLUS-29110:
   name: "Monster Hunter [Public Beta Vol.1 - Ver.1.01]"
   region: "NTSC-U"
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLUS-29111:
   name: "Asterix & Obelix XXL - Kick Buttix [Demo]"
   region: "NTSC-U"
@@ -46038,6 +46059,8 @@ TLES-52339:
 TLES-52707:
   name: "Monster Hunter Beta Trial Code"
   region: "PAL-E"
+  clampModes:
+    vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 TLES-52781:
   name: "WWE - Smackdown Vs Raw Beta Trial Code"
   region: "PAL-E"
