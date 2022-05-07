@@ -108,6 +108,7 @@ void EmuThread::startVM(std::shared_ptr<VMBootParameters> boot_params)
 	// create the display, this may take a while...
 	m_is_fullscreen = boot_params->fullscreen.value_or(QtHost::GetBaseBoolSettingValue("UI", "StartFullscreen", false));
 	m_is_rendering_to_main = QtHost::GetBaseBoolSettingValue("UI", "RenderToMainWindow", true);
+	m_is_surfaceless = false;
 	if (!VMManager::Initialize(*boot_params))
 		return;
 
@@ -133,6 +134,10 @@ void EmuThread::setVMPaused(bool paused)
 		QMetaObject::invokeMethod(this, "setVMPaused", Qt::QueuedConnection, Q_ARG(bool, paused));
 		return;
 	}
+
+	// if we were surfaceless (view->game list, system->unpause), get our display widget back
+	if (!paused && m_is_surfaceless)
+		setSurfaceless(false);
 
 	VMManager::SetPaused(paused);
 }
@@ -346,6 +351,23 @@ void EmuThread::setFullscreen(bool fullscreen)
 	GetMTGS().WaitGS();
 }
 
+void EmuThread::setSurfaceless(bool surfaceless)
+{
+	if (!isOnEmuThread())
+	{
+		QMetaObject::invokeMethod(this, "setSurfaceless", Qt::QueuedConnection, Q_ARG(bool, surfaceless));
+		return;
+	}
+
+	if (!VMManager::HasValidVM() || m_is_surfaceless == surfaceless)
+		return;
+
+	// This will call back to us on the MTGS thread.
+	m_is_surfaceless = surfaceless;
+	GetMTGS().UpdateDisplayWindow();
+	GetMTGS().WaitGS();
+}
+
 void EmuThread::applySettings()
 {
 	if (!isOnEmuThread())
@@ -545,7 +567,6 @@ void EmuThread::connectDisplaySignals(DisplayWidget* widget)
 	connect(widget, &DisplayWidget::windowFocusEvent, this, &EmuThread::onDisplayWindowFocused);
 	connect(widget, &DisplayWidget::windowResizedEvent, this, &EmuThread::onDisplayWindowResized);
 	// connect(widget, &DisplayWidget::windowRestoredEvent, this, &EmuThread::redrawDisplayWindow);
-	connect(widget, &DisplayWidget::windowClosedEvent, []() { g_main_window->requestShutdown(); });
 	connect(widget, &DisplayWidget::windowKeyEvent, this, &EmuThread::onDisplayWindowKeyEvent);
 	connect(widget, &DisplayWidget::windowMouseMoveEvent, this, &EmuThread::onDisplayWindowMouseMoveEvent);
 	connect(widget, &DisplayWidget::windowMouseButtonEvent, this, &EmuThread::onDisplayWindowMouseButtonEvent);
@@ -590,8 +611,8 @@ void EmuThread::updateDisplay()
 	display->DoneRenderContextCurrent();
 
 	// but we should get it back after this call
-	DisplayWidget* widget = onUpdateDisplayRequested(m_is_fullscreen, !m_is_fullscreen && m_is_rendering_to_main);
-	if (!widget || !display->MakeRenderContextCurrent())
+	onUpdateDisplayRequested(m_is_fullscreen, !m_is_fullscreen && m_is_rendering_to_main, m_is_surfaceless);
+	if (!display->MakeRenderContextCurrent())
 	{
 		pxFailRel("Failed to recreate context after updating");
 		return;
@@ -849,19 +870,6 @@ void Host::RunOnCPUThread(std::function<void()> function, bool block /* = false 
 	QMetaObject::invokeMethod(g_emu_thread, "runOnCPUThread",
 		block ? Qt::BlockingQueuedConnection : Qt::QueuedConnection,
 		Q_ARG(const std::function<void()>&, std::move(function)));
-}
-
-ScopedVMPause::ScopedVMPause(bool was_paused)
-	: m_was_paused(was_paused)
-{
-	if (!m_was_paused)
-		g_emu_thread->setVMPaused(true);
-}
-
-ScopedVMPause::~ScopedVMPause()
-{
-	if (!m_was_paused)
-		g_emu_thread->setVMPaused(false);
 }
 
 alignas(16) static SysMtgsThread s_mtgs_thread;

@@ -43,6 +43,33 @@ class MainWindow final : public QMainWindow
 	Q_OBJECT
 
 public:
+	/// This class is a scoped lock on the VM, which prevents it from running while
+	/// the object exists. Its purpose is to be used for blocking/modal popup boxes,
+	/// where the VM needs to exit fullscreen temporarily.
+	class VMLock
+	{
+	public:
+		VMLock(VMLock&& lock);
+		VMLock(const VMLock&) = delete;
+		~VMLock();
+
+		/// Returns the parent widget, which can be used for any popup dialogs.
+		__fi QWidget* getDialogParent() const { return m_dialog_parent; }
+
+		/// Cancels any pending unpause/fullscreen transition.
+		/// Call when you're going to destroy the VM anyway.
+		void cancelResume();
+
+	private:
+		VMLock(QWidget* dialog_parent, bool was_paused, bool was_fullscreen);
+		friend MainWindow;
+
+		QWidget* m_dialog_parent;
+		bool m_was_paused;
+		bool m_was_fullscreen;
+	};
+
+	/// Default theme name for the platform.
 	static const char* DEFAULT_THEME_NAME;
 
 public:
@@ -51,6 +78,9 @@ public:
 
 	void initialize();
 	void connectVMThreadSignals(EmuThread* thread);
+
+	/// Locks the VM by pausing it, while a popup dialog is displayed.
+	VMLock pauseAndLockVM();
 
 public Q_SLOTS:
 	void refreshGameList(bool invalidate_cache);
@@ -62,7 +92,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	DisplayWidget* createDisplay(bool fullscreen, bool render_to_main);
-	DisplayWidget* updateDisplay(bool fullscreen, bool render_to_main);
+	DisplayWidget* updateDisplay(bool fullscreen, bool render_to_main, bool surfaceless);
 	void displayResizeRequested(qint32 width, qint32 height);
 	void destroyDisplay();
 	void focusDisplayWidget();
@@ -134,6 +164,8 @@ private:
 	void clearProgressBar();
 
 	bool isShowingGameList() const;
+	bool isRenderingFullscreen() const;
+	bool isRenderingToMain() const;
 	void switchToGameListView();
 	void switchToEmulationView();
 
@@ -158,6 +190,7 @@ private:
 	void populateLoadStateMenu(QMenu* menu, const QString& filename, const QString& serial, quint32 crc);
 	void populateSaveStateMenu(QMenu* menu, const QString& serial, quint32 crc);
 	void updateSaveStateMenus(const QString& filename, const QString& serial, quint32 crc);
+	void doDiscChange(const QString& path);
 
 	Ui::MainWindow m_ui;
 
@@ -181,7 +214,8 @@ private:
 	bool m_vm_valid = false;
 	bool m_vm_paused = false;
 	bool m_save_states_invalidated = false;
-	bool m_was_focused_on_container_switch = false;
+	bool m_was_paused_on_surface_loss = false;
+	bool m_was_disc_change_request = false;
 
 	QString m_last_fps_status;
 };

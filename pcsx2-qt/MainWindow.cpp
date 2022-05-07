@@ -104,11 +104,10 @@ void MainWindow::setupAdditionalUi()
 	m_ui.actionViewStatusBar->setChecked(status_bar_visible);
 	m_ui.statusBar->setVisible(status_bar_visible);
 
-	m_game_list_widget = new GameListWidget(m_ui.mainContainer);
+	m_game_list_widget = new GameListWidget(this);
 	m_game_list_widget->initialize();
-	m_ui.mainContainer->insertWidget(0, m_game_list_widget);
-	m_ui.mainContainer->setCurrentIndex(0);
 	m_ui.actionGridViewShowTitles->setChecked(m_game_list_widget->getShowGridCoverTitles());
+	setCentralWidget(m_game_list_widget);
 
 	m_status_progress_widget = new QProgressBar(m_ui.statusBar);
 	m_status_progress_widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -216,6 +215,8 @@ void MainWindow::connectSignals()
 	connect(m_game_list_widget, &GameListWidget::entryActivated, this, &MainWindow::onGameListEntryActivated, Qt::QueuedConnection);
 	connect(
 		m_game_list_widget, &GameListWidget::entryContextMenuRequested, this, &MainWindow::onGameListEntryContextMenuRequested, Qt::QueuedConnection);
+	connect(m_game_list_widget, &GameListWidget::addGameDirectoryRequested, this,
+		[this]() { getSettingsDialog()->getGameListSettingsWidget()->addSearchDirectory(this); });
 }
 
 void MainWindow::connectVMThreadSignals(EmuThread* thread)
@@ -578,6 +579,9 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 	m_ui.actionViewGameProperties->setEnabled(running);
 
 	m_game_list_widget->setDisabled(starting && !running);
+
+	if (!starting && !running)
+		m_ui.actionPause->setChecked(false);
 }
 
 void MainWindow::updateStatusBarWidgetVisibility()
@@ -603,26 +607,28 @@ void MainWindow::updateStatusBarWidgetVisibility()
 
 void MainWindow::updateWindowTitle()
 {
-	QString title;
-	if (!m_vm_valid || m_current_game_name.isEmpty())
-	{
 #if defined(_DEBUG)
-		title = QStringLiteral("PCSX2 [Debug] %1").arg(GIT_REV);
+	QString main_title(QStringLiteral("PCSX2 [Debug] %1").arg(GIT_REV));
+	QString display_title(QStringLiteral("%1 [Debug]").arg(m_current_game_name));
 #else
-		title = QStringLiteral("PCSX2 %1").arg(GIT_REV);
+	QString main_title(QStringLiteral("PCSX2 %1").arg(GIT_REV));
+	QString display_title(m_current_game_name);
 #endif
-	}
-	else
-	{
-#if defined(_DEBUG)
-		title = QStringLiteral("%1 [Debug]").arg(m_current_game_name);
-#else
-		title = m_current_game_name;
-#endif
-	}
 
-	if (windowTitle() != title)
-		setWindowTitle(title);
+	if (!m_vm_valid || m_current_game_name.isEmpty())
+		display_title = main_title;
+	else if (isRenderingToMain())
+		main_title = display_title;
+
+	if (windowTitle() != main_title)
+		setWindowTitle(main_title);
+
+	if (m_display_widget && !isRenderingToMain())
+	{
+		QWidget* container = m_display_container ? static_cast<QWidget*>(m_display_container) : static_cast<QWidget*>(m_display_widget);
+		if (container->windowTitle() != display_title)
+			container->setWindowTitle(display_title);
+	}
 }
 
 void MainWindow::setProgressBar(int current, int total)
@@ -648,38 +654,64 @@ void MainWindow::clearProgressBar()
 
 bool MainWindow::isShowingGameList() const
 {
-	return m_ui.mainContainer->currentIndex() == 0;
+	return (centralWidget() == m_game_list_widget);
+}
+
+bool MainWindow::isRenderingFullscreen() const
+{
+	HostDisplay* display = Host::GetHostDisplay();
+	if (!display || !m_display_widget)
+		return false;
+
+	return (m_display_widget->parent() != this && (m_display_widget->isFullScreen() || display->IsFullscreen()));
+}
+
+bool MainWindow::isRenderingToMain() const
+{
+	return (m_display_widget && m_display_widget->parent() == this);
 }
 
 void MainWindow::switchToGameListView()
 {
-	if ((m_display_widget && !m_display_widget->parent()) || m_ui.mainContainer->currentIndex() == 0)
+	if (centralWidget() == m_game_list_widget)
+	{
+		m_game_list_widget->setFocus();
 		return;
+	}
 
 	if (m_vm_valid)
 	{
-		m_was_focused_on_container_switch = m_vm_paused;
+		m_was_paused_on_surface_loss = m_vm_paused;
 		if (!m_vm_paused)
 			g_emu_thread->setVMPaused(true);
+
+		// switch to surfaceless. we have to wait until the display widget is gone before we swap over.
+		g_emu_thread->setSurfaceless(true);
+		while (m_display_widget)
+			QApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 1);
 	}
 
-	m_ui.mainContainer->setCurrentIndex(0);
+	pxAssertMsg(!centralWidget(), "Should not have a central widget at game list switch time");
+	takeCentralWidget();
+	setCentralWidget(m_game_list_widget);
+	m_game_list_widget->setVisible(true);
 	m_game_list_widget->setFocus();
 }
 
 void MainWindow::switchToEmulationView()
 {
-	if (!m_display_widget || !m_display_widget->parent() || m_ui.mainContainer->currentIndex() == 1)
+	if (!m_vm_valid || (m_display_widget && centralWidget() == m_display_widget))
 		return;
 
-	if (m_vm_valid)
-	{
-		m_ui.mainContainer->setCurrentIndex(1);
-		if (m_vm_paused && !m_was_focused_on_container_switch)
-			g_emu_thread->setVMPaused(false);
-	}
+	// we're no longer surfaceless! this will call back to UpdateDisplay(), which will swap the widget out.
+	g_emu_thread->setSurfaceless(false);
 
-	m_display_widget->setFocus();
+	// resume if we weren't paused at switch time
+	if (m_vm_paused && !m_was_paused_on_surface_loss)
+		g_emu_thread->setVMPaused(false);
+
+	if (m_display_widget)
+		m_display_widget->setFocus();
 }
 
 void MainWindow::refreshGameList(bool invalidate_cache)
@@ -710,8 +742,8 @@ bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_sav
 	// only confirm on UI thread because we need to display a msgbox
 	if (allow_confirm && !GSDumpReplayer::IsReplayingDump() && QtHost::GetBaseBoolSettingValue("UI", "ConfirmShutdown", true))
 	{
-		ScopedVMPause pauser(m_vm_paused);
-		if (QMessageBox::question(g_main_window, tr("Confirm Shutdown"),
+		VMLock lock(pauseAndLockVM());
+		if (QMessageBox::question(lock.getDialogParent(), tr("Confirm Shutdown"),
 			tr("Are you sure you want to shut down the virtual machine?\n\nAll unsaved progress will be lost.")) != QMessageBox::Yes)
 		{
 			return false;
@@ -781,8 +813,7 @@ void MainWindow::onGameListEntryActivated()
 	if (m_vm_valid)
 	{
 		// change disc on double click
-		g_emu_thread->changeDisc(QString::fromStdString(entry->path));
-		switchToEmulationView();
+		doDiscChange(QString::fromStdString(entry->path));
 		return;
 	}
 
@@ -882,9 +913,8 @@ void MainWindow::onStartBIOSActionTriggered()
 
 void MainWindow::onChangeDiscFromFileActionTriggered()
 {
-	ScopedVMPause pauser(m_vm_paused);
-
-	QString filename = QFileDialog::getOpenFileName(this, tr("Select Disc Image"), QString(), tr(DISC_IMAGE_FILTER), nullptr);
+	VMLock lock(pauseAndLockVM());
+	QString filename = QFileDialog::getOpenFileName(lock.getDialogParent(), tr("Select Disc Image"), QString(), tr(DISC_IMAGE_FILTER), nullptr);
 	if (filename.isEmpty())
 		return;
 
@@ -893,6 +923,7 @@ void MainWindow::onChangeDiscFromFileActionTriggered()
 
 void MainWindow::onChangeDiscFromGameListActionTriggered()
 {
+	m_was_disc_change_request = true;
 	switchToGameListView();
 }
 
@@ -1039,6 +1070,7 @@ void MainWindow::onVMStarting()
 void MainWindow::onVMStarted()
 {
 	m_vm_valid = true;
+	m_was_disc_change_request = false;
 	updateEmulationActions(true, true);
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
@@ -1067,9 +1099,12 @@ void MainWindow::onVMResumed()
 	}
 
 	m_vm_paused = false;
+	m_was_disc_change_request = false;
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
 	m_status_fps_widget->setText(m_last_fps_status);
+	if (m_display_widget)
+		m_display_widget->setFocus();
 }
 
 void MainWindow::onVMStopped()
@@ -1114,6 +1149,8 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 {
+	DevCon.WriteLn("createDisplay(%u, %u)", static_cast<u32>(fullscreen), static_cast<u32>(render_to_main));
+
 	HostDisplay* host_display = Host::GetHostDisplay();
 	if (!host_display)
 		return nullptr;
@@ -1131,12 +1168,15 @@ DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 	}
 	else
 	{
-		m_display_widget = new DisplayWidget((!fullscreen && render_to_main) ? m_ui.mainContainer : nullptr);
+		m_display_widget = new DisplayWidget((!fullscreen && render_to_main) ? this : nullptr);
 		container = m_display_widget;
 	}
 
-	container->setWindowTitle(windowTitle());
-	container->setWindowIcon(windowIcon());
+	if (fullscreen || !render_to_main)
+	{
+		container->setWindowTitle(windowTitle());
+		container->setWindowIcon(windowIcon());
+	}
 
 	if (fullscreen)
 	{
@@ -1152,8 +1192,9 @@ DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 	}
 	else
 	{
-		m_ui.mainContainer->insertWidget(1, container);
-		switchToEmulationView();
+		m_game_list_widget->setVisible(false);
+		takeCentralWidget();
+		setCentralWidget(m_display_widget);
 	}
 
 	// we need the surface visible.. this might be able to be replaced with something else
@@ -1180,30 +1221,41 @@ DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 	if (is_exclusive_fullscreen)
 		setDisplayFullscreen(fullscreen_mode);
 
+	updateWindowTitle();
+	m_display_widget->setFocus();
+
 	host_display->DoneRenderContextCurrent();
 	return m_display_widget;
 }
 
-DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main)
+DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main, bool surfaceless)
 {
+	DevCon.WriteLn("updateDisplay() fullscreen=%s render_to_main=%s surfaceless=%s",
+		fullscreen ? "true" : "false", render_to_main ? "true" : "false", surfaceless ? "true" : "false");
+
 	HostDisplay* host_display = Host::GetHostDisplay();
 	QWidget* container = m_display_container ? static_cast<QWidget*>(m_display_container) : static_cast<QWidget*>(m_display_widget);
-	const bool is_fullscreen = container->isFullScreen();
-	const bool is_rendering_to_main = (!is_fullscreen && container->parent());
+	const bool is_fullscreen = isRenderingFullscreen();
+	const bool is_rendering_to_main = isRenderingToMain();
 	const std::string fullscreen_mode(QtHost::GetBaseStringSettingValue("EmuCore/GS", "FullscreenMode", ""));
 	const bool is_exclusive_fullscreen = (fullscreen && !fullscreen_mode.empty() && host_display->SupportsFullscreen());
-	if (fullscreen == is_fullscreen && is_rendering_to_main == render_to_main)
+	const bool changing_surfaceless = (!m_display_widget != surfaceless);
+	if (fullscreen == is_fullscreen && is_rendering_to_main == render_to_main && !changing_surfaceless)
 		return m_display_widget;
 
 	// Skip recreating the surface if we're just transitioning between fullscreen and windowed with render-to-main off.
 	// .. except on Wayland, where everything tends to break if you don't recreate.
 	const bool has_container = (m_display_container != nullptr);
 	const bool needs_container = DisplayContainer::IsNeeded(fullscreen, render_to_main);
-	if (!is_rendering_to_main && !render_to_main && !is_exclusive_fullscreen && has_container == needs_container && !needs_container)
+	if (!is_rendering_to_main && !render_to_main && !is_exclusive_fullscreen && has_container == needs_container && !needs_container && !changing_surfaceless)
 	{
-		Console.WriteLn("Toggling to %s without recreating surface", (fullscreen ? "fullscreen" : "windowed"));
+		DevCon.WriteLn("Toggling to %s without recreating surface", (fullscreen ? "fullscreen" : "windowed"));
 		if (host_display->IsFullscreen())
 			host_display->SetFullscreen(false, 0, 0, 0.0f);
+
+		// since we don't destroy the display widget, we need to save it here
+		if (!is_fullscreen && !is_rendering_to_main)
+			saveDisplayWindowGeometryToConfig();
 
 		if (fullscreen)
 		{
@@ -1223,6 +1275,10 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main)
 
 	destroyDisplayWidget();
 
+	// if we're going to surfaceless, we're done here
+	if (surfaceless)
+		return nullptr;
+
 	if (DisplayContainer::IsNeeded(fullscreen, render_to_main))
 	{
 		m_display_container = new DisplayContainer();
@@ -1232,12 +1288,22 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main)
 	}
 	else
 	{
-		m_display_widget = new DisplayWidget((!fullscreen && render_to_main) ? m_ui.mainContainer : nullptr);
+		m_display_widget = new DisplayWidget((!fullscreen && render_to_main) ? this : nullptr);
 		container = m_display_widget;
 	}
 
-	container->setWindowTitle(windowTitle());
-	container->setWindowIcon(windowIcon());
+	if (fullscreen || !render_to_main)
+	{
+		container->setWindowTitle(windowTitle());
+		container->setWindowIcon(windowIcon());
+
+		// make sure the game list widget is still visible
+		if (centralWidget() != m_game_list_widget && !fullscreen)
+		{
+			setCentralWidget(m_game_list_widget);
+			m_game_list_widget->setVisible(true);
+		}
+	}
 
 	if (fullscreen)
 	{
@@ -1253,8 +1319,10 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main)
 	}
 	else
 	{
-		m_ui.mainContainer->insertWidget(1, container);
-		switchToEmulationView();
+		m_game_list_widget->setVisible(false);
+		takeCentralWidget();
+		setCentralWidget(m_display_widget);
+		m_display_widget->setFocus();
 	}
 
 	// we need the surface visible.. this might be able to be replaced with something else
@@ -1276,6 +1344,7 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main)
 	if (is_exclusive_fullscreen)
 		setDisplayFullscreen(fullscreen_mode);
 
+	updateWindowTitle();
 	m_display_widget->setFocus();
 
 	QSignalBlocker blocker(m_ui.actionFullscreen);
@@ -1308,11 +1377,20 @@ void MainWindow::displayResizeRequested(qint32 width, qint32 height)
 void MainWindow::destroyDisplay()
 {
 	destroyDisplayWidget();
+
+	// switch back to game list view, we're not going back to display, so we can't use switchToGameListView().
+	if (centralWidget() != m_game_list_widget)
+	{
+		takeCentralWidget();
+		setCentralWidget(m_game_list_widget);
+		m_game_list_widget->setVisible(true);
+		m_game_list_widget->setFocus();
+	}	
 }
 
 void MainWindow::focusDisplayWidget()
 {
-	if (m_ui.mainContainer->currentIndex() != 1)
+	if (!m_display_widget || centralWidget() != m_display_widget)
 		return;
 
 	m_display_widget->setFocus();
@@ -1325,6 +1403,13 @@ QWidget* MainWindow::getDisplayContainer() const
 
 void MainWindow::saveDisplayWindowGeometryToConfig()
 {
+	QWidget* container = getDisplayContainer();
+	if (container->windowState() & Qt::WindowFullScreen)
+	{
+		// if we somehow ended up here, don't save the fullscreen state to the config
+		return;
+	}
+
 	const QByteArray geometry = getDisplayContainer()->saveGeometry();
 	const QByteArray geometry_b64 = geometry.toBase64();
 	const std::string old_geometry_b64 = QtHost::GetBaseStringSettingValue("UI", "DisplayWindowGeometry");
@@ -1338,9 +1423,17 @@ void MainWindow::restoreDisplayWindowGeometryFromConfig()
 	const QByteArray geometry = QByteArray::fromBase64(QByteArray::fromStdString(geometry_b64));
 	QWidget* container = getDisplayContainer();
 	if (!geometry.isEmpty())
+	{
 		container->restoreGeometry(geometry);
+
+		// make sure we're not loading a dodgy config which had fullscreen set...
+		container->setWindowState(container->windowState() & ~(Qt::WindowFullScreen | Qt::WindowActive));
+	}
 	else
+	{
+		// default size
 		container->resize(640, 480);
+	}
 }
 
 void MainWindow::destroyDisplayWidget()
@@ -1348,25 +1441,26 @@ void MainWindow::destroyDisplayWidget()
 	if (!m_display_widget)
 		return;
 
-	const QWidget* container = m_display_container ? static_cast<QWidget*>(m_display_container) : static_cast<QWidget*>(m_display_widget);
-	if (!container->parent() && !container->isFullScreen())
+	if (!isRenderingFullscreen() && !isRenderingToMain())
 		saveDisplayWindowGeometryToConfig();
 
 	if (m_display_container)
 		m_display_container->removeDisplayWidget();
 
-	if (m_display_widget->parent())
+	if (m_display_widget == centralWidget())
+		takeCentralWidget();
+
+	if (m_display_widget)
 	{
-		m_ui.mainContainer->removeWidget(m_display_widget);
-		m_ui.mainContainer->setCurrentIndex(0);
-		m_game_list_widget->setFocus();
+		m_display_widget->deleteLater();
+		m_display_widget = nullptr;
 	}
 
-	delete m_display_widget;
-	m_display_widget = nullptr;
-
-	delete m_display_container;
-	m_display_container = nullptr;
+	if (m_display_container)
+	{
+		m_display_container->deleteLater();
+		m_display_container = nullptr;
+	}
 }
 
 void MainWindow::setDisplayFullscreen(const std::string& fullscreen_mode)
@@ -1629,3 +1723,67 @@ void MainWindow::updateSaveStateMenus(const QString& filename, const QString& se
 	if (save_enabled)
 		populateSaveStateMenu(m_ui.menuSaveState, serial, crc);
 }
+
+void MainWindow::doDiscChange(const QString& path)
+{
+	bool reset_system = false;
+	if (!m_was_disc_change_request)
+	{
+		const int choice = QMessageBox::question(this, tr("Confirm Disc Change"), tr("Do you want to swap discs or boot the new image (via system reset)?"),
+			tr("Swap Disc"), tr("Reset"), tr("Cancel"), 0, 2);
+		if (choice == 2)
+			return;
+		reset_system = (choice != 0);
+	}
+
+	switchToEmulationView();
+
+	g_emu_thread->changeDisc(path);
+	if (reset_system)
+		g_emu_thread->resetVM();
+}
+
+MainWindow::VMLock MainWindow::pauseAndLockVM()
+{
+	const bool was_fullscreen = isRenderingFullscreen();
+	const bool was_paused = m_vm_paused;
+
+	// We use surfaceless rather than switching out of fullscreen, because
+	// we're paused, so we're not going to be rendering anyway.
+	if (was_fullscreen)
+		g_emu_thread->setSurfaceless(true);
+	if (!was_paused)
+		g_emu_thread->setVMPaused(true);
+
+	// We want to parent dialogs to the display widget, except if we were fullscreen,
+	// since it's going to get destroyed by the surfaceless call above.
+	QWidget* dialog_parent = was_fullscreen ? static_cast<QWidget*>(this) : getDisplayContainer();
+
+	return VMLock(dialog_parent, was_paused, was_fullscreen);
+}
+
+MainWindow::VMLock::VMLock(QWidget* dialog_parent, bool was_paused, bool was_fullscreen)
+	: m_dialog_parent(dialog_parent)
+	, m_was_paused(was_paused)
+	, m_was_fullscreen(was_fullscreen)	
+{
+}
+
+MainWindow::VMLock::VMLock(VMLock&& lock)
+	: m_dialog_parent(lock.m_dialog_parent)
+	, m_was_paused(lock.m_was_paused)
+	, m_was_fullscreen(lock.m_was_fullscreen)
+{
+	lock.m_dialog_parent = nullptr;
+	lock.m_was_paused = false;
+	lock.m_was_fullscreen = false;
+}
+
+MainWindow::VMLock::~VMLock()
+{
+	if (m_was_fullscreen)
+		g_emu_thread->setSurfaceless(false);
+	if (!m_was_paused)
+		g_emu_thread->setVMPaused(false);
+}
+
