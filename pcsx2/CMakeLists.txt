@@ -1133,13 +1133,16 @@ set(pcsx2GuiSources
 	gui/Panels/PathsPanel.cpp
 	gui/Panels/SpeedhacksPanel.cpp
 	gui/Panels/VideoPanel.cpp
+	gui/PersistentThread.cpp
 	gui/pxCheckBox.cpp
 	gui/pxRadioPanel.cpp
 	gui/pxStaticText.cpp
 	gui/pxWindowTextWriter.cpp
 	gui/RecentIsoList.cpp
 	gui/Saveslots.cpp
+	gui/SysCoreThread.cpp
 	gui/SysState.cpp
+	gui/SysThreadBase.cpp
 	gui/ThreadingDialogs.cpp
 	gui/UpdateUI.cpp
 	gui/wxAppWithHelpers.cpp
@@ -1184,6 +1187,7 @@ set(pcsx2GuiHeaders
 	gui/Panels/ConfigurationPanels.h
 	gui/Panels/LogOptionsPanels.h
 	gui/Panels/MemoryCardPanels.h
+	gui/PersistentThread.h
 	gui/pxCheckBox.h
 	gui/pxEvents.h
 	gui/pxEventThread.h
@@ -1191,6 +1195,8 @@ set(pcsx2GuiHeaders
 	gui/pxStaticText.h
 	gui/RecentIsoList.h
 	gui/Saveslots.h
+	gui/ScopedPtrMT.h
+	gui/SysThreads.h
 	gui/ThreadingDialogs.h
 	gui/ThreadingDialogs.cpp
 	gui/wxGuiTools.h
@@ -1368,19 +1374,9 @@ set(pcsx2RecordingVirtualPadResources
 	${res_rec_vp_src}/upPressed.h
 )
 
-# System sources
-set(pcsx2SystemSources
-	System/SysThreadBase.cpp)
-if(NOT PCSX2_CORE)
-	list(APPEND pcsx2SystemSources
-		System/SysCoreThread.cpp
-	)
-endif()
-
 # System headers
 set(pcsx2SystemHeaders
-	System/RecTypes.h
-	System/SysThreads.h)
+	System/RecTypes.h)
 
 # Utilities sources
 set(pcsx2UtilitiesSources
@@ -1517,7 +1513,6 @@ target_sources(PCSX2 PRIVATE
 	${pcsx2FrontendHeaders}
 	${pcsx2ps2Sources}
 	${pcsx2ps2Headers}
-	${pcsx2SystemSources}
 	${pcsx2SystemHeaders}
 	${pcsx2UtilitiesSources}
 	${pcsx2UtilitiesHeaders})

@@ -28,7 +28,6 @@ target_sources(common PRIVATE
 	Perf.cpp
 	ProgressCallback.cpp
 	pxTranslate.cpp
-	RwMutex.cpp
 	Semaphore.cpp
 	SettingsWrapper.cpp
 	StringHelpers.cpp
@@ -85,10 +84,8 @@ target_sources(common PRIVATE
 	ProgressCallback.h
 	pxForwardDefs.h
 	RedtapeWindows.h
-	RwMutex.h
 	SafeArray.h
 	ScopedGuard.h
-	ScopedPtrMT.h
 	SettingsInterface.h
 	SettingsWrapper.h
 	StringHelpers.h
