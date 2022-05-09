@@ -84,7 +84,13 @@ namespace VMManager
 
 	static std::string GetCurrentSaveStateFileName(s32 slot);
 	static bool DoLoadState(const char* filename);
-	static bool DoSaveState(const char* filename, s32 slot_for_message);
+	static bool DoSaveState(const char* filename, s32 slot_for_message, bool zip_on_thread);
+	static void ZipSaveState(std::unique_ptr<ArchiveEntryList> elist,
+		std::unique_ptr<SaveStateScreenshotData> screenshot, std::string osd_key,
+		const char* filename, s32 slot_for_message);
+	static void ZipSaveStateOnThread(std::unique_ptr<ArchiveEntryList> elist,
+		std::unique_ptr<SaveStateScreenshotData> screenshot, std::string osd_key,
+		std::string filename, s32 slot_for_message);
 
 	static void SetTimerResolutionIncreased(bool enabled);
 	static void SetEmuThreadAffinities(bool force);
@@ -97,6 +103,9 @@ static u64 s_emu_thread_affinity;
 
 static std::atomic<VMState> s_state{VMState::Shutdown};
 static std::atomic_bool s_cpu_implementation_changed{false};
+
+static std::deque<std::thread> s_save_state_threads;
+static std::mutex s_save_state_threads_mutex;
 
 static std::mutex s_info_mutex;
 static std::string s_disc_path;
@@ -534,30 +543,11 @@ bool VMManager::ApplyBootParameters(const VMBootParameters& params, std::string*
 			return false;
 		}
 
-		// try the game list first, but this won't work if we're in batch mode
+		*state_to_load = GetSaveStateFileName(params.filename.c_str(), params.state_index.value());
+		if (state_to_load->empty())
 		{
-			auto lock = GameList::GetLock();
-			if (const GameList::Entry* entry = GameList::GetEntryForPath(params.filename.c_str()); entry)
-			{
-				*state_to_load = GetSaveStateFileName(entry->serial.c_str(), entry->crc, params.state_index.value());
-			}
-			else
-			{
-				// just scan it.. hopefully it'll come back okay
-				GameList::Entry temp_entry;
-				if (!GameList::PopulateEntryFromPath(params.filename.c_str(), &temp_entry))
-				{
-					Host::ReportFormattedErrorAsync("Error", "Could not scan path '%s' for indexed save state load.", params.filename.c_str());
-					return false;
-				}
-
-				*state_to_load = GetSaveStateFileName(temp_entry.serial.c_str(), temp_entry.crc, params.state_index.value());
-			}
-			if (state_to_load->empty())
-			{
-				Host::ReportFormattedErrorAsync("Error", "Could not resolve path indexed save state load.");
-				return false;
-			}
+			Host::ReportFormattedErrorAsync("Error", "Could not resolve path indexed save state load.");
+			return false;
 		}
 	}
 
@@ -771,7 +761,7 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	{
 		if (!DoLoadState(state_to_load.c_str()))
 		{
-			Shutdown();
+			Shutdown(false);
 			return false;
 		}
 	}
@@ -779,7 +769,7 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	return true;
 }
 
-void VMManager::Shutdown(bool allow_save_resume_state /* = true */)
+void VMManager::Shutdown(bool save_resume_state)
 {
 	SetTimerResolutionIncreased(false);
 
@@ -788,10 +778,10 @@ void VMManager::Shutdown(bool allow_save_resume_state /* = true */)
 		vu1Thread.WaitVU();
 	GetMTGS().WaitGS();
 
-	if (!GSDumpReplayer::IsReplayingDump() && allow_save_resume_state && ShouldSaveResumeState())
+	if (!GSDumpReplayer::IsReplayingDump() && save_resume_state)
 	{
 		std::string resume_file_name(GetCurrentSaveStateFileName(-1));
-		if (!resume_file_name.empty() && !DoSaveState(resume_file_name.c_str(), -1))
+		if (!resume_file_name.empty() && !DoSaveState(resume_file_name.c_str(), -1, true))
 			Console.Error("Failed to save resume state");
 	}
 	else if (GSDumpReplayer::IsReplayingDump())
@@ -854,23 +844,45 @@ void VMManager::Reset()
 		UpdateRunningGame(true);
 }
 
-bool VMManager::ShouldSaveResumeState()
-{
-	return Host::GetBoolSettingValue("EmuCore", "AutoStateLoadSave", false);
-}
-
 std::string VMManager::GetSaveStateFileName(const char* game_serial, u32 game_crc, s32 slot)
 {
-	if (!game_serial || game_serial[0] == '\0')
-		return std::string();
-
 	std::string filename;
-	if (slot < 0)
-		filename = StringUtil::StdStringFromFormat("%s (%08X).resume.p2s", game_serial, game_crc);
-	else
-		filename = StringUtil::StdStringFromFormat("%s (%08X).%02d.p2s", game_serial, game_crc, slot);
+	if (game_crc != 0)
+	{
+		if (slot < 0)
+			filename = StringUtil::StdStringFromFormat("%s (%08X).resume.p2s", game_serial, game_crc);
+		else
+			filename = StringUtil::StdStringFromFormat("%s (%08X).%02d.p2s", game_serial, game_crc, slot);
 
-	return Path::CombineStdString(EmuFolders::Savestates, filename);
+		filename = Path::CombineStdString(EmuFolders::Savestates, filename);
+	}
+
+	return filename;
+}
+
+std::string VMManager::GetSaveStateFileName(const char* filename, s32 slot)
+{
+	pxAssertRel(!HasValidVM(), "Should not have a VM when calling the non-gamelist GetSaveStateFileName()");
+
+	std::string ret;
+
+	// try the game list first, but this won't work if we're in batch mode
+	auto lock = GameList::GetLock();
+	if (const GameList::Entry* entry = GameList::GetEntryForPath(filename); entry)
+	{
+		ret = GetSaveStateFileName(entry->serial.c_str(), entry->crc, slot);
+	}
+	else
+	{
+		// just scan it.. hopefully it'll come back okay
+		GameList::Entry temp_entry;
+		if (GameList::PopulateEntryFromPath(filename, &temp_entry))
+		{
+			ret = GetSaveStateFileName(temp_entry.serial.c_str(), temp_entry.crc, slot);
+		}
+	}
+
+	return ret;
 }
 
 bool VMManager::HasSaveStateInSlot(const char* game_serial, u32 game_crc, s32 slot)
@@ -906,23 +918,93 @@ bool VMManager::DoLoadState(const char* filename)
 	}
 }
 
-bool VMManager::DoSaveState(const char* filename, s32 slot_for_message)
+bool VMManager::DoSaveState(const char* filename, s32 slot_for_message, bool zip_on_thread)
 {
 	if (GSDumpReplayer::IsReplayingDump())
 		return false;
 
+	std::string osd_key(StringUtil::StdStringFromFormat("SaveStateSlot%d", slot_for_message));
+
 	try
 	{
-		std::unique_ptr<ArchiveEntryList> elist = SaveState_DownloadState();
-		SaveState_ZipToDisk(std::move(elist), SaveState_SaveScreenshot(), filename, slot_for_message);
-		Host::InvalidateSaveStateCache();
+		std::unique_ptr<ArchiveEntryList> elist(SaveState_DownloadState());
+		std::unique_ptr<SaveStateScreenshotData> screenshot(SaveState_SaveScreenshot());
+
+		if (zip_on_thread)
+		{
+			// lock order here is important; the thread could exit before we resume here.
+			std::unique_lock lock(s_save_state_threads_mutex);
+			s_save_state_threads.emplace_back(&VMManager::ZipSaveStateOnThread,
+				std::move(elist), std::move(screenshot), std::move(osd_key), std::string(filename),
+				slot_for_message);
+		}
+		else
+		{
+			ZipSaveState(std::move(elist), std::move(screenshot), std::move(osd_key), filename, slot_for_message);
+		}
+
 		Host::OnSaveStateSaved(filename);
 		return true;
 	}
 	catch (Exception::BaseException& e)
 	{
-		Host::AddFormattedOSDMessage(15.0f, "Failed to save save state: %s", static_cast<const char*>(e.DiagMsg().c_str()));
+		Host::AddKeyedFormattedOSDMessage(std::move(osd_key), 15.0f, "Failed to save save state: %s", static_cast<const char*>(e.DiagMsg().c_str()));
 		return false;
+	}
+}
+
+void VMManager::ZipSaveState(std::unique_ptr<ArchiveEntryList> elist,
+	std::unique_ptr<SaveStateScreenshotData> screenshot, std::string osd_key,
+	const char* filename, s32 slot_for_message)
+{
+	Common::Timer timer;
+
+	if (SaveState_ZipToDisk(std::move(elist), std::move(screenshot), filename))
+	{
+		if (slot_for_message >= 0 && VMManager::HasValidVM())
+			Host::AddKeyedFormattedOSDMessage(std::move(osd_key), 10.0f, "State saved to slot %d.", slot_for_message);
+	}
+	else
+	{
+		Host::AddKeyedFormattedOSDMessage(std::move(osd_key), 15.0f, "Failed to save save state to slot %d", slot_for_message);
+	}
+
+	DevCon.WriteLn("Zipping save state to '%s' took %.2f ms", filename, timer.GetTimeMilliseconds());
+
+	Host::InvalidateSaveStateCache();
+}
+
+void VMManager::ZipSaveStateOnThread(std::unique_ptr<ArchiveEntryList> elist, std::unique_ptr<SaveStateScreenshotData> screenshot,
+	std::string osd_key, std::string filename, s32 slot_for_message)
+{
+	ZipSaveState(std::move(elist), std::move(screenshot), std::move(osd_key), filename.c_str(), slot_for_message);
+
+	// remove ourselves from the thread list. if we're joining, we might not be in there.
+	const auto this_id = std::this_thread::get_id();
+	std::unique_lock lock(s_save_state_threads_mutex);
+	for (auto it = s_save_state_threads.begin(); it != s_save_state_threads.end(); ++it)
+	{
+		if (it->get_id() == this_id)
+		{
+			it->detach();
+			s_save_state_threads.erase(it);
+			break;
+		}
+	}
+}
+
+void VMManager::WaitForSaveStateFlush()
+{
+	std::unique_lock lock(s_save_state_threads_mutex);
+	while (!s_save_state_threads.empty())
+	{
+		// take a thread from the list and join with it. it won't self detatch then, but that's okay,
+		// since we're joining with it here.
+		std::thread save_thread(std::move(s_save_state_threads.front()));
+		s_save_state_threads.pop_front();
+		lock.unlock();
+		save_thread.join();
+		lock.lock();
 	}
 }
 
@@ -949,12 +1031,12 @@ bool VMManager::LoadStateFromSlot(s32 slot)
 	return DoLoadState(filename.c_str());
 }
 
-bool VMManager::SaveState(const char* filename)
+bool VMManager::SaveState(const char* filename, bool zip_on_thread)
 {
-	return DoSaveState(filename, -1);
+	return DoSaveState(filename, -1, zip_on_thread);
 }
 
-bool VMManager::SaveStateToSlot(s32 slot)
+bool VMManager::SaveStateToSlot(s32 slot, bool zip_on_thread)
 {
 	const std::string filename(GetCurrentSaveStateFileName(slot));
 	if (filename.empty())
@@ -962,7 +1044,7 @@ bool VMManager::SaveStateToSlot(s32 slot)
 
 	// if it takes more than a minute.. well.. wtf.
 	Host::AddKeyedFormattedOSDMessage(StringUtil::StdStringFromFormat("SaveStateSlot%d", slot), 60.0f, "Saving state to slot %d...", slot);
-	return DoSaveState(filename.c_str(), slot);
+	return DoSaveState(filename.c_str(), slot, zip_on_thread);
 }
 
 LimiterModeType VMManager::GetLimiterMode()
