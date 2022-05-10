@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-02-03 12:55+0800\n"
+"POT-Creation-Date: 2022-05-10 21:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,35 +22,35 @@ msgstr ""
 "X-Poedit-SearchPath-0: pcsx2\n"
 "X-Poedit-SearchPath-1: common\n"
 
-#: common/Exceptions.cpp:246
+#: common/Exceptions.cpp:232
 msgid "There is not enough virtual memory available, or necessary virtual memory mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 
-#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:581
+#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:582
 #, c-format
 msgid ""
 "The PS2-slot %d has been automatically disabled.  You can correct the problem\n"
 "and re-enable it at any time using Config:Memory cards from the main menu."
 msgstr ""
 
-#: pcsx2/MemoryCardFolder.h:586
+#: pcsx2/MemoryCardFolder.h:587
 #, c-format
 msgid "(FolderMcd) Memory Card is full, could not add: %s"
 msgstr ""
 
-#: pcsx2/System.cpp:111
+#: pcsx2/System.cpp:135
 msgid "This recompiler was unable to reserve contiguous memory required for internal caches.  This error can be caused by low virtual memory resources, such as a small or disabled swapfile, or by another program that is hogging a lot of memory."
 msgstr ""
 
-#: pcsx2/System.cpp:328
+#: pcsx2/System.cpp:349
 msgid "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close out some memory hogging background tasks and try again."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:174
+#: pcsx2/gui/AppInit.cpp:178
 msgid "Warning: Some of the configured PS2 recompilers failed to initialize and have been disabled:"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:205
+#: pcsx2/gui/AppInit.cpp:209
 msgid "Note: Recompilers are not necessary for PCSX2 to run, however they typically improve emulation speed substantially. You may have to manually re-enable the recompilers listed above, if you resolve the errors."
 msgstr ""
 
@@ -58,7 +58,7 @@ msgstr ""
 msgid "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't count).  Please consult the FAQs and Guides for further instructions."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:468
+#: pcsx2/gui/AppMain.cpp:470
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -178,16 +178,18 @@ msgstr ""
 msgid "When checked this folder will automatically reflect the default associated with PCSX2's current usermode setting. "
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:76
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
 "\n"
-"4:3: Temporarily switch to a 4:3 aspect ratio while an FMV plays to correctly display an 4:3 FMV.\n"
+"Auto 4:3/3:2: Temporarily switch to a 4:3 aspect ratio while an FMV plays to correctly display a 4:3 FMV. Will use 3:2 is the resolution is 480P\n"
+"\n"
+"4:3: Temporarily switch to a 4:3 aspect ratio while an FMV plays to correctly display a 4:3 FMV. \n"
 "\n"
 "16:9: Temporarily switch to a 16:9 aspect ratio while an FMV plays to correctly display a widescreen 16:9 FMV."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:80
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -202,21 +204,21 @@ msgid ""
 "CTRL + NUMPAD-*: Toggle 100/0"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:88
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
 msgid "Vsync eliminates screen tearing but typically has a big performance hit. It usually only applies to fullscreen mode."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:90
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
 msgid "Check this to force the mouse cursor invisible inside the GS window; useful if using the mouse as a primary control device for gaming.  By default the mouse auto-hides after 2 seconds of inactivity."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming emulation. You can still toggle fullscreen display at any time using \n"
 "Alt-Enter or double clicking the output window (game)."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
@@ -301,6 +303,10 @@ msgstr ""
 
 #: pcsx2/gui/Panels/PathsPanel.cpp:59
 msgid "This folder is where PCSX2 saves its logfiles and diagnostic dumps."
+msgstr ""
+
+#: pcsx2/gui/Panels/PathsPanel.cpp:67
+msgid "This folder is where PCSX2 saves texture dumps and replacements."
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:29

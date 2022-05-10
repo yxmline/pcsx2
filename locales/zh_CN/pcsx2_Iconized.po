@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-02-03 12:55+0800\n"
-"PO-Revision-Date: 2022-02-03 12:59+0800\n"
+"POT-Creation-Date: 2022-05-10 21:36+0800\n"
+"PO-Revision-Date: 2022-05-10 21:38+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,14 +14,14 @@ msgstr ""
 "X-Generator: Poedit 3.0.1\n"
 "X-Poedit-Basepath: .\n"
 
-#: common/Exceptions.cpp:246
+#: common/Exceptions.cpp:232
 msgid ""
 "There is not enough virtual memory available, or necessary virtual memory "
 "mappings have already been reserved by other processes, services, or DLLs."
 msgstr ""
 "没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保留。"
 
-#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:581
+#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:582
 #, c-format
 msgid ""
 "The PS2-slot %d has been automatically disabled.  You can correct the "
@@ -31,12 +31,12 @@ msgstr ""
 "%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题并"
 "重新启用记忆卡。"
 
-#: pcsx2/MemoryCardFolder.h:586
+#: pcsx2/MemoryCardFolder.h:587
 #, c-format
 msgid "(FolderMcd) Memory Card is full, could not add: %s"
 msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
 
-#: pcsx2/System.cpp:111
+#: pcsx2/System.cpp:135
 msgid ""
 "This recompiler was unable to reserve contiguous memory required for "
 "internal caches.  This error can be caused by low virtual memory resources, "
@@ -46,20 +46,20 @@ msgstr ""
 "重编译器无法保留内部缓存所需的连续内存空间。此错误可能是由虚拟内存资源不足引"
 "起，如交换文件过小或未使用交换文件、某个其它程序正占用过大内存。"
 
-#: pcsx2/System.cpp:328
+#: pcsx2/System.cpp:349
 msgid ""
 "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close "
 "out some memory hogging background tasks and try again."
 msgstr ""
 "PCSX2 无法分配 PS2 虚拟机所需内存。请关闭一些占用内存的后台任务后重试。"
 
-#: pcsx2/gui/AppInit.cpp:174
+#: pcsx2/gui/AppInit.cpp:178
 msgid ""
 "Warning: Some of the configured PS2 recompilers failed to initialize and "
 "have been disabled:"
 msgstr "警告: 部分已配置的 PS2 重编译器初始化失败且已被禁用："
 
-#: pcsx2/gui/AppInit.cpp:205
+#: pcsx2/gui/AppInit.cpp:209
 msgid ""
 "Note: Recompilers are not necessary for PCSX2 to run, however they typically "
 "improve emulation speed substantially. You may have to manually re-enable "
@@ -77,7 +77,7 @@ msgstr ""
 "PCSX2 需要一个 PS2 BIOS 才可以运行。由于法律问题，您必须从一台属于您的 PS2 实"
 "机中取得一个 BIOS 文件。请参考常见问题及教程以获取进一步的说明。"
 
-#: pcsx2/gui/AppMain.cpp:468
+#: pcsx2/gui/AppMain.cpp:470
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -277,24 +277,30 @@ msgid ""
 "with PCSX2's current usermode setting. "
 msgstr "选中时此文件夹将自动反映当前 PCSX2 用户设置选项相关的默认值。 "
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:76
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting "
 "from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
 "\n"
+"Auto 4:3/3:2: Temporarily switch to a 4:3 aspect ratio while an FMV plays to "
+"correctly display a 4:3 FMV. Will use 3:2 is the resolution is 480P\n"
+"\n"
 "4:3: Temporarily switch to a 4:3 aspect ratio while an FMV plays to "
-"correctly display an 4:3 FMV.\n"
+"correctly display a 4:3 FMV. \n"
 "\n"
 "16:9: Temporarily switch to a 16:9 aspect ratio while an FMV plays to "
 "correctly display a widescreen 16:9 FMV."
 msgstr ""
 "关: 关闭临时高宽比切换。(它将使用上述设置中高宽比替代并覆盖 FMV 高宽比。)\n"
 "\n"
+"自动 4:3/3:2: 临时切换 4:3 高宽比使得可以正确播放 4:3 FMV。 将使用3:2的分辨率"
+"为480P\n"
+"\n"
 "4:3: 临时切换 4:3 高宽比使得可以正确播放 4:3 FMV。\n"
 "\n"
 "16:9: 临时切换 16:9 高宽比使得可以正确播放 16:9 FMV。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:80
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -318,13 +324,13 @@ msgstr ""
 "键盘: Ctrl+小键盘加号: 放大，Ctrl+小键盘减号: 缩小，Ctrl+小键盘星号: 在 100 "
 "和 0 之间切换"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:88
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
 msgid ""
 "Vsync eliminates screen tearing but typically has a big performance hit. It "
 "usually only applies to fullscreen mode."
 msgstr "垂直同步可以消除花屏但通常对性能有较大影响。通常仅应用于全屏幕模式。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:90
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
 msgid ""
 "Check this to force the mouse cursor invisible inside the GS window; useful "
 "if using the mouse as a primary control device for gaming.  By default the "
@@ -333,7 +339,7 @@ msgstr ""
 "选中此项强制 GS 窗口中不显示鼠标光标。在使用鼠标控制游戏时比较有用。默认状态"
 "鼠标在 2 秒不活动后隐藏。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming "
 "emulation. You can still toggle fullscreen display at any time using \n"
@@ -343,7 +349,7 @@ msgstr ""
 "用alt-enter切换全屏幕显示。\n"
 "Alt-Enter或在输出窗口双击(游戏)。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
 msgid ""
 "Completely closes the often large and bulky GS window when pressing ESC or "
 "pausing the emulator."
@@ -477,6 +483,10 @@ msgstr "此文件夹是 PCSX2 保存截图位置。"
 #: pcsx2/gui/Panels/PathsPanel.cpp:59
 msgid "This folder is where PCSX2 saves its logfiles and diagnostic dumps."
 msgstr "此文件夹是 PCSX2 保存日志和诊断转储位置。"
+
+#: pcsx2/gui/Panels/PathsPanel.cpp:67
+msgid "This folder is where PCSX2 saves texture dumps and replacements."
+msgstr "此文件夹是 PCSX2 保存纹理转储和替换的位置。"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:29
 #, c-format
