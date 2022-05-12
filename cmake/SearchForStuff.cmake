@@ -252,8 +252,8 @@ if(QT_BUILD)
 	add_subdirectory(3rdparty/sdl2 EXCLUDE_FROM_ALL)
 endif()
 
-add_subdirectory(3rdparty/libchdr/libchdr EXCLUDE_FROM_ALL)
-target_compile_options(chdr-static PRIVATE "-w")
+add_subdirectory(3rdparty/lzma EXCLUDE_FROM_ALL)
+add_subdirectory(3rdparty/libchdr EXCLUDE_FROM_ALL)
 
 if(USE_NATIVE_TOOLS)
 	add_subdirectory(tools/bin2cpp EXCLUDE_FROM_ALL)
