@@ -480,35 +480,6 @@ void GSvsync(u32 field, bool registers_written)
 	}
 }
 
-u32 GSmakeSnapshot(char* path)
-{
-	try
-	{
-		std::string s{path};
-
-		if (!s.empty())
-		{
-			// Allows for providing a complete path
-			std::string extension = s.substr(s.size() - 4, 4);
-#ifdef _WIN32
-			std::transform(extension.begin(), extension.end(), extension.begin(), (char(_cdecl*)(int))tolower);
-#else
-			std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
-#endif
-			if (extension == ".png")
-				return g_gs_renderer->MakeSnapshot(s);
-			else if (s[s.length() - 1] != DIRECTORY_SEPARATOR)
-				s = s + DIRECTORY_SEPARATOR;
-		}
-
-		return g_gs_renderer->MakeSnapshot(s + "gs");
-	}
-	catch (GSRecoverableError)
-	{
-		return false;
-	}
-}
-
 int GSfreeze(FreezeAction mode, freezeData* data)
 {
 	try
@@ -531,6 +502,18 @@ int GSfreeze(FreezeAction mode, freezeData* data)
 	}
 
 	return 0;
+}
+
+void GSQueueSnapshot(const std::string& path, u32 gsdump_frames)
+{
+	if (g_gs_renderer)
+		g_gs_renderer->QueueSnapshot(path, gsdump_frames);
+}
+
+void GSStopGSDump()
+{
+	if (g_gs_renderer)
+		g_gs_renderer->StopGSDump();
 }
 
 #ifndef PCSX2_CORE
@@ -577,9 +560,7 @@ int GStest()
 	return 0;
 }
 
-#endif
-
-void pt(const char* str)
+static void pt(const char* str)
 {
 	struct tm* current;
 	time_t now;
@@ -623,6 +604,7 @@ void GSendRecording()
 	g_gs_renderer->EndCapture();
 	pt(" - Capture ended\n");
 }
+#endif
 
 void GSsetGameCRC(u32 crc, int options)
 {
@@ -1293,6 +1275,10 @@ void GSApp::Init()
 	m_gs_tv_shaders.push_back(GSSetting(3, "Triangular filter", ""));
 	m_gs_tv_shaders.push_back(GSSetting(4, "Wave filter", ""));
 
+	m_gs_dump_compression.push_back(GSSetting(static_cast<u32>(GSDumpCompressionMethod::Uncompressed), "Uncompressed", ""));
+	m_gs_dump_compression.push_back(GSSetting(static_cast<u32>(GSDumpCompressionMethod::LZMA), "LZMA (xz)", ""));
+	m_gs_dump_compression.push_back(GSSetting(static_cast<u32>(GSDumpCompressionMethod::Zstandard), "Zstandard (zst)", ""));
+
 	// clang-format off
 	// Avoid to clutter the ini file with useless options
 #if defined(ENABLE_VULKAN) || defined(_WIN32)
@@ -1333,6 +1319,7 @@ void GSApp::Init()
 	m_default_configuration["filter"]                                     = std::to_string(static_cast<s8>(BiFiltering::PS2));
 	m_default_configuration["FMVSoftwareRendererSwitch"]                  = "0";
 	m_default_configuration["fxaa"]                                       = "0";
+	m_default_configuration["GSDumpCompression"]                          = "0";
 	m_default_configuration["HWDisableReadbacks"]                         = "0";
 	m_default_configuration["pcrtc_offsets"]                              = "0";
 	m_default_configuration["IntegerScaling"]                             = "0";
@@ -1581,8 +1568,32 @@ static void HotkeyAdjustZoom(double delta)
 	GetMTGS().RunOnGSThread([new_zoom]() { GSConfig.Zoom = new_zoom; });
 }
 
-BEGIN_HOTKEY_LIST(g_gs_hotkeys){
-	"ToggleSoftwareRendering", "Graphics", "Toggle Software Rendering", [](bool pressed) {
+BEGIN_HOTKEY_LIST(g_gs_hotkeys)
+	{"Screenshot", "Graphics", "Save Screenshot", [](bool pressed) {
+		if (!pressed)
+		{
+			GetMTGS().RunOnGSThread([]() {
+				GSQueueSnapshot(std::string(), 0);
+			});
+		}
+	}},
+	{"GSDumpSingleFrame", "Graphics", "Save Single Frame GS Dump", [](bool pressed) {
+		if (!pressed)
+		{
+			GetMTGS().RunOnGSThread([]() {
+				GSQueueSnapshot(std::string(), 1);
+			});
+		}
+	}},
+	{"GSDumpMultiFrame", "Graphics", "Save Multi Frame GS Dump", [](bool pressed) {
+		GetMTGS().RunOnGSThread([pressed]() {
+			if (pressed)
+				GSQueueSnapshot(std::string(), std::numeric_limits<u32>::max());
+			else
+				GSStopGSDump();
+		});
+	}},
+	{"ToggleSoftwareRendering", "Graphics", "Toggle Software Rendering", [](bool pressed) {
 		if (!pressed)
 			GetMTGS().ToggleSoftwareRendering();
 	}},
@@ -1598,10 +1609,9 @@ BEGIN_HOTKEY_LIST(g_gs_hotkeys){
 		 if (pressed)
 			 return;
 
-		 GetMTGS().RunOnGSThread([]() {
-			 GSConfig.AspectRatio = static_cast<AspectRatioType>((static_cast<int>(GSConfig.AspectRatio) + 1) % static_cast<int>(AspectRatioType::MaxCount));
-			 Host::AddKeyedFormattedOSDMessage("CycleAspectRatio", 10.0f, "Aspect ratio set to '%s'.", Pcsx2Config::GSOptions::AspectRatioNames[static_cast<int>(GSConfig.AspectRatio)]);
-		 });
+		 // technically this races, but the worst that'll happen is one frame uses the old AR.
+		 EmuConfig.CurrentAspectRatio = static_cast<AspectRatioType>((static_cast<int>(EmuConfig.CurrentAspectRatio) + 1) % static_cast<int>(AspectRatioType::MaxCount));
+		 Host::AddKeyedFormattedOSDMessage("CycleAspectRatio", 10.0f, "Aspect ratio set to '%s'.", Pcsx2Config::GSOptions::AspectRatioNames[static_cast<int>(EmuConfig.CurrentAspectRatio)]);
 	 }},
 	{"CycleMipmapMode", "Graphics", "Cycle Hardware Mipmapping", [](bool pressed) {
 		 if (pressed)

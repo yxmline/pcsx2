@@ -281,7 +281,6 @@ set(pcsx2CDVDHeaders
 	CDVD/CDVD.h
 	CDVD/CDVD_internal.h
 	CDVD/CDVDdiscReader.h
-	CDVD/CDVDisoReader.h
 	CDVD/ChunksCache.h
 	CDVD/CompressedFileReader.h
 	CDVD/ChdFileReader.h
@@ -1004,9 +1003,11 @@ set(pcsx2FrontendHeaders
 if(USE_OPENGL)
 	list(APPEND pcsx2FrontendSources
 		Frontend/OpenGLHostDisplay.cpp
+		Frontend/imgui_impl_opengl3.cpp
 	)
 	list(APPEND pcsx2FrontendHeaders
 		Frontend/OpenGLHostDisplay.h
+		Frontend/imgui_impl_opengl3.h
 	)
 endif()
 
@@ -1025,10 +1026,14 @@ if(WIN32)
 	list(APPEND pcsx2FrontendSources
 		Frontend/D3D11HostDisplay.cpp
 		Frontend/D3D12HostDisplay.cpp
+		Frontend/imgui_impl_dx11.cpp
+		Frontend/imgui_impl_dx12.cpp
 	)
 	list(APPEND pcsx2FrontendHeaders
 		Frontend/D3D11HostDisplay.h
 		Frontend/D3D12HostDisplay.h
+		Frontend/imgui_impl_dx11.h
+		Frontend/imgui_impl_dx12.h
 	)
 elseif(APPLE)
 	list(APPEND pcsx2GSSources
@@ -1604,6 +1609,7 @@ target_link_libraries(PCSX2_FLAGS INTERFACE
 	PkgConfig::SAMPLERATE
 	PNG::PNG
 	LibLZMA::LibLZMA
+	Zstd::Zstd
 	${LIBC_LIBRARIES}
 )
 
