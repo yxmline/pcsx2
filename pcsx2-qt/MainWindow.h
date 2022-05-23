@@ -87,6 +87,7 @@ public:
 public Q_SLOTS:
 	void checkForUpdates(bool display_message);
 	void refreshGameList(bool invalidate_cache);
+	void cancelGameListRefresh();
 	void invalidateSaveStateCache();
 	void reportError(const QString& title, const QString& message);
 	void runOnUIThread(const std::function<void()>& func);
@@ -135,6 +136,12 @@ private Q_SLOTS:
 	void onLoggingOptionChanged();
 	void onScreenshotActionTriggered();
 	void onSaveGSDumpActionTriggered();
+
+	// Input Recording
+	void onInputRecNewActionTriggered();
+	void onInputRecPlayActionTriggered();
+	void onInputRecStopActionTriggered();
+	void onInputRecOpenSettingsTriggered();
 
 	void onVMStarting();
 	void onVMStarted();

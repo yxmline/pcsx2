@@ -35,6 +35,7 @@
 #include "pcsx2/HostDisplay.h"
 #include "pcsx2/PAD/Host/PAD.h"
 #include "pcsx2/PerformanceMetrics.h"
+#include "pcsx2/Recording/InputRecordingControls.h"
 #include "pcsx2/VMManager.h"
 
 #include "DisplayWidget.h"
@@ -666,7 +667,7 @@ HostDisplay* EmuThread::acquireHostDisplay(HostDisplay::RenderAPI api)
 		return nullptr;
 	}
 
-	if (!s_host_display->InitializeRenderDevice(StringUtil::wxStringToUTF8String(EmuFolders::Cache.ToString()), false) ||
+	if (!s_host_display->InitializeRenderDevice(EmuFolders::Cache, false) ||
 		!ImGuiManager::Initialize())
 	{
 		Console.Error("Failed to initialize device/imgui");
@@ -905,6 +906,41 @@ void Host::RunOnCPUThread(std::function<void()> function, bool block /* = false 
 		Q_ARG(const std::function<void()>&, std::move(function)));
 }
 
+void Host::RefreshGameListAsync(bool invalidate_cache)
+{
+	QMetaObject::invokeMethod(g_main_window, "refreshGameList", Qt::QueuedConnection,
+		Q_ARG(bool, invalidate_cache));
+}
+
+void Host::CancelGameListRefresh()
+{
+	QMetaObject::invokeMethod(g_main_window, "cancelGameListRefresh", Qt::BlockingQueuedConnection);
+}
+
+void Host::RequestExit(bool save_state_if_running)
+{
+	if (VMManager::HasValidVM())
+		g_emu_thread->shutdownVM(save_state_if_running);
+
+	QMetaObject::invokeMethod(g_main_window, "requestExit", Qt::QueuedConnection);
+}
+
+void Host::RequestVMShutdown(bool save_state)
+{
+	if (VMManager::HasValidVM())
+		g_emu_thread->shutdownVM(save_state);
+}
+
+bool Host::IsFullscreen()
+{
+	return g_emu_thread->isFullscreen();
+}
+
+void Host::SetFullscreen(bool enabled)
+{
+	g_emu_thread->setFullscreen(enabled);
+}
+
 alignas(16) static SysMtgsThread s_mtgs_thread;
 
 SysMtgsThread& GetMTGS()
@@ -932,5 +968,12 @@ DEFINE_HOTKEY("TogglePause", "System", "Toggle Pause", [](bool pressed) {
 DEFINE_HOTKEY("ToggleFullscreen", "General", "Toggle Fullscreen", [](bool pressed) {
 	if (!pressed)
 		g_emu_thread->toggleFullscreen();
+})
+// Input Recording Hot Keys
+DEFINE_HOTKEY("InputRecToggleMode", "Input Recording", "Toggle Recording Mode", [](bool pressed) {
+	if (!pressed) // ?? - not pressed so it is on key up?
+	{
+		g_InputRecordingControls.RecordModeToggle();
+	}
 })
 END_HOTKEY_LIST()

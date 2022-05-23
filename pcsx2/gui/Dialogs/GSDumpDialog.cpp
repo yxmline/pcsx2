@@ -21,13 +21,13 @@
 #include "gui/Dialogs/ModalPopups.h"
 
 
-#include "common/EmbeddedImage.h"
+#include "gui/EmbeddedImage.h"
 #include "common/FileSystem.h"
 #include "common/StringUtil.h"
 #include "gui/Resources/NoIcon.h"
 #include "HostDisplay.h"
 
-#include "PathDefs.h"
+#include "gui/PathDefs.h"
 #include "gui/AppConfig.h"
 #include "gui/GSFrame.h"
 #include "Counters.h"

@@ -23,6 +23,7 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleFactory>
 
+#include "common/Assertions.h"
 #include "common/FileSystem.h"
 
 #include "pcsx2/CDVD/CDVDaccess.h"
@@ -30,6 +31,7 @@
 #include "pcsx2/GSDumpReplayer.h"
 #include "pcsx2/HostDisplay.h"
 #include "pcsx2/PerformanceMetrics.h"
+#include "pcsx2/Recording/InputRecording.h"
 
 #include "AboutDialog.h"
 #include "AutoUpdaterDialog.h"
@@ -44,6 +46,9 @@
 #include "Settings/GameListSettingsWidget.h"
 #include "Settings/InterfaceSettingsWidget.h"
 #include "SettingWidgetBinder.h"
+#include "svnrev.h"
+#include "Tools/InputRecording/NewInputRecordingDlg.h"
+
 
 static constexpr char DISC_IMAGE_FILTER[] =
 	QT_TRANSLATE_NOOP("MainWindow", "All File Types (*.bin *.iso *.cue *.chd *.cso *.gz *.elf *.irx *.m3u *.gs *.gs.xz *.gs.zst);;"
@@ -211,6 +216,15 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionEnableIOPConsoleLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 
 	connect(m_ui.actionSaveGSDump, &QAction::triggered, this, &MainWindow::onSaveGSDumpActionTriggered);
+
+	// Input Recording
+	connect(m_ui.actionInputRecNew, &QAction::triggered, this, &MainWindow::onInputRecNewActionTriggered);
+	connect(m_ui.actionInputRecPlay, &QAction::triggered, this, &MainWindow::onInputRecPlayActionTriggered);
+	connect(m_ui.actionInputRecStop, &QAction::triggered, this, &MainWindow::onInputRecStopActionTriggered);
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecConsoleLogs, "Logging", "EnableInputRecordingLogs", false);
+	connect(m_ui.actionInputRecConsoleLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
+	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecControllerLogs, "Logging", "EnableControllerLogs", false);
+	connect(m_ui.actionInputRecControllerLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged); 
 
 	// These need to be queued connections to stop crashing due to menus opening/closing and switching focus.
 	connect(m_game_list_widget, &GameListWidget::refreshProgress, this, &MainWindow::onGameListRefreshProgress);
@@ -597,6 +611,10 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 
 	if (!starting && !running)
 		m_ui.actionPause->setChecked(false);
+
+	// scanning needs to be disabled while running
+	m_ui.actionScanForNewGames->setDisabled(starting_or_running);
+	m_ui.actionRescanAllGames->setDisabled(starting_or_running);
 }
 
 void MainWindow::updateStatusBarWidgetVisibility()
@@ -727,7 +745,16 @@ void MainWindow::switchToEmulationView()
 
 void MainWindow::refreshGameList(bool invalidate_cache)
 {
+	// can't do this while the VM is running because of CDVD
+	if (m_vm_valid)
+		return;
+
 	m_game_list_widget->refresh(invalidate_cache);
+}
+
+void MainWindow::cancelGameListRefresh()
+{
+	m_game_list_widget->cancelRefresh();
 }
 
 void MainWindow::invalidateSaveStateCache()
@@ -1142,7 +1169,7 @@ void MainWindow::startupUpdateCheck()
 
 void MainWindow::onToolsOpenDataDirectoryTriggered()
 {
-	const QString path(QtUtils::WxStringToQString(EmuFolders::DataRoot.ToString()));
+	const QString path(QString::fromStdString(EmuFolders::DataRoot));
 	QtUtils::OpenURL(this, QUrl::fromLocalFile(path));
 }
 
@@ -1163,6 +1190,85 @@ void MainWindow::onThemeChangedFromSettings()
 void MainWindow::onLoggingOptionChanged()
 {
 	QtHost::UpdateLogging();
+}
+
+void MainWindow::onInputRecNewActionTriggered()
+{
+	const bool wasPaused = m_vm_paused;
+	const bool wasRunning = m_vm_valid;
+	if (wasRunning && !wasPaused)
+	{
+		VMManager::SetPaused(true);
+	}
+
+	NewInputRecordingDlg dlg(this);
+	const auto result = dlg.exec();
+
+	if (result == QDialog::Accepted)
+	{
+		if (g_InputRecording.Create(
+				dlg.getFilePath(),
+				dlg.getInputRecType() == InputRecording::Type::FROM_SAVESTATE,
+				dlg.getAuthorName()))
+		{
+			return;
+		}
+	}
+
+	if (wasRunning && !wasPaused)
+	{
+		VMManager::SetPaused(false);
+	}
+}
+
+#include "pcsx2/Recording/InputRecordingControls.h"
+
+void MainWindow::onInputRecPlayActionTriggered()
+{
+	const bool wasPaused = m_vm_paused;
+
+	if (!wasPaused)
+		g_InputRecordingControls.PauseImmediately();
+
+	QFileDialog dialog(this);
+	dialog.setFileMode(QFileDialog::ExistingFile);
+	dialog.setWindowTitle("Select a File");
+	dialog.setNameFilter(tr("Input Recording Files (*.p2m2)"));
+	QStringList fileNames;
+	if (dialog.exec())
+	{
+		fileNames = dialog.selectedFiles();
+	}
+
+	if (fileNames.length() > 0)
+	{
+		if (g_InputRecording.IsActive())
+		{
+			g_InputRecording.Stop();
+		}
+		if (g_InputRecording.Play(fileNames.first().toStdString()))
+		{
+			return;
+		}
+	}
+
+	if (!wasPaused)
+	{
+		g_InputRecordingControls.Resume();
+	}
+}
+
+void MainWindow::onInputRecStopActionTriggered()
+{
+	if (g_InputRecording.IsActive())
+	{
+		g_InputRecording.Stop();
+	}
+}
+
+void MainWindow::onInputRecOpenSettingsTriggered()
+{
+	// TODO - Vaser - Implement
 }
 
 void MainWindow::onVMStarting()

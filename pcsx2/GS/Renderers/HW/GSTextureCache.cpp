@@ -145,7 +145,7 @@ GSTextureCache::Source* GSTextureCache::LookupDepthSource(const GIFRegTEX0& TEX0
 		src->m_texture = dst->m_texture;
 		src->m_shared_texture = true;
 		src->m_target = true; // So renderer can check if a conversion is required
-		src->m_from_target = dst->m_texture; // avoid complex condition on the renderer
+		src->m_from_target = &dst->m_texture; // avoid complex condition on the renderer
 		src->m_from_target_TEX0 = dst->m_TEX0;
 		src->m_32_bits_fmt = dst->m_32_bits_fmt;
 		src->m_valid_rect = dst->m_valid;
@@ -184,6 +184,9 @@ GSTextureCache::Source* GSTextureCache::LookupDepthSource(const GIFRegTEX0& TEX0
 		// Rendering is nicer (less garbage) if we skip the draw call.
 		throw GSRecoverableError();
 	}
+
+	ASSERT(src->m_texture);
+	ASSERT(src->m_texture->GetScale() == (dst ? dst->m_texture->GetScale() : GSVector2(1, 1)));
 
 	return src;
 }
@@ -1258,7 +1261,7 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 		// Keep a trace of origin of the texture
 		src->m_texture = dTex;
 		src->m_target = true;
-		src->m_from_target = dst->m_texture;
+		src->m_from_target = &dst->m_texture;
 		src->m_from_target_TEX0 = dst->m_TEX0;
 		src->m_texture->SetScale(scale);
 		src->m_end_block = dst->m_end_block;
@@ -1287,9 +1290,10 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 		// Keep a trace of origin of the texture
 		src->m_texture = dTex;
 		src->m_target = true;
-		src->m_from_target = dst->m_texture;
+		src->m_from_target = &dst->m_texture;
 		src->m_from_target_TEX0 = dst->m_TEX0;
 		src->m_end_block = dst->m_end_block;
+		src->m_texture->SetScale(dst->m_texture->GetScale());
 
 		// Even if we sample the framebuffer directly we might need the palette
 		// to handle the format conversion on GPU
@@ -1323,7 +1327,7 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 
 		// Keep a trace of origin of the texture
 		src->m_target = true;
-		src->m_from_target = dst->m_texture;
+		src->m_from_target = &dst->m_texture;
 		src->m_from_target_TEX0 = dst->m_TEX0;
 		src->m_valid_rect = dst->m_valid;
 		src->m_end_block = dst->m_end_block;
@@ -1531,6 +1535,9 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 	}
 
 	ASSERT(src->m_texture);
+	ASSERT(src->m_target == (dst != nullptr));
+	ASSERT(src->m_from_target == (dst ? &dst->m_texture : nullptr));
+	ASSERT(src->m_texture->GetScale() == ((!dst || TEX0.PSM == PSM_PSMT8) ? GSVector2(1, 1) : dst->m_texture->GetScale()));
 
 	m_src.Add(src, TEX0, g_gs_renderer->m_context->offset.tex);
 

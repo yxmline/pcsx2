@@ -17,7 +17,6 @@
 
 #include "common/emitter/tools.h"
 #include "common/General.h"
-#include "common/Path.h"
 #include <string>
 
 class SettingsInterface;
@@ -802,9 +801,6 @@ struct Pcsx2Config
 		void LoadSave(SettingsWrapper& wrap);
 		GamefixOptions& DisableAll();
 
-		void Set(const wxString& list, bool enabled = true);
-		void Clear(const wxString& list) { Set(list, false); }
-
 		bool Get(GamefixId id) const;
 		void Set(GamefixId id, bool enabled = true);
 		void Clear(GamefixId id) { Set(id, false); }
@@ -944,9 +940,8 @@ struct Pcsx2Config
 		EnableCheats : 1, // enables cheat detection and application
 		EnablePINE : 1, // enables inter-process communication
 		EnableWideScreenPatches : 1,
-#ifndef DISABLE_RECORDING
+		// TODO - Vaser - where are these settings exposed in the Qt UI?
 		EnableRecordingTools : 1,
-#endif
 #ifdef PCSX2_CORE
 		EnableGameFixes : 1, // enables automatic game fixes
 		SaveStateOnShutdown : 1, // default value for saving state on shutdown
@@ -967,7 +962,7 @@ struct Pcsx2Config
 		HostFs : 1;
 
 	// uses automatic ntfs compression when creating new memory cards (Win32 only)
-#ifdef __WXMSW__
+#ifdef _WIN32
 	bool McdCompressNTFS;
 #endif
 	BITFIELD_END
@@ -1004,9 +999,8 @@ struct Pcsx2Config
 	void LoadSave(SettingsWrapper& wrap);
 	void LoadSaveMemcards(SettingsWrapper& wrap);
 
-	// TODO: Make these std::string when we remove wxFile...
 	std::string FullpathToBios() const;
-	wxString FullpathToMcd(uint slot) const;
+	std::string FullpathToMcd(uint slot) const;
 
 	bool MultitapEnabled(uint port) const;
 
@@ -1027,22 +1021,22 @@ extern Pcsx2Config EmuConfig;
 
 namespace EmuFolders
 {
-	extern wxDirName AppRoot;
-	extern wxDirName DataRoot;
-	extern wxDirName Settings;
-	extern wxDirName Bios;
-	extern wxDirName Snapshots;
-	extern wxDirName Savestates;
-	extern wxDirName MemoryCards;
-	extern wxDirName Langs;
-	extern wxDirName Logs;
-	extern wxDirName Cheats;
-	extern wxDirName CheatsWS;
-	extern wxDirName Resources;
-	extern wxDirName Cache;
-	extern wxDirName Covers;
-	extern wxDirName GameSettings;
-	extern wxDirName Textures;
+	extern std::string AppRoot;
+	extern std::string DataRoot;
+	extern std::string Settings;
+	extern std::string Bios;
+	extern std::string Snapshots;
+	extern std::string Savestates;
+	extern std::string MemoryCards;
+	extern std::string Langs;
+	extern std::string Logs;
+	extern std::string Cheats;
+	extern std::string CheatsWS;
+	extern std::string Resources;
+	extern std::string Cache;
+	extern std::string Covers;
+	extern std::string GameSettings;
+	extern std::string Textures;
 
 	// Assumes that AppRoot and DataRoot have been initialized.
 	void SetDefaults();

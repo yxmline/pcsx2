@@ -45,12 +45,12 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\lzma\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)pcsx2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <!-- Needed for moc pch -->
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir)\Settings;$(ProjectDir)\GameList</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir)\Settings;$(ProjectDir)\GameList;$(ProjectDir)\Tools\InputRecording</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>PrecompiledHeader.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;LZMA_API_STATIC;BUILD_DX=1;ENABLE_OPENGL;ENABLE_VULKAN;DIRECTINPUT_VERSION=0x0800;PCSX2_CORE;DISABLE_RECORDING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;LZMA_API_STATIC;BUILD_DX=1;ENABLE_OPENGL;ENABLE_VULKAN;DIRECTINPUT_VERSION=0x0800;PCSX2_CORE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Debug))">PCSX2_DEBUG;PCSX2_DEVBUILD;_SECURE_SCL_=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Devel))">PCSX2_DEVEL;PCSX2_DEVBUILD;NDEBUG;_SECURE_SCL_=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="$(Configuration.Contains(Release))">NDEBUG;_SECURE_SCL_=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -79,16 +79,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="$(SolutionDir)3rdparty\wxwidgets3.0\include\wx\msw\wx.rc">
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\wxwidgets3.0\$(PlatformName);$(SolutionDir)3rdparty\wxwidgets3.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
     <ResourceCompile Include="..\pcsx2\PCSX2.rc" />
-    <ResourceCompile Include="..\pcsx2\GS\GS.rc" />
-    <ResourceCompile Include="..\pcsx2\PAD\Windows\PAD.rc" />
-    <ResourceCompile Include="..\pcsx2\SPU2\Windows\SPU2.rc" />
-    <ResourceCompile Include="..\pcsx2\USB\usb-pad\dx\versionproxy.rc" />
-    <ResourceCompile Include="..\pcsx2\USB\usb-pad\raw\raw-config.rc" />
-    <ResourceCompile Include="..\pcsx2\USB\Win32\USBDialog.rc" />
     <ResourceCompile Include="..\pcsx2\windows\wxResources.rc" />
   </ItemGroup>
   <ItemGroup>
@@ -110,9 +101,6 @@
     <ProjectReference Include="$(SolutionDir)3rdparty\soundtouch\SoundTouch.vcxproj">
       <Project>{e9b51944-7e6d-4bcd-83f2-7bbd5a46182d}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)3rdparty\wxwidgets3.0\build\msw\wx30_base.vcxproj">
-      <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)3rdparty\xz\liblzma.vcxproj">
       <Project>{12728250-16ec-4dc6-94d7-e21dd88947f8}</Project>
     </ProjectReference>
@@ -121,10 +109,6 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)3rdparty\zlib\zlib.vcxproj">
       <Project>{2f6c0388-20cb-4242-9f6c-a6ebb6a83f47}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)tools\bin2cpp\bin2c.vcxproj">
-      <Project>{677b7d11-d5e1-40b3-88b1-9a4df83d2213}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)3rdparty\jpgd\jpgd.vcxproj">
@@ -150,6 +134,7 @@
     <Manifest Include="..\pcsx2\windows\PCSX2.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Tools\InputRecording\NewInputRecordingDlg.cpp" />
     <ClCompile Include="Settings\BIOSSettingsWidget.cpp" />
     <ClCompile Include="Settings\ControllerBindingWidgets.cpp" />
     <ClCompile Include="Settings\ControllerGlobalSettingsWidget.cpp" />
@@ -210,6 +195,7 @@
     <QtMoc Include="GameList\GameListModel.h" />
     <QtMoc Include="GameList\GameListWidget.h" />
     <QtMoc Include="GameList\GameListRefreshThread.h" />
+    <QtMoc Include="Tools\InputRecording\NewInputRecordingDlg.h" />
     <ClInclude Include="QtUtils.h" />
     <QtMoc Include="Settings\ControllerBindingWidgets.h" />
     <QtMoc Include="Settings\ControllerGlobalSettingsWidget.h" />
@@ -256,6 +242,7 @@
     <ClCompile Include="$(IntDir)moc_DisplayWidget.cpp" />
     <ClCompile Include="$(IntDir)moc_EmuThread.cpp" />
     <ClCompile Include="$(IntDir)moc_MainWindow.cpp" />
+    <ClCompile Include="$(IntDir)Tools\InputRecording\moc_NewInputRecordingDlg.cpp" />
     <ClCompile Include="$(IntDir)qrc_resources.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -325,6 +312,9 @@
       <FileType>Document</FileType>
     </QtUi>
     <QtUi Include="AutoUpdaterDialog.ui">
+      <FileType>Document</FileType>
+    </QtUi>
+    <QtUi Include="Tools\InputRecording\NewInputRecordingDlg.ui">
       <FileType>Document</FileType>
     </QtUi>
   </ItemGroup>
