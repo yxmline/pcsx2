@@ -145,7 +145,9 @@ void AutoUpdaterDialog::reportError(const char* msg, ...)
 	std::string full_msg = StringUtil::StdStringFromFormatV(msg, ap);
 	va_end(ap);
 
-	QMessageBox::critical(this, tr("Updater Error"), QString::fromStdString(full_msg));
+	// don't display errors when we're doing an automatic background check, it's just annoying
+	if (m_display_messages)
+		QMessageBox::critical(this, tr("Updater Error"), QString::fromStdString(full_msg));
 }
 
 void AutoUpdaterDialog::queueUpdateCheck(bool display_message)
@@ -343,9 +345,6 @@ void AutoUpdaterDialog::getChangesComplete(QNetworkReply* reply)
 					tr("<h2>Settings Warning</h2><p>Installing this update will reset your program configuration. Please note "
 					   "that you will have to reconfigure your settings after this update.</p>"));
 			}
-
-			changes_html += tr("<h4>Installing this update will download %1 MB through your internet connection.</h4>")
-								.arg(static_cast<double>(m_download_size) / 1000000.0, 0, 'f', 2);
 
 			m_ui.updateNotes->setText(changes_html);
 		}

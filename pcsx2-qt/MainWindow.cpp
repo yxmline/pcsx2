@@ -51,7 +51,7 @@
 
 
 static constexpr char DISC_IMAGE_FILTER[] =
-	QT_TRANSLATE_NOOP("MainWindow", "All File Types (*.bin *.iso *.cue *.chd *.cso *.gz *.elf *.irx *.m3u *.gs *.gs.xz *.gs.zst);;"
+	QT_TRANSLATE_NOOP("MainWindow", "All File Types (*.bin *.iso *.cue *.chd *.cso *.gz *.elf *.irx *.m3u *.gs *.gs.xz *.gs.zst *.dump);;"
 									"Single-Track Raw Images (*.bin *.iso);;"
 									"Cue Sheets (*.cue);;"
 									"MAME CHD Images (*.chd);;"
@@ -60,7 +60,8 @@ static constexpr char DISC_IMAGE_FILTER[] =
 									"ELF Executables (*.elf);;"
 									"IRX Executables (*.irx);;"
 									"Playlists (*.m3u);;"
-									"GS Dumps (*.gs *.gs.xz *.gs.zst)");
+									"GS Dumps (*.gs *.gs.xz *.gs.zst);;"
+									"Block Dumps (*.dump)");
 
 const char* MainWindow::DEFAULT_THEME_NAME = "darkfusion";
 
@@ -315,7 +316,7 @@ void MainWindow::setStyleFromSettings()
 		standardPalette.setColor(QPalette::Text, black);
 		standardPalette.setColor(QPalette::Button, tameTeal);
 		standardPalette.setColor(QPalette::ButtonText, Qt::white);
-		standardPalette.setColor(QPalette::Link, tameTeal);
+		standardPalette.setColor(QPalette::Link, black);
 		standardPalette.setColor(QPalette::Highlight, teal);
 		standardPalette.setColor(QPalette::HighlightedText, Qt::white);
 
@@ -352,7 +353,7 @@ void MainWindow::setStyleFromSettings()
 		standardPalette.setColor(QPalette::Text, black);
 		standardPalette.setColor(QPalette::Button, pink);
 		standardPalette.setColor(QPalette::ButtonText, black);
-		standardPalette.setColor(QPalette::Link, congoPink);
+		standardPalette.setColor(QPalette::Link, black);
 		standardPalette.setColor(QPalette::Highlight, congoPink);
 		standardPalette.setColor(QPalette::HighlightedText, black);
 
@@ -387,7 +388,7 @@ void MainWindow::setStyleFromSettings()
 		standardPalette.setColor(QPalette::Text, Qt::white);
 		standardPalette.setColor(QPalette::Button, blue);
 		standardPalette.setColor(QPalette::ButtonText, Qt::white);
-		standardPalette.setColor(QPalette::Link, blue);
+		standardPalette.setColor(QPalette::Link, darkBlue);
 		standardPalette.setColor(QPalette::Highlight, Qt::white);
 		standardPalette.setColor(QPalette::HighlightedText, black);
 
@@ -491,7 +492,7 @@ void MainWindow::setStyleFromSettings()
 		darkPalette.setColor(QPalette::Text, Qt::white);
 		darkPalette.setColor(QPalette::Button, darkRed);
 		darkPalette.setColor(QPalette::ButtonText, Qt::white);
-		darkPalette.setColor(QPalette::Link, darkRed);
+		darkPalette.setColor(QPalette::Link, brightRed);
 		darkPalette.setColor(QPalette::Highlight, brightRed);
 		darkPalette.setColor(QPalette::HighlightedText, Qt::white);
 
@@ -594,11 +595,9 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 	m_ui.actionReset->setEnabled(running);
 	m_ui.actionPause->setEnabled(running);
 	m_ui.actionChangeDisc->setEnabled(running);
-	m_ui.actionCheats->setEnabled(running);
 	m_ui.actionScreenshot->setEnabled(running);
 	m_ui.actionViewSystemDisplay->setEnabled(starting_or_running);
 	m_ui.menuChangeDisc->setEnabled(running);
-	m_ui.menuCheats->setEnabled(running);
 
 	m_ui.actionSaveState->setEnabled(running);
 	m_ui.menuSaveState->setEnabled(running);
@@ -898,7 +897,7 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 		QAction* action = menu.addAction(tr("Properties..."));
 		action->setEnabled(!entry->serial.empty());
 		if (action->isEnabled())
-			connect(action, &QAction::triggered, [entry]() { SettingsDialog::openGamePropertiesDialog(entry, entry->crc); });
+			connect(action, &QAction::triggered, [entry]() { SettingsDialog::openGamePropertiesDialog(entry, entry->serial, entry->crc); });
 
 		action = menu.addAction(tr("Open Containing Directory..."));
 		connect(action, &QAction::triggered, [this, entry]() {
@@ -1075,14 +1074,14 @@ void MainWindow::onViewGamePropertiesActionTriggered()
 		const GameList::Entry* entry = GameList::GetEntryForPath(m_current_disc_path.toUtf8().constData());
 		if (entry)
 		{
-			SettingsDialog::openGamePropertiesDialog(entry, entry->crc);
+			SettingsDialog::openGamePropertiesDialog(entry, entry->serial, entry->crc);
 			return;
 		}
 	}
 
 	// open properties for the current running file (isn't in the game list)
 	if (m_current_game_crc != 0)
-		SettingsDialog::openGamePropertiesDialog(nullptr, m_current_game_crc);
+		SettingsDialog::openGamePropertiesDialog(nullptr, m_current_game_serial.toStdString(), m_current_game_crc);
 }
 
 void MainWindow::onGitHubRepositoryActionTriggered()

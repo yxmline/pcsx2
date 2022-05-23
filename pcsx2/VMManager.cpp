@@ -62,6 +62,10 @@
 #include "common/emitter/x86_intrin.h"
 #endif
 
+#ifdef _WIN32
+#include "common/RedtapeWindows.h"
+#endif
+
 namespace VMManager
 {
 	static void LoadSettings();
@@ -187,6 +191,18 @@ std::string VMManager::GetGameName()
 
 bool VMManager::Internal::InitializeGlobals()
 {
+	// On Win32, we have a bunch of things which use COM (e.g. SDL, XAudio2, etc).
+	// We need to initialize COM first, before anything else does, because otherwise they might
+	// initialize it in single-threaded/apartment mode, which can't be changed to multithreaded.
+#ifdef _WIN32
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		Host::ReportErrorAsync("Error", fmt::format("CoInitializeEx() failed: {:08X}", hr));
+		return false;
+	}
+#endif
+
 	x86caps.Identify();
 	x86caps.CountCores();
 	x86caps.SIMD_EstablishMXCSRmask();
@@ -194,6 +210,13 @@ bool VMManager::Internal::InitializeGlobals()
 	SysLogMachineCaps();
 
 	return true;
+}
+
+void VMManager::Internal::ReleaseGlobals()
+{
+#ifdef _WIN32
+	CoUninitialize();
+#endif
 }
 
 bool VMManager::Internal::InitializeMemory()
@@ -262,9 +285,14 @@ void VMManager::ApplyGameFixes()
 	s_active_game_fixes += game->applyGSHardwareFixes(EmuConfig.GS);
 }
 
-std::string VMManager::GetGameSettingsPath(u32 game_crc)
+std::string VMManager::GetGameSettingsPath(const std::string_view& game_serial, u32 game_crc)
 {
-	return Path::Combine(EmuFolders::GameSettings, StringUtil::StdStringFromFormat("%08X.ini", game_crc));
+	std::string sanitized_serial(game_serial);
+	Path::SanitizeFileName(sanitized_serial);
+
+	return game_serial.empty() ?
+			   Path::Combine(EmuFolders::GameSettings, fmt::format("{:08X}.ini", game_crc)) :
+               Path::Combine(EmuFolders::GameSettings, fmt::format("{}_{:08X}.ini", sanitized_serial, game_crc));
 }
 
 void VMManager::RequestDisplaySize(float scale /*= 0.0f*/)
@@ -318,7 +346,13 @@ bool VMManager::UpdateGameSettingsLayer()
 	std::unique_ptr<INISettingsInterface> new_interface;
 	if (s_game_crc != 0)
 	{
-		const std::string filename(GetGameSettingsPath(s_game_crc));
+		std::string filename(GetGameSettingsPath(s_game_serial.c_str(), s_game_crc));
+		if (!FileSystem::FileExists(filename.c_str()))
+		{
+			// try the legacy format (crc.ini)
+			filename = GetGameSettingsPath({}, s_game_crc);
+		}
+
 		if (FileSystem::FileExists(filename.c_str()))
 		{
 			Console.WriteLn("Loading game settings from '%s'...", filename.c_str());
@@ -647,19 +681,6 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	ScopedGuard close_cdvd = [] { DoCDVDclose(); };
 
 	Console.WriteLn("Opening GS...");
-
-	// TODO: Get rid of thread state nonsense and just make it a "normal" thread.
-	static bool gs_initialized = false;
-	if (!gs_initialized)
-	{
-		if (GSinit() != 0)
-		{
-			Console.WriteLn("Failed to initialize GS.");
-			return false;
-		}
-
-		gs_initialized = true;
-	}
 	if (!GetMTGS().WaitForOpen())
 	{
 		// we assume GS is going to report its own error
@@ -1165,6 +1186,10 @@ void VMManager::Internal::GameStartingOnCPUThread()
 	UpdateRunningGame(false);
 	ApplyLoadedPatches(PPT_ONCE_ON_LOAD);
 	ApplyLoadedPatches(PPT_COMBINED_0_1);
+
+	// If we don't reset the timer here, when using folder memcards the reindex will cause an eject,
+	// which a bunch of games don't like since they access the memory card on boot.
+	ClearMcdEjectTimeoutNow();
 }
 
 void VMManager::Internal::VSyncOnCPUThread()
