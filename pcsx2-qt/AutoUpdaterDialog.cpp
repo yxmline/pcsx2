@@ -20,6 +20,7 @@
 #include "QtHost.h"
 #include "QtUtils.h"
 
+#include "pcsx2/HostSettings.h"
 #include "pcsx2/SysForwardDefs.h"
 #include "svnrev.h"
 
@@ -132,7 +133,7 @@ QString AutoUpdaterDialog::getCurrentVersionDate()
 QString AutoUpdaterDialog::getCurrentUpdateTag() const
 {
 #ifdef AUTO_UPDATER_SUPPORTED
-	return QString::fromStdString(QtHost::GetBaseStringSettingValue("AutoUpdater", "UpdateTag", THIS_RELEASE_TAG));
+	return QString::fromStdString(Host::GetBaseStringSettingValue("AutoUpdater", "UpdateTag", THIS_RELEASE_TAG));
 #else
 	return QString();
 #endif
@@ -424,7 +425,7 @@ void AutoUpdaterDialog::downloadUpdateClicked()
 void AutoUpdaterDialog::checkIfUpdateNeeded()
 {
 	const QString last_checked_version(
-		QString::fromStdString(QtHost::GetBaseStringSettingValue("AutoUpdater", "LastVersion")));
+		QString::fromStdString(Host::GetBaseStringSettingValue("AutoUpdater", "LastVersion")));
 
 	Console.WriteLn(Color_StrongGreen, "Current version: %s", GIT_TAG);
 	Console.WriteLn(Color_StrongYellow, "Latest SHA: %s", m_latest_version.toUtf8().constData());
