@@ -2850,7 +2850,7 @@ SCES-51135:
   clampModes:
     vuClampMode: 0 # Fix other SPS.
 SCES-51159:
-  name: "The Getaway"
+  name: "Getaway, The"
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
@@ -2897,7 +2897,7 @@ SCES-51248:
     preloadFrameData: 1 # Fixes bad textures on Jake.
     halfPixelOffset: 1 # Fixes double image.
 SCES-51426:
-  name: "The Getaway"
+  name: "Getaway, The"
   region: "PAL-M5"
   gsHWFixes:
     textureInsideRT: 1
@@ -3285,7 +3285,7 @@ SCES-52756:
   name: "DJ - Decks & FX - Claudio Coccoluto Edition"
   region: "PAL-I"
 SCES-52758:
-  name: "The Getaway - Black Monday"
+  name: " Getaway, The - Black Monday"
   region: "PAL-M6"
   gsHWFixes:
     textureInsideRT: 1
@@ -3330,7 +3330,7 @@ SCES-52930:
   region: "PAL-M5"
   compat: 2
 SCES-52948:
-  name: "The Getaway - Black Monday"
+  name: " Getaway, The - Black Monday"
   region: "PAL-M4"
   gsHWFixes:
     textureInsideRT: 1
@@ -4332,7 +4332,7 @@ SCKA-20016:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
 SCKA-20018:
-  name: "The Getaway"
+  name: "Getaway, The"
   region: "NTSC-K"
   gsHWFixes:
     textureInsideRT: 1
@@ -7168,7 +7168,7 @@ SCUS-97407:
   name: "Kiosk Demo Disc Q2-Q3 2004"
   region: "NTSC-U"
 SCUS-97408:
-  name: "The Getaway - Black Monday"
+  name: "Getaway, The - Black Monday"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
@@ -7313,7 +7313,7 @@ SCUS-97440:
     textureInsideRT: 1
     autoFlush: 1
 SCUS-97441:
-  name: "The Getaway - Black Monday [Demo]"
+  name: "Getaway The - Black Monday [Demo]"
   region: "NTSC-U"
   gsHWFixes:
     textureInsideRT: 1
@@ -13602,7 +13602,7 @@ SLES-52573:
   roundModes:
     eeRoundMode: 2 # Fixes abnormal character behaviour.
 SLES-52576:
-  name: "Yu-Gi-Oh! - Capsule Monster Coliseum"
+  name: "Yu-Gi-Oh! Capsule Monster Coliseum"
   region: "PAL-M5"
 SLES-52579:
   name: "Legends of Wrestling - Showdown"
@@ -15197,7 +15197,7 @@ SLES-53320:
   name: "S.C.A.R. - Squadra Corse Alfa Romeo"
   region: "PAL-M5"
 SLES-53321:
-  name: "The X Factor Sing"
+  name: "X Factor Sing, The"
   region: "PAL-E"
 SLES-53322:
   name: "Obscure"
@@ -15567,7 +15567,7 @@ SLES-53463:
   name: "NHL '06"
   region: "PAL-E"
 SLES-53464:
-  name: "The Great British Football Quiz"
+  name: "Great British Football Quiz, The"
   region: "PAL-UK"
 SLES-53465:
   name: "Maxi Quiz du Foot Français"
@@ -17161,7 +17161,7 @@ SLES-54123:
   name: "Marvel - Ultimate Alliance"
   region: "PAL-E-I"
 SLES-54124:
-  name: "The Quest for Aladdin's Treasure"
+  name: "Quest for Aladdin's Treasure, The"
   region: "PAL-M6"
 SLES-54125:
   name: "Robin Hood's Quest"
@@ -18580,7 +18580,7 @@ SLES-54705:
   name: "SBK-07 - Superbike World Championship"
   region: "PAL-M5"
 SLES-54708:
-  name: "The History Channel - Great Battles of Rome"
+  name: "History Channel, The - Great Battles of Rome"
   region: "PAL-M5"
 SLES-54711:
   name: "Shadow Hearts - From the New World"
@@ -19289,7 +19289,7 @@ SLES-54983:
   name: "Postman Pat"
   region: "PAL-M11"
 SLES-54984:
-  name: "The Water Horse - Legend of the Deep"
+  name: "Water Horse, The - Legend of the Deep"
   region: "PAL-M11"
 SLES-54986:
   name: "Bratz - The Movie"
@@ -19565,7 +19565,7 @@ SLES-55091:
   name: "Hoppie"
   region: "PAL-E"
 SLES-55102:
-  name: "The History Channel - Battle for the Pacific"
+  name: "History Channel, The - Battle for the Pacific"
   region: "PAL-E"
 SLES-55103:
   name: "Cabela's Big Game Hunter 2008"
@@ -19640,22 +19640,22 @@ SLES-55138:
   name: "Nickelodeon El Tigre - The Adventures of Manny Rivera"
   region: "PAL-E"
 SLES-55143:
-  name: "The Chronicles of Narnia - Prince Caspian"
+  name: "Chronicles of Narnia, The - Prince Caspian"
   region: "PAL-G-I"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55144:
-  name: "The Chronicles of Narnia - Prince Caspian"
+  name: "Chronicles of Narnia, The - Prince Caspian"
   region: "PAL-M6"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55145:
-  name: "The Chronicles of Narnia - Prince Caspian"
+  name: "Chronicles of Narnia, The - Prince Caspian"
   region: "PAL-F-DU"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
 SLES-55146:
-  name: "The Chronicles of Narnia - Prince Caspian"
+  name: "Chronicles of Narnia, The - Prince Caspian"
   region: "PAL-UK"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces ghosting but on normal vertex is less ghosting but causes corruption at the sides.
@@ -21057,7 +21057,7 @@ SLKA-25044:
   name: "Robotech - Battlecry"
   region: "NTSC-K"
 SLKA-25045:
-  name: "The King of Fighters 2000"
+  name: "King of Fighters 2000, The"
   region: "NTSC-K"
 SLKA-25046:
   name: "Dragon Ball Z"
@@ -21162,6 +21162,8 @@ SLKA-25115:
   compat: 5
   clampModes:
     eeClampMode: 3 # For camera issues in some scenes.
+  gsHWFixes:
+    disablePartialInvalidation: 1 # Fixes black screens.
 SLKA-25125:
   name: "SNK vs. Capcom - Chaos"
   region: "NTSC-K"
@@ -22166,6 +22168,8 @@ SLPM-60207:
   compat: 5
   clampModes:
     eeClampMode: 3 # For camera issues in some scenes.
+  gsHWFixes:
+    disablePartialInvalidation: 1 # Fixes black screens.
 SLPM-60216:
   name: "R - Racing Evolution [Trial]"
   region: "NTSC-J"
@@ -23158,7 +23162,7 @@ SLPM-62345:
   name: "Simple 2000 Series Vol. 32 - The Sensha"
   region: "NTSC-J"
 SLPM-62348:
-  name: "The Mechsmith - Rum"
+  name: "Mechsmith, The - Rum"
   region: "NTSC-J"
 SLPM-62349:
   name: "Welcome to Universal Studios Japan"
@@ -24982,6 +24986,9 @@ SLPM-65186:
 SLPM-65187:
   name: "Thread Colors"
   region: "NTSC-J"
+SLPM-65190:
+  name: "Tony Hawk's Pro Skater 3"
+  region: "NTSC-J"
 SLPM-65191:
   name: "V-Rally 3"
   region: "NTSC-J"
@@ -25508,6 +25515,8 @@ SLPM-65331:
   compat: 5
   clampModes:
     eeClampMode: 3 # For camera issues in some scenes.
+  gsHWFixes:
+    disablePartialInvalidation: 1 # Fixes Fixes black screens.
 SLPM-65332:
   name: "Mahoromatic Automatic Maiden [Limited Edition]"
   region: "NTSC-J"
@@ -25825,7 +25834,7 @@ SLPM-65438:
   region: "NTSC-J"
   compat: 5
   gameFixes:
-    - VuAddSubHack
+    - VuAddSubHack # Fixes ELF decryption.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
     roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
@@ -25834,7 +25843,7 @@ SLPM-65439:
   region: "NTSC-J"
   compat: 5
   gameFixes:
-    - VuAddSubHack
+    - VuAddSubHack # Fixes ELF decryption.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes bloom and ghosting in certain areas.
     roundSprite: 1 # Fixes door transition vertical lines and minimap artifacts.
@@ -27293,7 +27302,7 @@ SLPM-65896:
   name: "Tsuki wa Kirisaku"
   region: "NTSC-J"
 SLPM-65897:
-  name: "C1 Grand Prix Racing Battle"
+  name: "Racing Battle - C1 Grand Prix"
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes black lines when upscaling.
@@ -31805,6 +31814,9 @@ SLPS-20095:
   region: "NTSC-J"
   gsHWFixes:
     disablePartialInvalidation: 1 # Fixes missing arena, fighters and other missing graphics.
+SLPS-20096:
+  name: "Gambler Densetsu Tetsuya"
+  region: "NTSC-J"
 SLPS-20097:
   name: "Magical Sports - Koshien"
   region: "NTSC-J"
@@ -31888,6 +31900,12 @@ SLPS-20137:
   compat: 5
 SLPS-20139:
   name: "All Star Pro-Wrestling II"
+  region: "NTSC-J"
+SLPS-20140:
+  name: "Dream Audition SuperHit Disc 1"
+  region: "NTSC-J"
+SLPS-20141:
+  name: "Dream Audition SuperHit Disc 2"
   region: "NTSC-J"
 SLPS-20143:
   name: "RPG Tsukuru 5"
@@ -32317,6 +32335,9 @@ SLPS-20394:
   region: "NTSC-J"
 SLPS-20396:
   name: "Slotter UP - Mania 5"
+  region: "NTSC-J"
+SLPS-20397:
+  name: "Pachitte Chonmage Tatsujin 7 - CR Pachinko Dokaben"
   region: "NTSC-J"
 SLPS-20398:
   name: "La Pucelle - Hikari no Seijyo Densetsu Nijuu"
@@ -35879,7 +35900,7 @@ SLPS-25934:
   name: "Samurai Spirits - Rokuban Shoubu [NeoGeo Online Collection the Best]"
   region: "NTSC-J"
 SLPS-25935:
-  name: "The King of Fighters '98 Ultimate Match (NeoGeo Online Collection the Best)"
+  name: "King of Fighters '98 Ultimate Match, The (NeoGeo Online Collection the Best)"
   region: "NTSC-J"
 SLPS-25941:
   name: "SD Gundam G Generation Wars"
@@ -39655,7 +39676,7 @@ SLUS-20757:
   clampModes:
     vuClampMode: 2 # Fixes black textures on characters.
 SLUS-20758:
-  name: "Growlanser Generations [Disc1of2]"
+  name: "Growlanser Generations [Disc1of2] - Growlanser II - The Sense of Justice"
   region: "NTSC-U"
   compat: 5
   patches:
@@ -39669,7 +39690,7 @@ SLUS-20758:
         comment=IPU freeze fix
         patch=0,EE,00109d04,word,00000000
 SLUS-20759:
-  name: "Growlanser Generations [Disc2of2]"
+  name: "Growlanser Generations [Disc2of2] - Growlanser III - The Dual Darkness"
   region: "NTSC-U"
   compat: 5
   patches:
@@ -45941,6 +45962,11 @@ SLUS-80421:
 SLUS-90009:
   name: "Resident Evil 2 [Trade Demo]"
   region: "NTSC-U"
+SLUS-97133:
+  name: "Getaway, The"
+  region: "NTSC-U"
+  gsHWFixes:
+    textureInsideRT: 1
 SLUS-97405:
   name: "ATV Offroad Fury 3 [Greatest Hits]"
   region: "NTSC-U"
