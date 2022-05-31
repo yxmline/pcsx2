@@ -4148,6 +4148,9 @@ SCES-55485:
 SCES-55489:
   name: "SingStar Mallorca Party"
   region: "PAL-G"
+SCES-55496:
+  name: "Secret Agent Clank"
+  region: "PAL-M12"
 SCES-55510:
   name: "Jak and Daxter - The Lost Frontier"
   region: "PAL-M12"
@@ -4765,12 +4768,6 @@ SCPS-11008:
   name: "Boku to Mao"
   region: "NTSC-J"
   compat: 5
-  patches:
-    EE838B5C:
-      content: |-
-        comment=Patches by Nachbrenner
-        // Skip OP.PSS.
-        patch=0,EE,001d6258,word,24020001
 SCPS-11009:
   name: "Ka (Mosquito)"
   region: "NTSC-J"
