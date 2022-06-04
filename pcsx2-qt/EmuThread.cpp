@@ -27,6 +27,7 @@
 #include "common/StringUtil.h"
 
 #include "pcsx2/CDVD/CDVD.h"
+#include "pcsx2/Counters.h"
 #include "pcsx2/Frontend/InputManager.h"
 #include "pcsx2/Frontend/ImGuiManager.h"
 #include "pcsx2/GS.h"
@@ -361,6 +362,9 @@ void EmuThread::setFullscreen(bool fullscreen)
 	m_is_fullscreen = fullscreen;
 	GetMTGS().UpdateDisplayWindow();
 	GetMTGS().WaitGS();
+
+	// If we're using exclusive fullscreen, the refresh rate may have changed.
+	UpdateVSyncRate();
 }
 
 void EmuThread::setSurfaceless(bool surfaceless)
@@ -498,9 +502,9 @@ void EmuThread::reloadInputSources()
 		return;
 	}
 
-	auto lock = Host::GetSettingsLock();
+	std::unique_lock<std::mutex> lock = Host::GetSettingsLock();
 	SettingsInterface* si = Host::GetSettingsInterface();
-	InputManager::ReloadSources(*si);
+	InputManager::ReloadSources(*si, lock);
 
 	// skip loading bindings if we're not running, since it'll get done on startup anyway
 	if (VMManager::HasValidVM())
@@ -744,6 +748,10 @@ void Host::ResizeHostDisplay(u32 new_window_width, u32 new_window_height, float 
 {
 	s_host_display->ResizeRenderWindow(new_window_width, new_window_height, new_window_scale);
 	ImGuiManager::WindowResized();
+
+	// if we're paused, re-present the current frame at the new window size.
+	if (VMManager::GetState() == VMState::Paused)
+		GetMTGS().PresentCurrentFrame();
 }
 
 void Host::RequestResizeHostDisplay(s32 width, s32 height)
@@ -755,6 +763,10 @@ void Host::UpdateHostDisplay()
 {
 	g_emu_thread->updateDisplay();
 	ImGuiManager::WindowResized();
+
+	// if we're paused, re-present the current frame at the new window size.
+	if (VMManager::GetState() == VMState::Paused)
+		GetMTGS().PresentCurrentFrame();
 }
 
 void Host::OnVMStarting()

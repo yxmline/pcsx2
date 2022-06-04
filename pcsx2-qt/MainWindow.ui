@@ -16,10 +16,6 @@
   <property name="windowTitle">
    <string>PCSX2</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="resources/resources.qrc">
-    <normaloff>:/icons/AppIconLarge.png</normaloff>:/icons/AppIconLarge.png</iconset>
-  </property>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -81,6 +77,7 @@
     <addaction name="menuLoadState"/>
     <addaction name="menuSaveState"/>
     <addaction name="separator"/>
+    <addaction name="actionSettings"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -516,6 +513,9 @@
    </property>
    <property name="text">
     <string>&amp;Settings...</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::PreferencesRole</enum>
    </property>
   </action>
   <action name="actionChangeDiscFromFile">

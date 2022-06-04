@@ -24,6 +24,7 @@
 #include <QtWidgets/QStyleFactory>
 
 #include "common/Assertions.h"
+#include "common/CocoaTools.h"
 #include "common/FileSystem.h"
 
 #include "pcsx2/CDVD/CDVDaccess.h"
@@ -64,7 +65,11 @@ static constexpr char DISC_IMAGE_FILTER[] =
 									"GS Dumps (*.gs *.gs.xz *.gs.zst);;"
 									"Block Dumps (*.dump)");
 
+#ifdef __APPLE__
+const char* MainWindow::DEFAULT_THEME_NAME = "";
+#else
 const char* MainWindow::DEFAULT_THEME_NAME = "darkfusion";
+#endif
 
 MainWindow* g_main_window = nullptr;
 
@@ -80,14 +85,27 @@ MainWindow::~MainWindow()
 	// we compare here, since recreate destroys the window later
 	if (g_main_window == this)
 		g_main_window = nullptr;
+#ifdef __APPLE__
+	CocoaTools::RemoveThemeChangeHandler(this);
+#endif
 }
 
 void MainWindow::initialize()
 {
-	setIconThemeFromSettings();
+	setStyleFromSettings();
+	setIconThemeFromStyle();
+#ifdef __APPLE__
+	CocoaTools::AddThemeChangeHandler(this, [](void* ctx){
+		// This handler is called *before* the style change has propagated far enough for Qt to see it
+		// Use RunOnUIThread to delay until it has
+		QtHost::RunOnUIThread([ctx = static_cast<MainWindow*>(ctx)]{
+			ctx->setStyleFromSettings(); // Qt won't notice the style change without us touching the palette in some way
+			ctx->setIconThemeFromStyle();
+		});
+	});
+#endif
 	m_ui.setupUi(this);
 	setupAdditionalUi();
-	setStyleFromSettings();
 	connectSignals();
 	connectVMThreadSignals(g_emu_thread);
 
@@ -97,8 +115,31 @@ void MainWindow::initialize()
 	updateSaveStateMenus(QString(), QString(), 0);
 }
 
+// TODO: Figure out how to set this in the .ui file
+/// Marks the icons for all actions in the given menu as mask icons
+/// This means macOS's menubar renderer will ignore color values and use only the alpha in the image.
+/// The color value will instead be taken from the system theme.
+/// Since the menubar follows the OS's dark/light mode and not our current theme's, this prevents problems where a theme mismatch puts white icons in light mode or dark icons in dark mode.
+static void makeIconsMasks(QWidget* menu)
+{
+	for (QAction* action : menu->actions())
+	{
+		if (!action->icon().isNull())
+		{
+			QIcon icon = action->icon();
+			icon.setIsMask(true);
+			action->setIcon(icon);
+		}
+		if (action->menu())
+			makeIconsMasks(action->menu());
+	}
+}
+
 void MainWindow::setupAdditionalUi()
 {
+	setWindowIcon(QIcon(QStringLiteral("%1/icons/AppIconLarge.png").arg(QtHost::GetResourcesBasePath())));
+	makeIconsMasks(menuBar());
+
 	const bool toolbar_visible = Host::GetBaseBoolSettingValue("UI", "ShowToolbar", false);
 	m_ui.actionViewToolbar->setChecked(toolbar_visible);
 	m_ui.toolBar->setVisible(toolbar_visible);
@@ -523,17 +564,11 @@ void MainWindow::setStyleFromSettings()
 	}
 }
 
-void MainWindow::setIconThemeFromSettings()
+void MainWindow::setIconThemeFromStyle()
 {
-	const std::string theme(Host::GetBaseStringSettingValue("UI", "Theme", DEFAULT_THEME_NAME));
-	QString icon_theme;
-
-	if (theme == "darkfusion" || theme == "darkfusionblue" || theme == "dualtoneOrangeBlue" || theme == "ScarletDevilRed")
-		icon_theme = QStringLiteral("white");
-	else
-		icon_theme = QStringLiteral("black");
-
-	QIcon::setThemeName(icon_theme);
+	QPalette palette = qApp->palette();
+	bool dark = palette.windowText().color().value() > palette.window().color().value();
+	QIcon::setThemeName(dark ? QStringLiteral("white") : QStringLiteral("black"));
 }
 
 void MainWindow::onScreenshotActionTriggered()
@@ -1193,7 +1228,7 @@ void MainWindow::onToolsOpenDataDirectoryTriggered()
 void MainWindow::onThemeChanged()
 {
 	setStyleFromSettings();
-	setIconThemeFromSettings();
+	setIconThemeFromStyle();
 	recreate();
 }
 
@@ -1364,6 +1399,17 @@ void MainWindow::onPerformanceMetricsUpdated(const QString& fps_stat, const QStr
 	m_last_fps_status = fps_stat;
 	m_status_fps_widget->setText(m_last_fps_status);
 	m_status_gs_widget->setText(gs_stat);
+}
+
+void MainWindow::showEvent(QShowEvent* event)
+{
+	QMainWindow::showEvent(event);
+
+	// This is a bit silly, but for some reason resizing *before* the window is shown
+	// gives the incorrect sizes for columns, if you set the style before setting up
+	// the rest of the window... so, instead, let's just force it to be resized on show.
+	if (isShowingGameList())
+		m_game_list_widget->resizeTableViewColumnsToFit();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

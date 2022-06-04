@@ -104,9 +104,11 @@ namespace VMManager
 static std::unique_ptr<SysMainMemory> s_vm_memory;
 static std::unique_ptr<SysCpuProviderPack> s_cpu_provider_pack;
 static std::unique_ptr<INISettingsInterface> s_game_settings_interface;
+static std::unique_ptr<INISettingsInterface> s_input_settings_interface;
 
 static std::atomic<VMState> s_state{VMState::Shutdown};
-static std::atomic_bool s_cpu_implementation_changed{false};
+static bool s_cpu_implementation_changed = false;
+static Threading::ThreadHandle s_vm_thread_handle;
 
 static std::deque<std::thread> s_save_state_threads;
 static std::mutex s_save_state_threads_mutex;
@@ -118,6 +120,7 @@ static u32 s_patches_crc;
 static std::string s_game_serial;
 static std::string s_game_name;
 static std::string s_elf_override;
+static std::string s_input_profile_name;
 static u32 s_active_game_fixes = 0;
 static std::vector<u8> s_widescreen_cheats_data;
 static bool s_widescreen_cheats_loaded = false;
@@ -162,16 +165,16 @@ bool VMManager::PerformEarlyHardwareChecks(const char** error)
 
 VMState VMManager::GetState()
 {
-	return s_state.load();
+	return s_state.load(std::memory_order_acquire);
 }
 
 void VMManager::SetState(VMState state)
 {
 	// Some state transitions aren't valid.
-	const VMState old_state = s_state.load();
+	const VMState old_state = s_state.load(std::memory_order_acquire);
 	pxAssert(state != VMState::Initializing && state != VMState::Shutdown);
 	SetTimerResolutionIncreased(state == VMState::Running);
-	s_state.store(state);
+	s_state.store(state, std::memory_order_release);
 
 	if (state != VMState::Stopping && (state == VMState::Paused || old_state == VMState::Paused))
 	{
@@ -198,7 +201,7 @@ void VMManager::SetState(VMState state)
 
 bool VMManager::HasValidVM()
 {
-	const VMState state = s_state.load();
+	const VMState state = s_state.load(std::memory_order_acquire);
 	return (state == VMState::Running || state == VMState::Paused);
 }
 
@@ -292,12 +295,12 @@ SysCpuProviderPack& GetCpuProviders()
 
 void VMManager::LoadSettings()
 {
-	auto lock = Host::GetSettingsLock();
+	std::unique_lock<std::mutex> lock = Host::GetSettingsLock();
 	SettingsInterface* si = Host::GetSettingsInterface();
 	SettingsLoadWrapper slw(*si);
 	EmuConfig.LoadSave(slw);
 	PAD::LoadConfig(*si);
-	InputManager::ReloadSources(*si);
+	InputManager::ReloadSources(*si, lock);
 	InputManager::ReloadBindings(*si);
 
 	// Remove any user-specified hacks in the config (we don't want stale/conflicting values when it's globally disabled).
@@ -336,6 +339,11 @@ std::string VMManager::GetGameSettingsPath(const std::string_view& game_serial, 
 	return game_serial.empty() ?
 			   Path::Combine(EmuFolders::GameSettings, fmt::format("{:08X}.ini", game_crc)) :
                Path::Combine(EmuFolders::GameSettings, fmt::format("{}_{:08X}.ini", sanitized_serial, game_crc));
+}
+
+std::string VMManager::GetInputProfilePath(const std::string_view& name)
+{
+	return Path::Combine(EmuFolders::InputProfiles, fmt::format("{}.ini", name));
 }
 
 void VMManager::RequestDisplaySize(float scale /*= 0.0f*/)
@@ -412,11 +420,43 @@ bool VMManager::UpdateGameSettingsLayer()
 		}
 	}
 
-	if (!s_game_settings_interface && !new_interface)
+	std::string input_profile_name;
+	if (new_interface)
+		new_interface->GetStringValue("Pad", "InputProfileName", &input_profile_name);
+
+	if (!s_game_settings_interface && !new_interface && s_input_profile_name == input_profile_name)
 		return false;
 
 	Host::Internal::SetGameSettingsLayer(new_interface.get());
 	s_game_settings_interface = std::move(new_interface);
+
+	std::unique_ptr<INISettingsInterface> input_interface;
+	if (!input_profile_name.empty())
+	{
+		const std::string filename(GetInputProfilePath(input_profile_name));
+		if (FileSystem::FileExists(filename.c_str()))
+		{
+			Console.WriteLn("Loading input profile from '%s'...", filename.c_str());
+			input_interface = std::make_unique<INISettingsInterface>(std::move(filename));
+			if (!input_interface->Load())
+			{
+				Console.Error("Failed to parse input profile ini '%s'", input_interface->GetFileName().c_str());
+				input_interface.reset();
+				input_profile_name = {};
+			}
+		}
+		else
+		{
+			DevCon.WriteLn("No game settings found (tried '%s')", filename.c_str());
+			input_profile_name = {};
+		}
+	}
+
+	Host::Internal::SetInputSettingsLayer(input_interface.get());
+	s_input_settings_interface = std::move(input_interface);
+	s_input_profile_name = std::move(input_profile_name);
+
+
 	return true;
 }
 
@@ -743,21 +783,23 @@ bool VMManager::CheckBIOSAvailability()
 bool VMManager::Initialize(const VMBootParameters& boot_params)
 {
 	const Common::Timer init_timer;
-	pxAssertRel(s_state.load() == VMState::Shutdown, "VM is shutdown");
+	pxAssertRel(s_state.load(std::memory_order_acquire) == VMState::Shutdown, "VM is shutdown");
 
 	// cancel any game list scanning, we need to use CDVD!
 	// TODO: we can get rid of this once, we make CDVD not use globals...
 	// (or make it thread-local, but that seems silly.)
 	Host::CancelGameListRefresh();
 
-	s_state.store(VMState::Initializing);
+	s_state.store(VMState::Initializing, std::memory_order_release);
+	s_vm_thread_handle = Threading::ThreadHandle::GetForCallingThread();
 	Host::OnVMStarting();
 
 	ScopedGuard close_state = [] {
 		if (GSDumpReplayer::IsReplayingDump())
 			GSDumpReplayer::Shutdown();
 
-		s_state.store(VMState::Shutdown);
+		s_vm_thread_handle = {};
+		s_state.store(VMState::Shutdown, std::memory_order_release);
 		Host::OnVMDestroyed();
 	};
 
@@ -865,7 +907,7 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	s_mxcsr_saved = static_cast<u32>(a64_getfpcr());
 #endif
 
-	s_cpu_implementation_changed.store(false);
+	s_cpu_implementation_changed = false;
 	s_cpu_provider_pack->ApplyConfig();
 	SetCPUState(EmuConfig.Cpu.sseMXCSR, EmuConfig.Cpu.sseVUMXCSR);
 	SysClearExecutionCache();
@@ -877,7 +919,7 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 	cpuReset();
 
 	Console.WriteLn("VM subsystems initialized in %.2f ms", init_timer.GetTimeMilliseconds());
-	s_state.store(VMState::Paused);
+	s_state.store(VMState::Paused, std::memory_order_release);
 	Host::OnVMStarted();
 
 	UpdateRunningGame(true, false);
@@ -901,6 +943,10 @@ bool VMManager::Initialize(const VMBootParameters& boot_params)
 
 void VMManager::Shutdown(bool save_resume_state)
 {
+	// we'll probably already be stopping (this is how Qt calls shutdown),
+	// but just in case, so any of the stuff we call here knows we don't have a valid VM.
+	s_state.store(VMState::Stopping, std::memory_order_release);
+
 	SetTimerResolutionIncreased(false);
 
 	// sync everything
@@ -958,7 +1004,7 @@ void VMManager::Shutdown(bool save_resume_state)
 
 	s_vm_memory->DecommitAll();
 
-	s_state.store(VMState::Shutdown);
+	s_state.store(VMState::Shutdown, std::memory_order_release);
 	Host::OnVMDestroyed();
 }
 
@@ -1042,6 +1088,13 @@ bool VMManager::DoLoadState(const char* filename)
 	{
 		Host::OnSaveStateLoading(filename);
 		SaveState_UnzipFromDisk(filename);
+
+		// HACK: LastELF isn't in the save state...
+		if (!s_elf_override.empty())
+			cdvdReloadElfInfo(fmt::format("host:{}", s_elf_override));
+		else
+			cdvdReloadElfInfo();
+
 		UpdateRunningGame(false, false);
 		Host::OnSaveStateLoaded(filename, true);
 		return true;
@@ -1265,7 +1318,7 @@ bool VMManager::IsLoadableFileName(const std::string_view& path)
 void VMManager::Execute()
 {
 	// Check for interpreter<->recompiler switches.
-	if (s_cpu_implementation_changed.exchange(false))
+	if (std::exchange(s_cpu_implementation_changed, false))
 	{
 		// We need to switch the cpus out, and reset the new ones if so.
 		s_cpu_provider_pack->ApplyConfig();
@@ -1292,7 +1345,7 @@ const std::string& VMManager::Internal::GetElfOverride()
 
 bool VMManager::Internal::IsExecutionInterrupted()
 {
-	return s_state.load() != VMState::Running || s_cpu_implementation_changed.load();
+	return s_state.load(std::memory_order_relaxed) != VMState::Running || s_cpu_implementation_changed;
 }
 
 void VMManager::Internal::EntryPointCompilingOnCPUThread()
@@ -1355,7 +1408,7 @@ void VMManager::CheckForCPUConfigChanges(const Pcsx2Config& old_config)
 		// This has to be done asynchronously, since we're still executing the
 		// cpu when this function is called. Break the execution as soon as
 		// possible and reset next time we're called.
-		s_cpu_implementation_changed.store(true);
+		s_cpu_implementation_changed = true;
 	}
 }
 
@@ -1508,7 +1561,7 @@ void VMManager::ApplySettings()
 	Console.WriteLn("Applying settings...");
 
 	// if we're running, ensure the threads are synced
-	const bool running = (s_state.load() == VMState::Running);
+	const bool running = (s_state.load(std::memory_order_acquire) == VMState::Running);
 	if (running)
 	{
 		if (THREAD_VU1)

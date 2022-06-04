@@ -502,7 +502,6 @@ void GSRenderer::VSync(u32 field, bool registers_written)
 
 	const int fb_sprite_blits = g_perfmon.GetDisplayFramebufferSpriteBlits();
 	const bool fb_sprite_frame = (fb_sprite_blits > 0);
-	PerformanceMetrics::Update(registers_written, fb_sprite_frame);
 
 	bool skip_frame = m_frameskip;
 	if (GSConfig.SkipDuplicateFrames)
@@ -540,6 +539,7 @@ void GSRenderer::VSync(u32 field, bool registers_written)
 		if (Host::BeginPresentFrame(true))
 			Host::EndPresentFrame();
 		g_gs_device->RestoreAPIState();
+		PerformanceMetrics::Update(registers_written, fb_sprite_frame);
 		return;
 	}
 
@@ -572,6 +572,7 @@ void GSRenderer::VSync(u32 field, bool registers_written)
 			PerformanceMetrics::OnGPUPresent(Host::GetHostDisplay()->GetAndResetAccumulatedGPUTime());
 	}
 	g_gs_device->RestoreAPIState();
+	PerformanceMetrics::Update(registers_written, fb_sprite_frame);
 
 	// snapshot
 	// wx is dumb and call this from the UI thread...
@@ -743,6 +744,30 @@ void GSRenderer::StopGSDump()
 {
 	m_snapshot = {};
 	m_dump_frames = 0;
+}
+
+void GSRenderer::PresentCurrentFrame()
+{
+	g_gs_device->ResetAPIState();
+	if (Host::BeginPresentFrame(false))
+	{
+		GSTexture* current = g_gs_device->GetCurrent();
+		if (current)
+		{
+			HostDisplay* const display = g_gs_device->GetDisplay();
+			const GSVector4 draw_rect(CalculateDrawRect(display->GetWindowWidth(), display->GetWindowHeight(),
+				current->GetWidth(), current->GetHeight(), display->GetDisplayAlignment(), display->UsesLowerLeftOrigin(), GetVideoMode() == GSVideoMode::SDTV_480P));
+
+			static constexpr ShaderConvert s_shader[5] = { ShaderConvert::COPY, ShaderConvert::SCANLINE,
+				ShaderConvert::DIAGONAL_FILTER, ShaderConvert::TRIANGULAR_FILTER,
+				ShaderConvert::COMPLEX_FILTER }; // FIXME
+
+			g_gs_device->StretchRect(current, nullptr, draw_rect, s_shader[GSConfig.TVShader], GSConfig.LinearPresent);
+		}
+
+		Host::EndPresentFrame();
+	}
+	g_gs_device->RestoreAPIState();
 }
 
 #ifndef PCSX2_CORE

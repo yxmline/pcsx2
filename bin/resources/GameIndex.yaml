@@ -95,6 +95,8 @@ GUST-00009:
     eeRoundMode: 0 # Fixes jump issue.
   gameFixes:
     - SoftwareRendererFMVHack # Vertical lines in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes misalignment of textures in the Pause Menu.
 PAPX-90201:
   name: "Fantavision [Taikenban]"
   region: "NTSC-J"
@@ -2905,6 +2907,7 @@ SCES-51159:
   compat: 5
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCES-51164:
   name: "Mark of Kri, The"
   region: "PAL-M5"
@@ -2952,6 +2955,7 @@ SCES-51426:
   region: "PAL-M5"
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCES-51428:
   name: "Shinobi"
   region: "PAL-M5"
@@ -4406,6 +4410,7 @@ SCKA-20018:
   region: "NTSC-K"
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCKA-20019:
   name: "Siren"
   region: "NTSC-K"
@@ -6429,6 +6434,7 @@ SCUS-97133:
   region: "NTSC-U"
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCUS-97134:
   name: "SOCOM - U.S. Navy SEALs"
   region: "NTSC-U"
@@ -9850,6 +9856,8 @@ SLES-50672:
   name: "Baldur's Gate - Dark Alliance"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-50677:
   name: "Shadow Hearts"
   region: "PAL-E"
@@ -11688,9 +11696,13 @@ SLES-51523:
 SLES-51525:
   name: "Fallout - Brotherhood of Steel"
   region: "PAL-M3"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-51526:
   name: "Fallout - Brotherhood of Steel"
   region: "PAL-M3"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-51541:
   name: "Grand Theft Auto - San Andreas"
   region: "PAL-Unk"
@@ -12435,6 +12447,7 @@ SLES-51914:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting.
     roundSprite: 2 # Fixes various lines / reduces bars on right edge.
+    disablePartialInvalidation: 1 # Fixes textureless graphics ingame.
 SLES-51915:
   name: "Pro Evolution Soccer 3"
   region: "PAL-I"
@@ -12923,12 +12936,14 @@ SLES-52187:
   compat: 5
   gsHWFixes:
     roundSprite: 1 # Fixes lines in sprites but still some lines left.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52188:
   name: "Baldur's Gate - Dark Alliance II"
   region: "PAL-M3"
   compat: 5
   gsHWFixes:
     roundSprite: 1 # Fixes lines in sprites but still some lines left.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52190:
   name: "RPM Tuning"
   region: "PAL-M6"
@@ -13180,6 +13195,8 @@ SLES-52323:
 SLES-52325:
   name: "Champions of Norrath - Realms of EverQuest"
   region: "PAL-M3"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52326:
   name: "Spawn - Armageddon"
   region: "PAL-M5"
@@ -13266,6 +13283,8 @@ SLES-52372:
 SLES-52373:
   name: "Champions of Norrath"
   region: "PAL-E-S"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52374:
   name: "Fight Night 2004"
   region: "PAL-M3"
@@ -13314,6 +13333,8 @@ SLES-52388:
 SLES-52392:
   name: "Combat Elite - WWII Paratroopers [Preview]"
   region: "PAL-E"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52393:
   name: "Pinball Fun"
   region: "PAL-E"
@@ -14202,8 +14223,14 @@ SLES-52782:
   name: "Call of Duty - Finest Hour"
   region: "PAL-E"
 SLES-52783:
-  name: "Call of Duty - Le Jour de Glorie"
+  name: "Call of Duty - Le Jour de Gloire"
   region: "PAL-F"
+  patches:
+    30AE5279:
+      content: |-
+        // Avoids bad COP2 errors due to the instant nature of the PCSX2's COP2 handling.
+        patch=1,EE,001ab900,word,48488800
+        patch=1,EE,001ab904,word,4A252942
 SLES-52784:
   name: "Call of Duty - Finest Hour"
   region: "PAL-G"
@@ -14418,6 +14445,8 @@ SLES-52889:
 SLES-52894:
   name: "Bard's Tale, The"
   region: "PAL-E"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-52895:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-E"
@@ -14850,6 +14879,8 @@ SLES-53039:
   name: "Champions - Return to Arms" # aka "Champions of Norrath 2"
   region: "PAL-M4"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
   memcardFilters: # Allows import of characters from first game.
     - "SLES-53039"
     - "SLES-52325"
@@ -15097,6 +15128,8 @@ SLES-53152:
 SLES-53154:
   name: "Bard's Tale, The"
   region: "PAL-M8"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLES-53155:
   name: "Star Wars - Episode III - Revenge of the Sith"
   region: "PAL-M3"
@@ -17991,6 +18024,8 @@ SLES-54421:
 SLES-54423:
   name: "Justice League Heroes"
   region: "PAL-M5"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
   clampModes:
     vuClampMode: 2 # Fixes ingame SPS for the capes.
 SLES-54424:
@@ -20407,6 +20442,8 @@ SLES-55443:
     eeRoundMode: 0 # Fixes jump issue.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
+  gsHWFixes:
+    roundSprite: 1 # Fixes misalignment of textures in the Pause Menu.
 SLES-55444:
   name: "Ar tonelico II - Melody of Metafalica"
   region: "PAL-E"
@@ -21229,6 +21266,7 @@ SLKA-25093:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting.
     roundSprite: 2 # Fixes various lines / reduces bars on right edge.
+    disablePartialInvalidation: 1 # Fixes textureless graphics ingame.
 SLKA-25100:
   name: "Dragon Quest V Dragon Quarter"
   region: "NTSC-K"
@@ -21481,6 +21519,8 @@ SLKA-25244:
 SLKA-25246:
   name: "Bard's Tale, The"
   region: "NTSC-K"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLKA-25249:
   name: "Ys - The Ark of Napishtim [with Guide Book]"
   region: "NTSC-K"
@@ -23473,7 +23513,11 @@ SLPM-62437:
   name: "Suisui Sweet - Amai Ai no Mitsukekata"
   region: "NTSC-J"
 SLPM-62438:
-  name: "Growlanser Collection"
+  name: "Growlanser Collection - The Dual Darkness"
+  region: "NTSC-J"
+  compat: 4
+SLPM-62439:
+  name: "Growlanser Collection - The Sense of Justice"
   region: "NTSC-J"
   compat: 4
 SLPM-62440:
@@ -25833,6 +25877,7 @@ SLPM-65410:
   region: "NTSC-J"
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPM-65411:
   name: "Onimusha Buraiden"
   region: "NTSC-J"
@@ -25854,6 +25899,7 @@ SLPM-65413:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting.
     roundSprite: 2 # Fixes various lines / reduces bars on right edge.
+    disablePartialInvalidation: 1 # Fixes textureless graphics ingame.
 SLPM-65414:
   name: "Simple 2000 Series Vol. 45 - The Koi to Namida to, Tsuioku to..."
   region: "NTSC-J"
@@ -27234,6 +27280,7 @@ SLPM-65845:
   compat: 5
   gsHWFixes:
     roundSprite: 1 # Fixes lines in sprites but still some lines left.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPM-65846:
   name: "Lord of the Rings, The - Uchitsu Kuni Daisanki"
   region: "NTSC-J"
@@ -27451,6 +27498,8 @@ SLPM-65914:
 SLPM-65915:
   name: "Fallout - Brotherhood of Steel"
   region: "NTSC-J"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPM-65916:
   name: "Harukanaru Jikuu no Kade - Hachiha Katsunori"
   region: "NTSC-J"
@@ -33258,6 +33307,8 @@ SLPS-25139:
   name: "Baldur's Gate - Dark Alliance"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPS-25141:
   name: "Pac-Man World 2"
   region: "NTSC-J"
@@ -33713,6 +33764,8 @@ SLPS-25291:
   name: "Baldur's Gate - Dark Alliance [PCCW The Best]"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPS-25292:
   name: "D-A - Black"
   region: "NTSC-J"
@@ -36809,6 +36862,10 @@ SLUS-20035:
   name: "Baldur's Gate - Dark Alliance"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes FMVs.
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20037:
   name: "Run Like Hell - Hunt or Be Hunted"
   region: "NTSC-U"
@@ -38866,6 +38923,8 @@ SLUS-20539:
   name: "Fallout - Brotherhood of Steel"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20540:
   name: "Evolution Skateboarding"
   region: "NTSC-U"
@@ -38996,6 +39055,8 @@ SLUS-20565:
   name: "Champions of Norrath"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20566:
   name: "Buffy the Vampire Slayer - Chaos Bleeds"
   region: "NTSC-U"
@@ -39477,8 +39538,11 @@ SLUS-20675:
   name: "Baldur's Gate - Dark Alliance II"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes FMVs.
   gsHWFixes:
     roundSprite: 1 # Fixes lines in sprites but still some lines left.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20676:
   name: "Lowrider"
   region: "NTSC-U"
@@ -39558,6 +39622,7 @@ SLUS-20694:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting.
     roundSprite: 2 # Fixes various lines / reduces bars on right edge.
+    disablePartialInvalidation: 1 # Fixes textureless graphics ingame.
 SLUS-20695:
   name: "Chaos Legion"
   region: "NTSC-U"
@@ -39638,6 +39703,8 @@ SLUS-20714:
 SLUS-20715:
   name: "Combat Elite - WWII Paratroopers"
   region: "NTSC-U"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20716:
   name: "Teenage Mutant Ninja Turtles"
   region: "NTSC-U"
@@ -40021,6 +40088,8 @@ SLUS-20803:
   name: "Bard's Tale, The"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20804:
   name: "Forgotten Realms - Demon Stone"
   region: "NTSC-U"
@@ -40370,6 +40439,8 @@ SLUS-20888:
   name: "Front Mission 4"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes FMVs.
   gsHWFixes:
     preloadFrameData: 1 # Fixes mech shadows.
     roundSprite: 2 # Fixes font artifacts.
@@ -40791,6 +40862,8 @@ SLUS-20973:
   name: "Champions - Return to Arms" # aka "Champions of Norrath 2"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
   memcardFilters:
     - "SLUS-20973"
     - "SLUS-20565"
@@ -42457,6 +42530,8 @@ SLUS-21304:
   name: "Justice League Heroes"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
   clampModes:
     vuClampMode: 2 # Ingame capes become SPS mess with lower than extra VU clamp.
 SLUS-21305:
@@ -44462,6 +44537,8 @@ SLUS-21735:
     eeRoundMode: 0 # Fixes jump issue.
   gameFixes:
     - SoftwareRendererFMVHack # Vertical lines in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes misalignment of textures in the Pause Menu.
 SLUS-21736:
   name: "Wall-E"
   region: "NTSC-U"
@@ -45073,6 +45150,12 @@ SLUS-21881:
   name: "Transformers - Revenge of the Fallen"
   region: "NTSC-U"
   compat: 5
+  patches:
+    137C792E:
+      content: |-
+        // Fix Pause menu, some hud parts, etc.
+        patch=1,EE,0016ee38,word,3464fff0
+        patch=1,EE,0016ee58,word,3464fffc
 SLUS-21882:
   name: "Ghostbusters"
   region: "NTSC-U"
@@ -45494,6 +45577,8 @@ SLUS-28053:
 SLUS-28054:
   name: "Combat Elite - WWII Paratroopers [Trade Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-28056:
   name: "State of Emergency 2 [Trade Demo]"
   region: "NTSC-U"
@@ -45781,6 +45866,8 @@ SLUS-29087:
 SLUS-29088:
   name: "Champions of Norrath - Realms of EverQuest [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-29089:
   name: "Resident Evil Outbreak [Public Beta 1.0]"
   region: "NTSC-U"
@@ -45869,6 +45956,8 @@ SLUS-29126:
   name: "Champions - Return to Arms [Demo]" # aka "Champions of Norrath 2 [Demo]"
   region: "NTSC-U"
   compat: 4
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-29127:
   name: "FIFA Soccer 2005 [Demo]"
   region: "NTSC-U"
@@ -46089,6 +46178,7 @@ SLUS-97133:
   region: "NTSC-U"
   gsHWFixes:
     textureInsideRT: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-97405:
   name: "ATV Offroad Fury 3 [Greatest Hits]"
   region: "NTSC-U"
