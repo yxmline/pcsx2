@@ -219,7 +219,8 @@ bool GSRenderer::Merge(int field)
 			if (!slbg || !feedback_merge)
 			{
 				const int videomode = static_cast<int>(GetVideoMode()) - 1;
-				GSVector2i base_resolution(VideoModeOffsets[videomode].x, VideoModeOffsets[videomode].y);
+				const GSVector4i offsets = !GSConfig.PCRTCOverscan ? VideoModeOffsets[videomode] : VideoModeOffsetsOverscan[videomode];
+				GSVector2i base_resolution(offsets.x, offsets.y);
 
 				if (isinterlaced() && !m_regs->SMODE2.FFMD)
 					base_resolution.y *= 2;
@@ -337,7 +338,7 @@ bool GSRenderer::Merge(int field)
 		// Offset is not compatible with scanmsk, as scanmsk renders every other line, but at x7 the interlace offset will be 7 lines
 		const int offset = (m_scanmask_used || !m_regs->SMODE2.FFMD) ? 0 : (int)(tex[1] ? tex[1]->GetScale().y : tex[0]->GetScale().y);
 
-		if (m_regs->SMODE2.INT && GSConfig.InterlaceMode != GSInterlaceMode::Off)
+		if (isReallyInterlaced() && GSConfig.InterlaceMode != GSInterlaceMode::Off)
 		{
 			const bool scanmask = m_scanmask_used && scanmask_frame && GSConfig.InterlaceMode == GSInterlaceMode::Automatic;
 
@@ -567,7 +568,7 @@ void GSRenderer::VSync(u32 field, bool registers_written)
 		{
 			HostDisplay* const display = g_gs_device->GetDisplay();
 			const GSVector4 draw_rect(CalculateDrawRect(display->GetWindowWidth(), display->GetWindowHeight(),
-				current->GetWidth(), current->GetHeight(), display->GetDisplayAlignment(), display->UsesLowerLeftOrigin(), GetVideoMode() == GSVideoMode::SDTV_480P));
+				current->GetWidth(), current->GetHeight(), display->GetDisplayAlignment(), display->UsesLowerLeftOrigin(), GetVideoMode() == GSVideoMode::SDTV_480P || (GSConfig.PCRTCOverscan && GSConfig.PCRTCOffsets)));
 
 			const u64 current_time = Common::Timer::GetCurrentValue();
 			const float shader_time = static_cast<float>(Common::Timer::ConvertValueToSeconds(current_time - m_shader_time_start));
@@ -766,7 +767,8 @@ void GSRenderer::PresentCurrentFrame()
 		{
 			HostDisplay* const display = g_gs_device->GetDisplay();
 			const GSVector4 draw_rect(CalculateDrawRect(display->GetWindowWidth(), display->GetWindowHeight(),
-				current->GetWidth(), current->GetHeight(), display->GetDisplayAlignment(), display->UsesLowerLeftOrigin(), GetVideoMode() == GSVideoMode::SDTV_480P));
+				current->GetWidth(), current->GetHeight(), display->GetDisplayAlignment(), display->UsesLowerLeftOrigin(), GetVideoMode() == GSVideoMode::SDTV_480P || (GSConfig.PCRTCOverscan && GSConfig.PCRTCOffsets)));
+
 			const u64 current_time = Common::Timer::GetCurrentValue();
 			const float shader_time = static_cast<float>(Common::Timer::ConvertValueToSeconds(current_time - m_shader_time_start));
 
@@ -783,7 +785,7 @@ void GSRenderer::PresentCurrentFrame()
 
 bool GSRenderer::BeginCapture(std::string& filename)
 {
-	return m_capture.BeginCapture(GetTvRefreshRate(), GetInternalResolution(), GetCurrentAspectRatioFloat(GetVideoMode() == GSVideoMode::SDTV_480P), filename);
+	return m_capture.BeginCapture(GetTvRefreshRate(), GetInternalResolution(), GetCurrentAspectRatioFloat(GetVideoMode() == GSVideoMode::SDTV_480P || (GSConfig.PCRTCOverscan && GSConfig.PCRTCOffsets)), filename);
 }
 
 void GSRenderer::EndCapture()
@@ -886,7 +888,7 @@ bool GSRenderer::SaveSnapshotToMemory(u32 width, u32 height, std::vector<u32>* p
 		return false;
 
 	GSVector4 draw_rect(CalculateDrawRect(width, height, current->GetWidth(), current->GetHeight(),
-		HostDisplay::Alignment::LeftOrTop, false, GetVideoMode() == GSVideoMode::SDTV_480P));
+		HostDisplay::Alignment::LeftOrTop, false, GetVideoMode() == GSVideoMode::SDTV_480P || (GSConfig.PCRTCOverscan && GSConfig.PCRTCOffsets)));
 	u32 draw_width = static_cast<u32>(draw_rect.z - draw_rect.x);
 	u32 draw_height = static_cast<u32>(draw_rect.w - draw_rect.y);
 	if (draw_width > width)

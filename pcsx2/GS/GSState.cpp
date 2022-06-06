@@ -340,6 +340,12 @@ bool GSState::isinterlaced()
 	return !!m_regs->SMODE2.INT;
 }
 
+bool GSState::isReallyInterlaced()
+{
+	// The FIELD register only flips if the CMOD field in SMODE1 is set to anything but 0 and Front Porch bottom bit in SYNCV is set.
+	return (m_regs->SYNCV.VFP & 0x1) && m_regs->SMODE1.CMOD;
+}
+
 GSVideoMode GSState::GetVideoMode()
 {
 	// TODO: Get confirmation of videomode from SYSCALL ? not necessary but would be nice.
@@ -481,9 +487,10 @@ GSVector2i GSState::GetResolutionOffset(int i)
 
 	const auto& SMODE2 = m_regs->SMODE2;
 	const int res_multi = (SMODE2.INT + 1);
+	const GSVector4i offsets = !GSConfig.PCRTCOverscan ? VideoModeOffsets[videomode] : VideoModeOffsetsOverscan[videomode];
 
-	offset.x = (static_cast<int>(DISP.DX) - VideoModeOffsets[videomode].z) / (VideoModeDividers[videomode].x + 1);
-	offset.y = (static_cast<int>(DISP.DY) - (VideoModeOffsets[videomode].w * ((IsAnalogue() && res_multi) ? res_multi : 1))) / (VideoModeDividers[videomode].y + 1);
+	offset.x = (static_cast<int>(DISP.DX) - offsets.z) / (VideoModeDividers[videomode].x + 1);
+	offset.y = (static_cast<int>(DISP.DY) - (offsets.w * ((IsAnalogue() && res_multi) ? res_multi : 1))) / (VideoModeDividers[videomode].y + 1);
 
 	return offset;
 }
@@ -493,7 +500,9 @@ GSVector2i GSState::GetResolution()
 	const int videomode = static_cast<int>(GetVideoMode()) - 1;
 	const bool ignore_offset = !GSConfig.PCRTCOffsets;
 
-	GSVector2i resolution(VideoModeOffsets[videomode].x, VideoModeOffsets[videomode].y);
+	const GSVector4i offsets = !GSConfig.PCRTCOverscan ? VideoModeOffsets[videomode] : VideoModeOffsetsOverscan[videomode];
+
+	GSVector2i resolution(offsets.x, offsets.y);
 
 	// The resolution of the framebuffer is double when in FRAME mode and interlaced.
 	// Also we need a special check because no-interlace patches like to render in the original height, but in non-interlaced mode
@@ -508,6 +517,10 @@ GSVector2i GSState::GetResolution()
 		// which does fit, but when we ignore offsets we go on framebuffer size and some other games
 		// such as Johnny Mosleys Mad Trix and Transformers render too much but design it to go off the screen.
 		int magnified_width = (VideoModeDividers[videomode].z + 1) / GetDisplayHMagnification();
+
+		// When viewing overscan allow up to the overscan size
+		if (GSConfig.PCRTCOverscan)
+			magnified_width = std::max(magnified_width, offsets.x);
 
 		GSVector4i total_rect = GetDisplayRect(0).runion(GetDisplayRect(1));
 		total_rect.z = total_rect.z - total_rect.x;

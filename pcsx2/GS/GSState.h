@@ -272,6 +272,15 @@ public:
 		GSVector4i(1920, 540, 238, 40)
 	};
 
+	const GSVector4i VideoModeOffsetsOverscan[6] = {
+		GSVector4i(711, 243, 498, 12),
+		GSVector4i(702, 288, 532, 18),
+		GSVector4i(640, 480, 276, 34),
+		GSVector4i(720, 480, 232, 35),
+		GSVector4i(1280, 720, 302, 24),
+		GSVector4i(1920, 540, 238, 40)
+	};
+
 	const GSVector4i VideoModeDividers[6] = {
 		GSVector4i(3, 0, 2559, 239),
 		GSVector4i(3, 0, 2559, 287),
@@ -298,6 +307,7 @@ public:
 
 	bool IsEnabled(int i);
 	bool isinterlaced();
+	bool isReallyInterlaced();
 	bool IsAnalogue();
 
 	float GetTvRefreshRate();
