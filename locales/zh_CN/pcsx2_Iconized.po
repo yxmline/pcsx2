@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-05-10 21:36+0800\n"
-"PO-Revision-Date: 2022-05-10 21:38+0800\n"
+"POT-Creation-Date: 2022-06-13 06:59+0800\n"
+"PO-Revision-Date: 2022-06-13 07:04+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,52 +14,13 @@ msgstr ""
 "X-Generator: Poedit 3.0.1\n"
 "X-Poedit-Basepath: .\n"
 
-#: common/Exceptions.cpp:232
-msgid ""
-"There is not enough virtual memory available, or necessary virtual memory "
-"mappings have already been reserved by other processes, services, or DLLs."
-msgstr ""
-"没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保留。"
-
-#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:582
-#, c-format
-msgid ""
-"The PS2-slot %d has been automatically disabled.  You can correct the "
-"problem\n"
-"and re-enable it at any time using Config:Memory cards from the main menu."
-msgstr ""
-"%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题并"
-"重新启用记忆卡。"
-
-#: pcsx2/MemoryCardFolder.h:587
-#, c-format
-msgid "(FolderMcd) Memory Card is full, could not add: %s"
-msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
-
-#: pcsx2/System.cpp:135
-msgid ""
-"This recompiler was unable to reserve contiguous memory required for "
-"internal caches.  This error can be caused by low virtual memory resources, "
-"such as a small or disabled swapfile, or by another program that is hogging "
-"a lot of memory."
-msgstr ""
-"重编译器无法保留内部缓存所需的连续内存空间。此错误可能是由虚拟内存资源不足引"
-"起，如交换文件过小或未使用交换文件、某个其它程序正占用过大内存。"
-
-#: pcsx2/System.cpp:349
-msgid ""
-"PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close "
-"out some memory hogging background tasks and try again."
-msgstr ""
-"PCSX2 无法分配 PS2 虚拟机所需内存。请关闭一些占用内存的后台任务后重试。"
-
-#: pcsx2/gui/AppInit.cpp:178
+#: pcsx2/gui/AppInit.cpp:176
 msgid ""
 "Warning: Some of the configured PS2 recompilers failed to initialize and "
 "have been disabled:"
 msgstr "警告: 部分已配置的 PS2 重编译器初始化失败且已被禁用："
 
-#: pcsx2/gui/AppInit.cpp:209
+#: pcsx2/gui/AppInit.cpp:207
 msgid ""
 "Note: Recompilers are not necessary for PCSX2 to run, however they typically "
 "improve emulation speed substantially. You may have to manually re-enable "
@@ -68,7 +29,7 @@ msgstr ""
 "注意: 重编译器对 PCSX2 非必需，但是它们通常可大大提升模拟速度。如错误已解决，"
 "您可能要手动重新启用以上列出的重编译器。"
 
-#: pcsx2/gui/AppMain.cpp:83
+#: pcsx2/gui/AppMain.cpp:81
 msgid ""
 "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* "
 "obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't "
@@ -77,7 +38,7 @@ msgstr ""
 "PCSX2 需要一个 PS2 BIOS 才可以运行。由于法律问题，您必须从一台属于您的 PS2 实"
 "机中取得一个 BIOS 文件。请参考常见问题及教程以获取进一步的说明。"
 
-#: pcsx2/gui/AppMain.cpp:470
+#: pcsx2/gui/AppMain.cpp:464
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -240,7 +201,7 @@ msgid ""
 "progress will be lost.  Are you sure?"
 msgstr "此动作将复位当前的 PS2 虚拟机状态；当前进度将丢失。是否确认?"
 
-#: pcsx2/gui/MainMenuClicks.cpp:169
+#: pcsx2/gui/MainMenuClicks.cpp:167
 #, c-format
 msgid ""
 "This command clears %s settings and allows you to re-run the First-Time "
@@ -254,13 +215,6 @@ msgstr ""
 "\n"
 "警告!! 单击确定将删除全部 %s 的设置且强制关闭应用程序，当前模拟进度将丢失。是"
 "否确定?"
-
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:138
-msgid ""
-"Please select a valid BIOS.  If you are unable to make a valid selection "
-"then press Cancel to close the Configuration panel."
-msgstr ""
-"请选择一个合法的 BIOS。如果您不能作出合法的选择请单击取消来关闭配置面板。"
 
 #: pcsx2/gui/Panels/CpuPanel.cpp:112 pcsx2/gui/Panels/CpuPanel.cpp:180
 msgid "Notice: Most games are fine with the default options."
@@ -277,7 +231,7 @@ msgid ""
 "with PCSX2's current usermode setting. "
 msgstr "选中时此文件夹将自动反映当前 PCSX2 用户设置选项相关的默认值。 "
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:79
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting "
 "from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
@@ -300,7 +254,7 @@ msgstr ""
 "\n"
 "16:9: 临时切换 16:9 高宽比使得可以正确播放 16:9 FMV。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:84
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -324,13 +278,13 @@ msgstr ""
 "键盘: Ctrl+小键盘加号: 放大，Ctrl+小键盘减号: 缩小，Ctrl+小键盘星号: 在 100 "
 "和 0 之间切换"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
 msgid ""
 "Vsync eliminates screen tearing but typically has a big performance hit. It "
 "usually only applies to fullscreen mode."
 msgstr "垂直同步可以消除花屏但通常对性能有较大影响。通常仅应用于全屏幕模式。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:94
 msgid ""
 "Check this to force the mouse cursor invisible inside the GS window; useful "
 "if using the mouse as a primary control device for gaming.  By default the "
@@ -339,7 +293,7 @@ msgstr ""
 "选中此项强制 GS 窗口中不显示鼠标光标。在使用鼠标控制游戏时比较有用。默认状态"
 "鼠标在 2 秒不活动后隐藏。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:96
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming "
 "emulation. You can still toggle fullscreen display at any time using \n"
@@ -349,7 +303,7 @@ msgstr ""
 "用alt-enter切换全屏幕显示。\n"
 "Alt-Enter或在输出窗口双击(游戏)。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:99
 msgid ""
 "Completely closes the often large and bulky GS window when pressing ESC or "
 "pausing the emulator."
@@ -661,21 +615,14 @@ msgid ""
 "not be available either."
 msgstr "注意: 如限帧被禁用，快速模式和慢动作模式将不可用。"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:218
-msgid ""
-"Notice: Due to PS2 hardware design, precise frame skipping is impossible. "
-"Enabling it will cause severe graphical errors in some games."
-msgstr ""
-"注意: 由于 PS2 硬件设计，不可能准确跳帧。启用此选项可能在游戏中导致图像错误。"
-
-#: pcsx2/gui/Panels/VideoPanel.cpp:299
+#: pcsx2/gui/Panels/VideoPanel.cpp:184
 msgid ""
 "Setting this to a lower value improves input lag, a value around 2 or 3 will "
 "slightly improve framerates. (Default is 2)"
 msgstr ""
 "将其设置为较低的值会改善输入延迟,2 或 3 左右的值会略微提高帧率。(默认值为 2)"
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:301
+#: pcsx2/gui/Panels/VideoPanel.cpp:186
 msgid ""
 "Enable this if you think MTGS thread sync is causing crashes or graphical "
 "errors. For debugging to see if GS is running at the correct speed."
@@ -683,14 +630,59 @@ msgstr ""
 "请在您认为MTGS线程同步导致崩溃或图形错误时开启此选项。用于调试来查看GS是否以"
 "正确的速度运行。"
 
-#: pcsx2/vtlb.cpp:853
-msgid ""
-"Your system is too low on virtual resources for PCSX2 to run. This can be "
-"caused by having a small or disabled swapfile, or by other programs that are "
-"hogging resources."
-msgstr ""
-"您的系统没有足够的资源运行 PCSX2。可能是由于交换文件过小或未使用，或其它占用"
-"资源的程序。"
+#~ msgid ""
+#~ "Notice: Due to PS2 hardware design, precise frame skipping is impossible. "
+#~ "Enabling it will cause severe graphical errors in some games."
+#~ msgstr ""
+#~ "注意: 由于 PS2 硬件设计，不可能准确跳帧。启用此选项可能在游戏中导致图像错"
+#~ "误。"
+
+#~ msgid ""
+#~ "There is not enough virtual memory available, or necessary virtual memory "
+#~ "mappings have already been reserved by other processes, services, or DLLs."
+#~ msgstr ""
+#~ "没有足够的虚拟内存可用，或所需的虚拟内存映射已经被其它进程、服务或 DLL 保"
+#~ "留。"
+
+#~ msgid ""
+#~ "The PS2-slot %d has been automatically disabled.  You can correct the "
+#~ "problem\n"
+#~ "and re-enable it at any time using Config:Memory cards from the main menu."
+#~ msgstr ""
+#~ "%d 插槽上的记忆卡已自动被禁用。您可以随时在主菜单上的配置:记忆卡中改正问题"
+#~ "并重新启用记忆卡。"
+
+#~ msgid "(FolderMcd) Memory Card is full, could not add: %s"
+#~ msgstr "(FolderMcd) 记忆卡已满，无法加入: %s"
+
+#~ msgid ""
+#~ "This recompiler was unable to reserve contiguous memory required for "
+#~ "internal caches.  This error can be caused by low virtual memory "
+#~ "resources, such as a small or disabled swapfile, or by another program "
+#~ "that is hogging a lot of memory."
+#~ msgstr ""
+#~ "重编译器无法保留内部缓存所需的连续内存空间。此错误可能是由虚拟内存资源不足"
+#~ "引起，如交换文件过小或未使用交换文件、某个其它程序正占用过大内存。"
+
+#~ msgid ""
+#~ "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. "
+#~ "Close out some memory hogging background tasks and try again."
+#~ msgstr ""
+#~ "PCSX2 无法分配 PS2 虚拟机所需内存。请关闭一些占用内存的后台任务后重试。"
+
+#~ msgid ""
+#~ "Please select a valid BIOS.  If you are unable to make a valid selection "
+#~ "then press Cancel to close the Configuration panel."
+#~ msgstr ""
+#~ "请选择一个合法的 BIOS。如果您不能作出合法的选择请单击取消来关闭配置面板。"
+
+#~ msgid ""
+#~ "Your system is too low on virtual resources for PCSX2 to run. This can be "
+#~ "caused by having a small or disabled swapfile, or by other programs that "
+#~ "are hogging resources."
+#~ msgstr ""
+#~ "您的系统没有足够的资源运行 PCSX2。可能是由于交换文件过小或未使用，或其它占"
+#~ "用资源的程序。"
 
 #~ msgid ""
 #~ "Failed to read/write NVM/MEC file. Check your BIOS setup/permission "

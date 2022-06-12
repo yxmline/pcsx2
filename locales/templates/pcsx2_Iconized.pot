@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PCSX2 1.3.0\n"
+"Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-05-10 21:36+0800\n"
+"POT-Creation-Date: 2022-06-13 06:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,43 +22,19 @@ msgstr ""
 "X-Poedit-SearchPath-0: pcsx2\n"
 "X-Poedit-SearchPath-1: common\n"
 
-#: common/Exceptions.cpp:232
-msgid "There is not enough virtual memory available, or necessary virtual memory mappings have already been reserved by other processes, services, or DLLs."
-msgstr ""
-
-#: pcsx2/MemoryCardFile.cpp:194 pcsx2/MemoryCardFolder.h:582
-#, c-format
-msgid ""
-"The PS2-slot %d has been automatically disabled.  You can correct the problem\n"
-"and re-enable it at any time using Config:Memory cards from the main menu."
-msgstr ""
-
-#: pcsx2/MemoryCardFolder.h:587
-#, c-format
-msgid "(FolderMcd) Memory Card is full, could not add: %s"
-msgstr ""
-
-#: pcsx2/System.cpp:135
-msgid "This recompiler was unable to reserve contiguous memory required for internal caches.  This error can be caused by low virtual memory resources, such as a small or disabled swapfile, or by another program that is hogging a lot of memory."
-msgstr ""
-
-#: pcsx2/System.cpp:349
-msgid "PCSX2 is unable to allocate memory needed for the PS2 virtual machine. Close out some memory hogging background tasks and try again."
-msgstr ""
-
-#: pcsx2/gui/AppInit.cpp:178
+#: pcsx2/gui/AppInit.cpp:176
 msgid "Warning: Some of the configured PS2 recompilers failed to initialize and have been disabled:"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:209
+#: pcsx2/gui/AppInit.cpp:207
 msgid "Note: Recompilers are not necessary for PCSX2 to run, however they typically improve emulation speed substantially. You may have to manually re-enable the recompilers listed above, if you resolve the errors."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:83
+#: pcsx2/gui/AppMain.cpp:81
 msgid "PCSX2 requires a PS2 BIOS in order to run.  For legal reasons, you *must* obtain a BIOS from an actual PS2 unit that you own (borrowing doesn't count).  Please consult the FAQs and Guides for further instructions."
 msgstr ""
 
-#: pcsx2/gui/AppMain.cpp:470
+#: pcsx2/gui/AppMain.cpp:464
 msgid ""
 "'Ignore' to continue waiting for the thread to respond.\n"
 "'Cancel' to attempt to cancel the thread.\n"
@@ -154,16 +130,12 @@ msgstr ""
 msgid "This action will reset the existing PS2 virtual machine state; all current progress will be lost.  Are you sure?"
 msgstr ""
 
-#: pcsx2/gui/MainMenuClicks.cpp:169
+#: pcsx2/gui/MainMenuClicks.cpp:167
 #, c-format
 msgid ""
 "This command clears %s settings and allows you to re-run the First-Time Wizard.  You will need to manually restart %s after this operation.\n"
 "\n"
 "WARNING!!  Click OK to delete *ALL* settings for %s and force-close the app, losing any current emulation progress.  Are you absolutely sure?"
-msgstr ""
-
-#: pcsx2/gui/Panels/BiosSelectorPanel.cpp:138
-msgid "Please select a valid BIOS.  If you are unable to make a valid selection then press Cancel to close the Configuration panel."
 msgstr ""
 
 #: pcsx2/gui/Panels/CpuPanel.cpp:112 pcsx2/gui/Panels/CpuPanel.cpp:180
@@ -178,7 +150,7 @@ msgstr ""
 msgid "When checked this folder will automatically reflect the default associated with PCSX2's current usermode setting. "
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:79
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
 "\n"
@@ -189,7 +161,7 @@ msgid ""
 "16:9: Temporarily switch to a 16:9 aspect ratio while an FMV plays to correctly display a widescreen 16:9 FMV."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:84
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -204,21 +176,21 @@ msgid ""
 "CTRL + NUMPAD-*: Toggle 100/0"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
 msgid "Vsync eliminates screen tearing but typically has a big performance hit. It usually only applies to fullscreen mode."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:94
 msgid "Check this to force the mouse cursor invisible inside the GS window; useful if using the mouse as a primary control device for gaming.  By default the mouse auto-hides after 2 seconds of inactivity."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:96
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming emulation. You can still toggle fullscreen display at any time using \n"
 "Alt-Enter or double clicking the output window (game)."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:99
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
@@ -395,18 +367,10 @@ msgstr ""
 msgid "Note that when Framelimiting is disabled, Turbo and SlowMotion modes will not be available either."
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:218
-msgid "Notice: Due to PS2 hardware design, precise frame skipping is impossible. Enabling it will cause severe graphical errors in some games."
-msgstr ""
-
-#: pcsx2/gui/Panels/VideoPanel.cpp:299
+#: pcsx2/gui/Panels/VideoPanel.cpp:184
 msgid "Setting this to a lower value improves input lag, a value around 2 or 3 will slightly improve framerates. (Default is 2)"
 msgstr ""
 
-#: pcsx2/gui/Panels/VideoPanel.cpp:301
+#: pcsx2/gui/Panels/VideoPanel.cpp:186
 msgid "Enable this if you think MTGS thread sync is causing crashes or graphical errors. For debugging to see if GS is running at the correct speed."
-msgstr ""
-
-#: pcsx2/vtlb.cpp:853
-msgid "Your system is too low on virtual resources for PCSX2 to run. This can be caused by having a small or disabled swapfile, or by other programs that are hogging resources."
 msgstr ""
