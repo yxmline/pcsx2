@@ -48,7 +48,6 @@ GSState::GSState()
 	, m_regs(NULL)
 	, m_crc(0)
 	, m_options(0)
-	, m_frameskip(0)
 {
 	// m_nativeres seems to be a hack. Unfortunately it impacts draw call number which make debug painful in the replayer.
 	// Let's keep it disabled to ease debug.
@@ -148,34 +147,6 @@ GSState::~GSState()
 		_aligned_free(m_vertex.buff);
 	if (m_index.buff)
 		_aligned_free(m_index.buff);
-}
-
-void GSState::SetFrameSkip(int skip)
-{
-	if (m_frameskip == skip)
-		return;
-
-	m_frameskip = skip;
-
-	if (skip)
-	{
-		m_fpGIFPackedRegHandlers[GIF_REG_XYZF2] = &GSState::GIFPackedRegHandlerNOP;
-		m_fpGIFPackedRegHandlers[GIF_REG_XYZ2] = &GSState::GIFPackedRegHandlerNOP;
-		m_fpGIFPackedRegHandlers[GIF_REG_XYZF3] = &GSState::GIFPackedRegHandlerNOP;
-		m_fpGIFPackedRegHandlers[GIF_REG_XYZ3] = &GSState::GIFPackedRegHandlerNOP;
-
-		m_fpGIFRegHandlers[GIF_A_D_REG_XYZF2] = &GSState::GIFRegHandlerNOP;
-		m_fpGIFRegHandlers[GIF_A_D_REG_XYZ2] = &GSState::GIFRegHandlerNOP;
-		m_fpGIFRegHandlers[GIF_A_D_REG_XYZF3] = &GSState::GIFRegHandlerNOP;
-		m_fpGIFRegHandlers[GIF_A_D_REG_XYZ3] = &GSState::GIFRegHandlerNOP;
-
-		m_fpGIFPackedRegHandlersC[GIF_REG_STQRGBAXYZF2] = &GSState::GIFPackedRegHandlerNOP;
-		m_fpGIFPackedRegHandlersC[GIF_REG_STQRGBAXYZ2] = &GSState::GIFPackedRegHandlerNOP;
-	}
-	else
-	{
-		UpdateVertexKick();
-	}
 }
 
 void GSState::Reset(bool hardware_reset)
@@ -2562,9 +2533,6 @@ void GSState::UpdateScissor()
 
 void GSState::UpdateVertexKick()
 {
-	if (m_frameskip)
-		return;
-
 	const u32 prim = PRIM->PRIM;
 
 	m_fpGIFPackedRegHandlers[GIF_REG_XYZF2] = m_fpGIFPackedRegHandlerXYZ[prim][0];
@@ -3685,10 +3653,14 @@ void GSState::GSTransferBuffer::Init(int tx, int ty, const GIFRegBITBLTBUF& blit
 
 bool GSState::GSTransferBuffer::Update(int tw, int th, int bpp, int& len)
 {
+	u32 packet_size = 0;
+	u32 tex_size = 0;
 	if (total == 0)
 	{
 		start = end = 0;
-		total = std::min<int>((tw * bpp >> 3) * th, 1024 * 1024 * 4);
+		tex_size = (((tw * th * bpp) + 7) >> 3);
+		packet_size = (tex_size + 15) & ~0xF; // Round up to the nearest quadword
+		total = std::min<int>(tex_size, 1024 * 1024 * 4);
 		overflow = false;
 	}
 
@@ -3696,11 +3668,11 @@ bool GSState::GSTransferBuffer::Update(int tw, int th, int bpp, int& len)
 
 	if (len > remaining)
 	{
-		if (!overflow)
+		if (!overflow && len > packet_size)
 		{
 			overflow = true;
 #if defined(PCSX2_DEVBUILD) || defined(_DEBUG)
-			Console.Warning("GS transfer buffer overflow");
+			Console.Warning("GS transfer buffer overflow len %d remaining %d, tex_size %d tw %d th %d bpp %d", len, remaining, tex_size, tw, th, bpp);
 #endif
 		}
 
