@@ -38716,7 +38716,7 @@ SLUS-20478:
   region: "NTSC-U"
   compat: 5
 SLUS-20480:
-  name: "Tennis - Sega Sports"
+  name: "Sega Sports Tennis"
   region: "NTSC-U"
   compat: 5
   gameFixes:
