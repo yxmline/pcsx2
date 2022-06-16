@@ -14815,6 +14815,9 @@ SLES-52986:
 SLES-52988:
   name: "Mega Man X8"
   region: "PAL-M5"
+  gsHWFixes:
+    autoFlush: 1 # Fixes bloom.
+    roundSprite: 1 # Fixes misalliged bloom.
   memcardFilters: # Reads Command Mission save for bonus boss.
     - "SLES-52988"
     - "SLES-52832"
@@ -21599,6 +21602,9 @@ SLKA-25221:
 SLKA-25222:
   name: "Rockman X8"
   region: "NTSC-K"
+  gsHWFixes:
+    autoFlush: 1 # Fixes bloom.
+    roundSprite: 1 # Fixes misalliged bloom.
 SLKA-25224:
   name: "Detective Saburo Jinguji 9 - Kind of Blue"
   region: "NTSC-K"
@@ -27034,6 +27040,9 @@ SLPM-65729:
 SLPM-65730:
   name: "Rockman X8"
   region: "NTSC-J"
+  gsHWFixes:
+    autoFlush: 1 # Fixes bloom.
+    roundSprite: 1 # Fixes misalliged bloom.
   gameFixes:
     - SoftwareRendererFMVHack # Flickering and wrong textures in FMV.
   memcardFilters:
@@ -32195,6 +32204,9 @@ SLPS-20106:
   name: "Growlanser II - The Sense of Justice"
   region: "NTSC-J"
   compat: 4
+SLPS-20107:
+  name: "NBA Street"
+  region: "NTSC-J"
 SLPS-20108:
   name: "Quake III - Revolution"
   region: "NTSC-J"
@@ -32245,6 +32257,9 @@ SLPS-20131:
 SLPS-20132:
   name: "Chenuen no San Goku Shi (Chen Wen's Romance of the Three Kingdoms)"
   region: "NTSC-J"
+SLPS-20135:
+  name: "Pai Chenjan"
+  region: "NTSC-J"
 SLPS-20136:
   name: "Guilty Gear X Plus [DX Pack]"
   region: "NTSC-J"
@@ -32253,6 +32268,9 @@ SLPS-20137:
   name: "Guilty Gear X Plus"
   region: "NTSC-J"
   compat: 5
+SLPS-20138:
+  name: "Digital Holmes"
+  region: "NTSC-J"
 SLPS-20139:
   name: "All Star Pro-Wrestling II"
   region: "NTSC-J"
@@ -32290,20 +32308,35 @@ SLPS-20165:
 SLPS-20167:
   name: "La Pucelle"
   region: "NTSC-J"
+SLPS-20168:
+  name: "NHL 2002"
+  region: "NTSC-J"
 SLPS-20169:
   name: "Chou! Rakushii Internet Tomodachi Nowa [Type-PG]"
+  region: "NTSC-J"
+SLPS-20170:
+  name: "Wave Rally"
   region: "NTSC-J"
 SLPS-20171:
   name: "Smash Court Tennis Pro"
   region: "NTSC-J"
+SLPS-20173:
+  name: "Magical Sports - Hard Hitter 2"
+  region: "NTSC-J"
+SLPS-20174:
+  name: "Typing Renai Hakusho - Boys Be... [with Keyboard]"
+  region: "NTSC-J"
 SLPS-20175:
-  name: "Typing Love Story - Boys Be"
+  name: "Typing Renai Hakusho - Boys Be..."
   region: "NTSC-J"
 SLPS-20177:
   name: "Make Your Dream Home"
   region: "NTSC-J"
 SLPS-20178:
   name: "Samurai"
+  region: "NTSC-J"
+SLPS-20183:
+  name: "Motto Golful Golf"
   region: "NTSC-J"
 SLPS-20185:
   name: "Wangan Midnight"
@@ -33605,6 +33638,11 @@ SLPS-25155:
 SLPS-25156:
   name: "King of Fighters 2000, The"
   region: "NTSC-J"
+SLPS-25157:
+  name: "Madden NFL Super Bowl 2003"
+  region: "NTSC-J"
+  clampModes:
+    vuClampMode: 3 # Missing geometry with microVU.
 SLPS-25158:
   name: "dot hack - Outbreak Part 3"
   region: "NTSC-J"
@@ -33665,6 +33703,9 @@ SLPS-25171:
 SLPS-25172:
   name: "Tales of Destiny 2"
   region: "NTSC-J"
+SLPS-25173:
+  name: "Omoide ni Kawaru Kimi - Memories Off"
+  region: "NTSC-J"
 SLPS-25174:
   name: "Dragon Ball Z - Budokai"
   region: "NTSC-J"
@@ -33700,6 +33741,9 @@ SLPS-25185:
   region: "NTSC-J"
 SLPS-25186:
   name: "Kidou Shinsengumi - Moe yo Ken"
+  region: "NTSC-J"
+SLPS-25188:
+  name: "Erde - Nezu no Ki no Shita de"
   region: "NTSC-J"
 SLPS-25190:
   name: "Sweet Legacy"
@@ -40935,6 +40979,9 @@ SLUS-20960:
   name: "Mega Man X8"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    autoFlush: 1 # Fixes bloom.
+    roundSprite: 1 # Fixes misalliged bloom.
   memcardFilters:
     - "SLUS-20960"
     - "SLUS-20903"
@@ -41314,6 +41361,15 @@ SLUS-21029:
   gsHWFixes:
     wildArmsHack: 1 # Fixes post-processing misalignment.
   patches:
+    0DD3417A:
+      content: |-
+        comment=Patch by Refraction
+        // Patches a CTC2 write to FBRST to not set the T-Bit enable
+        // Fixes slow speed in MTVU due to developers leaving T-Bit enabled and not using it
+        // PCSX2 has to sync more when T-Bit is enabled so the game spends more time waiting
+        // for VU1 to finish, which reduces the advantage of MTVU to basically zero.
+        patch=1,EE,D0525B3C,extended,00000800
+        patch=1,EE,20525B3C,extended,00000000
     4A0E5B3A:
       content: |-
         comment=Patch by Refraction
