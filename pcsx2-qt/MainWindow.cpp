@@ -29,6 +29,7 @@
 
 #include "pcsx2/CDVD/CDVDaccess.h"
 #include "pcsx2/Frontend/GameList.h"
+#include "pcsx2/Frontend/LogSink.h"
 #include "pcsx2/GSDumpReplayer.h"
 #include "pcsx2/HostDisplay.h"
 #include "pcsx2/HostSettings.h"
@@ -210,6 +211,7 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionAudioSettings, &QAction::triggered, [this]() { doSettings("Audio"); });
 	connect(m_ui.actionMemoryCardSettings, &QAction::triggered, [this]() { doSettings("Memory Cards"); });
 	connect(m_ui.actionDEV9Settings, &QAction::triggered, [this]() { doSettings("Network & HDD"); });
+	connect(m_ui.actionFolderSettings, &QAction::triggered, [this]() { doSettings("Folders"); });
 	connect(
 		m_ui.actionControllerSettings, &QAction::triggered, [this]() { doControllerSettings(ControllerSettingsDialog::Category::GlobalSettings); });
 	connect(m_ui.actionHotkeySettings, &QAction::triggered, [this]() { doControllerSettings(ControllerSettingsDialog::Category::HotkeySettings); });
@@ -848,11 +850,11 @@ bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_sav
 	if (!VMManager::HasValidVM())
 		return true;
 
-	// if we don't have a crc, we can't save state
+	// If we don't have a crc, we can't save state.
 	allow_save_to_state &= (m_current_game_crc != 0);
 	bool save_state = allow_save_to_state && EmuConfig.SaveStateOnShutdown;
 
-	// only confirm on UI thread because we need to display a msgbox
+	// Only confirm on UI thread because we need to display a msgbox.
 	if (allow_confirm && !GSDumpReplayer::IsReplayingDump() && Host::GetBaseBoolSettingValue("UI", "ConfirmShutdown", true))
 	{
 		VMLock lock(pauseAndLockVM());
@@ -873,20 +875,23 @@ bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_sav
 			return false;
 
 		save_state = save_cb->isChecked();
+
+		// Don't switch back to fullscreen when we're shutting down anyway.
+		lock.cancelResume();
 	}
 
 	g_emu_thread->shutdownVM(save_state);
 
 	if (block_until_done || QtHost::InBatchMode())
 	{
-		// we need to yield here, since the display gets destroyed
+		// We need to yield here, since the display gets destroyed.
 		while (VMManager::GetState() != VMState::Shutdown)
 			QApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 1);
 	}
 
 	if (QtHost::InBatchMode())
 	{
-		// closing the window should shut down everything.
+		// Closing the window should shut down everything.
 		close();
 	}
 
@@ -1252,7 +1257,7 @@ void MainWindow::onThemeChangedFromSettings()
 
 void MainWindow::onLoggingOptionChanged()
 {
-	QtHost::UpdateLogging();
+	Host::UpdateLogging();
 }
 
 void MainWindow::onInputRecNewActionTriggered()
@@ -1365,8 +1370,11 @@ void MainWindow::onVMPaused()
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
 	m_status_fps_widget->setText(tr("Paused"));
-	m_display_widget->updateRelativeMode(false);
-	m_display_widget->updateCursor(false);
+	if (m_display_widget)
+	{
+		m_display_widget->updateRelativeMode(false);
+		m_display_widget->updateCursor(false);
+	}
 }
 
 void MainWindow::onVMResumed()
@@ -1382,10 +1390,12 @@ void MainWindow::onVMResumed()
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
 	m_status_fps_widget->setText(m_last_fps_status);
-	m_display_widget->updateRelativeMode(true);
-	m_display_widget->updateCursor(true);
 	if (m_display_widget)
+	{
+		m_display_widget->updateRelativeMode(true);
+		m_display_widget->updateCursor(true);
 		m_display_widget->setFocus();
+	}
 }
 
 void MainWindow::onVMStopped()
@@ -1624,6 +1634,11 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main, b
 			restoreDisplayWindowGeometryFromConfig();
 			container->showNormal();
 		}
+
+		m_display_widget->setFocus();
+		m_display_widget->setShouldHideCursor(shouldHideMouseCursor());
+		m_display_widget->updateRelativeMode(m_vm_valid && !m_vm_paused);
+		m_display_widget->updateCursor(m_vm_valid && !m_vm_paused);
 
 		QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 		return m_display_widget;
@@ -2076,7 +2091,7 @@ void MainWindow::populateLoadStateMenu(QMenu* menu, const QString& filename, con
 		if (!FileSystem::StatFile(state_filename.c_str(), &sd))
 			continue;
 
-		action = menu->addAction(tr("Save Slot %1 (%2)").arg(i).arg(formatTimestampForSaveStateMenu(sd.ModificationTime)));
+		action = menu->addAction(tr("Load Slot %1 (%2)").arg(i).arg(formatTimestampForSaveStateMenu(sd.ModificationTime)));
 		connect(action, &QAction::triggered, [this, i]() { loadSaveStateSlot(i); });
 	}
 }
@@ -2202,7 +2217,7 @@ MainWindow::VMLock::VMLock(VMLock&& lock)
 	, m_was_fullscreen(lock.m_was_fullscreen)
 {
 	lock.m_dialog_parent = nullptr;
-	lock.m_was_paused = false;
+	lock.m_was_paused = true;
 	lock.m_was_fullscreen = false;
 }
 
@@ -2212,5 +2227,11 @@ MainWindow::VMLock::~VMLock()
 		g_emu_thread->setSurfaceless(false);
 	if (!m_was_paused)
 		g_emu_thread->setVMPaused(false);
+}
+
+void MainWindow::VMLock::cancelResume()
+{
+	m_was_paused = true;
+	m_was_fullscreen = false;
 }
 

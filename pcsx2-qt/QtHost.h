@@ -40,12 +40,6 @@ namespace QtHost
 	bool Initialize();
 	void Shutdown();
 
-	void UpdateFolders();
-	void UpdateLogging();
-
-	/// Initializes early console logging (for printing command line arguments).
-	void InitializeEarlyConsole();
-
 	/// Sets batch mode (exit after game shutdown).
 	bool InBatchMode();
 	void SetBatchMode(bool enabled);

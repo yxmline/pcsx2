@@ -47,7 +47,6 @@
 #include "QtUtils.h"
 
 EmuThread* g_emu_thread = nullptr;
-WindowInfo g_gs_window_info;
 
 static std::unique_ptr<HostDisplay> s_host_display;
 
@@ -412,6 +411,17 @@ void EmuThread::reloadGameSettings()
 	}
 }
 
+void EmuThread::updateEmuFolders()
+{
+	if (!isOnEmuThread())
+	{
+		QMetaObject::invokeMethod(this, &EmuThread::updateEmuFolders, Qt::QueuedConnection);
+		return;
+	}
+
+	Host::Internal::UpdateEmuFolders();
+}
+
 void EmuThread::loadOurSettings()
 {
 	m_verbose_status = Host::GetBaseBoolSettingValue("UI", "VerboseStatusBar", false);
@@ -667,8 +677,6 @@ HostDisplay* EmuThread::acquireHostDisplay(HostDisplay::RenderAPI api)
 		return nullptr;
 	}
 
-	g_gs_window_info = s_host_display->GetWindowInfo();
-
 	Console.WriteLn(Color_StrongGreen, "%s Graphics Driver Info:", HostDisplay::RenderAPIToString(s_host_display->GetRenderAPI()));
 	Console.Indent().WriteLn(s_host_display->GetDriverInfo());
 
@@ -679,17 +687,8 @@ void EmuThread::releaseHostDisplay()
 {
 	ImGuiManager::Shutdown();
 
-	if (s_host_display)
-	{
-		s_host_display->DestroyRenderSurface();
-		s_host_display->DestroyRenderDevice();
-	}
-
-	g_gs_window_info = WindowInfo();
-
-	emit onDestroyDisplayRequested();
-
 	s_host_display.reset();
+	emit onDestroyDisplayRequested();
 }
 
 HostDisplay* Host::GetHostDisplay()
