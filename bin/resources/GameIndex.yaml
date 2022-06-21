@@ -8242,7 +8242,12 @@ SLAJ-25016:
   region: "NTSC-Unk"
 SLAJ-25018:
   name: "Shutokou Battle 01"
-  region: "NTSC-Unk"
+  region: "NTSC-HK"
+  compat: 5
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Improves visual clarity whilst upscaling.
+    roundSprite: 1 # Reduces graphics garbage on UI whilst upscaling.
 SLAJ-25023:
   name: "Shin Sangoku Musou 3 - Mushoden"
   region: "NTSC-Unk"
@@ -21411,6 +21416,14 @@ SLKA-25082:
   compat: 5
   clampModes:
     eeClampMode: 3 # Fixes cutscene freezes.
+SLKA-25084:
+  name: "Shutokou Battle 01"
+  region: "NTSC-K"
+  compat: 5
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Improves visual clarity whilst upscaling.
+    roundSprite: 1 # Reduces graphics garbage on UI whilst upscaling.
 SLKA-25087:
   name: "FIFA Soccer 2004"
   region: "NTSC-J"
@@ -25792,6 +25805,8 @@ SLPM-65308:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Improves visual clarity whilst upscaling.
+    roundSprite: 1 # Reduces graphics garbage on UI whilst upscaling.
 SLPM-65309:
   name: "Splashdown [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -31694,6 +31709,8 @@ SLPM-74204:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Improves visual clarity whilst upscaling.
+    roundSprite: 1 # Reduces graphics garbage on UI whilst upscaling.
 SLPM-74205:
   name: "Shin Megami Tensei III - Nocturne [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -39181,7 +39198,7 @@ SLUS-20541:
   clampModes:
     vuClampMode: 2 # Fixes transparency issues.
 SLUS-20543:
-  name: "Metal Gear Solid 2"
+  name: "Document of Metal Gear Solid 2, The"
   region: "NTSC-U"
   compat: 5
 SLUS-20544:
@@ -43295,12 +43312,14 @@ SLUS-21388:
   gsHWFixes:
     halfPixelOffset: 2 # Reduces ghosting but doesn't fully fix it.
 SLUS-21389:
-  name: "Xenosaga - Episode III - Also Sprach Zarathustra [Disc1of2]"
+  name: "Xenosaga Episode III - Also Sprach Zarathustra [Disc1of2]"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
     textureInsideRT: 1
     autoFlush: 1
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters: # Allows import of Xenosaga II save data.
     - "SLUS-21389"
     - "SLUS-20892"
@@ -43422,12 +43441,14 @@ SLUS-21416:
   clampModes:
     eeClampMode: 3 # Fixes black screen.
 SLUS-21417:
-  name: "Xenosaga - Episode III - Also Sprach Zarathustra [Disc2of2]"
+  name: "Xenosaga Episode III - Also Sprach Zarathustra [Disc2of2]"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
     textureInsideRT: 1
     autoFlush: 1
+    halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows.
+    roundSprite: 2 # Fixes font artifacts.
   memcardFilters:
     - "SLUS-21389"
     - "SLUS-20892"
