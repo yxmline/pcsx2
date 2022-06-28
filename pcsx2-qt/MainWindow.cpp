@@ -18,6 +18,7 @@
 #include <QtCore/QDateTime>
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QStyle>
@@ -28,6 +29,7 @@
 #include "common/FileSystem.h"
 
 #include "pcsx2/CDVD/CDVDaccess.h"
+#include "pcsx2/CDVD/CDVDdiscReader.h"
 #include "pcsx2/Frontend/GameList.h"
 #include "pcsx2/Frontend/LogSink.h"
 #include "pcsx2/GSDumpReplayer.h"
@@ -53,7 +55,7 @@
 #include "Tools/InputRecording/NewInputRecordingDlg.h"
 
 
-static constexpr char DISC_IMAGE_FILTER[] =
+static constexpr char OPEN_FILE_FILTER[] =
 	QT_TRANSLATE_NOOP("MainWindow", "All File Types (*.bin *.iso *.cue *.chd *.cso *.gz *.elf *.irx *.m3u *.gs *.gs.xz *.gs.zst *.dump);;"
 									"Single-Track Raw Images (*.bin *.iso);;"
 									"Cue Sheets (*.cue);;"
@@ -66,6 +68,15 @@ static constexpr char DISC_IMAGE_FILTER[] =
 									"GS Dumps (*.gs *.gs.xz *.gs.zst);;"
 									"Block Dumps (*.dump)");
 
+static constexpr char DISC_IMAGE_FILTER[] =
+	QT_TRANSLATE_NOOP("MainWindow", "All File Types (*.bin *.iso *.cue *.chd *.cso *.gz *.dump);;"
+									"Single-Track Raw Images (*.bin *.iso);;"
+									"Cue Sheets (*.cue);;"
+									"MAME CHD Images (*.chd);;"
+									"CSO Images (*.cso);;"
+									"GZ Images (*.gz);;"
+									"Block Dumps (*.dump)");
+
 #ifdef __APPLE__
 const char* MainWindow::DEFAULT_THEME_NAME = "";
 #else
@@ -73,6 +84,10 @@ const char* MainWindow::DEFAULT_THEME_NAME = "darkfusion";
 #endif
 
 MainWindow* g_main_window = nullptr;
+
+// UI thread VM validity.
+static bool s_vm_valid = false;
+static bool s_vm_paused = false;
 
 MainWindow::MainWindow(const QString& unthemed_style_name)
 	: m_unthemed_style_name(unthemed_style_name)
@@ -96,10 +111,10 @@ void MainWindow::initialize()
 	setStyleFromSettings();
 	setIconThemeFromStyle();
 #ifdef __APPLE__
-	CocoaTools::AddThemeChangeHandler(this, [](void* ctx){
+	CocoaTools::AddThemeChangeHandler(this, [](void* ctx) {
 		// This handler is called *before* the style change has propagated far enough for Qt to see it
 		// Use RunOnUIThread to delay until it has
-		QtHost::RunOnUIThread([ctx = static_cast<MainWindow*>(ctx)]{
+		QtHost::RunOnUIThread([ctx = static_cast<MainWindow*>(ctx)] {
 			ctx->setStyleFromSettings(); // Qt won't notice the style change without us touching the palette in some way
 			ctx->setIconThemeFromStyle();
 		});
@@ -186,11 +201,13 @@ void MainWindow::setupAdditionalUi()
 void MainWindow::connectSignals()
 {
 	connect(m_ui.actionStartFile, &QAction::triggered, this, &MainWindow::onStartFileActionTriggered);
+	connect(m_ui.actionStartDisc, &QAction::triggered, this, &MainWindow::onStartDiscActionTriggered);
 	connect(m_ui.actionStartBios, &QAction::triggered, this, &MainWindow::onStartBIOSActionTriggered);
 	connect(m_ui.actionChangeDisc, &QAction::triggered, [this] { m_ui.menuChangeDisc->exec(QCursor::pos()); });
 	connect(m_ui.actionChangeDiscFromFile, &QAction::triggered, this, &MainWindow::onChangeDiscFromFileActionTriggered);
 	connect(m_ui.actionChangeDiscFromDevice, &QAction::triggered, this, &MainWindow::onChangeDiscFromDeviceActionTriggered);
 	connect(m_ui.actionChangeDiscFromGameList, &QAction::triggered, this, &MainWindow::onChangeDiscFromGameListActionTriggered);
+	connect(m_ui.actionRemoveDisc, &QAction::triggered, this, &MainWindow::onRemoveDiscActionTriggered);
 	connect(m_ui.menuChangeDisc, &QMenu::aboutToShow, this, &MainWindow::onChangeDiscMenuAboutToShow);
 	connect(m_ui.menuChangeDisc, &QMenu::aboutToHide, this, &MainWindow::onChangeDiscMenuAboutToHide);
 	connect(m_ui.actionPowerOff, &QAction::triggered, this, [this]() { requestShutdown(true, true); });
@@ -277,7 +294,7 @@ void MainWindow::connectSignals()
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecConsoleLogs, "Logging", "EnableInputRecordingLogs", false);
 	connect(m_ui.actionInputRecConsoleLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecControllerLogs, "Logging", "EnableControllerLogs", false);
-	connect(m_ui.actionInputRecControllerLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged); 
+	connect(m_ui.actionInputRecControllerLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 
 	// These need to be queued connections to stop crashing due to menus opening/closing and switching focus.
 	connect(m_game_list_widget, &GameListWidget::refreshProgress, this, &MainWindow::onGameListRefreshProgress);
@@ -324,7 +341,7 @@ void MainWindow::connectVMThreadSignals(EmuThread* thread)
 
 void MainWindow::recreate()
 {
-	if (m_vm_valid)
+	if (s_vm_valid)
 		requestShutdown(false, true, true);
 
 	close();
@@ -687,8 +704,7 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 
 void MainWindow::updateStatusBarWidgetVisibility()
 {
-	auto Update = [this](QWidget* widget, bool visible, int stretch)
-	{
+	auto Update = [this](QWidget* widget, bool visible, int stretch) {
 		if (widget->isVisible())
 		{
 			m_ui.statusBar->removeWidget(widget);
@@ -702,8 +718,8 @@ void MainWindow::updateStatusBarWidgetVisibility()
 		}
 	};
 
-	Update(m_status_gs_widget, m_vm_valid && !m_vm_paused, 1);
-	Update(m_status_fps_widget, m_vm_valid, 0);
+	Update(m_status_gs_widget, s_vm_valid && !s_vm_paused, 1);
+	Update(m_status_fps_widget, s_vm_valid, 0);
 }
 
 void MainWindow::updateWindowTitle()
@@ -712,7 +728,7 @@ void MainWindow::updateWindowTitle()
 	QString main_title(QtHost::GetAppNameAndVersion() + suffix);
 	QString display_title(m_current_game_name + suffix);
 
-	if (!m_vm_valid || m_current_game_name.isEmpty())
+	if (!s_vm_valid || m_current_game_name.isEmpty())
 		display_title = main_title;
 	else if (isRenderingToMain())
 		main_title = display_title;
@@ -726,6 +742,27 @@ void MainWindow::updateWindowTitle()
 		if (container->windowTitle() != display_title)
 			container->setWindowTitle(display_title);
 	}
+}
+
+void MainWindow::updateWindowState(bool force_visible)
+{
+	const bool hide_window = !g_emu_thread->isRenderingToMain() && Host::GetBaseBoolSettingValue("UI", "HideMainWindowWhenRunning", false);
+	const bool disable_resize = Host::GetBaseBoolSettingValue("UI", "DisableWindowResize", false);
+	const bool has_window = s_vm_valid || m_display_widget;
+
+	// Need to test both valid and display widget because of startup (vm invalid while window is created).
+	const bool visible = force_visible || !hide_window || !has_window;
+	if (isVisible() != visible)
+		setVisible(visible);
+
+	// No point changing realizability if we're not visible.
+	const bool resizeable = force_visible || !disable_resize || !has_window;
+	if (visible)
+		QtUtils::SetWindowResizeable(this, resizeable);
+
+	// Update the display widget too if rendering separately.
+	if (m_display_widget && !isRenderingToMain())
+		QtUtils::SetWindowResizeable(getDisplayContainer(), resizeable);
 }
 
 void MainWindow::setProgressBar(int current, int total)
@@ -781,10 +818,10 @@ void MainWindow::switchToGameListView()
 		return;
 	}
 
-	if (m_vm_valid)
+	if (s_vm_valid)
 	{
-		m_was_paused_on_surface_loss = m_vm_paused;
-		if (!m_vm_paused)
+		m_was_paused_on_surface_loss = s_vm_paused;
+		if (!s_vm_paused)
 			g_emu_thread->setVMPaused(true);
 
 		// switch to surfaceless. we have to wait until the display widget is gone before we swap over.
@@ -802,14 +839,14 @@ void MainWindow::switchToGameListView()
 
 void MainWindow::switchToEmulationView()
 {
-	if (!m_vm_valid || (m_display_widget && centralWidget() == m_display_widget))
+	if (!s_vm_valid || (m_display_widget && centralWidget() == m_display_widget))
 		return;
 
 	// we're no longer surfaceless! this will call back to UpdateDisplay(), which will swap the widget out.
 	g_emu_thread->setSurfaceless(false);
 
 	// resume if we weren't paused at switch time
-	if (m_vm_paused && !m_was_paused_on_surface_loss)
+	if (s_vm_paused && !m_was_paused_on_surface_loss)
 		g_emu_thread->setVMPaused(false);
 
 	if (m_display_widget)
@@ -819,7 +856,7 @@ void MainWindow::switchToEmulationView()
 void MainWindow::refreshGameList(bool invalidate_cache)
 {
 	// can't do this while the VM is running because of CDVD
-	if (m_vm_valid)
+	if (s_vm_valid)
 		return;
 
 	m_game_list_widget->refresh(invalidate_cache);
@@ -847,7 +884,7 @@ void MainWindow::runOnUIThread(const std::function<void()>& func)
 
 bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_save_to_state /* = true */, bool block_until_done /* = false */)
 {
-	if (!VMManager::HasValidVM())
+	if (!s_vm_valid)
 		return true;
 
 	// If we don't have a crc, we can't save state.
@@ -880,6 +917,15 @@ bool MainWindow::requestShutdown(bool allow_confirm /* = true */, bool allow_sav
 		lock.cancelResume();
 	}
 
+	// This is a little bit annoying. Qt will close everything down if we don't have at least one window visible,
+	// but we might not be visible because the user is using render-to-separate and hide. We don't want to always
+	// reshow the main window during display updates, because otherwise fullscreen transitions and renderer switches
+	// would briefly show and then hide the main window. So instead, we do it on shutdown, here. Except if we're in
+	// batch mode, when we're going to exit anyway.
+	if (!isRenderingToMain() && isHidden() && !QtHost::InBatchMode())
+		updateWindowState(true);
+
+	// Now we can actually shut down the VM.
 	g_emu_thread->shutdownVM(save_state);
 
 	if (block_until_done || QtHost::InBatchMode())
@@ -910,7 +956,9 @@ void MainWindow::requestExit()
 void MainWindow::checkForSettingChanges()
 {
 	if (m_display_widget)
-		m_display_widget->updateRelativeMode(m_vm_valid && !m_vm_paused);
+		m_display_widget->updateRelativeMode(s_vm_valid && !s_vm_paused);
+
+	updateWindowState();
 }
 
 void Host::InvalidateSaveStateCache()
@@ -946,10 +994,16 @@ void MainWindow::onGameListEntryActivated()
 	if (!entry)
 		return;
 
-	if (m_vm_valid)
+	if (s_vm_valid)
 	{
 		// change disc on double click
-		doDiscChange(QString::fromStdString(entry->path));
+		if (!entry->IsDisc())
+		{
+			QMessageBox::critical(this, tr("Error"), tr("You must select a disc to change discs."));
+			return;
+		}
+
+		doDiscChange(CDVD_SourceType::Iso, QString::fromStdString(entry->path));
 		return;
 	}
 
@@ -996,7 +1050,7 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 
 		menu.addSeparator();
 
-		if (!m_vm_valid)
+		if (!s_vm_valid)
 		{
 			action = menu.addAction(tr("Default Boot"));
 			connect(action, &QAction::triggered, [this, entry]() { startGameListEntry(entry); });
@@ -1020,11 +1074,11 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 			menu.addSeparator();
 			populateLoadStateMenu(&menu, QString::fromStdString(entry->path), QString::fromStdString(entry->serial), entry->crc);
 		}
-		else
+		else if (entry->IsDisc())
 		{
 			action = menu.addAction(tr("Change Disc"));
 			connect(action, &QAction::triggered, [this, entry]() {
-				g_emu_thread->changeDisc(QString::fromStdString(entry->path));
+				g_emu_thread->changeDisc(CDVD_SourceType::Iso, QString::fromStdString(entry->path));
 				switchToEmulationView();
 			});
 			QtUtils::MarkActionAsDefault(action);
@@ -1041,12 +1095,20 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 
 void MainWindow::onStartFileActionTriggered()
 {
-	QString path =
-		QDir::toNativeSeparators(QFileDialog::getOpenFileName(this, tr("Select Disc Image"), QString(), tr(DISC_IMAGE_FILTER), nullptr));
+	const QString path(QDir::toNativeSeparators(QFileDialog::getOpenFileName(this, tr("Start File"), QString(), tr(OPEN_FILE_FILTER), nullptr)));
 	if (path.isEmpty())
 		return;
 
-	doStartDisc(path);
+	doStartFile(std::nullopt, path);
+}
+
+void MainWindow::onStartDiscActionTriggered()
+{
+	QString path(getDiscDevicePath(tr("Start Disc")));
+	if (path.isEmpty())
+		return;
+
+	doStartFile(CDVD_SourceType::Disc, path);
 }
 
 void MainWindow::onStartBIOSActionTriggered()
@@ -1062,7 +1124,7 @@ void MainWindow::onChangeDiscFromFileActionTriggered()
 	if (filename.isEmpty())
 		return;
 
-	g_emu_thread->changeDisc(filename);
+	g_emu_thread->changeDisc(CDVD_SourceType::Iso, filename);
 }
 
 void MainWindow::onChangeDiscFromGameListActionTriggered()
@@ -1073,7 +1135,16 @@ void MainWindow::onChangeDiscFromGameListActionTriggered()
 
 void MainWindow::onChangeDiscFromDeviceActionTriggered()
 {
-	// TODO
+	QString path(getDiscDevicePath(tr("Change Disc")));
+	if (path.isEmpty())
+		return;
+
+	g_emu_thread->changeDisc(CDVD_SourceType::Disc, path);
+}
+
+void MainWindow::onRemoveDiscActionTriggered()
+{
+	g_emu_thread->changeDisc(CDVD_SourceType::NoDisc, QString());
 }
 
 void MainWindow::onChangeDiscMenuAboutToShow()
@@ -1127,13 +1198,13 @@ void MainWindow::onViewGameGridActionTriggered()
 
 void MainWindow::onViewSystemDisplayTriggered()
 {
-	if (m_vm_valid)
+	if (s_vm_valid)
 		switchToEmulationView();
 }
 
 void MainWindow::onViewGamePropertiesActionTriggered()
 {
-	if (!m_vm_valid)
+	if (!s_vm_valid)
 		return;
 
 	// prefer to use a game list entry, if we have one, that way the summary is populated
@@ -1262,8 +1333,8 @@ void MainWindow::onLoggingOptionChanged()
 
 void MainWindow::onInputRecNewActionTriggered()
 {
-	const bool wasPaused = m_vm_paused;
-	const bool wasRunning = m_vm_valid;
+	const bool wasPaused = s_vm_paused;
+	const bool wasRunning = s_vm_valid;
 	if (wasRunning && !wasPaused)
 	{
 		VMManager::SetPaused(true);
@@ -1293,7 +1364,7 @@ void MainWindow::onInputRecNewActionTriggered()
 
 void MainWindow::onInputRecPlayActionTriggered()
 {
-	const bool wasPaused = m_vm_paused;
+	const bool wasPaused = s_vm_paused;
 
 	if (!wasPaused)
 		g_InputRecordingControls.PauseImmediately();
@@ -1341,7 +1412,7 @@ void MainWindow::onInputRecOpenSettingsTriggered()
 
 void MainWindow::onVMStarting()
 {
-	m_vm_valid = true;
+	s_vm_valid = true;
 	updateEmulationActions(true, false);
 	updateWindowTitle();
 
@@ -1351,7 +1422,7 @@ void MainWindow::onVMStarting()
 
 void MainWindow::onVMStarted()
 {
-	m_vm_valid = true;
+	s_vm_valid = true;
 	m_was_disc_change_request = false;
 	updateEmulationActions(true, true);
 	updateWindowTitle();
@@ -1366,7 +1437,7 @@ void MainWindow::onVMPaused()
 		m_ui.actionPause->setChecked(true);
 	}
 
-	m_vm_paused = true;
+	s_vm_paused = true;
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
 	m_status_fps_widget->setText(tr("Paused"));
@@ -1385,7 +1456,7 @@ void MainWindow::onVMResumed()
 		m_ui.actionPause->setChecked(false);
 	}
 
-	m_vm_paused = false;
+	s_vm_paused = false;
 	m_was_disc_change_request = false;
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
@@ -1400,11 +1471,12 @@ void MainWindow::onVMResumed()
 
 void MainWindow::onVMStopped()
 {
-	m_vm_valid = false;
-	m_vm_paused = false;
+	s_vm_valid = false;
+	s_vm_paused = false;
 	m_last_fps_status = QString();
 	updateEmulationActions(false, false);
 	updateWindowTitle();
+	updateWindowState();
 	updateStatusBarWidgetVisibility();
 
 	if (m_display_widget)
@@ -1489,8 +1561,8 @@ void MainWindow::dropEvent(QDropEvent* event)
 	const std::string filename_str(filename.toStdString());
 	if (VMManager::IsSaveStateFileName(filename_str))
 	{
-		// can't load a save state without a current VM 
-		if (m_vm_valid)
+		// can't load a save state without a current VM
+		if (s_vm_valid)
 		{
 			event->acceptProposedAction();
 			g_emu_thread->loadState(filename);
@@ -1504,11 +1576,11 @@ void MainWindow::dropEvent(QDropEvent* event)
 	{
 		// if we're already running, do a disc change, otherwise start
 		event->acceptProposedAction();
-		if (m_vm_valid)
-			doDiscChange(filename);
+		if (s_vm_valid)
+			doDiscChange(CDVD_SourceType::Iso, filename);
 		else
-			doStartDisc(filename);
-	}	
+			doStartFile(CDVD_SourceType::Iso, filename);
+	}
 }
 
 DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
@@ -1586,11 +1658,12 @@ DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 		setDisplayFullscreen(fullscreen_mode);
 
 	updateWindowTitle();
-	m_display_widget->setFocus();
+	updateWindowState();
 
+	m_display_widget->setFocus();
 	m_display_widget->setShouldHideCursor(shouldHideMouseCursor());
-	m_display_widget->updateRelativeMode(m_vm_valid && !m_vm_paused);
-	m_display_widget->updateCursor(m_vm_valid && !m_vm_paused);
+	m_display_widget->updateRelativeMode(s_vm_valid && !s_vm_paused);
+	m_display_widget->updateCursor(s_vm_valid && !s_vm_paused);
 
 	host_display->DoneRenderContextCurrent();
 	return m_display_widget;
@@ -1637,8 +1710,8 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main, b
 
 		m_display_widget->setFocus();
 		m_display_widget->setShouldHideCursor(shouldHideMouseCursor());
-		m_display_widget->updateRelativeMode(m_vm_valid && !m_vm_paused);
-		m_display_widget->updateCursor(m_vm_valid && !m_vm_paused);
+		m_display_widget->updateRelativeMode(s_vm_valid && !s_vm_paused);
+		m_display_widget->updateCursor(s_vm_valid && !s_vm_paused);
 
 		QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 		return m_display_widget;
@@ -1718,10 +1791,12 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main, b
 		setDisplayFullscreen(fullscreen_mode);
 
 	updateWindowTitle();
+	updateWindowState();
+
 	m_display_widget->setFocus();
 	m_display_widget->setShouldHideCursor(shouldHideMouseCursor());
-	m_display_widget->updateRelativeMode(m_vm_valid && !m_vm_paused);
-	m_display_widget->updateCursor(m_vm_valid && !m_vm_paused);
+	m_display_widget->updateRelativeMode(s_vm_valid && !s_vm_paused);
+	m_display_widget->updateCursor(s_vm_valid && !s_vm_paused);
 
 	QSignalBlocker blocker(m_ui.actionFullscreen);
 	m_ui.actionFullscreen->setChecked(fullscreen);
@@ -1741,27 +1816,28 @@ void MainWindow::displayResizeRequested(qint32 width, qint32 height)
 	if (m_display_container || !m_display_widget->parent())
 	{
 		// no parent - rendering to separate window. easy.
-		getDisplayContainer()->resize(QSize(std::max<qint32>(width, 1), std::max<qint32>(height, 1)));
+		QtUtils::ResizePotentiallyFixedSizeWindow(getDisplayContainer(), width, height);
 		return;
 	}
 
 	// we are rendering to the main window. we have to add in the extra height from the toolbar/status bar.
 	const s32 extra_height = this->height() - m_display_widget->height();
-	resize(QSize(std::max<qint32>(width, 1), std::max<qint32>(height + extra_height, 1)));
+	QtUtils::ResizePotentiallyFixedSizeWindow(this, width, height + extra_height);
 }
 
 void MainWindow::destroyDisplay()
 {
+	// Now we can safely destroy the display window.
 	destroyDisplayWidget();
 
-	// switch back to game list view, we're not going back to display, so we can't use switchToGameListView().
+	// Switch back to game list view, we're not going back to display, so we can't use switchToGameListView().
 	if (centralWidget() != m_game_list_widget)
 	{
 		takeCentralWidget();
 		setCentralWidget(m_game_list_widget);
 		m_game_list_widget->setVisible(true);
 		m_game_list_widget->setFocus();
-	}	
+	}
 }
 
 void MainWindow::focusDisplayWidget()
@@ -1902,6 +1978,44 @@ void MainWindow::doControllerSettings(ControllerSettingsDialog::Category categor
 		dlg->setCategory(category);
 }
 
+QString MainWindow::getDiscDevicePath(const QString& title)
+{
+	QString ret;
+
+	const std::vector<std::string> devices(GetOpticalDriveList());
+	if (devices.empty())
+	{
+		QMessageBox::critical(this, title,
+			tr("Could not find any CD/DVD-ROM devices. Please ensure you have a drive connected and "
+			   "sufficient permissions to access it."));
+		return ret;
+	}
+
+	// if there's only one, select it automatically
+	if (devices.size() == 1)
+	{
+		ret = QString::fromStdString(devices.front());
+		return ret;
+	}
+
+	QStringList input_options;
+	for (const std::string& name : devices)
+		input_options.append(QString::fromStdString(name));
+
+	QInputDialog input_dialog(this);
+	input_dialog.setWindowTitle(title);
+	input_dialog.setLabelText(tr("Select disc drive:"));
+	input_dialog.setInputMode(QInputDialog::TextInput);
+	input_dialog.setOptions(QInputDialog::UseListViewForComboBoxItems);
+	input_dialog.setComboBoxEditable(false);
+	input_dialog.setComboBoxItems(std::move(input_options));
+	if (input_dialog.exec() == 0)
+		return ret;
+
+	ret = input_dialog.textValue();
+	return ret;
+}
+
 void MainWindow::startGameListEntry(const GameList::Entry* entry, std::optional<s32> save_slot, std::optional<bool> fast_boot)
 {
 	std::shared_ptr<VMBootParameters> params = std::make_shared<VMBootParameters>();
@@ -2003,7 +2117,7 @@ std::optional<bool> MainWindow::promptForResumeState(const QString& save_state_p
 
 void MainWindow::loadSaveStateSlot(s32 slot)
 {
-	if (m_vm_valid)
+	if (s_vm_valid)
 	{
 		// easy when we're running
 		g_emu_thread->loadStateFromSlot(slot);
@@ -2022,10 +2136,10 @@ void MainWindow::loadSaveStateSlot(s32 slot)
 
 void MainWindow::loadSaveStateFile(const QString& filename, const QString& state_filename)
 {
-	if (m_vm_valid)
+	if (s_vm_valid)
 	{
 		if (!filename.isEmpty() && m_current_disc_path != filename)
-			g_emu_thread->changeDisc(m_current_disc_path);
+			g_emu_thread->changeDisc(CDVD_SourceType::Iso, m_current_disc_path);
 		g_emu_thread->loadState(state_filename);
 	}
 	else
@@ -2130,7 +2244,7 @@ void MainWindow::populateSaveStateMenu(QMenu* menu, const QString& serial, quint
 void MainWindow::updateSaveStateMenus(const QString& filename, const QString& serial, quint32 crc)
 {
 	const bool load_enabled = !serial.isEmpty();
-	const bool save_enabled = !serial.isEmpty() && m_vm_valid;
+	const bool save_enabled = !serial.isEmpty() && s_vm_valid;
 	m_ui.menuLoadState->clear();
 	m_ui.menuLoadState->setEnabled(load_enabled);
 	m_ui.actionLoadState->setEnabled(load_enabled);
@@ -2144,12 +2258,13 @@ void MainWindow::updateSaveStateMenus(const QString& filename, const QString& se
 		populateSaveStateMenu(m_ui.menuSaveState, serial, crc);
 }
 
-void MainWindow::doStartDisc(const QString& path)
+void MainWindow::doStartFile(std::optional<CDVD_SourceType> source, const QString& path)
 {
-	if (m_vm_valid)
+	if (s_vm_valid)
 		return;
 
 	std::shared_ptr<VMBootParameters> params = std::make_shared<VMBootParameters>();
+	params->source_type = source;
 	params->filename = path.toStdString();
 
 	// we might still be saving a resume state...
@@ -2166,7 +2281,7 @@ void MainWindow::doStartDisc(const QString& path)
 	g_emu_thread->startVM(std::move(params));
 }
 
-void MainWindow::doDiscChange(const QString& path)
+void MainWindow::doDiscChange(CDVD_SourceType source, const QString& path)
 {
 	bool reset_system = false;
 	if (!m_was_disc_change_request)
@@ -2180,7 +2295,7 @@ void MainWindow::doDiscChange(const QString& path)
 
 	switchToEmulationView();
 
-	g_emu_thread->changeDisc(path);
+	g_emu_thread->changeDisc(source, path);
 	if (reset_system)
 		g_emu_thread->resetVM();
 }
@@ -2188,7 +2303,7 @@ void MainWindow::doDiscChange(const QString& path)
 MainWindow::VMLock MainWindow::pauseAndLockVM()
 {
 	const bool was_fullscreen = isRenderingFullscreen();
-	const bool was_paused = m_vm_paused;
+	const bool was_paused = s_vm_paused;
 
 	// We use surfaceless rather than switching out of fullscreen, because
 	// we're paused, so we're not going to be rendering anyway.
@@ -2207,7 +2322,7 @@ MainWindow::VMLock MainWindow::pauseAndLockVM()
 MainWindow::VMLock::VMLock(QWidget* dialog_parent, bool was_paused, bool was_fullscreen)
 	: m_dialog_parent(dialog_parent)
 	, m_was_paused(was_paused)
-	, m_was_fullscreen(was_fullscreen)	
+	, m_was_fullscreen(was_fullscreen)
 {
 }
 
@@ -2235,3 +2350,12 @@ void MainWindow::VMLock::cancelResume()
 	m_was_fullscreen = false;
 }
 
+bool QtHost::IsVMValid()
+{
+	return s_vm_valid;
+}
+
+bool QtHost::IsVMPaused()
+{
+	return s_vm_paused;
+}

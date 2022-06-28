@@ -1294,30 +1294,33 @@ void VMManager::FrameAdvance(u32 num_frames /*= 1*/)
 	SetState(VMState::Running);
 }
 
-bool VMManager::ChangeDisc(std::string path)
+bool VMManager::ChangeDisc(CDVD_SourceType source, std::string path)
 {
-	std::string old_path(CDVDsys_GetFile(CDVD_SourceType::Iso));
-	CDVD_SourceType old_type = CDVDsys_GetSourceType();
+	const CDVD_SourceType old_type = CDVDsys_GetSourceType();
+	const std::string old_path(CDVDsys_GetFile(old_type));
 
-	const std::string display_name(path.empty() ? std::string() : FileSystem::GetDisplayNameFromPath(path));
-	CDVDsys_ChangeSource(path.empty() ? CDVD_SourceType::NoDisc : CDVD_SourceType::Iso);
+	const std::string display_name((source != CDVD_SourceType::Iso) ? path : FileSystem::GetDisplayNameFromPath(path));
+	CDVDsys_ChangeSource(source);
 	if (!path.empty())
-		CDVDsys_SetFile(CDVD_SourceType::Iso, std::move(path));
+		CDVDsys_SetFile(source, std::move(path));
 
 	const bool result = DoCDVDopen();
 	if (result)
 	{
-		Host::AddOSDMessage(fmt::format("Disc changed to '{}'.", display_name), 5.0f);
+		if (source == CDVD_SourceType::NoDisc)
+			Host::AddKeyedOSDMessage("ChangeDisc", "Disc removed.", 5.0f);
+		else
+			Host::AddKeyedOSDMessage("ChangeDisc", fmt::format("Disc changed to '{}'.", display_name), 5.0f);
 	}
 	else
 	{
-		Host::AddOSDMessage(fmt::format("Failed to open new disc image '{}'. Reverting to old image.", display_name), 20.0f);
+		Host::AddKeyedOSDMessage("ChangeDisc", fmt::format("Failed to open new disc image '{}'. Reverting to old image.", display_name), 20.0f);
 		CDVDsys_ChangeSource(old_type);
 		if (!old_path.empty())
 			CDVDsys_SetFile(old_type, std::move(old_path));
 		if (!DoCDVDopen())
 		{
-			Host::AddOSDMessage("Failed to switch back to old disc image. Removing disc.", 20.0f);
+			Host::AddKeyedOSDMessage("ChangeDisc", "Failed to switch back to old disc image. Removing disc.", 20.0f);
 			CDVDsys_ChangeSource(CDVD_SourceType::NoDisc);
 			DoCDVDopen();
 		}

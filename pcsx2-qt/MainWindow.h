@@ -39,6 +39,8 @@ namespace GameList
 	struct Entry;
 }
 
+enum class CDVD_SourceType : uint8_t;
+
 class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
@@ -111,10 +113,12 @@ private Q_SLOTS:
 	void onGameListEntryContextMenuRequested(const QPoint& point);
 
 	void onStartFileActionTriggered();
+	void onStartDiscActionTriggered();
 	void onStartBIOSActionTriggered();
 	void onChangeDiscFromFileActionTriggered();
 	void onChangeDiscFromGameListActionTriggered();
 	void onChangeDiscFromDeviceActionTriggered();
+	void onRemoveDiscActionTriggered();
 	void onChangeDiscMenuAboutToShow();
 	void onChangeDiscMenuAboutToHide();
 	void onLoadStateMenuAboutToShow();
@@ -179,6 +183,7 @@ private:
 	void updateEmulationActions(bool starting, bool running);
 	void updateStatusBarWidgetVisibility();
 	void updateWindowTitle();
+	void updateWindowState(bool force_visible = false);
 	void setProgressBar(int current, int total);
 	void clearProgressBar();
 
@@ -201,6 +206,8 @@ private:
 	ControllerSettingsDialog* getControllerSettingsDialog();
 	void doControllerSettings(ControllerSettingsDialog::Category category = ControllerSettingsDialog::Category::Count);
 
+	QString getDiscDevicePath(const QString& title);
+
 	void startGameListEntry(const GameList::Entry* entry, std::optional<s32> save_slot = std::nullopt,
 		std::optional<bool> fast_boot = std::nullopt);
 	void setGameListEntryCoverImage(const GameList::Entry* entry);
@@ -211,8 +218,8 @@ private:
 	void populateLoadStateMenu(QMenu* menu, const QString& filename, const QString& serial, quint32 crc);
 	void populateSaveStateMenu(QMenu* menu, const QString& serial, quint32 crc);
 	void updateSaveStateMenus(const QString& filename, const QString& serial, quint32 crc);
-	void doStartDisc(const QString& path);
-	void doDiscChange(const QString& path);
+	void doStartFile(std::optional<CDVD_SourceType> source, const QString& path);
+	void doDiscChange(CDVD_SourceType source, const QString& path);
 
 	Ui::MainWindow m_ui;
 
@@ -234,8 +241,7 @@ private:
 	QString m_current_game_serial;
 	QString m_current_game_name;
 	quint32 m_current_game_crc;
-	bool m_vm_valid = false;
-	bool m_vm_paused = false;
+
 	bool m_save_states_invalidated = false;
 	bool m_was_paused_on_surface_loss = false;
 	bool m_was_disc_change_request = false;

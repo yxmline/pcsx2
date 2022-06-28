@@ -108,13 +108,24 @@ void EmuThread::startVM(std::shared_ptr<VMBootParameters> boot_params)
 
 	// create the display, this may take a while...
 	m_is_fullscreen = boot_params->fullscreen.value_or(Host::GetBaseBoolSettingValue("UI", "StartFullscreen", false));
-	m_is_rendering_to_main = Host::GetBaseBoolSettingValue("UI", "RenderToMainWindow", true);
+	m_is_rendering_to_main = !Host::GetBaseBoolSettingValue("UI", "RenderToSeparateWindow", false);
 	m_is_surfaceless = false;
 	m_save_state_on_shutdown = false;
 	if (!VMManager::Initialize(*boot_params))
 		return;
 
-	VMManager::SetState(VMState::Running);
+	if (!Host::GetBoolSettingValue("UI", "StartPaused", false))
+	{
+		// This will come back and call OnVMResumed().
+		VMManager::SetState(VMState::Running);
+	}
+	else
+	{
+		// When starting paused, redraw the window, so there's at least something there.
+		redrawDisplayWindow();
+		Host::OnVMPaused();
+	}
+
 	m_event_loop->quit();
 }
 
@@ -236,6 +247,7 @@ void EmuThread::run()
 	reloadInputSources();
 	createBackgroundControllerPollTimer();
 	startBackgroundControllerPollTimer();
+	connectSignals();
 
 	while (!m_shutdown_flag.load())
 	{
@@ -266,6 +278,7 @@ void EmuThread::destroyVM()
 	m_last_video_fps = 0.0f;
 	m_last_internal_width = 0;
 	m_last_internal_height = 0;
+	m_was_paused_by_focus_loss = false;
 	VMManager::Shutdown(m_save_state_on_shutdown);
 }
 
@@ -425,6 +438,12 @@ void EmuThread::updateEmuFolders()
 void EmuThread::loadOurSettings()
 {
 	m_verbose_status = Host::GetBaseBoolSettingValue("UI", "VerboseStatusBar", false);
+	m_pause_on_focus_loss = Host::GetBaseBoolSettingValue("UI", "PauseOnFocusLoss", false);
+}
+
+void EmuThread::connectSignals()
+{
+	connect(qApp, &QGuiApplication::applicationStateChanged, this, &EmuThread::onApplicationStateChanged);
 }
 
 void EmuThread::checkForSettingChanges()
@@ -433,7 +452,7 @@ void EmuThread::checkForSettingChanges()
 
 	if (VMManager::HasValidVM())
 	{
-		const bool render_to_main = Host::GetBaseBoolSettingValue("UI", "RenderToMainWindow", true);
+		const bool render_to_main = !Host::GetBaseBoolSettingValue("UI", "RenderToSeparateWindow", false);
 		if (!m_is_fullscreen && m_is_rendering_to_main != render_to_main)
 		{
 			m_is_rendering_to_main = render_to_main;
@@ -478,18 +497,18 @@ void EmuThread::switchRenderer(GSRendererType renderer)
 	GetMTGS().SwitchRenderer(renderer);
 }
 
-void EmuThread::changeDisc(const QString& path)
+void EmuThread::changeDisc(CDVD_SourceType source, const QString& path)
 {
 	if (!isOnEmuThread())
 	{
-		QMetaObject::invokeMethod(this, "changeDisc", Qt::QueuedConnection, Q_ARG(const QString&, path));
+		QMetaObject::invokeMethod(this, "changeDisc", Qt::QueuedConnection, Q_ARG(CDVD_SourceType, source), Q_ARG(const QString&, path));
 		return;
 	}
 
 	if (!VMManager::HasValidVM())
 		return;
 
-	VMManager::ChangeDisc(path.toStdString());
+	VMManager::ChangeDisc(source, path.toStdString());
 }
 
 void EmuThread::reloadPatches()
@@ -594,9 +613,8 @@ void EmuThread::connectDisplaySignals(DisplayWidget* widget)
 {
 	widget->disconnect(this);
 
-	connect(widget, &DisplayWidget::windowFocusEvent, this, &EmuThread::onDisplayWindowFocused);
 	connect(widget, &DisplayWidget::windowResizedEvent, this, &EmuThread::onDisplayWindowResized);
-	// connect(widget, &DisplayWidget::windowRestoredEvent, this, &EmuThread::redrawDisplayWindow);
+	connect(widget, &DisplayWidget::windowRestoredEvent, this, &EmuThread::redrawDisplayWindow);
 }
 
 void EmuThread::onDisplayWindowResized(int width, int height, float scale)
@@ -607,7 +625,46 @@ void EmuThread::onDisplayWindowResized(int width, int height, float scale)
 	GetMTGS().ResizeDisplayWindow(width, height, scale);
 }
 
-void EmuThread::onDisplayWindowFocused() {}
+void EmuThread::onApplicationStateChanged(Qt::ApplicationState state)
+{
+	// NOTE: This is executed on the emu thread, not UI thread.
+	if (!m_pause_on_focus_loss || !VMManager::HasValidVM())
+		return;
+
+	const bool focus_loss = (state != Qt::ApplicationActive);
+	if (focus_loss)
+	{
+		if (!m_was_paused_by_focus_loss && VMManager::GetState() == VMState::Running)
+		{
+			m_was_paused_by_focus_loss = true;
+			VMManager::SetPaused(true);
+		}
+	}
+	else
+	{
+		if (m_was_paused_by_focus_loss)
+		{
+			m_was_paused_by_focus_loss = false;
+			if (VMManager::GetState() == VMState::Paused)
+				VMManager::SetPaused(false);
+		}
+	}
+}
+
+void EmuThread::redrawDisplayWindow()
+{
+	if (!isOnEmuThread())
+	{
+		QMetaObject::invokeMethod(this, &EmuThread::redrawDisplayWindow, Qt::QueuedConnection);
+		return;
+	}
+
+	// If we're running, we're going to re-present anyway.
+	if (!VMManager::HasValidVM() || VMManager::GetState() == VMState::Running)
+		return;
+
+	GetMTGS().RunOnGSThread([]() { GetMTGS().PresentCurrentFrame(); });
+}
 
 void EmuThread::runOnCPUThread(const std::function<void()>& func)
 {

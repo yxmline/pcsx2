@@ -30,6 +30,8 @@
 class DisplayWidget;
 struct VMBootParameters;
 
+enum class CDVD_SourceType : uint8_t;
+
 class EmuThread : public QThread
 {
 	Q_OBJECT
@@ -43,6 +45,7 @@ public:
 
 	__fi QEventLoop* getEventLoop() const { return m_event_loop; }
 	__fi bool isFullscreen() const { return m_is_fullscreen; }
+	__fi bool isRenderingToMain() const { return m_is_rendering_to_main; }
 
 	bool isOnEmuThread() const;
 
@@ -73,7 +76,7 @@ public Q_SLOTS:
 	void updateEmuFolders();
 	void toggleSoftwareRendering();
 	void switchRenderer(GSRendererType renderer);
-	void changeDisc(const QString& path);
+	void changeDisc(CDVD_SourceType source, const QString& path);
 	void reloadPatches();
 	void reloadInputSources();
 	void reloadInputBindings();
@@ -139,12 +142,14 @@ private:
 	void createBackgroundControllerPollTimer();
 	void destroyBackgroundControllerPollTimer();
 	void loadOurSettings();
+	void connectSignals();
 
 private Q_SLOTS:
 	void stopInThread();
 	void doBackgroundControllerPoll();
 	void onDisplayWindowResized(int width, int height, float scale);
-	void onDisplayWindowFocused();
+	void onApplicationStateChanged(Qt::ApplicationState state);
+	void redrawDisplayWindow();
 
 private:
 	QThread* m_ui_thread;
@@ -159,6 +164,9 @@ private:
 	bool m_is_fullscreen = false;
 	bool m_is_surfaceless = false;
 	bool m_save_state_on_shutdown = false;
+	bool m_pause_on_focus_loss = false;
+
+	bool m_was_paused_by_focus_loss = false;
 
 	float m_last_speed = 0.0f;
 	float m_last_game_fps = 0.0f;
