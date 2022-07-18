@@ -1277,6 +1277,43 @@ void GSRendererHW::Draw()
 	//  Test if we can optimize Alpha Test as a NOP
 	context->TEST.ATE = context->TEST.ATE && !GSRenderer::TryAlphaTest(fm, fm_mask, zm);
 
+	// Need to fix the alpha test, since the alpha will be fixed to 1.0 if ABE is disabled and AA1 is enabled
+	// So if it doesn't meet the condition, always fail, if it does, always pass (turn off the test).
+	if (IsCoverageAlpha() && context->TEST.ATE && context->TEST.ATST > 1)
+	{
+		const float aref = (float)context->TEST.AREF;
+		const int old_ATST = context->TEST.ATST;
+		context->TEST.ATST = 0;
+
+		switch (old_ATST)
+		{
+			case ATST_LESS:
+				if (128.0f < aref)
+					context->TEST.ATE = false;
+				break;
+			case ATST_LEQUAL:
+				if (128.0f <= aref)
+					context->TEST.ATE = false;
+				break;
+			case ATST_EQUAL:
+				if (128.0f == aref)
+					context->TEST.ATE = false;
+				break;
+			case ATST_GEQUAL:
+				if (128.0f >= aref)
+					context->TEST.ATE = false;
+				break;
+			case ATST_GREATER:
+				if (128.0f > aref)
+					context->TEST.ATE = false;
+				break;
+			case ATST_NOTEQUAL:
+				if (128.0f != aref)
+					context->TEST.ATE = false;
+				break;
+		}
+	}
+
 	context->FRAME.FBMSK = fm;
 	context->ZBUF.ZMSK = zm != 0;
 
@@ -2336,7 +2373,7 @@ void GSRendererHW::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER, bool& 
 {
 	// AA1: Don't enable blending on AA1, not yet implemented on hardware mode,
 	// it requires coverage sample so it's safer to turn it off instead.
-	const bool AA1 = PRIM->AA1 && (m_vt.m_primclass == GS_LINE_CLASS);
+	const bool AA1 = PRIM->AA1 && (m_vt.m_primclass == GS_LINE_CLASS || m_vt.m_primclass == GS_TRIANGLE_CLASS);
 	// PABE: Check condition early as an optimization.
 	const bool PABE = PRIM->ABE && m_env.PABE.PABE && (GetAlphaMinMax().max < 128);
 	// FBMASK: Color is not written, no need to do blending.
@@ -2361,10 +2398,18 @@ void GSRendererHW::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER, bool& 
 	m_conf.ps.blend_c = ALPHA.C;
 	m_conf.ps.blend_d = ALPHA.D;
 
+	// When AA1 is enabled and Alpha Blending is disabled, alpha blending done with coverage instead of alpha.
+	// We use a COV value of 128 (full coverage) in triangles (except the edge geometry, which we can't do easily).
+	if (IsCoverageAlpha())
+	{
+		m_conf.ps.fixed_one_a = 1;
+		m_conf.ps.blend_c = 0;
+	}
+
 	// Get alpha value
-	const bool alpha_c0_zero = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max == 0);
-	const bool alpha_c0_one = (m_conf.ps.blend_c == 0 && (GetAlphaMinMax().min == 128) && (GetAlphaMinMax().max == 128));
-	const bool alpha_c0_high_max_one = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max > 128);
+	const bool alpha_c0_zero = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max == 0) && !IsCoverageAlpha();
+	const bool alpha_c0_one = (m_conf.ps.blend_c == 0 && (GetAlphaMinMax().min == 128) && (GetAlphaMinMax().max == 128)) || IsCoverageAlpha();
+	const bool alpha_c0_high_max_one = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max > 128) && !IsCoverageAlpha();
 	const bool alpha_c2_zero = (m_conf.ps.blend_c == 2 && ALPHA.FIX == 0u);
 	const bool alpha_c2_one = (m_conf.ps.blend_c == 2 && ALPHA.FIX == 128u);
 	const bool alpha_c2_high_one = (m_conf.ps.blend_c == 2 && ALPHA.FIX > 128u);
@@ -3253,7 +3298,8 @@ void GSRendererHW::DrawPrims(GSTexture* rt, GSTexture* ds, GSTextureCache::Sourc
 				DATE_BARRIER = true;
 			}
 		}
-		else if (m_context->FBA.FBA)
+		// When Blending is disabled and Edge Anti Aliasing is enabled, the output alpha is Coverage (which we force to 128) so DATE will fail/pass guaranteed on second pass.
+		else if (m_conf.colormask.wa && (m_context->FBA.FBA || IsCoverageAlpha()))
 		{
 			GL_PERF("DATE: Fast with FBA, all pixels will be >= 128");
 			DATE_one = !m_context->TEST.DATM;
