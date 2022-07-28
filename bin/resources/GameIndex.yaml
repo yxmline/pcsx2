@@ -2599,6 +2599,9 @@ SCES-50000:
   gsHWFixes:
     cpuFramebufferConversion: 1
     textureInsideRT: 1
+    halfPixelOffset: 2 # Fixes title screen and some intro post processing alignment.
+    roundSprite: 1 # Fixes ui and hud alignment.
+    texturePreloading: 0 # Disabling for major speedup.
 SCES-50001:
   name: "Tekken Tag Tournament"
   region: "PAL-M5"
@@ -21394,13 +21397,13 @@ SLES-82030:
   name: "Shadow Hearts - Covenant [Disc1of2]"
   region: "PAL-M3"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
 SLES-82031:
   name: "Shadow Hearts - Covenant [Disc2of2]"
   region: "PAL-M3"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
   memcardFilters:
     - "SLES-82030"
@@ -23109,6 +23112,9 @@ SLPM-60109:
   gsHWFixes:
     cpuFramebufferConversion: 1
     textureInsideRT: 1
+    halfPixelOffset: 2 # Fixes title screen and some intro post processing alignment.
+    roundSprite: 1 # Fixes ui and hud alignment.
+    texturePreloading: 0 # Disabling for major speedup.
 SLPM-60123:
   name: "Gekikuukan Pro Baseball - The End of the Century 1999 [Trial]"
   region: "NTSC-J"
@@ -32837,6 +32843,9 @@ SLPS-20001:
   gsHWFixes:
     cpuFramebufferConversion: 1
     textureInsideRT: 1
+    halfPixelOffset: 2 # Fixes title screen and some intro post processing alignment.
+    roundSprite: 1 # Fixes ui and hud alignment.
+    texturePreloading: 0 # Disabling for major speedup.
 SLPS-20002:
   name: "Doukyu Billiards"
   region: "NTSC-J"
@@ -35161,13 +35170,13 @@ SLPS-25317:
   name: "Shadow Hearts 2 [Deluxe Pack] [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
 SLPS-25318:
   name: "Shadow Hearts 2 [Deluxe Pack] [Disc2of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
   memcardFilters:
     - "SLPS-25317"
@@ -35214,13 +35223,13 @@ SLPS-25334:
   name: "Shadow Hearts 2 [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
 SLPS-25335:
   name: "Shadow Hearts 2 [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
   memcardFilters:
     - "SLPS-25334"
@@ -37558,13 +37567,13 @@ SLPS-73214:
   name: "Shadow Hearts 2 [Director's Cut] [PlayStation 2 The Best] [Disc1of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
 SLPS-73215:
   name: "Shadow Hearts 2 [Director's Cut] [PlayStation 2 The Best] [Disc2of2]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
   memcardFilters:
     - "SLPS-73214"
@@ -38004,6 +38013,9 @@ SLUS-20002:
   gsHWFixes:
     cpuFramebufferConversion: 1
     textureInsideRT: 1
+    halfPixelOffset: 2 # Fixes title screen and some intro post processing alignment.
+    roundSprite: 1 # Fixes ui and hud alignment.
+    texturePreloading: 0 # Disabling for major speedup.
 SLUS-20003:
   name: "Portal Runner"
   region: "NTSC-U"
@@ -42571,7 +42583,7 @@ SLUS-21041:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
 SLUS-21042:
   name: "Darkwatch"
@@ -42586,7 +42598,7 @@ SLUS-21044:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
+    halfPixelOffset: 2 # Fixes blurrines, preload frame for FMV breaks visuals with this setting.
     disablePartialInvalidation: 1 # Fixes shadows when upscaling.
   memcardFilters:
     - "SLUS-21041"
