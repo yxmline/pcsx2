@@ -237,9 +237,6 @@ const CRC::Game CRC::m_games[] =
 	{0xDDF76A98, BurnoutGames, JP, 0}, // BurnoutDominator
 	{0x8C9576B4, BurnoutGames, EU, 0}, // BurnoutDominator
 	{0x8C9C76B4, BurnoutGames, EU, 0}, // BurnoutDominator
-	{0x4A0E5B3A, MidnightClub3, US, 0}, // dub
-	{0xEBE1972D, MidnightClub3, EU, 0}, // dub
-	{0x60A42FF5, MidnightClub3, US, 0}, // remix
 	{0x43AB7214, TalesOfLegendia, US, 0},
 	{0x1F8640E0, TalesOfLegendia, JP, 0},
 	{0xE4F5DA2B, TalesOfLegendia, KO, 0},
@@ -258,12 +255,6 @@ const CRC::Game CRC::m_games[] =
 	{0x97E9C87E, YakuzaGames, US, 0}, // Yakuza2
 	{0xB1EBD841, YakuzaGames, US, 0}, // Yakuza2
 	{0xC6B95C48, YakuzaGames, JP, 0}, // Yakuza2
-	{0x9000252A, SkyGunner, JP, 0},
-	{0x93092623, SkyGunner, JP, 0},
-	{0xA9461CB2, SkyGunner, US, 0},
-	{0xC71DE999, SkyGunner, US, 0}, // Regular Demo
-	{0xAADF3287, SkyGunner, US, 0}, // Trade Demo
-	{0xB799A60C, SkyGunner, NoRegion, 0},
 	{0x2905C5C6, ZettaiZetsumeiToshi2, US, 0}, // Raw Danger!
 	{0xC988ECBB, ZettaiZetsumeiToshi2, JP, 0},
 	{0x90F4B057, ZettaiZetsumeiToshi2, CH, 0},
