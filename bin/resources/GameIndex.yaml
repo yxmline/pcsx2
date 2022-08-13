@@ -14242,19 +14242,16 @@ SLES-52588:
   region: "PAL-E"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLES-52589:
   name: "Mercenaries"
   region: "PAL-F"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLES-52590:
   name: "Mercenaries"
   region: "PAL-G"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLES-52591:
   name: "Dynasty Warriors 4 - Empires"
   region: "PAL-E"
@@ -15218,7 +15215,6 @@ SLES-53008:
   region: "PAL-I-S"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLES-53009:
   name: "Dance Factory"
   region: "PAL-M5"
@@ -22800,7 +22796,7 @@ SLPM-55040:
   name: "Soukoku no Kusabi - Hiiro no Kakera 3"
   region: "NTSC-J"
 SLPM-55042:
-  name: "Suika A.S Eternal Name  - Sweet So Sweet [Best Edition]"
+  name: "Suika A.S+ Eternal Name - Sweet So Sweet [Best Edition]"
   region: "NTSC-J"
 SLPM-55041:
   name: "Kanokon - Esuii"
@@ -24084,7 +24080,7 @@ SLPM-62244:
   name: "Choro Q - High Grade 3"
   region: "NTSC-J"
 SLPM-62245:
-  name: "Yuusei Kara no Buutai - Episode 2"
+  name: "Yuusei kara no Buttai X - Episode II"
   region: "NTSC-J"
 SLPM-62247:
   name: "Shin Contra"
@@ -27204,7 +27200,7 @@ SLPM-65465:
   gameFixes:
     - EETimingHack
 SLPM-65466:
-  name: "Kousen Gaeri - Refrain"
+  name: "Yomigaeri - Refrain"
   region: "NTSC-J"
 SLPM-65468:
   name: "Roommate Asami - D-Collection"
@@ -28742,7 +28738,6 @@ SLPM-65942:
   region: "NTSC-J"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLPM-65943:
   name: "Angel's Feather"
   region: "NTSC-J"
@@ -30597,7 +30592,6 @@ SLPM-66465:
   region: "NTSC-J"
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLPM-66467:
   name: "Midway Arcade Treasures - The Game Center of USA"
   region: "NTSC-J"
@@ -31791,7 +31785,7 @@ SLPM-66786:
   name: "Gift - Prism [Broccoli Best Quality]"
   region: "NTSC-J"
 SLPM-66787:
-  name: "Tsuika AS+ Eternal Name"
+  name: "Suika A.S+ Eternal Name"
   region: "NTSC-J"
 SLPM-66788:
   name: "Grand Theft Auto - San Andreas [Best Price]"
@@ -32992,6 +32986,10 @@ SLPM-74405:
 SLPM-74406:
   name: "World Rally Championship [PlayStation 2 The Best]"
   region: "NTSC-J"
+  roundModes:
+    eeRoundMode: 0 # Fixes crash when using the Subaru.
+  gameFixes:
+    - XGKickHack # Fixes SPS while ingame.
 SLPM-74407:
   name: "Jet de Go! 2 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -34677,6 +34675,8 @@ SLPS-25099:
   region: "NTSC-J"
   roundModes:
     eeRoundMode: 0 # Fixes crash when using the Subaru.
+  gameFixes:
+    - XGKickHack # Fixes SPS while ingame.
 SLPS-25100:
   name: "Tekken 4"
   region: "NTSC-J"
@@ -37733,7 +37733,7 @@ SLPS-73203:
     - "SLPS-73202"
     - "SLPS-73203"
 SLPS-73204:
-  name: "Zettai Zetsumi Toshi [PlayStation 2 The Best]"
+  name: "Zettai Zetsumei Toshi [PlayStation 2 The Best]"
   region: "NTSC-J"
   gsHWFixes:
     autoFlush: 1 # Fixes incorrect blur effect.
@@ -42250,7 +42250,6 @@ SLUS-20932:
   compat: 5
   gsHWFixes:
     halfBottomOverride: 1 # Bottom screen has wrong colors.
-    halfPixelOffset: 1 # Fixes bloom misalignment.
 SLUS-20933:
   name: "Smash Court Pro Tournament Tennis 2"
   region: "NTSC-U"
