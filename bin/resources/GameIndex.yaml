@@ -12477,6 +12477,8 @@ SLES-51750:
   name: "Charlie's Angels"
   region: "PAL-M3"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Helps blur.
 SLES-51752:
   name: "Tony Hawks Underground"
   region: "PAL-Unk"
@@ -15719,6 +15721,9 @@ SLES-53200:
   name: "DragonBall Z - Budokai Tenkaichi"
   region: "PAL-M6"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines when powering up.
+    roundSprite: 2 # Fixes misaligned bloom.
 SLES-53201:
   name: "Saint Seiya Chapter Sanctuary"
   region: "PAL-M5"
@@ -21285,6 +21290,8 @@ SLES-55605:
   compat: 5
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
+  gsHWFixes:
+    halfPixelOffset: 1 # Corrects post processing position.
 SLES-55609:
   name: "Scooby-Doo! and the Spooky Swamp"
   region: "PAL-M5"
@@ -22526,6 +22533,9 @@ SLKA-25307:
   name: "Dragon Ball Z Sparking"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines when powering up.
+    roundSprite: 2 # Fixes misaligned bloom.
 SLKA-25311:
   name: "Marvel Nemesis - Rise of the Imperfects"
   region: "NTSC-K"
@@ -32682,6 +32692,8 @@ SLPM-68019:
   region: "NTSC-J"
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
+  gsHWFixes:
+    halfPixelOffset: 1 # Corrects post processing position.
 SLPM-68503:
   name: "Metal Gear Solid 2 - Sons of Liberty [Shareholder Edition]"
   region: "NTSC-J"
@@ -36276,6 +36288,9 @@ SLPS-25559:
 SLPS-25560:
   name: "Dragon Ball Z - Sparking!"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines when powering up.
+    roundSprite: 2 # Fixes misaligned bloom.
 SLPS-25561:
   name: "MotoGP 4"
   region: "NTSC-J"
@@ -37282,6 +37297,8 @@ SLPS-25837:
   region: "NTSC-J"
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
+  gsHWFixes:
+    halfPixelOffset: 1 # Corrects post processing position.
 SLPS-25838:
   name: "Taiheiyou no Arashi - Senkan Yamato, Akatsuki ni Shutsugeki su"
   region: "NTSC-J"
@@ -43725,6 +43742,9 @@ SLUS-21227:
   name: "Dragon Ball Z - Budokai Tenkaichi"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines when powering up.
+    roundSprite: 2 # Fixes misaligned bloom.
 SLUS-21228:
   name: "Call of Duty 2 - Big Red One"
   region: "NTSC-U"
