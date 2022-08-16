@@ -2612,6 +2612,7 @@ void GSRendererHW::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER, bool& 
 			// A fast algo that requires 2 passes
 			GL_INS("COLCLIP Fast HDR mode ENABLED");
 			m_conf.ps.hdr = 1;
+			blend_mix = false;
 			sw_blending   = true; // Enable sw blending for the HDR algo
 		}
 		else if (sw_blending)
@@ -2712,7 +2713,7 @@ void GSRendererHW::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER, bool& 
 		{
 			// For mixed blend, the source blend is done in the shader (so we use CONST_ONE as a factor).
 			m_conf.blend = {true, GSDevice::CONST_ONE, blend.dst, blend.op, m_conf.ps.blend_c == 2, ALPHA.FIX};
-			m_conf.ps.blend_mix = 1;
+			m_conf.ps.blend_mix = (blend.op == GSDevice::OP_REV_SUBTRACT) ? 2 : 1;
 			
 			// Elide DSB colour output if not used by dest.
 			m_conf.ps.no_color1 |= !GSDevice::IsDualSourceBlendFactor(blend.dst);
