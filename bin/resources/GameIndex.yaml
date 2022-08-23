@@ -8642,7 +8642,6 @@ SLAJ-25094:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
-    mipmap: 2 # Fixes over sharpening.
 SLAJ-25095:
   name: "Medal of Honor - Vanguard"
   region: "NTSC-Unk"
@@ -19104,7 +19103,6 @@ SLES-54627:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
-    mipmap: 2 # Fixes over sharpening.
 SLES-54628:
   name: "Skate Attack [Promo]"
   region: "PAL-E"
@@ -19264,7 +19262,6 @@ SLES-54681:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
-    mipmap: 2 # Fixes over sharpening.
 SLES-54683:
   name: "Medal of Honor - Vanguard"
   region: "PAL-M9"
@@ -31698,7 +31695,6 @@ SLPM-66739:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
-    mipmap: 2 # Fixes over sharpening.
 SLPM-66740:
   name: "Sentou Kokka Kai - Legend [DX Pack]"
   region: "NTSC-J"
@@ -45622,7 +45618,6 @@ SLUS-21596:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
-    mipmap: 2 # Fixes over sharpening.
 SLUS-21597:
   name: "Medal of Honor - Vanguard"
   region: "NTSC-U"
