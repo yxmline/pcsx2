@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-06-13 06:59+0800\n"
+"POT-Creation-Date: 2022-08-27 00:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,80 +39,80 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:70
+#: pcsx2/DEV9/ConfigUI.cpp:72
 msgid "Auto"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:120
+#: pcsx2/DEV9/ConfigUI.cpp:122
 msgid "Network and HDD Settings"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:129
+#: pcsx2/DEV9/ConfigUI.cpp:131
 msgid "Ethernet"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:131 pcsx2/DEV9/ConfigUI.cpp:159
-#: pcsx2/DEV9/ConfigUI.cpp:183
+#: pcsx2/DEV9/ConfigUI.cpp:133 pcsx2/DEV9/ConfigUI.cpp:161
+#: pcsx2/DEV9/ConfigUI.cpp:185
 msgid "Enabled"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:153
+#: pcsx2/DEV9/ConfigUI.cpp:155
 msgid "Ethernet Device Type:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:154
+#: pcsx2/DEV9/ConfigUI.cpp:156
 msgid "Ethernet Device:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:155
+#: pcsx2/DEV9/ConfigUI.cpp:157
 msgid "Intercept DHCP:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:156
+#: pcsx2/DEV9/ConfigUI.cpp:158
 msgid "PS2 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:172
+#: pcsx2/DEV9/ConfigUI.cpp:174
 msgid "Subnet Mask:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:173
+#: pcsx2/DEV9/ConfigUI.cpp:175
 msgid "Gateway Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:174
+#: pcsx2/DEV9/ConfigUI.cpp:176
 msgid "DNS1 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:175
+#: pcsx2/DEV9/ConfigUI.cpp:177
 msgid "DNS2 Address:"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:181
+#: pcsx2/DEV9/ConfigUI.cpp:183
 msgid "Hard Disk Drive"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:185
+#: pcsx2/DEV9/ConfigUI.cpp:187
 msgid "HDD File"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:186
+#: pcsx2/DEV9/ConfigUI.cpp:188
 msgid "HDD image file"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:187
+#: pcsx2/DEV9/ConfigUI.cpp:189
 msgid "HDD Size (GiB)"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:399
+#: pcsx2/DEV9/ConfigUI.cpp:401
 msgid "Please select an ethernet adapter or disable ethernet"
 msgstr ""
 
-#: pcsx2/DEV9/ConfigUI.cpp:401
+#: pcsx2/DEV9/ConfigUI.cpp:403
 msgid "Please specify a HDD file or disable the hard drive"
 msgstr ""
 
-#: pcsx2/GS/Window/GSwxDialog.cpp:729
+#: pcsx2/GS/Window/GSwxDialog.cpp:725
 msgid "Default Adapter"
 msgstr ""
 
@@ -150,7 +150,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr ""
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:50 pcsx2/gui/AppInit.cpp:690
+#: pcsx2/Recording/NewRecordingFrame.cpp:50 pcsx2/gui/AppInit.cpp:694
 msgid "Cancel"
 msgstr ""
 
@@ -163,31 +163,31 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:977
+#: pcsx2/gui/AppConfig.cpp:976
 msgid "Safest (No hacks)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:978
+#: pcsx2/gui/AppConfig.cpp:977
 msgid "Safe (Default)"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:979
+#: pcsx2/gui/AppConfig.cpp:978
 msgid "Balanced"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1366
+#: pcsx2/gui/AppConfig.cpp:1365
 msgid "File name empty or too short"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1372
+#: pcsx2/gui/AppConfig.cpp:1371
 msgid "File name outside of required directory"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1378 pcsx2/gui/AppConfig.cpp:1383
+#: pcsx2/gui/AppConfig.cpp:1377 pcsx2/gui/AppConfig.cpp:1382
 msgid "File name already exists"
 msgstr ""
 
-#: pcsx2/gui/AppConfig.cpp:1390
+#: pcsx2/gui/AppConfig.cpp:1389
 msgid "The Operating-System prevents this file from being created"
 msgstr ""
 
@@ -299,71 +299,71 @@ msgstr ""
 msgid "%s Critical Error"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:688
+#: pcsx2/gui/AppInit.cpp:692
 msgid "OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:689
+#: pcsx2/gui/AppInit.cpp:693
 msgid "&OK"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:691
+#: pcsx2/gui/AppInit.cpp:695
 msgid "&Cancel"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:692
+#: pcsx2/gui/AppInit.cpp:696
 msgid "&Apply"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:693
+#: pcsx2/gui/AppInit.cpp:697
 msgid "&Next >"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:694
+#: pcsx2/gui/AppInit.cpp:698
 msgid "< &Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:695
+#: pcsx2/gui/AppInit.cpp:699
 msgid "&Back"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:696
+#: pcsx2/gui/AppInit.cpp:700
 msgid "&Finish"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:697
+#: pcsx2/gui/AppInit.cpp:701
 msgid "&Yes"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:698
+#: pcsx2/gui/AppInit.cpp:702
 msgid "&No"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:699
+#: pcsx2/gui/AppInit.cpp:703
 msgid "Browse"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:700
+#: pcsx2/gui/AppInit.cpp:704
 msgid "&Save"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:701
+#: pcsx2/gui/AppInit.cpp:705
 msgid "Save &As..."
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:702 pcsx2/gui/MainFrame.cpp:591
+#: pcsx2/gui/AppInit.cpp:706 pcsx2/gui/MainFrame.cpp:591
 msgid "&Help"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:703
+#: pcsx2/gui/AppInit.cpp:707
 msgid "&Home"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:704
+#: pcsx2/gui/AppInit.cpp:708
 msgid "&Window"
 msgstr ""
 
-#: pcsx2/gui/AppInit.cpp:706
+#: pcsx2/gui/AppInit.cpp:710
 msgid "Show about dialog."
 msgstr ""
 
@@ -1856,27 +1856,23 @@ msgstr ""
 msgid "Double-click toggles fullscreen mode"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:77
-msgid "Sync To Host Refresh Rate"
-msgstr ""
-
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:114
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:113
 msgid "Aspect Ratio:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:116
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:115
 msgid "FMV Aspect Ratio Override:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:118
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:117
 msgid "Custom Window Size:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:121
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:120
 msgid "Zoom:"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:127
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:126
 msgid "Wait for Vsync on refresh:"
 msgstr ""
 
@@ -1956,7 +1952,11 @@ msgstr ""
 msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:116
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
+msgid "Use Blit for internal FPS"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:121
 msgid "Enable manual game fixes [Not recommended]"
 msgstr ""
 
@@ -2323,7 +2323,7 @@ msgid "Good Speedup and High Compatibility; may cause hanging... [Recommended on
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:170
-msgid "Instant VU1 (without MTVU only)"
+msgid "Instant VU1"
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:171
@@ -2442,6 +2442,6 @@ msgstr ""
 msgid "Waiting for task..."
 msgstr ""
 
-#: pcsx2/gui/i18n.cpp:67
+#: pcsx2/gui/i18n.cpp:65
 msgid " (default)"
 msgstr ""

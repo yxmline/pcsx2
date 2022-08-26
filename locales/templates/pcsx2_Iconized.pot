@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-06-13 06:59+0800\n"
+"POT-Creation-Date: 2022-08-27 00:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,7 +150,7 @@ msgstr ""
 msgid "When checked this folder will automatically reflect the default associated with PCSX2's current usermode setting. "
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:79
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
 "\n"
@@ -161,7 +161,7 @@ msgid ""
 "16:9: Temporarily switch to a 16:9 aspect ratio while an FMV plays to correctly display a widescreen 16:9 FMV."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:84
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -176,21 +176,21 @@ msgid ""
 "CTRL + NUMPAD-*: Toggle 100/0"
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
 msgid "Vsync eliminates screen tearing but typically has a big performance hit. It usually only applies to fullscreen mode."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:94
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
 msgid "Check this to force the mouse cursor invisible inside the GS window; useful if using the mouse as a primary control device for gaming.  By default the mouse auto-hides after 2 seconds of inactivity."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:96
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming emulation. You can still toggle fullscreen display at any time using \n"
 "Alt-Enter or double clicking the output window (game)."
 msgstr ""
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:99
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
 msgid "Completely closes the often large and bulky GS window when pressing ESC or pausing the emulator."
 msgstr ""
 
@@ -227,11 +227,15 @@ msgstr ""
 msgid "Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and others."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:117
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
+msgid "Use alternative method to calclate internal FPS to avoid false readings in some games."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:122
 msgid "It's better to enable 'Automatic game fixes' at the main menu instead, and leave this page empty ('Automatic' means: selectively use specific tested fixes for specific games). Manual game fixes will NOT increase your performance. In fact they may decrease it."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:121
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -344,11 +348,11 @@ msgid "Updates Status Flags only on blocks which will read them, instead of all 
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:176
-msgid "Runs VU1 on its own thread (microVU1-only). Generally a speedup on CPUs with 3 or more cores. This is safe for most games, but a few games are incompatible and may hang. In the case of GS limited games, it may be a slowdown (especially on dual core CPUs)."
+msgid "Runs VU1 on its own thread. Generally a speedup on CPUs with 3 or more cores. This is safe for most games, but a few games are incompatible and may hang. In the case of GS limited games, it may be a slowdown (especially on dual core CPUs)."
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:179
-msgid "Runs VU1 instantly (when MTVU is disabled). Provides a modest speed improvement. This is safe for most games, but a few games may exhibit graphical errors."
+msgid "Runs VU1 instantly. Provides a modest speed improvement in most games. This is safe for most games, but a few games may exhibit graphical errors."
 msgstr ""
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:197

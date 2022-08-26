@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-06-13 06:59+0800\n"
-"PO-Revision-Date: 2022-06-13 07:04+0800\n"
+"POT-Creation-Date: 2022-08-27 00:11+0800\n"
+"PO-Revision-Date: 2022-08-27 00:21+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1\n"
 "X-Poedit-Basepath: .\n"
 
 #: pcsx2/gui/AppInit.cpp:176
@@ -231,7 +231,7 @@ msgid ""
 "with PCSX2's current usermode setting. "
 msgstr "选中时此文件夹将自动反映当前 PCSX2 用户设置选项相关的默认值。 "
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:79
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:78
 msgid ""
 "Off: Disables temporary aspect ratio switch. (It will use the above setting "
 "from Aspect Ratio instead of FMV Aspect Ratio Override.)\n"
@@ -247,14 +247,14 @@ msgid ""
 msgstr ""
 "关: 关闭临时高宽比切换。(它将使用上述设置中高宽比替代并覆盖 FMV 高宽比。)\n"
 "\n"
-"自动 4:3/3:2: 临时切换 4:3 高宽比使得可以正确播放 4:3 FMV。 将使用3:2的分辨率"
-"为480P\n"
+"自动 4:3/3:2: 在播放 FMV 时临时切换到 4:3 高宽比，以正确显示 4:3 FMV。使用 "
+"3:2 的分辨率为 480P\n"
 "\n"
 "4:3: 临时切换 4:3 高宽比使得可以正确播放 4:3 FMV。\n"
 "\n"
-"16:9: 临时切换 16:9 高宽比使得可以正确播放 16:9 FMV。"
+"16:9: 临时切换 16:9 高宽比使得可以正确播放 16:9 宽屏 FMV。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:84
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:83
 msgid ""
 "Zoom = 100: Fit the entire image to the window without any cropping.\n"
 "Above/Below 100: Zoom In/Out.\n"
@@ -278,13 +278,13 @@ msgstr ""
 "键盘: Ctrl+小键盘加号: 放大，Ctrl+小键盘减号: 缩小，Ctrl+小键盘星号: 在 100 "
 "和 0 之间切换"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:92
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:91
 msgid ""
 "Vsync eliminates screen tearing but typically has a big performance hit. It "
 "usually only applies to fullscreen mode."
 msgstr "垂直同步可以消除花屏但通常对性能有较大影响。通常仅应用于全屏幕模式。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:94
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:93
 msgid ""
 "Check this to force the mouse cursor invisible inside the GS window; useful "
 "if using the mouse as a primary control device for gaming.  By default the "
@@ -293,7 +293,7 @@ msgstr ""
 "选中此项强制 GS 窗口中不显示鼠标光标。在使用鼠标控制游戏时比较有用。默认状态"
 "鼠标在 2 秒不活动后隐藏。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:96
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:95
 msgid ""
 "Enables automatic mode switch to fullscreen when starting or resuming "
 "emulation. You can still toggle fullscreen display at any time using \n"
@@ -303,7 +303,7 @@ msgstr ""
 "用alt-enter切换全屏幕显示。\n"
 "Alt-Enter或在输出窗口双击(游戏)。"
 
-#: pcsx2/gui/Panels/GSWindowPanel.cpp:99
+#: pcsx2/gui/Panels/GSWindowPanel.cpp:98
 msgid ""
 "Completely closes the often large and bulky GS window when pressing ESC or "
 "pausing the emulator."
@@ -360,7 +360,13 @@ msgid ""
 "others."
 msgstr "修复 WRC,武器种族传说,Tennis Court Smash和其他的图形错误。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:117
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
+msgid ""
+"Use alternative method to calclate internal FPS to avoid false readings in "
+"some games."
+msgstr "使用其他方法来计算内部 FPS，以避免在某些游戏中出现错误的读数。"
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:122
 msgid ""
 "It's better to enable 'Automatic game fixes' at the main menu instead, and "
 "leave this page empty ('Automatic' means: selectively use specific tested "
@@ -370,7 +376,7 @@ msgstr ""
 "建议在主菜单启用 '自动应用游戏特殊修正'，而不建议在此手动设置 ('自动' 即针对"
 "特定游戏自动应用对应修正)。事实上，手动设置并不能提升性能，反而会降低性能。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:121
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
@@ -561,23 +567,22 @@ msgstr "仅在标志位被读取时更新，而不是总是更新。此选项通
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:176
 msgid ""
-"Runs VU1 on its own thread (microVU1-only). Generally a speedup on CPUs with "
-"3 or more cores. This is safe for most games, but a few games are "
-"incompatible and may hang. In the case of GS limited games, it may be a "
-"slowdown (especially on dual core CPUs)."
+"Runs VU1 on its own thread. Generally a speedup on CPUs with 3 or more "
+"cores. This is safe for most games, but a few games are incompatible and may "
+"hang. In the case of GS limited games, it may be a slowdown (especially on "
+"dual core CPUs)."
 msgstr ""
-"在单独的线程是运行 VU1 (仅限 microVU1)。通常在三核以上 CPU 中有提速效果。此选"
-"项对大多数游戏是安全的，但一部分游戏可能不兼容或导致没有响应。对于受限于 GS "
-"的游戏，可能会造成性能下降 (特别是在双核 CPU 上)。"
+"在单独的线程是运行 VU1。通常在三核以上 CPU 中有提速效果。此选项对大多数游戏是"
+"安全的，但一部分游戏可能不兼容或导致没有响应。对于受限于 GS 的游戏，可能会造"
+"成性能下降 (特别是在双核 CPU 上)。"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:179
 msgid ""
-"Runs VU1 instantly (when MTVU is disabled). Provides a modest speed "
-"improvement. This is safe for most games, but a few games may exhibit "
-"graphical errors."
+"Runs VU1 instantly. Provides a modest speed improvement in most games. This "
+"is safe for most games, but a few games may exhibit graphical errors."
 msgstr ""
-"立即运行VU1(当MTVU被禁用时)。提供适度的速度提升。这对大多游戏是安全的,但有些"
-"游戏可能会显示图形错误。"
+"立即运行VU1。提供适度的速度提升。这对大多游戏是安全的,但有些游戏可能会显示图"
+"形错误。"
 
 #: pcsx2/gui/Panels/SpeedhacksPanel.cpp:197
 msgid ""
