@@ -466,8 +466,6 @@ set(pcsx2USBSources
 	USB/usb-mic/usb-mic-singstar.cpp
 	USB/usb-mic/usb-mic-logitech.cpp
 	USB/usb-mic/usb-headset.cpp
-	../3rdparty/jpgd/jpgd.cpp
-	../3rdparty/jpgd/jpge.cpp
 	USB/usb-eyetoy/jo_mpeg.cpp
 	USB/usb-eyetoy/usb-eyetoy-webcam.cpp
 	USB/usb-hid/usb-hid.cpp
@@ -1065,7 +1063,9 @@ endif()
 
 if(PCSX2_CORE)
 	list(APPEND pcsx2FrontendSources
+		Frontend/FullscreenUI.cpp
 		Frontend/GameList.cpp
+		Frontend/ImGuiFullscreen.cpp
 		Frontend/INISettingsInterface.cpp
 		Frontend/InputManager.cpp
 		Frontend/InputSource.cpp
@@ -1076,7 +1076,9 @@ if(PCSX2_CORE)
 		VMManager.cpp
 	)
 	list(APPEND pcsx2FrontendHeaders
+		Frontend/FullscreenUI.h
 		Frontend/GameList.h
+		Frontend/ImGuiFullscreen.h
 		Frontend/INISettingsInterface.h
 		Frontend/InputManager.h
 		Frontend/InputSource.h
@@ -1589,6 +1591,9 @@ else()
 		target_sources(PCSX2 PRIVATE
 			${pcsx2USBSources}
 			${pcsx2USBHeaders})
+		target_link_libraries(PCSX2_FLAGS INTERFACE
+			jpgd
+		)
 	else()
 		target_sources(PCSX2 PRIVATE
 			${pcsx2USBNullSources}
