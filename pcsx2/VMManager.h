@@ -165,8 +165,8 @@ namespace VMManager
 	/// If the scale is set to 0, the internal resolution will be used, otherwise it is treated as a multiplier to 1x.
 	void RequestDisplaySize(float scale = 0.0f);
 
-	/// Sets default settings based on hardware configuration.
-	void SetHardwareDependentDefaultSettings(Pcsx2Config& config);
+	/// Initializes default configuration in the specified file.
+	void SetDefaultSettings(SettingsInterface& si);
 
 	/// Returns a list of processors in the system, and their corresponding affinity mask.
 	/// This list is ordered by most performant to least performant for pinning threads to.
@@ -234,29 +234,4 @@ namespace Host
 
 	/// Provided by the host; called when a state is saved, and the frontend should invalidate its save state cache.
 	void InvalidateSaveStateCache();
-
-	/// Requests a specific display window size.
-	void RequestResizeHostDisplay(s32 width, s32 height);
-
-	/// Safely executes a function on the VM thread.
-	void RunOnCPUThread(std::function<void()> function, bool block = false);
-
-	/// Asynchronously starts refreshing the game list.
-	void RefreshGameListAsync(bool invalidate_cache);
-
-	/// Cancels game list refresh, if there is one in progress.
-	void CancelGameListRefresh();
-
-	/// Requests shut down and exit of the hosting application. This may not actually exit,
-	/// if the user cancels the shutdown confirmation.
-	void RequestExit(bool save_state_if_running);
-
-	/// Requests shut down of the current virtual machine.
-	void RequestVMShutdown(bool allow_confirm, bool allow_save_state, bool default_save_state);
-
-	/// Returns true if the hosting application is currently fullscreen.
-	bool IsFullscreen();
-
-	/// Alters fullscreen state of hosting application.
-	void SetFullscreen(bool enabled);
 }

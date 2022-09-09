@@ -191,12 +191,12 @@ GSTexture* GSDeviceOGL::CreateSurface(GSTexture::Type type, int width, int heigh
 	return new GSTextureOGL(type, width, height, levels, format, m_fbo_read);
 }
 
-bool GSDeviceOGL::Create(HostDisplay* display)
+bool GSDeviceOGL::Create()
 {
-	if (!GSDevice::Create(display))
+	if (!GSDevice::Create())
 		return false;
 
-	if (display->GetRenderAPI() != HostDisplay::RenderAPI::OpenGL)
+	if (g_host_display->GetRenderAPI() != HostDisplay::RenderAPI::OpenGL)
 		return false;
 
 	// Check openGL requirement as soon as possible so we can switch to another
@@ -318,6 +318,10 @@ bool GSDeviceOGL::Create(HostDisplay* display)
 			Host::ReportErrorAsync("GS", "Failed to create vertex/index/uniform streaming buffers");
 			return false;
 		}
+
+		// Force UBOs to be uploaded on first use.
+		std::memset(&m_vs_cb_cache, 0xFF, sizeof(m_vs_cb_cache));
+		std::memset(&m_ps_cb_cache, 0xFF, sizeof(m_ps_cb_cache));
 
 		// rebind because of VAO state
 		m_vertex_stream_buffer->Bind();
@@ -704,6 +708,10 @@ void GSDeviceOGL::RestoreAPIState()
 
 	if (GLState::point_size)
 		glEnable(GL_PROGRAM_POINT_SIZE);
+
+	// Force UBOs to be reuploaded, we don't know what else was bound there.
+	std::memset(&m_vs_cb_cache, 0xFF, sizeof(m_vs_cb_cache));
+	std::memset(&m_ps_cb_cache, 0xFF, sizeof(m_ps_cb_cache));
 }
 
 void GSDeviceOGL::DrawPrimitive()
@@ -1250,7 +1258,7 @@ void GSDeviceOGL::PresentRect(GSTexture* sTex, const GSVector4& sRect, GSTexture
 
 	BeginScene();
 
-	const GSVector2i ds(dTex ? dTex->GetSize() : GSVector2i(m_display->GetWindowWidth(), m_display->GetWindowHeight()));
+	const GSVector2i ds(dTex ? dTex->GetSize() : GSVector2i(g_host_display->GetWindowWidth(), g_host_display->GetWindowHeight()));
 	DisplayConstantBuffer cb;
 	cb.SetSource(sRect, sTex->GetSize());
 	cb.SetTarget(dRect, ds);
