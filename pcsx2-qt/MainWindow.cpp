@@ -236,6 +236,7 @@ void MainWindow::setupAdditionalUi()
 	}
 
 	updateEmulationActions(false, false);
+	updateDisplayRelatedActions(false, false, false);
 }
 
 void MainWindow::connectSignals()
@@ -308,23 +309,17 @@ void MainWindow::connectSignals()
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionViewStatusBarVerbose, "UI", "VerboseStatusBar", false);
 
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableSystemConsole, "Logging", "EnableSystemConsole", false);
-	connect(m_ui.actionEnableSystemConsole, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 #ifndef PCSX2_DEVBUILD
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableVerboseLogging, "Logging", "EnableVerbose", false);
-	connect(m_ui.actionEnableVerboseLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 #else
 	// Dev builds always have verbose logging.
 	m_ui.actionEnableVerboseLogging->setChecked(true);
 	m_ui.actionEnableVerboseLogging->setEnabled(false);
 #endif
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableEEConsoleLogging, "Logging", "EnableEEConsole", true);
-	connect(m_ui.actionEnableEEConsoleLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableIOPConsoleLogging, "Logging", "EnableIOPConsole", true);
-	connect(m_ui.actionEnableIOPConsoleLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableFileLogging, "Logging", "EnableFileLogging", false);
-	connect(m_ui.actionEnableFileLogging, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableLogTimestamps, "Logging", "EnableTimestamps", true);
-	connect(m_ui.actionEnableLogTimestamps, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionEnableCDVDVerboseReads, "EmuCore", "CdvdVerboseReads", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionSaveBlockDump, "EmuCore", "CdvdDumpBlocks", false);
 	connect(m_ui.actionSaveBlockDump, &QAction::toggled, this, &MainWindow::onBlockDumpActionToggled);
@@ -336,9 +331,7 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionInputRecPlay, &QAction::triggered, this, &MainWindow::onInputRecPlayActionTriggered);
 	connect(m_ui.actionInputRecStop, &QAction::triggered, this, &MainWindow::onInputRecStopActionTriggered);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecConsoleLogs, "Logging", "EnableInputRecordingLogs", false);
-	connect(m_ui.actionInputRecConsoleLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecControllerLogs, "Logging", "EnableControllerLogs", false);
-	connect(m_ui.actionInputRecControllerLogs, &QAction::triggered, this, &MainWindow::onLoggingOptionChanged);
 
 	// These need to be queued connections to stop crashing due to menus opening/closing and switching focus.
 	connect(m_game_list_widget, &GameListWidget::refreshProgress, this, &MainWindow::onGameListRefreshProgress);
@@ -840,7 +833,6 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 
 	m_ui.actionSaveState->setEnabled(running);
 	m_ui.menuSaveState->setEnabled(running);
-	m_ui.menuWindowSize->setEnabled(starting_or_running);
 
 	m_ui.actionViewGameProperties->setEnabled(running);
 
@@ -852,6 +844,19 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 	// scanning needs to be disabled while running
 	m_ui.actionScanForNewGames->setDisabled(starting_or_running);
 	m_ui.actionRescanAllGames->setDisabled(starting_or_running);
+}
+
+void MainWindow::updateDisplayRelatedActions(bool has_surface, bool render_to_main, bool fullscreen)
+{
+	// rendering to main, or switched to gamelist/grid
+	m_ui.actionViewSystemDisplay->setEnabled((has_surface && render_to_main) || (!has_surface && g_host_display));
+	m_ui.menuWindowSize->setEnabled(has_surface && !fullscreen);
+	m_ui.actionFullscreen->setEnabled(has_surface);
+
+	{
+		QSignalBlocker blocker(m_ui.actionFullscreen);
+		m_ui.actionFullscreen->setChecked(fullscreen);
+	}
 }
 
 void MainWindow::updateStatusBarWidgetVisibility()
@@ -1496,11 +1501,6 @@ void MainWindow::updateTheme()
 	m_game_list_widget->refreshImages();
 }
 
-void MainWindow::onLoggingOptionChanged()
-{
-	Host::UpdateLogging(QtHost::InNoGUIMode());
-}
-
 void MainWindow::onInputRecNewActionTriggered()
 {
 	const bool wasPaused = s_vm_paused;
@@ -1791,8 +1791,6 @@ DisplayWidget* MainWindow::createDisplay(bool fullscreen, bool render_to_main)
 	updateWindowTitle();
 	updateWindowState();
 
-	m_ui.actionViewSystemDisplay->setEnabled(true);
-	m_ui.actionFullscreen->setEnabled(true);
 	m_ui.actionStartFullscreenUI->setEnabled(false);
 	m_ui.actionStartFullscreenUI2->setEnabled(false);
 
@@ -1886,8 +1884,6 @@ DisplayWidget* MainWindow::updateDisplay(bool fullscreen, bool render_to_main, b
 	m_display_widget->updateRelativeMode(s_vm_valid && !s_vm_paused);
 	m_display_widget->updateCursor(s_vm_valid && !s_vm_paused);
 
-	QSignalBlocker blocker(m_ui.actionFullscreen);
-	m_ui.actionFullscreen->setChecked(fullscreen);
 	return m_display_widget;
 }
 
@@ -1953,6 +1949,8 @@ void MainWindow::createDisplayWidget(bool fullscreen, bool render_to_main, bool 
 		m_ui.mainContainer->addWidget(container);
 		m_ui.mainContainer->setCurrentIndex(1);
 	}
+
+	updateDisplayRelatedActions(true, render_to_main, fullscreen);
 
 	// We need the surface visible.
 	QGuiApplication::sync();
@@ -2039,6 +2037,8 @@ void MainWindow::destroyDisplayWidget(bool show_game_list)
 		m_display_container->deleteLater();
 		m_display_container = nullptr;
 	}
+
+	updateDisplayRelatedActions(false, false, false);
 }
 
 void MainWindow::focusDisplayWidget()

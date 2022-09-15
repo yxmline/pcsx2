@@ -149,7 +149,6 @@ private Q_SLOTS:
 	void onCheckForUpdatesActionTriggered();
 	void onToolsOpenDataDirectoryTriggered();
 	void updateTheme();
-	void onLoggingOptionChanged();
 	void onScreenshotActionTriggered();
 	void onSaveGSDumpActionTriggered();
 	void onBlockDumpActionToggled(bool checked);
@@ -192,6 +191,7 @@ private:
 	void restoreStateFromConfig();
 
 	void updateEmulationActions(bool starting, bool running);
+	void updateDisplayRelatedActions(bool has_surface, bool render_to_main, bool fullscreen);
 	void updateStatusBarWidgetVisibility();
 	void updateWindowTitle();
 	void updateWindowState(bool force_visible = false);
