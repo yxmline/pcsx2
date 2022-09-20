@@ -12172,6 +12172,8 @@ SLES-51526:
 SLES-51541:
   name: "Grand Theft Auto - San Andreas"
   region: "PAL-Unk"
+  clampModes:
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLES-51547:
@@ -14170,7 +14172,7 @@ SLES-52541:
   region: "PAL-M5"
   compat: 5
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLES-52542:
@@ -15088,7 +15090,7 @@ SLES-52927:
   name: "Grand Theft Auto - San Andreas"
   region: "PAL-G"
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLES-52931:
@@ -23001,7 +23003,7 @@ SLPM-55092:
   name: "Grand Theft Auto - San Andreas [Best Price]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLPM-55096:
@@ -23341,7 +23343,7 @@ SLPM-55292:
   name: "Grand Theft Auto - San Andreas [Rockstar Classics]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLPM-55294:
@@ -29043,7 +29045,7 @@ SLPM-65984:
   name: "Grand Theft Auto - San Andreas"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLPM-65985:
@@ -31964,7 +31966,7 @@ SLPM-66788:
   name: "Grand Theft Auto - San Andreas [Best Price]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLPM-66789:
@@ -42545,7 +42547,7 @@ SLUS-20946:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
+    eeClampMode: 2 # Fixes Game freezes during "Reuniting The Families" mission.
   gsHWFixes:
     autoFlush: 1
 SLUS-20947:
