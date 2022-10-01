@@ -119,7 +119,7 @@ static Threading::ThreadHandle s_vm_thread_handle;
 static std::deque<std::thread> s_save_state_threads;
 static std::mutex s_save_state_threads_mutex;
 
-static std::mutex s_info_mutex;
+static std::recursive_mutex s_info_mutex;
 static std::string s_disc_path;
 static u32 s_game_crc;
 static u32 s_patches_crc;
@@ -1799,7 +1799,7 @@ void VMManager::WarnAboutUnsafeSettings()
 		messages += ICON_FA_IMAGES " Mipmapping is not set to automatic. This may break rendering in some games.\n";
 	if (EmuConfig.GS.TextureFiltering != BiFiltering::PS2)
 		messages += ICON_FA_FILTER " Texture filtering is not set to Bilinear (PS2). This will break rendering in some games.\n";
-	if (EmuConfig.GS.UserHacks_TriFilter != TriFiltering::Automatic)
+	if (EmuConfig.GS.TriFilter != TriFiltering::Automatic)
 		messages += ICON_FA_PAGER " Trilinear filtering is not set to automatic. This may break rendering in some games.\n";
 	if (EmuConfig.GS.AccurateBlendingUnit <= AccBlendLevel::Minimum)
 		messages += ICON_FA_BLENDER " Blending is below basic, this may break effects in some games.\n";

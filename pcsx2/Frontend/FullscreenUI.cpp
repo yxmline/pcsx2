@@ -2633,7 +2633,7 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 		DrawIntListSetting(bsi, "Bilinear Filtering", "Selects where bilinear filtering is utilized when rendering textures.", "EmuCore/GS",
 			"filter", static_cast<int>(BiFiltering::PS2), s_bilinear_options, std::size(s_bilinear_options));
 		DrawIntListSetting(bsi, "Trilinear Filtering", "Selects where trilinear filtering is utilized when rendering textures.",
-			"EmuCore/GS", "UserHacks_TriFilter", static_cast<int>(TriFiltering::Automatic), s_trilinear_options,
+			"EmuCore/GS", "TriFilter", static_cast<int>(TriFiltering::Automatic), s_trilinear_options,
 			std::size(s_trilinear_options), -1);
 		DrawStringListSetting(bsi, "Anisotropic Filtering", "Selects where anistropic filtering is utilized when rendering textures.",
 			"EmuCore/GS", "MaxAnisotropy", "0", s_anisotropic_filtering_entries, s_anisotropic_filtering_values,
@@ -4541,15 +4541,16 @@ void FullscreenUI::HandleGameListOptions(const GameList::Entry* entry)
 		{ICON_FA_WINDOW_CLOSE " Close Menu", false},
 	};
 
+	const bool has_resume_state = VMManager::HasSaveStateInSlot(entry->serial.c_str(), entry->crc, -1);
 	OpenChoiceDialog(
-		entry->title.c_str(), false, std::move(options), [entry_path = entry->path](s32 index, const std::string& title, bool checked) {
+		entry->title.c_str(), false, std::move(options), [has_resume_state, entry_path = entry->path](s32 index, const std::string& title, bool checked) {
 			switch (index)
 			{
 				case 0: // Open Game Properties
 					SwitchToGameSettings(entry_path);
 					break;
 				case 1: // Resume Game
-					DoStartPath(entry_path, -1);
+					DoStartPath(entry_path, has_resume_state ? std::optional<s32>(-1) : std::optional<s32>());
 					break;
 				case 2: // Load State
 					OpenLoadStateSelectorForGame(entry_path);

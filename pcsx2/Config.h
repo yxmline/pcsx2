@@ -549,7 +549,7 @@ struct Pcsx2Config
 		int UserHacks_TCOffsetX{0};
 		int UserHacks_TCOffsetY{0};
 		int UserHacks_CPUSpriteRenderBW{0};
-		TriFiltering UserHacks_TriFilter{TriFiltering::Automatic};
+		TriFiltering TriFilter{TriFiltering::Automatic};
 		int OverrideTextureBarriers{-1};
 		int OverrideGeometryShaders{-1};
 
@@ -990,6 +990,7 @@ struct Pcsx2Config
 #ifdef PCSX2_CORE
 		EnableGameFixes : 1, // enables automatic game fixes
 		SaveStateOnShutdown : 1, // default value for saving state on shutdown
+		EnableDiscordPresence : 1, // enables discord rich presence integration
 #endif
 		// when enabled uses BOOT2 injection, skipping sony bios splashes
 		UseBOOT2Injection : 1,
