@@ -8550,7 +8550,7 @@ SLAJ-25053:
   name: "Burnout 3 - Takedown"
   region: "NTSC-Unk"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -8584,7 +8584,7 @@ SLAJ-25066:
   name: "Burnout Revenge - Battle Racing Ignited"
   region: "NTSC-Unk"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -8691,7 +8691,7 @@ SLAJ-25094:
   name: "Burnout Dominator"
   region: "NTSC-Unk"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -8838,6 +8838,8 @@ SLED-52488:
 SLED-52597:
   name: "Burnout 3 - Takedown [Demo]"
   region: "PAL-E"
+  clampModes:
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -8879,7 +8881,7 @@ SLED-53512:
   region: "PAL-E"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -14369,7 +14371,7 @@ SLES-52584:
   region: "PAL-M4"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -14379,7 +14381,7 @@ SLES-52585:
   name: "Burnout 3 - Takedown"
   region: "PAL-F-G-I"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -16465,7 +16467,7 @@ SLES-53506:
   region: "PAL-M5"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -16482,7 +16484,7 @@ SLES-53507:
   region: "PAL-M3"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -19221,7 +19223,7 @@ SLES-54627:
   region: "PAL-M5"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -19384,7 +19386,7 @@ SLES-54681:
   name: "Burnout Dominator"
   region: "PAL-E"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -22445,6 +22447,8 @@ SLKA-25205:
 SLKA-25206:
   name: "Burnout 3 - Takedown"
   region: "NTSC-K"
+  clampModes:
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -22709,7 +22713,7 @@ SLKA-25304:
   name: "Burnout Revenge"
   region: "NTSC-K"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -22982,6 +22986,8 @@ SLPM-20436:
 SLPM-55004:
   name: "Burnout Revenge (EASY 1980)"
   region: "NTSC-J"
+  clampModes:
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -23017,6 +23023,8 @@ SLPM-55033:
 SLPM-55036:
   name: "Burnout Dominator (EASY 1980)"
   region: "NTSC-J"
+  clampModes:
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -23558,7 +23566,7 @@ SLPM-60246:
   name: "Burnout 3 - Takedown [Trial]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -28250,7 +28258,7 @@ SLPM-65719:
   name: "Burnout 3 - Takedown"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -29073,7 +29081,7 @@ SLPM-65958:
   name: "Burnout 3 - Takedown [EA Best Hits]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -29590,7 +29598,7 @@ SLPM-66108:
   name: "Burnout Revenge"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -31545,7 +31553,7 @@ SLPM-66652:
   name: "Burnout Revenge [EA Best Hits]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -31907,7 +31915,7 @@ SLPM-66739:
   name: "Burnout Dominator"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -32620,7 +32628,7 @@ SLPM-66962:
   name: "Burnout 3 - Takedown [EA-SY! 1980]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -43230,7 +43238,7 @@ SLUS-21050:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -44168,7 +44176,7 @@ SLUS-21242:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -45886,7 +45894,7 @@ SLUS-21596:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -47959,7 +47967,7 @@ SLUS-29113:
   name: "Burnout 3 [Demo]"
   region: "NTSC-U"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -48064,7 +48072,7 @@ SLUS-29153:
   name: "Burnout Revenge [Demo]"
   region: "NTSC-U"
   clampModes:
-    vuClampMode: 0 # Fixes buggy lighting on certain objects.
+    vuClampMode: 3 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
