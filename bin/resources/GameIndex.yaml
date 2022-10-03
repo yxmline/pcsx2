@@ -2176,6 +2176,13 @@ SCED-52687:
 SCED-52728:
   name: "Official PlayStation 2 Magazine Demo 49"
   region: "PAL-M5"
+SCED-52759:
+  name: "Killzone [Demo]"
+  region: "PAL-M5"
+  clampModes:
+    vuClampMode: 0 # Resolves I Reg Clamping / performance impact and yellow graphics in certain areas.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SCED-52785:
   name: "Official PlayStation 2 Magazine Demo 50"
   region: "PAL-M5"
@@ -2188,9 +2195,13 @@ SCED-52796:
 SCED-52818:
   name: "EyeToy - Chat [Light]"
   region: "PAL-M11"
-SCED-52889:
-  name: "Killzone [Bonus Disc]"
-  region: "PAL-M5"
+SCED-52846:
+  name: "Killzone [Demo]"
+  region: "PAL-E"
+  clampModes:
+    vuClampMode: 0 # Resolves I Reg Clamping / performance impact and yellow graphics in certain areas.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SCED-52932:
   name: "Bonus Demo 8"
   region: "PAL-M5"
@@ -2939,7 +2950,7 @@ SCES-50916:
   gsHWFixes:
     mipmap: 1
 SCES-50917:
-  name: "Sly Racoon"
+  name: "Sly Raccoon"
   region: "PAL-M5"
 SCES-50928:
   name: "SOCOM - U.S. Navy SEALs [Beta & Full Release]"
@@ -3457,9 +3468,11 @@ SCES-52460:
     autoFlush: 1
     preloadFrameData: 1 # Fixes Sony splash at boot.
 SCES-52529:
-  name: "Sly Racoon 2 - Band of Thieves"
+  name: "Sly 2 - Band of Thieves"
   region: "PAL-M11"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCES-52530:
   name: "Crisis Zone"
   region: "PAL-M5"
@@ -3715,7 +3728,7 @@ SCES-53397:
   name: "SingStar Pop - World Events Code"
   region: "PAL-Unk"
 SCES-53409:
-  name: "Sly 3"
+  name: "Sly 3 - Honour Among Thieves"
   region: "PAL-M11"
   compat: 5
   roundModes:
@@ -4759,9 +4772,11 @@ SCKA-20043:
   name: "Magna Carta"
   region: "NTSC-K"
 SCKA-20044:
-  name: "Sly Cooper 2 Band of Thieves"
+  name: "Sly 2 - Band of Thieves"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCKA-20047:
   name: "Armored Core Nine Breaker"
   region: "NTSC-K"
@@ -4872,9 +4887,15 @@ SCKA-20062:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
 SCKA-20063:
-  name: "Sly Cooper 3 Honor Among Thieves"
+  name: "Sly 3 - Honor Among Thieves"
   region: "NTSC-K"
   compat: 5
+  roundModes:
+    vuRoundMode: 0 # Fixes game engine issue with bombs and ladders.
+  clampModes:
+    vuClampMode: 2 # Fixes bugged camera.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCKA-20064:
   name: "SOCOM 3 - U.S. Navy SEALs"
   region: "NTSC-K"
@@ -5639,8 +5660,11 @@ SCPS-15089:
   name: "EyeToy - Play 2 [With Camera]"
   region: "NTSC-J"
 SCPS-15090:
-  name: "Sly Racoon 2"
+  name: "Kaitou Sly Cooper 2"
   region: "NTSC-J"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes chromatic effect.
 SCPS-15091:
   name: "Wild ARMs - The 4th Detonator"
   region: "NTSC-J"
@@ -8584,7 +8608,7 @@ SLAJ-25066:
   name: "Burnout Revenge - Battle Racing Ignited"
   region: "NTSC-Unk"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -8855,6 +8879,13 @@ SLED-52890:
     - GIFFIFOHack # Partially fixes graphical issues also needs EE cycle rate + 3.
   gsHWFixes:
     mipmap: 1
+SLED-52899:
+  name: "Killzone [Bonus Disc]"
+  region: "PAL-M5"
+  clampModes:
+    vuClampMode: 0 # Resolves I Reg Clamping / performance impact and yellow graphics in certain areas.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
 SLED-52929:
   name: "Prince of Persia - Warrior Within [Demo]"
   region: "PAL-M5"
@@ -8881,7 +8912,7 @@ SLED-53512:
   region: "PAL-E"
   compat: 5
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -16467,7 +16498,7 @@ SLES-53506:
   region: "PAL-M5"
   compat: 5
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -16484,7 +16515,7 @@ SLES-53507:
   region: "PAL-M3"
   compat: 5
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -22010,6 +22041,11 @@ SLKA-25038:
     alignSprite: 1 # Fixes vertical lines.
     roundSprite: 2 # Fixes font artifacts.
     mergeSprite: 1 # Fixes flame-like bleeding.
+SLKA-25039:
+  name: "Burnout 2 - Point of Impact"
+  region: "NTSC-K"
+  roundModes:
+    vuRoundMode: 1 # Bright lights in cars.
 SLKA-25041:
   name: "Armored Core 3 Silent Line"
   region: "NTSC-K"
@@ -22477,6 +22513,7 @@ SLKA-25213:
   compat: 5
   gsHWFixes:
     preloadFrameData: 1 # Partially fixes HUD elements.
+    halfPixelOffset: 1 # Fixes misaligned blur around objects and enemies.
 SLKA-25214:
   name: "Final Fantasy X - International [PlayStation 2 - Big Hit Series]"
   region: "NTSC-K"
@@ -22713,7 +22750,7 @@ SLKA-25304:
   name: "Burnout Revenge"
   region: "NTSC-K"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -22987,7 +23024,7 @@ SLPM-55004:
   name: "Burnout Revenge (EASY 1980)"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -28148,6 +28185,7 @@ SLPM-65686:
   region: "NTSC-J"
   gsHWFixes:
     preloadFrameData: 1 # Partially fixes HUD elements.
+    halfPixelOffset: 1 # Fixes misaligned blur around objects and enemies.
 SLPM-65687:
   name: "Star Wars - Battlefront"
   region: "NTSC-J"
@@ -28157,6 +28195,7 @@ SLPM-65688:
   compat: 5
   gsHWFixes:
     preloadFrameData: 1 # Partially fixes HUD elements.
+    halfPixelOffset: 1 # Fixes misaligned blur around objects and enemies.
 SLPM-65689:
   name: "Never 7 - The End of Infinity [SuperLite 2000 Series]"
   region: "NTSC-J"
@@ -29598,7 +29637,7 @@ SLPM-66108:
   name: "Burnout Revenge"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -31553,7 +31592,7 @@ SLPM-66652:
   name: "Burnout Revenge [EA Best Hits]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -38703,7 +38742,7 @@ SLUS-20043:
   region: "NTSC-U"
   compat: 5
 SLUS-20044:
-  name: "Star Wars - StarFighter"
+  name: "Star Wars - Starfighter"
   region: "NTSC-U"
   compat: 5
 SLUS-20045:
@@ -44176,7 +44215,7 @@ SLUS-21242:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
@@ -48072,7 +48111,7 @@ SLUS-29153:
   name: "Burnout Revenge [Demo]"
   region: "NTSC-U"
   clampModes:
-    vuClampMode: 3 # Fixes buggy lighting in the garage.
+    vuClampMode: 0 # Fixes buggy lighting in the garage.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes depth lines.
     autoFlush: 1 # Fixes blur.
