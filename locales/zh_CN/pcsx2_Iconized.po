@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-08-27 00:11+0800\n"
-"PO-Revision-Date: 2022-08-27 00:21+0800\n"
+"POT-Creation-Date: 2022-10-07 15:43+0800\n"
+"PO-Revision-Date: 2022-10-07 16:12+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -14,13 +14,13 @@ msgstr ""
 "X-Generator: Poedit 3.1\n"
 "X-Poedit-Basepath: .\n"
 
-#: pcsx2/gui/AppInit.cpp:176
+#: pcsx2/gui/AppInit.cpp:187
 msgid ""
 "Warning: Some of the configured PS2 recompilers failed to initialize and "
 "have been disabled:"
 msgstr "警告: 部分已配置的 PS2 重编译器初始化失败且已被禁用："
 
-#: pcsx2/gui/AppInit.cpp:207
+#: pcsx2/gui/AppInit.cpp:218
 msgid ""
 "Note: Recompilers are not necessary for PCSX2 to run, however they typically "
 "improve emulation speed substantially. You may have to manually re-enable "
