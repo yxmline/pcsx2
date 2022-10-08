@@ -5031,8 +5031,11 @@ SCKA-20096:
   gsHWFixes:
     mipmap: 1 # Better characters and environment but has a texture cache issue that makes it worse.
 SCKA-20098:
-  name: "Spongebob Squarepants - Creature from the Krusty Krab"
+  name: "Nickelodeon SpongeBob SquarePants - Creature from the Krusty Krab"
   region: "NTSC-K"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SCKA-20099:
   name: "Persona 3"
   region: "NTSC-K"
@@ -11616,9 +11619,11 @@ SLES-51219:
     mipmap: 1
     cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
 SLES-51220:
-  name: "Ty - The Tazmanian Tiger"
+  name: "TY the Tasmanian Tiger"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-51222:
   name: "Rayman 3 - Hoodlum Havoc"
   region: "PAL-M5"
@@ -13073,8 +13078,10 @@ SLES-51931:
   region: "PAL-M5"
   compat: 5
 SLES-51932:
-  name: "Jimmy Neutron - Jet Fusion"
+  name: "Adventures of Jimmy Neutron, The - Boy Genius - Jet Fusion"
   region: "PAL-E"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-51933:
   name: "Gregory Horror Show"
   region: "PAL-M3"
@@ -14692,7 +14699,7 @@ SLES-52697:
   name: "Manager de la Liga 2005"
   region: "PAL-S"
 SLES-52700:
-  name: "Jimmy Neutron - Attack of the Twonkies"
+  name: "Adventures of Jimmy Neutron, The - Boy Genius - Attack of the Twonkies"
   region: "PAL-E"
 SLES-52701:
   name: "Future Tactics - The Uprising"
@@ -14721,8 +14728,12 @@ SLES-52707:
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
 SLES-52709:
-  name: "Ty the Tazmanian Tiger 2 - Bush Rescue"
+  name: "TY the Tasmanian Tiger 2 - Bush Rescue"
   region: "PAL-M7"
+  compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
+    halfPixelOffset: 1 # Fixes visible lines in water textures.
 SLES-52710:
   name: "McFarlane's Evil Prophecy"
   region: "PAL-M5"
@@ -15049,6 +15060,9 @@ SLES-52859:
 SLES-52861:
   name: "King Arthur"
   region: "PAL-M5"
+  compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-52863:
   name: "Pinball Hall of Fame"
   region: "PAL-M6"
@@ -16940,8 +16954,12 @@ SLES-53635:
 SLES-53636:
   name: "TY the Tasmanian Tiger 3 - Night of the Quinkan"
   region: "PAL-A"
+  compat: 5
   roundModes:
     eeRoundMode: 0 # Fixes story mission to make it completable.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
+    halfPixelOffset: 1 # Fixes visible lines in water textures.
 SLES-53638:
   name: "Ski Racing 2006"
   region: "PAL-M5"
@@ -17343,6 +17361,8 @@ SLES-53775:
   region: "PAL-M4"
   gameFixes:
     - EETimingHack
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-53777:
   name: "Prince of Persia - The Two Thrones"
   region: "PAL-M5"
@@ -18622,6 +18642,7 @@ SLES-54358:
 SLES-54359:
   name: "Legend of Spyro, The - A New Beginning"
   region: "PAL-M6"
+  compat: 5
   patches:
     0EE5646B:
       content: |-
@@ -18629,6 +18650,7 @@ SLES-54359:
         // Fixes HUD and menu display.
         patch=1,EE,001849b8,word,00000000
   gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
     halfPixelOffset: 2 # Fixes lighting on mushrooms + others.
 SLES-54360:
   name: "Pro Evolution Soccer 6"
@@ -18738,8 +18760,11 @@ SLES-54396:
   region: "PAL-E"
   compat: 5
 SLES-54400:
-  name: "SpongeBob SquarePants - Creature from the Krusty Krab"
+  name: "Nickelodeon SpongeBob SquarePants - Creature from the Krusty Krab"
   region: "PAL-M7"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-54402:
   name: "Need for Speed - Carbon [Collector's Edition]"
   region: "PAL-F"
@@ -19357,6 +19382,7 @@ SLES-54657:
 SLES-54658:
   name: "Star Wars - The Force Unleashed"
   region: "PAL-M5"
+  compat: 5
   patches:
     87109051:
       content: |-
@@ -19365,9 +19391,12 @@ SLES-54658:
         // Patch replace values passed to FPU to workaround x86 rounding issues.
         patch=1,EE,0017cb84,word,3464fff0
         patch=1,EE,0017cb90,word,3463fffc
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-54659:
   name: "Star Wars - The Force Unleashed"
   region: "PAL-M4"
+  compat: 5
   patches:
     DAF2145C:
       content: |-
@@ -19376,6 +19405,8 @@ SLES-54659:
         // Patch replace values passed to FPU to workaround x86 rounding issues.
         patch=1,EE,0017cb84,word,3464fff0
         patch=1,EE,0017cb90,word,3463fffc
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-54663:
   name: "Jackass - The Game"
   region: "PAL-M5"
@@ -19774,6 +19805,7 @@ SLES-54815:
         // Fixes HUD and menu display.
         patch=1,EE,00173c38,word,00000000
   gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
     halfPixelOffset: 2 # Fixes lighting on mushrooms + others.
 SLES-54816:
   name: "Legend of Spyro, The - The Eternal Night"
@@ -19786,6 +19818,7 @@ SLES-54816:
         // Fixes HUD and menu display.
         patch=1,EE,00173bb8,word,00000000
   gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
     halfPixelOffset: 2 # Fixes lighting on mushrooms + others.
 SLES-54817:
   name: "Garfield - Lasagna World Tour"
@@ -20351,6 +20384,9 @@ SLES-55023:
 SLES-55024:
   name: "Nickelodeon SpongeBob's Atlantis SquarePantis"
   region: "PAL-M4"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-55025:
   name: "Disney-Pixar Cars - Mater-National Championship"
   region: "PAL-E-A"
@@ -20367,7 +20403,7 @@ SLES-55029:
   name: "Disney-Pixar Cars - La Copa Internacional de Mate"
   region: "PAL-S"
 SLES-55030:
-  name: "Nickelodeon SpongeBob's Atlantis SquarePantis"
+  name: "Disney-Pixar Cars - Mater-National Championship"
   region: "PAL-M4"
 SLES-55031:
   name: "Kung Fu Panda"
@@ -20467,6 +20503,9 @@ SLES-55079:
 SLES-55080:
   name: "Nickelodeon SpongeBob's Atlantis SquarePantis"
   region: "PAL-A"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-55081:
   name: "Jackass - The Game"
   region: "PAL-E"
@@ -20607,6 +20646,7 @@ SLES-55152:
 SLES-55163:
   name: "Legend of Spyro, The - Dawn of the Dragon"
   region: "PAL-M6"
+  compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting and bloom misalignment.
 SLES-55165:
@@ -20764,6 +20804,7 @@ SLES-55220:
 SLES-55227:
   name: "Legend of Spyro, The - Dawn of the Dragon"
   region: "PAL-M5"
+  compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting and bloom misalignment.
 SLES-55231:
@@ -20881,6 +20922,7 @@ SLES-55264:
 SLES-55265:
   name: "Legend of Spyro, The - Dawn of the Dragon"
   region: "PAL-R-E"
+  compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes ghosting and bloom misalignment.
 SLES-55266:
@@ -21358,8 +21400,10 @@ SLES-55518:
 SLES-55520:
   name: "Transformers - Revenge of the Fallen"
   region: "PAL-M5"
+  compat: 5
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLES-55522:
   name: "Disney-Pixar Up"
   region: "PAL-E"
@@ -23000,6 +23044,13 @@ SLKA-25443:
   name: "Musou Orochi Maou Sairin"
   region: "NTSC-K"
   compat: 5
+SLKA-25459:
+  name: "Transformers - Revenge of the Fallen"
+  region: "NTSC-K"
+  compat: 5
+  gsHWFixes:
+    cpuSpriteRenderBW: 2 # Fixes textures.
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLKA-25477:
   name: "World Soccer Winning Eleven 2011"
   region: "NTSC-K"
@@ -31806,8 +31857,10 @@ SLPM-66693:
   name: "Princess Maker 4 [Best Version]"
   region: "NTSC-J"
 SLPM-66694:
-  name: "Spongebob"
+  name: "Nickelodeon SpongeBob SquarePants"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLPM-66695:
   name: "Kono Aozora ni Yakusoku o - Melody of the Sun and Sea"
   region: "NTSC-J"
@@ -37809,6 +37862,7 @@ SLPS-25887:
 SLPS-25888:
   name: "Star Wars - The Force Unleashed"
   region: "NTSC-J"
+  compat: 5
   patches:
     CC9BFDE3:
       content: |-
@@ -37817,6 +37871,8 @@ SLPS-25888:
         // Patch replace values passed to FPU to workaround x86 rounding issues.
         patch=1,EE,0017d454,word,3464fff0
         patch=1,EE,0017d460,word,3463fffc
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLPS-25889:
   name: "Guitar Hero - Aerosmith"
   region: "NTSC-J"
@@ -40978,9 +41034,11 @@ SLUS-20570:
   region: "NTSC-U"
   compat: 5
 SLUS-20571:
-  name: "Ty the Tasmanian Tiger"
+  name: "TY the Tasmanian Tiger"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLUS-20572:
   name: "Tiger Woods PGA Tour 2003"
   region: "NTSC-U"
@@ -41557,8 +41615,10 @@ SLUS-20695:
     alignSprite: 1 # Fixes green vertical lines.
     roundSprite: 2 # Fixes vertical lines and some font artifacts but not completely fixed.
 SLUS-20696:
-  name: "Jimmy Neutron - Boy Genius - Jet Fusion"
+  name: "Adventures of Jimmy Neutron, The - Boy Genius - Jet Fusion"
   region: "NTSC-U"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLUS-20697:
   name: "Cy Girls [Disc1of2]"
   region: "NTSC-U"
@@ -42422,7 +42482,7 @@ SLUS-20886:
   name: "Sitting Ducks"
   region: "NTSC-U"
 SLUS-20887:
-  name: "Adventures of Jimmy Neutron, The - Attack of the Twonkies"
+  name: "Adventures of Jimmy Neutron, The - Boy Genius - Attack of the Twonkies"
   region: "NTSC-U"
 SLUS-20888:
   name: "Front Mission 4"
@@ -43274,6 +43334,8 @@ SLUS-21046:
   name: "King Arthur"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLUS-21047:
   name: "Cold Fear"
   region: "NTSC-U"
@@ -43322,8 +43384,12 @@ SLUS-21056:
   name: "Cabal, The ~~CANCELLED~~"
   region: "NTSC-U"
 SLUS-21057:
-  name: "Ty the Tasmanian Tiger 2 - Bush Rescue"
+  name: "TY the Tasmanian Tiger 2 - Bush Rescue"
   region: "NTSC-U"
+  compat: 5
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
+    halfPixelOffset: 1 # Fixes visible lines in water textures.
 SLUS-21058:
   name: "NBA Live 2005"
   region: "NTSC-U"
@@ -44298,11 +44364,14 @@ SLUS-21252:
   region: "NTSC-U"
   compat: 4
 SLUS-21253:
-  name: "Ty the Tasmanian Tiger 3"
+  name: "TY the Tasmanian Tiger 3 - Night of the Quinkan"
   region: "NTSC-U"
   compat: 5
   roundModes:
     eeRoundMode: 0 # Fixes story mission to make it completable.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
+    halfPixelOffset: 1 # Fixes visible lines in water textures.
 SLUS-21254:
   name: "Zatch Bell! Mamodo Battles"
   region: "NTSC-U"
@@ -44971,6 +45040,7 @@ SLUS-21372:
         // Fixes HUD and menu display.
         patch=1,EE,001849b8,word,00000000
   gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
     halfPixelOffset: 2 # Fixes lighting on mushrooms + others.
 SLUS-21373:
   name: "Drakengard 2"
@@ -45094,9 +45164,11 @@ SLUS-21390:
   gsHWFixes:
     roundSprite: 1 # Fixes edge garbage and thin lines.
 SLUS-21391:
-  name: "SpongeBob SquarePants - Creature from the Krusty Krab"
+  name: "Nickelodeon SpongeBob SquarePants - Creature from the Krusty Krab"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLUS-21392:
   name: "Shrek Smash and Crash"
   region: "NTSC-U"
@@ -45534,6 +45606,8 @@ SLUS-21479:
   compat: 5
   gameFixes:
     - EETimingHack
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLUS-21480:
   name: "dot hack GU Volume 1 - Rebirth - Terminal Disc"
   region: "NTSC-U"
@@ -46029,6 +46103,7 @@ SLUS-21607:
         // Fixes HUD and menu display.
         patch=1,EE,00173cb8,word,00000000
   gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
     halfPixelOffset: 2 # Fixes lighting on mushrooms + others.
 SLUS-21608:
   name: "Dance Dance Revolution SuperNOVA 2"
@@ -46056,7 +46131,7 @@ SLUS-21613:
 SLUS-21614:
   name: "Star Wars - The Force Unleashed"
   region: "NTSC-U"
-  compat: 4
+  compat: 5
   patches:
     879CDA5E:
       content: |-
@@ -46065,6 +46140,8 @@ SLUS-21614:
         // Patch replace values passed to FPU to workaround x86 rounding issues.
         patch=1,EE,0017cf24,word,3464fff0
         patch=1,EE,0017cf30,word,3463fffc
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLUS-21615:
   name: "Wild ARMs 5"
   region: "NTSC-U"
@@ -46210,9 +46287,11 @@ SLUS-21643:
   name: "Bratz - The Movie"
   region: "NTSC-U"
 SLUS-21644:
-  name: "SpongeBob's Atlantis SquarePantis"
+  name: "Nickelodeon SpongeBob's Atlantis SquarePantis"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLUS-21645:
   name: "WWE SmackDown! vs. Raw 2008"
   region: "NTSC-U"
@@ -46896,7 +46975,7 @@ SLUS-21796:
   name: "Dora the Explorer - Dora Saves the Snow Princess"
   region: "NTSC-U"
 SLUS-21797:
-  name: "Tak - Guardians Of Gross"
+  name: "Nickelodeon Tak and the Guardians of Gross"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
@@ -47227,6 +47306,7 @@ SLUS-21881:
   compat: 5
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
   patches:
     137C792E:
       content: |-
@@ -47360,6 +47440,8 @@ SLUS-21913:
         // This can be fixed on the GS side but the software renderer is impossible to fix.
         // So this patch corrects the issue on the EE side.
         patch=1,EE,00173328,word,3464fffd
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes missing splash logo at boot.
 SLUS-21914:
   name: "NHL 2K10"
   region: "NTSC-U"

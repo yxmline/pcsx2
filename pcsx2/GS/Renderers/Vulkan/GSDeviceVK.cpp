@@ -552,6 +552,7 @@ void GSDeviceVK::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r,
 	EndRenderPass();
 
 	dTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	dTexVK->SetUsedThisCommandBuffer();
 	sTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	sTexVK->SetUsedThisCommandBuffer();
 
@@ -1413,26 +1414,6 @@ bool GSDeviceVK::CompileConvertPipelines()
 
 		if (i == ShaderConvert::COPY)
 		{
-			// compile the variant for setting up hdr rendering
-			for (u32 ds = 0; ds < 2; ds++)
-			{
-				for (u32 fbl = 0; fbl < 2; fbl++)
-				{
-					pxAssert(!m_hdr_setup_pipelines[ds][fbl]);
-
-					gpb.SetRenderPass(GetTFXRenderPass(true, ds != 0, true, DATE_RENDER_PASS_NONE, fbl != 0,
-										  VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_LOAD_OP_DONT_CARE),
-						0);
-					m_hdr_setup_pipelines[ds][fbl] =
-						gpb.Create(g_vulkan_context->GetDevice(), g_vulkan_shader_cache->GetPipelineCache(true), false);
-					if (!m_hdr_setup_pipelines[ds][fbl])
-						return false;
-
-					Vulkan::Util::SetObjectName(g_vulkan_context->GetDevice(), m_hdr_setup_pipelines[ds][fbl],
-						"HDR setup/copy pipeline (ds=%u, fbl=%u)", i, ds, fbl);
-				}
-			}
-
 			// compile color copy pipelines
 			gpb.SetRenderPass(m_utility_color_render_pass_discard, 0);
 			for (u32 i = 0; i < 16; i++)
@@ -1451,24 +1432,26 @@ bool GSDeviceVK::CompileConvertPipelines()
 					(i >> 3) & 1u);
 			}
 		}
-		else if (i == ShaderConvert::MOD_256)
+		else if (i == ShaderConvert::HDR_INIT || i == ShaderConvert::HDR_RESOLVE)
 		{
+			const bool is_setup = i == ShaderConvert::HDR_INIT;
+			VkPipeline (&arr)[2][2] = *(is_setup ? &m_hdr_setup_pipelines : &m_hdr_finish_pipelines);
 			for (u32 ds = 0; ds < 2; ds++)
 			{
 				for (u32 fbl = 0; fbl < 2; fbl++)
 				{
-					pxAssert(!m_hdr_finish_pipelines[ds][fbl]);
+					pxAssert(!arr[ds][fbl]);
 
-					gpb.SetRenderPass(GetTFXRenderPass(true, ds != 0, false, DATE_RENDER_PASS_NONE, fbl != 0,
-										  VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_LOAD_OP_DONT_CARE),
+					gpb.SetRenderPass(
+						GetTFXRenderPass(true, ds != 0, is_setup, DATE_RENDER_PASS_NONE, fbl != 0,
+							VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_LOAD_OP_DONT_CARE),
 						0);
-					m_hdr_finish_pipelines[ds][fbl] =
-						gpb.Create(g_vulkan_context->GetDevice(), g_vulkan_shader_cache->GetPipelineCache(true), false);
-					if (!m_hdr_finish_pipelines[ds][fbl])
+					arr[ds][fbl] = gpb.Create(g_vulkan_context->GetDevice(), g_vulkan_shader_cache->GetPipelineCache(true), false);
+					if (!arr[ds][fbl])
 						return false;
 
-					Vulkan::Util::SetObjectName(g_vulkan_context->GetDevice(), m_hdr_setup_pipelines[ds][fbl],
-						"HDR finish/copy pipeline (ds=%u, fbl=%u)", i, ds, fbl);
+					Vulkan::Util::SetObjectName(g_vulkan_context->GetDevice(), arr[ds][fbl],
+						"HDR %s/copy pipeline (ds=%u, fbl=%u)", is_setup ? "setup" : "finish", i, ds, fbl);
 				}
 			}
 		}
@@ -2972,7 +2955,7 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 	else if (config.require_one_barrier && !m_features.texture_barrier)
 	{
 		// requires a copy of the RT
-		draw_rt_clone = static_cast<GSTextureVK*>(CreateTexture(rtsize.x, rtsize.y, false, GSTexture::Format::Color, false));
+		draw_rt_clone = static_cast<GSTextureVK*>(CreateTexture(rtsize.x, rtsize.y, 1, GSTexture::Format::Color, false));
 		if (draw_rt_clone)
 		{
 			EndRenderPass();
