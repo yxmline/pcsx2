@@ -4991,14 +4991,14 @@ SCKA-20086:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SCKA-20087:
   name: "Shin Onimusha - Dawn of Dreams [Disc2of2]"
   region: "NTSC-K"
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SCKA-20086"
 SCKA-20090:
@@ -8919,7 +8919,8 @@ SLED-53445:
   name: "Incredible Hulk, The - Ultimate Destruction [Demo]"
   region: "PAL-M3"
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, fixes textures.
+    trilinearFiltering: 1
 SLED-53512:
   name: "Burnout Revenge [Demo]"
   region: "PAL-E"
@@ -15272,7 +15273,7 @@ SLES-52950:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Removes Blurriness.
+    halfPixelOffset: 2 # Fixes blurriness and misalgined garbage when upscaling.
 SLES-52951:
   name: "Phantom Brave"
   region: "PAL-E"
@@ -16351,7 +16352,8 @@ SLES-53430:
   name: "Incredible Hulk, The - Ultimate Destruction"
   region: "PAL-M4"
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, fixes textures.
+    trilinearFiltering: 1
 SLES-53433:
   name: "NHL '06"
   region: "PAL-M6"
@@ -21821,7 +21823,7 @@ SLES-82038:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SLES-82039:
   name: "Onimusha - Dawn of Dreams [Disc2of2]"
   region: "PAL-M5"
@@ -21829,7 +21831,7 @@ SLES-82039:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SLES-82038"
 SLES-82042:
@@ -28938,7 +28940,7 @@ SLPM-65883:
   name: "Shadow of Rome"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Removes Blurriness.
+    halfPixelOffset: 2 # Fixes blurriness and misalgined garbage when upscaling.
 SLPM-65884:
   name: "Remote Control Dandy SF"
   region: "NTSC-J"
@@ -30312,7 +30314,7 @@ SLPM-66275:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SLPM-66276:
   name: "Shin Onimusha - Dawn of Dreams [Disc2of2]"
   region: "NTSC-J"
@@ -30320,7 +30322,7 @@ SLPM-66276:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SLPM-66275"
 SLPM-66277:
@@ -32051,7 +32053,7 @@ SLPM-66745:
   name: "Shadow of Rome [CapKore]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Removes Blurriness.
+    halfPixelOffset: 2 # Fixes blurriness and misalgined garbage when upscaling.
 SLPM-66746:
   name: "Guilty Gear XX - Accent Core"
   region: "NTSC-J"
@@ -33236,14 +33238,14 @@ SLPM-74232:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SLPM-74233:
   name: "Shin Onimusha - Dawn of Dreams [PlayStation 2 The Best][Disc 2]"
   region: "NTSC-J"
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SLPM-74232"
 SLPM-74234:
@@ -33338,14 +33340,14 @@ SLPM-74251:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SLPM-74252:
   name: "Shin Onimusha - Dawn of Dreams [Playstation 2 the Best - Reprint Disc 2]"
   region: "NTSC-J"
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SLPM-74251"
 SLPM-74253:
@@ -42578,7 +42580,7 @@ SLUS-20902:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Removes Blurriness.
+    halfPixelOffset: 2 # Fixes blurriness and misalgined garbage when upscaling.
 SLUS-20903:
   name: "Mega Man X - Command Mission"
   region: "NTSC-U"
@@ -42782,7 +42784,8 @@ SLUS-20941:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, fixes textures.
+    trilinearFiltering: 1
 SLUS-20942:
   name: "Robots"
   region: "NTSC-U"
@@ -43975,6 +43978,8 @@ SLUS-21180:
   compat: 5
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
 SLUS-21181:
   name: "D.I.C.E. - DNA Integrated Cybernetic Enterprises"
   region: "NTSC-U"
@@ -44707,6 +44712,7 @@ SLUS-21312:
   compat: 5
   gsHWFixes:
     deinterlace: 3 # Game requires bob deinterlacing when auto.
+    halfPixelOffset: 1 # Fixes misalignment/bloom when upscaling.
 SLUS-21313:
   name: "Friends - The One with all the Trivia"
   region: "NTSC-U"
@@ -45008,7 +45014,7 @@ SLUS-21362:
   gameFixes:
     - SoftwareRendererFMVHack # Wrong white textures in FMV.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes upscaling lines.
+    halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
   memcardFilters:
     - "SLUS-21180"
 SLUS-21363:
@@ -48194,7 +48200,7 @@ SLUS-29139:
   name: "Shadow of Rome [Demo]"
   region: "NTSC-U"
   gsHWFixes:
-    halfPixelOffset: 1 # Removes Blurriness.
+    halfPixelOffset: 2 # Fixes blurriness and misalgined garbage when upscaling.
 SLUS-29140:
   name: "MX vs. ATV Unleashed [Demo]"
   region: "NTSC-U"
@@ -48208,7 +48214,8 @@ SLUS-29148:
   name: "Incredible Hulk, The - Ultimate Destruction [Demo]"
   region: "NTSC-U"
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, fixes textures.
+    trilinearFiltering: 1
 SLUS-29149:
   name: "Flipnic - Ultimate Pinball [Demo]"
   region: "NTSC-U"
