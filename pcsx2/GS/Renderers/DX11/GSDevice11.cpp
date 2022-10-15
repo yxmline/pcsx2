@@ -22,6 +22,7 @@
 #include "GS/GSUtil.h"
 #include "Host.h"
 #include "HostDisplay.h"
+#include "ShaderCacheVersion.h"
 #include "common/StringUtil.h"
 #include <fstream>
 #include <sstream>
@@ -79,26 +80,26 @@ bool GSDevice11::Create()
 
 	D3D_FEATURE_LEVEL level;
 
-	if (g_host_display->GetRenderAPI() != HostDisplay::RenderAPI::D3D11)
+	if (g_host_display->GetRenderAPI() != RenderAPI::D3D11)
 	{
-		fprintf(stderr, "Render API is incompatible with D3D11\n");
+		Console.Error("Render API is incompatible with D3D11");
 		return false;
 	}
 
-	m_dev = static_cast<ID3D11Device*>(g_host_display->GetRenderDevice());
-	m_ctx = static_cast<ID3D11DeviceContext*>(g_host_display->GetRenderContext());
+	m_dev = static_cast<ID3D11Device*>(g_host_display->GetDevice());
+	m_ctx = static_cast<ID3D11DeviceContext*>(g_host_display->GetContext());
 	level = m_dev->GetFeatureLevel();
 
 	if (!GSConfig.DisableShaderCache)
 	{
-		if (!m_shader_cache.Open(EmuFolders::Cache, m_dev->GetFeatureLevel(), SHADER_VERSION, GSConfig.UseDebugDevice))
+		if (!m_shader_cache.Open(EmuFolders::Cache, m_dev->GetFeatureLevel(), SHADER_CACHE_VERSION, GSConfig.UseDebugDevice))
 		{
 			Console.Warning("Shader cache failed to open.");
 		}
 	}
 	else
 	{
-		m_shader_cache.Open({}, m_dev->GetFeatureLevel(), SHADER_VERSION, GSConfig.UseDebugDevice);
+		m_shader_cache.Open({}, m_dev->GetFeatureLevel(), SHADER_CACHE_VERSION, GSConfig.UseDebugDevice);
 		Console.WriteLn("Not using shader cache.");
 	}
 
