@@ -2245,6 +2245,10 @@ void FullscreenUI::DrawInterfaceSettingsPage()
 		false);
 	DrawToggleSetting(bsi, ICON_FA_PLAY " Show Status Indicators",
 		"Shows indicators when fast forwarding, pausing, and other abnormal states are active.", "EmuCore/GS", "OsdShowIndicators", true);
+	DrawToggleSetting(bsi, ICON_FA_SLIDERS_H " Show Settings",
+		"Shows the current configuration in the bottom-right corner of the display.", "EmuCore/GS", "OsdShowSettings", false);
+	DrawToggleSetting(bsi, ICON_FA_GAMEPAD " Show Inputs",
+		"Shows the current controller state of the system in the bottom-left corner of the display.", "EmuCore/GS", "OsdShowInputs", false);
 
 	MenuHeading("Operations");
 	if (MenuButton(ICON_FA_FOLDER_MINUS " Reset Settings", "Resets configuration to defaults (excluding controller settings).",
@@ -2575,6 +2579,8 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 	static constexpr const char* s_anisotropic_filtering_values[] = {"0", "2", "4", "8", "16"};
 	static constexpr const char* s_preloading_options[] = {"None", "Partial", "Full (Hash Cache)"};
 	static constexpr const char* s_generic_options[] = {"Automatic (Default)", "Force Disabled", "Force Enabled"};
+	static constexpr const char* s_hw_download[] = {"Accurate (Recommended)", "Disable Readbacks (Synchronize GS Thread)",
+		"Unsynchronized (Non-Deterministic)", "Disabled (Ignore Transfers)"};
 
 	SettingsInterface* bsi = GetEditingSettingsInterface();
 
@@ -2650,6 +2656,8 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 			"Uploads full textures to the GPU on use, rather than only the utilized regions. Can improve performance in some games.",
 			"EmuCore/GS", "texture_preloading", static_cast<int>(TexturePreloadingLevel::Off), s_preloading_options,
 			std::size(s_preloading_options));
+		DrawIntListSetting(bsi, "Hardware Download Mode", "Changes synchronization behavior for GS downloads.", "EmuCore/GS", "HWDownloadMode",
+			static_cast<int>(GSHardwareDownloadMode::Enabled), s_hw_download, std::size(s_hw_download));
 		DrawToggleSetting(bsi, "GPU Palette Conversion",
 			"Applies palettes to textures on the GPU instead of the CPU. Can result in speed improvements in some games.", "EmuCore/GS",
 			"paltex", false);
@@ -2776,9 +2784,6 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 	DrawToggleSetting(bsi, "Skip Presenting Duplicate Frames",
 		"Skips displaying frames that don't change in 25/30fps games. Can improve speed but increase input lag/make frame pacing worse.",
 		"EmuCore/GS", "SkipDuplicateFrames", false);
-	DrawToggleSetting(bsi, "Disable Hardware Readbacks",
-		"Skips thread synchronization for GS downloads. Can improve speed, but break graphical effects.", "EmuCore/GS",
-		"HWDisableReadbacks", false);
 	DrawIntListSetting(bsi, "Override Texture Barriers", "Forces texture barrier functionality to the specified value.", "EmuCore/GS",
 		"OverrideTextureBarriers", -1, s_generic_options, std::size(s_generic_options), -1);
 	DrawIntListSetting(bsi, "Override Geometry Shaders", "Forces geometry shader functionality to the specified value.", "EmuCore/GS",

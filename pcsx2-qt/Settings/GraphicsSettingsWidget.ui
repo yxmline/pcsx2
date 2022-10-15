@@ -1144,24 +1144,10 @@
           </item>
           <item row="1" column="0" colspan="2">
            <layout class="QGridLayout" name="gridLayout_6">
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="osdShowMessages">
+            <item row="3" column="1">
+             <widget class="QCheckBox" name="osdShowIndicators">
               <property name="text">
-               <string>Show Notifications</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QCheckBox" name="osdShowSpeed">
-              <property name="text">
-               <string>Show Speed</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="osdShowFPS">
-              <property name="text">
-               <string>Show FPS</string>
+               <string>Show Indicators</string>
               </property>
              </widget>
             </item>
@@ -1172,17 +1158,17 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="osdShowSpeed">
+              <property name="text">
+               <string>Show Speed</string>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QCheckBox" name="osdShowCPU">
               <property name="text">
                <string>Show CPU Usage</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QCheckBox" name="osdShowGPU">
-              <property name="text">
-               <string>Show GPU Usage</string>
               </property>
              </widget>
             </item>
@@ -1193,10 +1179,38 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
-             <widget class="QCheckBox" name="osdShowIndicators">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="osdShowMessages">
               <property name="text">
-               <string>Show Indicators</string>
+               <string>Show Notifications</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="osdShowFPS">
+              <property name="text">
+               <string>Show FPS</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="osdShowGPU">
+              <property name="text">
+               <string>Show GPU Usage</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QCheckBox" name="osdShowSettings">
+              <property name="text">
+               <string>Show Settings</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="osdShowInputs">
+              <property name="text">
+               <string>Show Inputs</string>
               </property>
              </widget>
             </item>
@@ -1415,12 +1429,26 @@
             </item>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2">
+          <item row="5" column="0" colspan="2">
            <layout class="QGridLayout" name="gridLayout_7">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="skipPresentingDuplicateFrames">
+              <property name="text">
+               <string>Skip Presenting Duplicate Frames</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QCheckBox" name="useBlitSwapChain">
               <property name="text">
                <string>Use Blit Swap Chain</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="disableFramebufferFetch">
+              <property name="text">
+               <string>Disable Framebuffer Fetch</string>
               </property>
              </widget>
             </item>
@@ -1438,37 +1466,16 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QCheckBox" name="disableFramebufferFetch">
-              <property name="text">
-               <string>Disable Framebuffer Fetch</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="skipPresentingDuplicateFrames">
-              <property name="text">
-               <string>Skip Presenting Duplicate Frames</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QCheckBox" name="disableHardwareReadbacks">
-              <property name="text">
-               <string>Disable Hardware Readbacks</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_34">
             <property name="text">
              <string>GS Dump Compression:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QComboBox" name="gsDumpCompression">
             <item>
              <property name="text">
@@ -1483,6 +1490,37 @@
             <item>
              <property name="text">
               <string>Zstandard (zst)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_42">
+            <property name="text">
+             <string>Hardware Download Mode:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="gsDownloadMode">
+            <item>
+             <property name="text">
+              <string>Accurate (Recommended)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Disable Readbacks (Synchronize GS Thread)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Unsynchronized (Non-Deterministic)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Disabled (Ignore Transfers)</string>
              </property>
             </item>
            </widget>

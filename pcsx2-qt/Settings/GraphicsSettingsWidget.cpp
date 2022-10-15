@@ -138,6 +138,8 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.osdShowResolution, "EmuCore/GS", "OsdShowResolution", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.osdShowGSStats, "EmuCore/GS", "OsdShowGSStats", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.osdShowIndicators, "EmuCore/GS", "OsdShowIndicators", true);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.osdShowSettings, "EmuCore/GS", "OsdShowSettings", false);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.osdShowInputs, "EmuCore/GS", "OsdShowInputs", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.fxaa, "EmuCore/GS", "fxaa", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.shadeBoost, "EmuCore/GS", "ShadeBoost", false);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.shadeBoostBrightness, "EmuCore/GS", "ShadeBoost_Brightness", false);
@@ -243,7 +245,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.gsDumpCompression, "EmuCore/GS", "GSDumpCompression", static_cast<int>(GSDumpCompressionMethod::LZMA));
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.disableFramebufferFetch, "EmuCore/GS", "DisableFramebufferFetch", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.disableDualSource, "EmuCore/GS", "DisableDualSourceBlend", false);
-	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.disableHardwareReadbacks, "EmuCore/GS", "HWDisableReadbacks", false);
+	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.gsDownloadMode, "EmuCore/GS", "HWDownloadMode", static_cast<int>(GSHardwareDownloadMode::Enabled));
 
 	//////////////////////////////////////////////////////////////////////////
 	// SW Settings
@@ -288,9 +290,9 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	connect(m_ui.swTextureFiltering, &QComboBox::currentIndexChanged, this, &GraphicsSettingsWidget::onSWTextureFilteringChange);
 	updateRendererDependentOptions();
 
-	// only allow disabling readbacks for per-game settings, it's too dangerous
 #ifndef PCSX2_DEVBUILD
-	m_ui.disableHardwareReadbacks->setEnabled(m_dialog->isPerGameSettings());
+	// only allow disabling readbacks for per-game settings, it's too dangerous
+	m_ui.gsDownloadMode->setEnabled(m_dialog->isPerGameSettings());
 
 	// Remove texture offset and skipdraw range for global settings.
 	if (!m_dialog->isPerGameSettings())
@@ -475,7 +477,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 			   "the GPU has more time to complete it (this is NOT frame skipping). Can smooth our frame time fluctuations when the CPU/GPU are near maximum "
 			   "utilization, but makes frame pacing more inconsistent and can increase input lag."));
 
-		dialog->registerWidgetHelp(m_ui.disableHardwareReadbacks, tr("Disable Hardware Readbacks"), tr("Unchecked"),
+		dialog->registerWidgetHelp(m_ui.gsDownloadMode, tr("GS Download Mode"), tr("Accurate"),
 			tr("Skips synchronizing with the GS thread and host GPU for GS downloads. "
 			   "Can result in a large speed boost on slower systems, at the cost of many broken graphical effects. "
 			   "If games are broken and you have this option enabled, please disable it first."));

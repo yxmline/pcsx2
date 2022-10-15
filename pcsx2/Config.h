@@ -199,6 +199,14 @@ enum class GSDumpCompressionMethod : u8
 	Zstandard,
 };
 
+enum class GSHardwareDownloadMode : u8
+{
+	Enabled,
+	NoReadbacks,
+	Unsynchronized,
+	Disabled
+};
+
 // Template function for casting enumerations to their underlying type
 template <typename Enumeration>
 typename std::underlying_type<Enumeration>::type enum_cast(Enumeration E)
@@ -391,6 +399,30 @@ struct Pcsx2Config
 		{
 			return !OpEqu(bitset);
 		}
+
+		u32 GetEEClampMode() const
+		{
+			return fpuFullMode ? 3 : (fpuExtraOverflow ? 2 : (fpuOverflow ? 1 : 0));
+		}
+
+		void SetEEClampMode(u32 value)
+		{
+			fpuOverflow = (value >= 1);
+			fpuExtraOverflow = (value >= 2);
+			fpuFullMode = (value >= 3);
+		}
+
+		u32 GetVUClampMode() const
+		{
+			return vuSignOverflow ? 3 : (vuExtraOverflow ? 2 : (vuOverflow ? 1 : 0));
+		}
+
+		void SetVUClampMode(u32 value)
+		{
+			vuOverflow = (value >= 1);
+			vuExtraOverflow = (value >= 2);
+			vuSignOverflow = (value >= 3);
+		}
 	};
 
 	// ------------------------------------------------------------------------
@@ -459,10 +491,11 @@ struct Pcsx2Config
 					OsdShowGPU : 1,
 					OsdShowResolution : 1,
 					OsdShowGSStats : 1,
-					OsdShowIndicators : 1;
+					OsdShowIndicators : 1,
+					OsdShowSettings : 1,
+					OsdShowInputs : 1;
 
 				bool
-					HWDisableReadbacks : 1,
 					GPUPaletteConversion : 1,
 					AutoFlushSW : 1,
 					PreloadFrameWithGSData : 1,
@@ -535,6 +568,7 @@ struct Pcsx2Config
 		BiFiltering TextureFiltering{BiFiltering::PS2};
 		TexturePreloadingLevel TexturePreloading{TexturePreloadingLevel::Full};
 		GSDumpCompressionMethod GSDumpCompression{GSDumpCompressionMethod::LZMA};
+		GSHardwareDownloadMode HWDownloadMode{GSHardwareDownloadMode::Enabled};
 		int Dithering{2};
 		int MaxAnisotropy{0};
 		int SWExtraThreads{2};
