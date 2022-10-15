@@ -553,8 +553,13 @@ void GSDeviceVK::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r,
 
 	dTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	dTexVK->SetUsedThisCommandBuffer();
+
 	sTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	sTexVK->SetUsedThisCommandBuffer();
+
+	// ensure we don't leave this bound later on
+	if (m_tfx_textures[0] == sTexVK->GetView())
+		PSSetShaderResource(0, nullptr, false);
 
 	vkCmdCopyImage(g_vulkan_context->GetCurrentCommandBuffer(), sTexVK->GetImage(),
 		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dTexVK->GetImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &ic);
@@ -712,13 +717,14 @@ void GSDeviceVK::BlitRect(GSTexture* sTex, const GSVector4i& sRect, u32 sLevel, 
 	GSTextureVK* sTexVK = static_cast<GSTextureVK*>(sTex);
 	GSTextureVK* dTexVK = static_cast<GSTextureVK*>(dTex);
 
-	//const VkImageLayout old_src_layout = sTexVK->GetTexture().GetLayout();
-	//const VkImageLayout old_dst_layout = dTexVK->GetTexture().GetLayout();
-
 	EndRenderPass();
 
 	sTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 	dTexVK->TransitionToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	// ensure we don't leave this bound later on
+	if (m_tfx_textures[0] == sTexVK->GetView())
+		PSSetShaderResource(0, nullptr, false);
 
 	pxAssert(
 		(sTexVK->GetType() == GSTexture::Type::DepthStencil) == (dTexVK->GetType() == GSTexture::Type::DepthStencil));
@@ -1102,7 +1108,7 @@ VkShaderModule GSDeviceVK::GetUtilityVertexShader(const std::string& source, con
 	std::stringstream ss;
 	AddShaderHeader(ss);
 	AddShaderStageMacro(ss, true, false, false);
-	AddMacro(ss, "PS_SCALE_FACTOR", GSConfig.UpscaleMultiplier);
+	AddMacro(ss, "PS_SCALE_FACTOR", StringUtil::ToChars(GSConfig.UpscaleMultiplier).c_str());
 	if (replace_main)
 		ss << "#define " << replace_main << " main\n";
 	ss << source;
@@ -1115,7 +1121,7 @@ VkShaderModule GSDeviceVK::GetUtilityFragmentShader(const std::string& source, c
 	std::stringstream ss;
 	AddShaderHeader(ss);
 	AddShaderStageMacro(ss, false, false, true);
-	AddMacro(ss, "PS_SCALE_FACTOR", GSConfig.UpscaleMultiplier);
+	AddMacro(ss, "PS_SCALE_FACTOR", StringUtil::ToChars(GSConfig.UpscaleMultiplier).c_str());
 	if (replace_main)
 		ss << "#define " << replace_main << " main\n";
 	ss << source;
@@ -1894,7 +1900,7 @@ VkShaderModule GSDeviceVK::GetTFXVertexShader(GSHWDrawConfig::VSSelector sel)
 	AddMacro(ss, "VS_IIP", sel.iip);
 	AddMacro(ss, "VS_POINT_SIZE", sel.point_size);
 	if (sel.point_size)
-		AddMacro(ss, "VS_POINT_SIZE_VALUE", GSConfig.UpscaleMultiplier);
+		AddMacro(ss, "VS_POINT_SIZE_VALUE", StringUtil::ToChars(GSConfig.UpscaleMultiplier).c_str());
 	ss << m_tfx_source;
 
 	VkShaderModule mod = g_vulkan_shader_cache->GetVertexShader(ss.str());
@@ -1978,7 +1984,7 @@ VkShaderModule GSDeviceVK::GetTFXFragmentShader(const GSHWDrawConfig::PSSelector
 	AddMacro(ss, "PS_ZCLAMP", sel.zclamp);
 	AddMacro(ss, "PS_PABE", sel.pabe);
 	AddMacro(ss, "PS_SCANMSK", sel.scanmsk);
-	AddMacro(ss, "PS_SCALE_FACTOR", GSConfig.UpscaleMultiplier);
+	AddMacro(ss, "PS_SCALE_FACTOR", StringUtil::ToChars(GSConfig.UpscaleMultiplier).c_str());
 	AddMacro(ss, "PS_TEX_IS_FB", sel.tex_is_fb);
 	AddMacro(ss, "PS_NO_COLOR", sel.no_color);
 	AddMacro(ss, "PS_NO_COLOR1", sel.no_color1);
@@ -2885,6 +2891,7 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 	}
 	if (config.pal)
 		PSSetShaderResource(1, config.pal, true);
+
 	if (config.blend.constant_enable)
 		SetBlendConstants(config.blend.constant);
 
