@@ -701,6 +701,28 @@ void EmuThread::reloadInputBindings()
 	InputManager::ReloadBindings(*si, *bindings_si);
 }
 
+void EmuThread::reloadInputDevices()
+{
+	if (!isOnEmuThread())
+	{
+		QMetaObject::invokeMethod(this, &EmuThread::reloadInputDevices, Qt::QueuedConnection);
+		return;
+	}
+
+	InputManager::ReloadDevices();
+}
+
+void EmuThread::closeInputSources()
+{
+	if (!isOnEmuThread())
+	{
+		QMetaObject::invokeMethod(this, &EmuThread::reloadInputDevices, Qt::BlockingQueuedConnection);
+		return;
+	}
+
+	InputManager::CloseSources();
+}
+
 void EmuThread::requestDisplaySize(float scale)
 {
 	if (!isOnEmuThread())
@@ -1482,6 +1504,13 @@ void Host::EndTextInput()
 		QMetaObject::invokeMethod(method, "hide", Qt::QueuedConnection);
 }
 
+std::optional<WindowInfo> Host::GetTopLevelWindowInfo()
+{
+	std::optional<WindowInfo> ret;
+	QMetaObject::invokeMethod(g_main_window, &MainWindow::getWindowInfo, Qt::BlockingQueuedConnection, &ret);
+	return ret;
+}
+
 void Host::OnInputDeviceConnected(const std::string_view& identifier, const std::string_view& device_name)
 {
 	emit g_emu_thread->onInputDeviceConnected(
@@ -1754,6 +1783,7 @@ static bool PerformEarlyHardwareChecks()
 static void RegisterTypes()
 {
 	qRegisterMetaType<std::optional<bool>>();
+	qRegisterMetaType<std::optional<WindowInfo>>("std::optional<WindowInfo>()");
 	qRegisterMetaType<std::function<void()>>("std::function<void()>");
 	qRegisterMetaType<std::shared_ptr<VMBootParameters>>();
 	qRegisterMetaType<GSRendererType>();
