@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-10-07 15:43+0800\n"
-"PO-Revision-Date: 2022-10-07 16:12+0800\n"
+"POT-Creation-Date: 2022-10-16 09:49+0800\n"
+"PO-Revision-Date: 2022-10-16 09:55+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.1\n"
+"X-Generator: Poedit 3.1.1\n"
 "X-Poedit-Basepath: .\n"
 
 #: pcsx2/DEV9/ATA/HddCreateWx.cpp:38
@@ -149,7 +149,7 @@ msgstr ""
 msgid "Browse Required"
 msgstr "需要浏览"
 
-#: pcsx2/Recording/NewRecordingFrame.cpp:50 pcsx2/gui/AppInit.cpp:706
+#: pcsx2/Recording/NewRecordingFrame.cpp:50 pcsx2/gui/AppInit.cpp:652
 msgid "Cancel"
 msgstr "取消"
 
@@ -190,180 +190,172 @@ msgstr "文件名已存在"
 msgid "The Operating-System prevents this file from being created"
 msgstr "操作系统不允许建立此文件"
 
-#: pcsx2/gui/AppInit.cpp:180
-msgid "PCSX2 Recompiler Error(s)"
-msgstr "PCSX2 重编译器错误"
-
-#: pcsx2/gui/AppInit.cpp:229
+#: pcsx2/gui/AppInit.cpp:181
 msgid "All options are for the current session only and will not be saved.\n"
 msgstr "全部选项仅对当前会话有效，不会被保存。\n"
 
-#: pcsx2/gui/AppInit.cpp:239 pcsx2/gui/AppMain.cpp:246
+#: pcsx2/gui/AppInit.cpp:191 pcsx2/gui/AppMain.cpp:283
 msgid "IsoFile"
 msgstr "ISO 文件"
 
-#: pcsx2/gui/AppInit.cpp:240
+#: pcsx2/gui/AppInit.cpp:192
 msgid "displays this list of command line options"
 msgstr "显示此命令行选项列表"
 
-#: pcsx2/gui/AppInit.cpp:241
+#: pcsx2/gui/AppInit.cpp:193
 msgid "forces the program log/console to be visible"
 msgstr "强制程序日志/控制台为可见状态"
 
-#: pcsx2/gui/AppInit.cpp:242
+#: pcsx2/gui/AppInit.cpp:194
 msgid "use fullscreen GS mode"
 msgstr "使用全屏幕 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:243
+#: pcsx2/gui/AppInit.cpp:195
 msgid "use windowed GS mode"
 msgstr "使用窗口化 GS 模式"
 
-#: pcsx2/gui/AppInit.cpp:245
+#: pcsx2/gui/AppInit.cpp:197
 msgid "disables display of the gui while running games"
 msgstr "运行游戏时不显示图形界面"
 
-#: pcsx2/gui/AppInit.cpp:246
+#: pcsx2/gui/AppInit.cpp:198
 msgid "when nogui - prompt before exiting on suspend"
 msgstr "当关闭图形界面时，在退出前暂停并提示"
 
-#: pcsx2/gui/AppInit.cpp:248
+#: pcsx2/gui/AppInit.cpp:200
 msgid "executes an ELF image"
 msgstr "执行一个 ELF 映像"
 
-#: pcsx2/gui/AppInit.cpp:249
+#: pcsx2/gui/AppInit.cpp:201
 msgid "executes an IRX image"
 msgstr "执行一个 IRX 映像"
 
-#: pcsx2/gui/AppInit.cpp:250
+#: pcsx2/gui/AppInit.cpp:202
 msgid "boots an empty DVD tray; use to enter the PS2 system menu"
 msgstr "使用空白的 DVD 盘启动；用于进入 PS2 系统菜单"
 
-#: pcsx2/gui/AppInit.cpp:251
+#: pcsx2/gui/AppInit.cpp:203
 msgid "boots from the disc drive (overrides IsoFile parameter)"
 msgstr "从光盘驱动器启动 (将覆盖 IsoFile 参数)"
 
-#: pcsx2/gui/AppInit.cpp:253
+#: pcsx2/gui/AppInit.cpp:205
 msgid "disables all speedhacks"
 msgstr "取消所有速度 Hack"
 
-#: pcsx2/gui/AppInit.cpp:254
+#: pcsx2/gui/AppInit.cpp:206
 msgid "use the specified comma or pipe-delimited list of gamefixes."
 msgstr "使用指定的逗号或管道符隔开的游戏特殊修正列表。"
 
-#: pcsx2/gui/AppInit.cpp:255
+#: pcsx2/gui/AppInit.cpp:207
 msgid "disables fast booting"
 msgstr "禁用快速启动"
 
-#: pcsx2/gui/AppInit.cpp:256
+#: pcsx2/gui/AppInit.cpp:208
 msgid ""
 "passes the specified space-delimited string of launch arguments to the game"
 msgstr "传送指定的以空白分隔的执行选项字串至游戏"
 
-#: pcsx2/gui/AppInit.cpp:258
+#: pcsx2/gui/AppInit.cpp:210
 msgid "changes the configuration file path"
 msgstr "更改配置文件路径"
 
-#: pcsx2/gui/AppInit.cpp:259
+#: pcsx2/gui/AppInit.cpp:211
 msgid "specifies the PCSX2 configuration file to use"
 msgstr "指定使用的 PCSX2 配置文件"
 
-#: pcsx2/gui/AppInit.cpp:260
+#: pcsx2/gui/AppInit.cpp:212
 #, c-format
 msgid "forces %s to start the First-time Wizard"
 msgstr "强制 %s 启动首次运行向导"
 
-#: pcsx2/gui/AppInit.cpp:261
+#: pcsx2/gui/AppInit.cpp:213
 msgid "enables portable mode operation (requires admin/root access)"
 msgstr "启用绿色模式 (需要管理员权限)"
 
-#: pcsx2/gui/AppInit.cpp:263
+#: pcsx2/gui/AppInit.cpp:215
 msgid "update options to ease profiling (debug)"
 msgstr "更新选项以简化分析 (调试)"
 
-#: pcsx2/gui/AppInit.cpp:490
+#: pcsx2/gui/AppInit.cpp:442
 #, c-format
 msgid "Specified elf file %s does not exist!"
 msgstr "指定的 elf 文件 %s 不存在！"
 
-#: pcsx2/gui/AppInit.cpp:521
-msgid "PCSX2 Error: Hardware Deficiency."
-msgstr "PCSX2 错误: 硬件缺陷。"
-
-#: pcsx2/gui/AppInit.cpp:521 pcsx2/gui/AppInit.cpp:533
+#: pcsx2/gui/AppInit.cpp:479
 #, c-format
 msgid "Press OK to close %s."
 msgstr "请单击 \"确定\" 来关闭 %s。"
 
-#: pcsx2/gui/AppInit.cpp:534
+#: pcsx2/gui/AppInit.cpp:480
 #, c-format
 msgid "%s Critical Error"
 msgstr "%s 严重错误"
 
-#: pcsx2/gui/AppInit.cpp:704
+#: pcsx2/gui/AppInit.cpp:650
 msgid "OK"
 msgstr "确定"
 
-#: pcsx2/gui/AppInit.cpp:705
+#: pcsx2/gui/AppInit.cpp:651
 msgid "&OK"
 msgstr "确定(&O)"
 
-#: pcsx2/gui/AppInit.cpp:707
+#: pcsx2/gui/AppInit.cpp:653
 msgid "&Cancel"
 msgstr "取消(&C)"
 
-#: pcsx2/gui/AppInit.cpp:708
+#: pcsx2/gui/AppInit.cpp:654
 msgid "&Apply"
 msgstr "应用(&A)"
 
-#: pcsx2/gui/AppInit.cpp:709
+#: pcsx2/gui/AppInit.cpp:655
 msgid "&Next >"
 msgstr "下一步(&N) >"
 
-#: pcsx2/gui/AppInit.cpp:710
+#: pcsx2/gui/AppInit.cpp:656
 msgid "< &Back"
 msgstr "< 上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:711
+#: pcsx2/gui/AppInit.cpp:657
 msgid "&Back"
 msgstr "上一步(&B)"
 
-#: pcsx2/gui/AppInit.cpp:712
+#: pcsx2/gui/AppInit.cpp:658
 msgid "&Finish"
 msgstr "完成(&F)"
 
-#: pcsx2/gui/AppInit.cpp:713
+#: pcsx2/gui/AppInit.cpp:659
 msgid "&Yes"
 msgstr "是(&Y)"
 
-#: pcsx2/gui/AppInit.cpp:714
+#: pcsx2/gui/AppInit.cpp:660
 msgid "&No"
 msgstr "不(&N)"
 
-#: pcsx2/gui/AppInit.cpp:715
+#: pcsx2/gui/AppInit.cpp:661
 msgid "Browse"
 msgstr "浏览"
 
-#: pcsx2/gui/AppInit.cpp:716
+#: pcsx2/gui/AppInit.cpp:662
 msgid "&Save"
 msgstr "保存(&S)"
 
-#: pcsx2/gui/AppInit.cpp:717
+#: pcsx2/gui/AppInit.cpp:663
 msgid "Save &As..."
 msgstr "另存为(&A)..."
 
-#: pcsx2/gui/AppInit.cpp:718 pcsx2/gui/MainFrame.cpp:591
+#: pcsx2/gui/AppInit.cpp:664 pcsx2/gui/MainFrame.cpp:591
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: pcsx2/gui/AppInit.cpp:719
+#: pcsx2/gui/AppInit.cpp:665
 msgid "&Home"
 msgstr "首页(&H)"
 
-#: pcsx2/gui/AppInit.cpp:720
+#: pcsx2/gui/AppInit.cpp:666
 msgid "&Window"
 msgstr "窗口(&W)"
 
-#: pcsx2/gui/AppInit.cpp:722
+#: pcsx2/gui/AppInit.cpp:668
 msgid "Show about dialog."
 msgstr "显示关于对话框。"
 
@@ -371,20 +363,20 @@ msgstr "显示关于对话框。"
 msgid "PS2 BIOS Error"
 msgstr "PS2 BIOS 错误"
 
-#: pcsx2/gui/AppMain.cpp:258
+#: pcsx2/gui/AppMain.cpp:295
 #, c-format
 msgid "%s Commandline Options"
 msgstr "%s 命令行选项"
 
-#: pcsx2/gui/AppMain.cpp:461
+#: pcsx2/gui/AppMain.cpp:498
 msgid "PCSX2 Unresponsive Thread"
 msgstr "PCSX2 线程没有响应"
 
-#: pcsx2/gui/AppMain.cpp:468
+#: pcsx2/gui/AppMain.cpp:505
 msgid "Terminate"
 msgstr "终止"
 
-#: pcsx2/gui/AppMain.cpp:833
+#: pcsx2/gui/AppMain.cpp:870
 msgid "Executing PS2 Virtual Machine..."
 msgstr "正在执行 PS2 虚拟机..."
 
@@ -2557,6 +2549,12 @@ msgstr "正在等待任务..."
 #: pcsx2/gui/i18n.cpp:65
 msgid " (default)"
 msgstr " (默认)"
+
+#~ msgid "PCSX2 Recompiler Error(s)"
+#~ msgstr "PCSX2 重编译器错误"
+
+#~ msgid "PCSX2 Error: Hardware Deficiency."
+#~ msgstr "PCSX2 错误: 硬件缺陷。"
 
 #~ msgid "Instant VU1 (without MTVU only)"
 #~ msgstr "即时 VU1 (仅无 MTVU )"
