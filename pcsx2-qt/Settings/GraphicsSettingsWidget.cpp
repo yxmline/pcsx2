@@ -98,6 +98,8 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	SettingWidgetBinder::BindWidgetToStringSetting(sif, m_ui.adapter, "EmuCore/GS", "Adapter");
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.vsync, "EmuCore/GS", "VsyncEnable", 0);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.enableHWFixes, "EmuCore/GS", "UserHacks", false);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.spinGPUDuringReadbacks, "EmuCore/GS", "HWSpinGPUForReadbacks", false);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_ui.spinCPUDuringReadbacks, "EmuCore/GS", "HWSpinCPUForReadbacks", false);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Game Display Settings
@@ -409,6 +411,14 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 			tr("Enabling this option gives you the ability to change the renderer and upscaling fixes "
 			   "to your games. However IF you have ENABLED this, you WILL DISABLE AUTOMATIC "
 			   "SETTINGS and you can re-enable automatic settings by unchecking this option."));
+
+		dialog->registerWidgetHelp(m_ui.spinCPUDuringReadbacks, tr("Spin CPU During Readbacks"), tr("Unchecked"),
+			tr("Does useless work on the CPU during readbacks to prevent it from going to into powersave modes. "
+			   "May improve performance but with a significant increase in power usage."));
+
+		dialog->registerWidgetHelp(m_ui.spinGPUDuringReadbacks, tr("Spin GPU During Readbacks"), tr("Unchecked"),
+			tr("Submits useless work to the GPU during readbacks to prevent it from going into powersave modes. "
+			   "May improve performance but with a significant increase in power usage."));
 
 		// Software
 		dialog->registerWidgetHelp(m_ui.extraSWThreads, tr("Extra Rendering Threads"), tr("2 threads"),

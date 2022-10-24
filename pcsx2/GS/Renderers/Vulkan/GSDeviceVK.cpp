@@ -462,6 +462,16 @@ bool GSDeviceVK::DownloadTexture(GSTexture* src, const GSVector4i& rect, GSTextu
 	}
 
 	ExecuteCommandBuffer(true);
+	if (GSConfig.HWSpinGPUForReadbacks)
+	{
+		g_vulkan_context->NotifyOfReadback();
+		if (!g_vulkan_context->GetOptionalExtensions().vk_ext_calibrated_timestamps && !m_warned_slow_spin)
+		{
+			m_warned_slow_spin = true;
+			Host::AddKeyedOSDMessage("GSDeviceVK_NoCalibratedTimestamps",
+				"Spin GPU During Readbacks is enabled, but calibrated timestamps are unavailable.  This might be really slow.", 10.0f);
+		}
+	}
 
 	// invalidate cpu cache before reading
 	VkResult res = vmaInvalidateAllocation(g_vulkan_context->GetAllocator(), m_readback_staging_allocation, 0, size);
@@ -1812,7 +1822,7 @@ void GSDeviceVK::DestroyStagingBuffer()
 
 void GSDeviceVK::DestroyResources()
 {
-	g_vulkan_context->ExecuteCommandBuffer(true);
+	g_vulkan_context->ExecuteCommandBuffer(Vulkan::Context::WaitType::Sleep);
 	if (m_tfx_descriptor_sets[0] != VK_NULL_HANDLE)
 		g_vulkan_context->FreeGlobalDescriptorSet(m_tfx_descriptor_sets[0]);
 
@@ -2192,10 +2202,20 @@ bool GSDeviceVK::CreatePersistentDescriptorSets()
 	return true;
 }
 
+static Vulkan::Context::WaitType GetWaitType(bool wait, bool spin)
+{
+	if (!wait)
+		return Vulkan::Context::WaitType::None;
+	if (spin)
+		return Vulkan::Context::WaitType::Spin;
+	else
+		return Vulkan::Context::WaitType::Sleep;
+}
+
 void GSDeviceVK::ExecuteCommandBuffer(bool wait_for_completion)
 {
 	EndRenderPass();
-	g_vulkan_context->ExecuteCommandBuffer(wait_for_completion);
+	g_vulkan_context->ExecuteCommandBuffer(GetWaitType(wait_for_completion, GSConfig.HWSpinCPUForReadbacks));
 	InvalidateCachedState();
 }
 
@@ -2217,7 +2237,7 @@ void GSDeviceVK::ExecuteCommandBufferAndRestartRenderPass(const char* reason)
 	const VkRenderPass render_pass = m_current_render_pass;
 	const GSVector4i render_pass_area(m_current_render_pass_area);
 	EndRenderPass();
-	g_vulkan_context->ExecuteCommandBuffer(false);
+	g_vulkan_context->ExecuteCommandBuffer(Vulkan::Context::WaitType::None);
 	InvalidateCachedState();
 
 	if (render_pass != VK_NULL_HANDLE)
@@ -2389,6 +2409,7 @@ void GSDeviceVK::BeginRenderPass(VkRenderPass rp, const GSVector4i& rect)
 		m_current_framebuffer, {{rect.x, rect.y}, {static_cast<u32>(rect.width()), static_cast<u32>(rect.height())}}, 0,
 		nullptr};
 
+	g_vulkan_context->CountRenderPass();
 	vkCmdBeginRenderPass(g_vulkan_context->GetCurrentCommandBuffer(), &begin_info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
