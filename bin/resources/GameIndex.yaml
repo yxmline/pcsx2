@@ -10650,6 +10650,8 @@ SLES-50713:
 SLES-50714:
   name: "Defender"
   region: "PAL-M5"
+  gameFixes:
+    - InstantDMAHack # Fixes bad UI positioning.
 SLES-50715:
   name: "Gravity Games Bike Street - Vertical Dirt"
   region: "PAL-M5"
@@ -16170,6 +16172,7 @@ SLES-53191:
   region: "PAL-M5"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLES-53192:
   name: "Nightmare Before Christmas, The - Tim Burton's"
   region: "PAL-M5"
@@ -17960,6 +17963,7 @@ SLES-53900:
   region: "PAL-M3"
   gsHWFixes:
     alignSprite: 1 # Fixes black lines when upscaling.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLES-53901:
   name: "Torino 2006"
   region: "PAL-M5"
@@ -21165,8 +21169,9 @@ SLES-55214:
 SLES-55215:
   name: "Growlanser - Heritage of War"
   region: "PAL-E"
-  gsHWFixes:
-    preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
+  compat: 5
+  # gsHWFixes: Disabled because of GitHub Issue #6797
+  #   preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
 SLES-55216:
   name: "Baroque"
   region: "PAL-E"
@@ -22572,6 +22577,7 @@ SLKA-25063:
   region: "NTSC-K"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLKA-25064:
   name: "Tenchu 3 Wrath of Heaven"
   region: "NTSC-K"
@@ -22802,6 +22808,7 @@ SLKA-25146:
   region: "NTSC-K"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLKA-25149:
   name: "Silent Hill 4 - The Room"
   region: "NTSC-K"
@@ -25014,6 +25021,8 @@ SLPM-62285:
 SLPM-62287:
   name: "Fire Pro Wrestling Z [Limited Edition]"
   region: "NTSC-J"
+  gameFixes:
+    - InstantDMAHack # Fixes bad ring/UI textures.
 SLPM-62288:
   name: "pop'n music Best Hits!"
   region: "NTSC-J"
@@ -25156,6 +25165,8 @@ SLPM-62342:
   name: "Fire Pro Wrestling Z"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - InstantDMAHack # Fixes bad ring/UI textures.
 SLPM-62343:
   name: "Simple 2000 Series Vol. 34 - The Renai Horror Adventure - Hyouryuu Shoujo"
   region: "NTSC-J"
@@ -27348,10 +27359,11 @@ SLPM-65245:
     roundSprite: 2 # Fixes font artifacts.
     mergeSprite: 1 # Fixes flame-like bleeding.
 SLPM-65246:
-  name: "Kaidou Battle - Nikko, Haruna, Rokko, Hakone"
+  name: "Kaido Battle - Nikko, Haruna, Rokko, Hakone"
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLPM-65247:
   name: "Sangokushi Senki 2"
   region: "NTSC-J"
@@ -28228,6 +28240,7 @@ SLPM-65514:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLPM-65515:
   name: "Sakura Taisen - Mysterious Paris"
   region: "NTSC-J"
@@ -29473,6 +29486,7 @@ SLPM-65897:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes black lines when upscaling.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLPM-65898:
   name: "Castle Fantasia [Deluxe Pack]"
   region: "NTSC-J"
@@ -29929,6 +29943,7 @@ SLPM-66022:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes black lines when upscaling.
+    wildArmsHack: 1 # De-blurs the 3d image.
 SLPM-66023:
   name: "Fushigi Yuugi - ShigiYuugi Kurotake Kaiden Gaiden - Kagami no Fujo [Limited Edition]"
   region: "NTSC-J"
@@ -30756,8 +30771,9 @@ SLPM-66248:
 SLPM-66249:
   name: "Growlanser V - Generations [Limited Edition]"
   region: "NTSC-J"
-  gsHWFixes:
-    preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
+  compat: 5
+  # gsHWFixes: Disabled because of GitHub Issue #6797
+  #   preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
 SLPM-66250:
   name: "Choro Q HG 4 [Takara Best]"
   region: "NTSC-J"
@@ -31354,8 +31370,9 @@ SLPM-66417:
 SLPM-66418:
   name: "Growlanser V - Generations"
   region: "NTSC-J"
-  gsHWFixes:
-    preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
+  compat: 5
+  # gsHWFixes: Disabled because of GitHub Issue #6797
+  #   preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
 SLPM-66419:
   name: "Valkyrie Profile 2 - Silmeria"
   region: "NTSC-J"
@@ -32507,8 +32524,9 @@ SLPM-66715:
 SLPM-66716:
   name: "Growlanser VI"
   region: "NTSC-J"
-  gsHWFixes:
-    preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
+  compat: 5
+  # gsHWFixes: Disabled because of GitHub Issue #6797
+  #   preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
 SLPM-66717:
   name: "Standard Daisenryaku - Dengekisen [Sega the Best]"
   region: "NTSC-J"
@@ -40002,6 +40020,8 @@ SLUS-20191:
   name: "Defender"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - InstantDMAHack # Fixes bad UI positioning.
 SLUS-20194:
   name: "Grandia II"
   region: "NTSC-U"
@@ -46692,8 +46712,8 @@ SLUS-21571:
   name: "Growlanser - Heritage of War"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
+  # gsHWFixes: Disabled because of GitHub Issue #6797
+  #   preloadFrameData: 1 # Fixes layers where characters should be visually behind an object.
 SLUS-21572:
   name: "Surf's Up"
   region: "NTSC-U"
