@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-10-16 09:49+0800\n"
-"PO-Revision-Date: 2022-10-16 09:54+0800\n"
+"POT-Creation-Date: 2022-11-08 11:20+0800\n"
+"PO-Revision-Date: 2022-11-08 11:40+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -321,6 +321,14 @@ msgstr ""
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:71
 msgid ""
 "Known to affect following games:\n"
+" * Fire Pro Wrestling Z (Bad ring graphics)"
+msgstr ""
+"已知影响以下游戏。\n"
+" * Fire Pro Wrestling Z (Bad ring graphics)"
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
+msgid ""
+"Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down "
 "Behind Enemy Lines\n"
 msgstr ""
@@ -329,7 +337,7 @@ msgstr ""
 "* 重装机兵(介绍 FMV)\n"
 "* 敌后阵线\n"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:85
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
@@ -339,19 +347,19 @@ msgstr ""
 " * Test Drive Unlimited (无限试驾 2)\n"
 " * Transformers (变形金刚)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:105
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
 msgid ""
 "Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and "
 "others."
 msgstr "修复 WRC,武器种族传说,Tennis Court Smash和其他的图形错误。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:115
 msgid ""
 "Use alternative method to calclate internal FPS to avoid false readings in "
 "some games."
 msgstr "使用其他方法来计算内部 FPS，以避免在某些游戏中出现错误的读数。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:122
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:127
 msgid ""
 "It's better to enable 'Automatic game fixes' at the main menu instead, and "
 "leave this page empty ('Automatic' means: selectively use specific tested "
@@ -361,7 +369,7 @@ msgstr ""
 "建议在主菜单启用 '自动应用游戏特殊修正'，而不建议在此手动设置 ('自动' 即针对"
 "特定游戏自动应用对应修正)。事实上，手动设置并不能提升性能，反而会降低性能。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:131
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"

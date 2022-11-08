@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-10-16 09:49+0800\n"
-"PO-Revision-Date: 2022-10-16 09:55+0800\n"
+"POT-Creation-Date: 2022-11-08 11:20+0800\n"
+"PO-Revision-Date: 2022-11-08 11:42+0800\n"
 "Last-Translator: yxmline <yxmline@live.cn>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -104,7 +104,7 @@ msgstr "请选择以太网适配器或禁用以太网"
 msgid "Please specify a HDD file or disable the hard drive"
 msgstr "请指定硬盘文件或禁用硬盘驱动器"
 
-#: pcsx2/GS/Window/GSwxDialog.cpp:727
+#: pcsx2/GS/Window/GSwxDialog.cpp:726
 msgid "Default Adapter"
 msgstr "默认适配器"
 
@@ -875,10 +875,6 @@ msgstr ""
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:85
 msgid "Welcome to PCSX2!"
 msgstr "欢迎使用 PCSX2 !"
-
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:96
-msgid "Configuration Guide"
-msgstr "配置说明 (在线)"
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:100
 msgid "Readme / FAQ"
@@ -1975,29 +1971,33 @@ msgid "EE timing hack - Multi purpose hack. Try if all else fails."
 msgstr "EE 定时 Hack - 有多种用途。如以上皆失败请尝试。"
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:70
+msgid "Instant DMA hack. Try if all else fails."
+msgstr "即时 DMA Hack.如以上皆失败请尝试。"
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
 msgid "Handle DMAC writes when it is busy."
 msgstr "在 DMAC 处于忙状态时忽略写入操作。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
 msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
 msgstr "强制 FIFO 使用GIF PATH3 传输数据 (街头足球2)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:79
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
 msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
 msgstr "仿真 VIF1 FIFO 提前读取。修正游戏加载缓慢的问题。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
 msgid ""
 "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
 msgstr ""
 "延迟 VIF1 停顿 (VIF1 FIFO) - 解决 SOCOM 2 的 HUD 以及 Spy Hunter 加载时挂起的"
 "问题。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:93
 msgid "VU Add Hack - Fixes Tri-Ace games boot crash."
 msgstr "VU 加法 Hack - 修正 Tri-Ace 游戏启动崩溃。"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:94
 msgid ""
 "Games that need this hack to boot:\n"
 " * Star Ocean 3\n"
@@ -2009,32 +2009,32 @@ msgstr ""
 " * Radiata Stories\n"
 " * Valkyrie Profile 2 (北欧女神 2)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:97
 msgid ""
 "VU I bit Hack avoid constant recompilation in some games (Scarface The World "
 "Is Yours, Crash Tag Team Racing)"
 msgstr "VU I 位 Hack 避免无休止的重编译 (疤面煞星:掌握世界,古惑狼赛车)"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:101
 msgid ""
 "VU Sync (Run behind) to avoid sync problems when reading or writing VU "
 "registers"
 msgstr "VU 同步 (运行滞后) 以避免在读取或写入VU寄存器时出现同步问题"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:100
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:105
 msgid ""
 "VU Overflow hack to check for possible float overflows (Superman Returns)"
 msgstr "VU Overflow hack 检查可能的浮点溢出（超人归来）"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:104
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
 msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
 msgstr "VU XGkick 同步 - 使用 VU XGKicks 精确计时（慢）"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:114
 msgid "Use Blit for internal FPS"
 msgstr "使用 Blit 进行内部 FPS"
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:121
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
 msgid "Enable manual game fixes [Not recommended]"
 msgstr "手动设置游戏特殊修正 [不推荐]"
 
@@ -2549,6 +2549,9 @@ msgstr "正在等待任务..."
 #: pcsx2/gui/i18n.cpp:65
 msgid " (default)"
 msgstr " (默认)"
+
+#~ msgid "Configuration Guide"
+#~ msgstr "配置说明 (在线)"
 
 #~ msgid "PCSX2 Recompiler Error(s)"
 #~ msgstr "PCSX2 重编译器错误"

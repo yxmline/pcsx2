@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-10-16 09:49+0800\n"
+"POT-Creation-Date: 2022-11-08 11:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,7 +112,7 @@ msgstr ""
 msgid "Please specify a HDD file or disable the hard drive"
 msgstr ""
 
-#: pcsx2/GS/Window/GSwxDialog.cpp:727
+#: pcsx2/GS/Window/GSwxDialog.cpp:726
 msgid "Default Adapter"
 msgstr ""
 
@@ -836,10 +836,6 @@ msgstr ""
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:85
 msgid "Welcome to PCSX2!"
-msgstr ""
-
-#: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:96
-msgid "Configuration Guide"
 msgstr ""
 
 #: pcsx2/gui/Dialogs/FirstTimeWizard.cpp:100
@@ -1901,26 +1897,30 @@ msgid "EE timing hack - Multi purpose hack. Try if all else fails."
 msgstr ""
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:70
-msgid "Handle DMAC writes when it is busy."
+msgid "Instant DMA hack. Try if all else fails."
 msgstr ""
 
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:75
+msgid "Handle DMAC writes when it is busy."
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
 msgid "Force GIF PATH3 transfers through FIFO (Fifa Street 2)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:79
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
 msgid "Simulate VIF1 FIFO read ahead. Fixes slow loading games."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:84
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
 msgid "Delay VIF1 Stalls (VIF1 FIFO) - For SOCOM 2 HUD and Spy Hunter loading hang."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:88
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:93
 msgid "VU Add Hack - Fixes Tri-Ace games boot crash."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:89
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:94
 msgid ""
 "Games that need this hack to boot:\n"
 " * Star Ocean 3\n"
@@ -1928,27 +1928,27 @@ msgid ""
 " * Valkyrie Profile 2"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:92
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:97
 msgid "VU I bit Hack avoid constant recompilation in some games (Scarface The World Is Yours, Crash Tag Team Racing)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:96
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:101
 msgid "VU Sync (Run behind) to avoid sync problems when reading or writing VU registers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:100
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:105
 msgid "VU Overflow hack to check for possible float overflows (Superman Returns)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:104
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
 msgid "VU XGkick Sync - Use accurate timing for VU XGKicks (Slower)"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:109
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:114
 msgid "Use Blit for internal FPS"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:121
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
 msgid "Enable manual game fixes [Not recommended]"
 msgstr ""
 

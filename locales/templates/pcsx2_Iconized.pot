@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PCSX2 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PCSX2/pcsx2/issues\n"
-"POT-Creation-Date: 2022-10-16 09:49+0800\n"
+"POT-Creation-Date: 2022-11-08 11:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -205,29 +205,35 @@ msgstr ""
 #: pcsx2/gui/Panels/GameFixesPanel.cpp:71
 msgid ""
 "Known to affect following games:\n"
+" * Fire Pro Wrestling Z (Bad ring graphics)"
+msgstr ""
+
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:76
+msgid ""
+"Known to affect following games:\n"
 " * Mana Khemia 1 (Going \"off campus\"), Metal Saga (Intro FMV), Pilot Down Behind Enemy Lines\n"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:80
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:85
 msgid ""
 "Known to affect following games:\n"
 " * Test Drive Unlimited\n"
 " * Transformers"
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:105
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
 msgid "Fixes graphical errors on WRC, Erementar Gerad, Tennis Court Smash and others."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:110
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:115
 msgid "Use alternative method to calclate internal FPS to avoid false readings in some games."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:122
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:127
 msgid "It's better to enable 'Automatic game fixes' at the main menu instead, and leave this page empty ('Automatic' means: selectively use specific tested fixes for specific games). Manual game fixes will NOT increase your performance. In fact they may decrease it."
 msgstr ""
 
-#: pcsx2/gui/Panels/GameFixesPanel.cpp:126
+#: pcsx2/gui/Panels/GameFixesPanel.cpp:131
 msgid ""
 "Gamefixes can work around wrong emulation in some titles. \n"
 "They may also cause compatibility or performance issues.\n"
