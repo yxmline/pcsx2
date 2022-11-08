@@ -5502,6 +5502,8 @@ SCPS-15030:
 SCPS-15031:
   name: "Train Simulator Real, The"
   region: "NTSC-J"
+  gsHWFixes:
+    texturePreloading: 1 # Increases performance due to massive hash cache size.
 SCPS-15032:
   name: "Formula One 2002"
   region: "NTSC-J"
@@ -5520,6 +5522,8 @@ SCPS-15034:
 SCPS-15035:
   name: "Train Simulator Real, The - Keihin Keikyu"
   region: "NTSC-J"
+  gsHWFixes:
+    texturePreloading: 1 # Increases performance due to massive hash cache size.
 SCPS-15036:
   name: "Kaitou Sly Cooper"
   region: "NTSC-J"
@@ -12742,6 +12746,8 @@ SLES-51681:
 SLES-51682:
   name: "Headhunter - Redemption"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes ghosting.
 SLES-51686:
   name: "Pitfall - The Lost Expedition"
   region: "PAL-E"
@@ -14468,9 +14474,13 @@ SLES-52510:
 SLES-52511:
   name: "Headhunter - Redemption"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes ghosting.
 SLES-52512:
   name: "Headhunter - Redemption"
   region: "PAL-M4"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes ghosting.
 SLES-52515:
   name: "Ultimate Casino"
   region: "PAL-E"
@@ -42906,6 +42916,8 @@ SLUS-20817:
   name: "Headhunter - Redemption"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes ghosting.
 SLUS-20818:
   name: "Bionicle"
   region: "NTSC-U"
