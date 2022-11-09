@@ -18728,6 +18728,8 @@ SLES-54218:
 SLES-54221:
   name: "LEGO Star Wars II - The Original Trilogy"
   region: "PAL-M6"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
   memcardFilters: # Allows import of characters from Lego Star Wars 1.
     - "SLES-54221"
     - "SLES-53194"
@@ -31979,6 +31981,8 @@ SLPM-66571:
 SLPM-66572:
   name: "LEGO Star Wars II - The Original Trilogy"
   region: "NTSC-J"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
   memcardFilters:
     - "SLPM-66572"
     - "SLPS-20423"
@@ -46046,6 +46050,8 @@ SLUS-21408:
 SLUS-21409:
   name: "LEGO Star Wars II - The Original Trilogy"
   region: "NTSC-U"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
   memcardFilters:
     - "SLUS-21409"
     - "SLUS-21083"
