@@ -16195,6 +16195,8 @@ SLES-53193:
 SLES-53194:
   name: "LEGO Star Wars"
   region: "PAL-M7"
+  clampModes:
+    vuClampMode: 3 # Fixes bad coordinate spam.
 SLES-53195:
   name: "Punisher, The"
   region: "PAL-E"
@@ -18495,6 +18497,8 @@ SLES-54147:
 SLES-54150:
   name: "Bionicle Heroes"
   region: "PAL-M6"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
 SLES-54151:
   name: "Let's Make a Soccer Team!"
   region: "PAL-M5"
@@ -32244,6 +32248,8 @@ SLPM-66644:
 SLPM-66645:
   name: "Bionicle Heroes"
   region: "NTSC-J"
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
 SLPM-66646:
   name: "Shining Force EXA"
   region: "NTSC-J"
@@ -35108,6 +35114,8 @@ SLPS-20422:
 SLPS-20423:
   name: "LEGO Star Wars - The Video Game"
   region: "NTSC-J"
+  clampModes:
+    vuClampMode: 3 # Fixes bad coordinate spam.
 SLPS-20424:
   name: "Taiko no Tatsujin - Tobikkiri! Anime Special [with Tatacon]"
   region: "NTSC-J"
@@ -44284,6 +44292,8 @@ SLUS-21083:
   name: "LEGO Star Wars - The Video Game"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vuClampMode: 3 # Fixes bad coordinate spam.
 SLUS-21084:
   name: "Winnie the Pooh's Rumbly Tumbly Adventure"
   region: "NTSC-U"
@@ -46181,6 +46191,8 @@ SLUS-21428:
   name: "Bionicle Heroes"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes ghosting on objects and people.
 SLUS-21430:
   name: "IGPX - Immortal Grand Prix"
   region: "NTSC-U"
