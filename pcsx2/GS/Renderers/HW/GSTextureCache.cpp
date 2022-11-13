@@ -898,11 +898,16 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 						t->m_texture ? t->m_texture->GetID() : 0,
 						t->m_TEX0.TBP0, r.x, r.y, r.z, r.w);
 					t->m_TEX0.TBW = bw;
+					t->m_age = 0;
 					t->m_dirty.push_back(GSDirtyRect(r, psm, bw));
 				}
 				else
 				{
 					// YOLO skipping t->m_TEX0.TBW = bw; It would change the surface offset results...
+					// This code exists because Destruction Derby Arenas uploads a 16x16 CLUT to the same BP as the depth buffer and invalidating the depth is bad (because it's not invalid).
+					// Possibly because the block layout is opposite for the 32bit colour and depth, it never actually overwrites the depth, so this is kind of a miss detection.
+					// The new code rightfully calculates that the depth does not become dirty, but in other cases, like bigger draws of the same format
+					// it might become invalid, so we check below and erase as before if so.
 					const SurfaceOffset so = ComputeSurfaceOffset(off, r, t);
 					if (so.is_valid)
 					{
@@ -928,7 +933,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							r.w
 						);
 					}
-					else
+					if (!ComputeSurfaceOffset(off, r, t).is_valid)
 					{
 						list.erase(j);
 						GL_CACHE("TC: Remove Target(%s) %d (0x%x)", to_string(type),
@@ -974,6 +979,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 								t->m_TEX0.TBP0);
 							// TODO: do not add this rect above too
 							t->m_TEX0.TBW = bw;
+							t->m_age = 0;
 							t->m_dirty.push_back(GSDirtyRect(GSVector4i(r.left, r.top - y, r.right, r.bottom - y), psm, bw));
 							continue;
 						}
@@ -1000,7 +1006,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							t->m_texture ? t->m_texture->GetID() : 0,
 							t->m_TEX0.TBP0, t->m_end_block,
 							r.left, r.top + y, r.right, r.bottom + y, bw);
-
+						t->m_age = 0;
 						t->m_TEX0.TBW = bw;
 						t->m_dirty.push_back(GSDirtyRect(GSVector4i(r.left, r.top + y, r.right, r.bottom + y), psm, bw));
 						continue;
@@ -1010,7 +1016,10 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 				{
 					const SurfaceOffset so = ComputeSurfaceOffset(off, r, t);
 					if (so.is_valid)
+					{
+						t->m_age = 0;
 						t->m_dirty.push_back(GSDirtyRect(so.b2a_offset, psm, bw));
+					}
 				}
 #endif
 			}
@@ -1226,11 +1235,6 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	if (!src || !dst || src->m_texture->GetScale() != dst->m_texture->GetScale())
 		return false;
 
-	// We don't want to copy "old" data that the game has overwritten with writes,
-	// so flush any overlapping dirty area.
-	src->UpdateIfDirtyIntersects(GSVector4i(sx, sy, sx + w, sy + h));;
-	dst->UpdateIfDirtyIntersects(GSVector4i(dx, dy, dx + w, dy + h));
-
 	// Scale coordinates.
 	const GSVector2 scale(src->m_texture->GetScale());
 	const int scaled_sx = static_cast<int>(sx * scale.x);
@@ -1239,6 +1243,15 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	const int scaled_dy = static_cast<int>(dy * scale.y);
 	const int scaled_w = static_cast<int>(w * scale.x);
 	const int scaled_h = static_cast<int>(h * scale.y);
+
+	// The source isn't in our texture, otherwise it could falsely expand the texture causing a misdetection later, which then renders black.
+	if ((scaled_sx + scaled_w) > src->m_texture->GetWidth() || (scaled_sy + scaled_h) > src->m_texture->GetHeight())
+		return false;
+
+	// We don't want to copy "old" data that the game has overwritten with writes,
+	// so flush any overlapping dirty area.
+	src->UpdateIfDirtyIntersects(GSVector4i(sx, sy, sx + w, sy + h));
+	dst->UpdateIfDirtyIntersects(GSVector4i(dx, dy, dx + w, dy + h));
 
 	// Expand the target when we used a more conservative size.
 	const int required_dh = scaled_dy + scaled_h;
@@ -1255,11 +1268,8 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	}
 
 	// Make sure the copy doesn't go out of bounds (it shouldn't).
-	if ((scaled_sx + scaled_w) > src->m_texture->GetWidth() || (scaled_sy + scaled_h) > src->m_texture->GetHeight() ||
-		(scaled_dx + scaled_w) > dst->m_texture->GetWidth() || (scaled_dy + scaled_h) > dst->m_texture->GetHeight())
-	{
+	if ((scaled_dx + scaled_w) > dst->m_texture->GetWidth() || (scaled_dy + scaled_h) > dst->m_texture->GetHeight())
 		return false;
-	}
 
 	g_gs_device->CopyRect(src->m_texture, dst->m_texture,
 		GSVector4i(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h),
