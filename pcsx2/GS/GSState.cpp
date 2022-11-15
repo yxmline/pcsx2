@@ -2000,8 +2000,6 @@ void GSState::Write(const u8* mem, int len)
 
 	GIFRegTEX0& prev_tex0 = m_prev_env.CTXT[m_prev_env.PRIM.CTXT].TEX0;
 
-	const GSLocalMemory::psm_t& tex_psm = GSLocalMemory::m_psm[prev_tex0.PSM];
-
 	const u32 write_start_bp = m_mem.m_psm[blit.DPSM].info.bn(m_env.TRXPOS.DSAX, m_env.TRXPOS.DSAY, blit.DBP, blit.DBW); // (m_mem.*psm.pa)(static_cast<int>(m_env.TRXPOS.DSAX), static_cast<int>(m_env.TRXPOS.DSAY), blit.DBP, blit.DBW) >> 6;
 	const u32 write_end_bp = m_mem.m_psm[blit.DPSM].info.bn(m_env.TRXPOS.DSAX + w - 1, m_env.TRXPOS.DSAY + h - 1, blit.DBP, blit.DBW); // (m_mem.*psm.pa)(w + static_cast<int>(m_env.TRXPOS.DSAX) - 1, h + static_cast<int>(m_env.TRXPOS.DSAY) - 1, blit.DBP, blit.DBW) >> 6;
 	const u32 tex_end_bp = m_mem.m_psm[prev_tex0.PSM].info.bn((1 << prev_tex0.TW) - 1, (1 << prev_tex0.TH) - 1, prev_tex0.TBP0, prev_tex0.TBW); // (m_mem.*psm.pa)((1 << prev_tex0.TW) - 1, (1 << prev_tex0.TH) - 1, prev_tex0.TBP0, prev_tex0.TBW) >> 6;
@@ -2149,8 +2147,6 @@ void GSState::Move()
 	const GSOffset dpo = m_mem.GetOffset(dbp, dbw, m_env.BITBLTBUF.DPSM);
 
 	GIFRegTEX0& prev_tex0 = m_prev_env.CTXT[m_prev_env.PRIM.CTXT].TEX0;
-
-	const GSLocalMemory::psm_t& tex_psm = GSLocalMemory::m_psm[prev_tex0.PSM];
 
 	const u32 write_start_bp = m_mem.m_psm[m_env.BITBLTBUF.DPSM].info.bn(m_env.TRXPOS.DSAX, m_env.TRXPOS.DSAY, dbp, dbw); // (m_mem.*dpsm.pa)(static_cast<int>(m_env.TRXPOS.DSAX), static_cast<int>(m_env.TRXPOS.DSAY), dbp, dbw) >> 6;
 	const u32 write_end_bp = m_mem.m_psm[m_env.BITBLTBUF.DPSM].info.bn(m_env.TRXPOS.DSAX + w - 1, m_env.TRXPOS.DSAY + h - 1, dbp, dbw); // (m_mem.*dpsm.pa)(w + static_cast<int>(m_env.TRXPOS.DSAX) - 1, h + static_cast<int>(m_env.TRXPOS.DSAY) - 1, dbp, dbw) >> 6;
@@ -2978,7 +2974,7 @@ __forceinline void GSState::CLUTAutoFlush()
 	if (m_mem.m_clut.IsInvalid() & 2)
 		return;
 
-	int  n = 1;
+	size_t  n = 1;
 
 	switch (PRIM->PRIM)
 	{
@@ -3002,7 +2998,7 @@ __forceinline void GSState::CLUTAutoFlush()
 			break;
 	}
 
-	if ((m_index.tail > 0 || (m_vertex.tail == n-1)) && (GSLocalMemory::m_psm[m_context->TEX0.PSM].pal == 0 || !PRIM->TME))
+	if ((m_index.tail > 0 || (m_vertex.tail == n - 1)) && (GSLocalMemory::m_psm[m_context->TEX0.PSM].pal == 0 || !PRIM->TME))
 	{
 		const GSLocalMemory::psm_t& psm = GSLocalMemory::m_psm[m_context->FRAME.PSM];
 
@@ -3460,7 +3456,7 @@ __forceinline void GSState::VertexKick(u32 skip)
 	GSVector4i draw_coord;
 	const GSVector2i offset = GSVector2i(m_context->XYOFFSET.OFX, m_context->XYOFFSET.OFY);
 
-	for (int i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		const GSVertex* v = &m_vertex.buff[m_index.buff[(m_index.tail - n) + i]];
 		draw_coord.x = (static_cast<int>(v->XYZ.X) - offset.x) >> 4;
@@ -3468,8 +3464,6 @@ __forceinline void GSState::VertexKick(u32 skip)
 
 		if (m_vertex.tail == n && i == 0)
 		{
-			const GSVector4i scissor = GSVector4i(m_context->scissor.in);
-
 			temp_draw_rect.x = draw_coord.x;
 			temp_draw_rect.y = draw_coord.y;
 			temp_draw_rect = temp_draw_rect.xyxy();
