@@ -2790,9 +2790,9 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 		"11", //GSRendererType::Null
 	};
 	static constexpr const char* s_vsync_values[] = {"Off", "On", "Adaptive"};
-	static constexpr const char* s_deinterlacing_options[] = {"None", "Weave (Top Field First, Sawtooth)",
+	static constexpr const char* s_deinterlacing_options[] = {"Automatic (Default)", "None", "Weave (Top Field First, Sawtooth)",
 		"Weave (Bottom Field First, Sawtooth)", "Bob (Top Field First)", "Bob (Bottom Field First)", "Blend (Top Field First, Half FPS)",
-		"Blend (Bottom Field First, Half FPS)", "Automatic (Default)"};
+		"Blend (Bottom Field First, Half FPS)", "Adaptive (Top Field First", "Adaptive (Bottom Field First)"};
 	static const char* s_resolution_options[] = {
 		"Native (PS2)",
 		"1.25x Native",
@@ -2866,7 +2866,7 @@ void FullscreenUI::DrawGraphicsSettingsPage()
 		"FMVAspectRatioSwitch", "Auto 4:3/3:2", Pcsx2Config::GSOptions::FMVAspectRatioSwitchNames,
 		Pcsx2Config::GSOptions::FMVAspectRatioSwitchNames, 0);
 	DrawIntListSetting(bsi, "Deinterlacing",
-		"Selects the algorithm used to convert the PS2's interlaced output to progressive for display.", "EmuCore/GS", "deinterlace",
+		"Selects the algorithm used to convert the PS2's interlaced output to progressive for display.", "EmuCore/GS", "deinterlace_mode",
 		static_cast<int>(GSInterlaceMode::Automatic), s_deinterlacing_options, std::size(s_deinterlacing_options));
 	DrawIntRangeSetting(bsi, "Zoom", "Increases or decreases the virtual picture size both horizontally and vertically.", "EmuCore/GS",
 		"Zoom", 100, 10, 300, "%d%%");
