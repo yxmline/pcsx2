@@ -9138,6 +9138,11 @@ SLED-53083:
   region: "PAL-M5"
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+SLED-53097:
+  name: "Worms 4 - Mayhem [Demo]"
+  region: "PAL-M5"
+  gameFixes:
+    - BlitInternalFPSHack # Fixes internal FPS detection.
 SLED-53109:
   name: "Juiced [Demo]"
   region: "PAL-M5"
@@ -16085,6 +16090,8 @@ SLES-53096:
   name: "Worms 4 - Mayhem"
   region: "PAL-M5"
   compat: 5
+  gameFixes:
+    - BlitInternalFPSHack # Fixes internal FPS detection.
 SLES-53098:
   name: "Conspiracy - Weapons of Mass Destruction"
   region: "PAL-M5"
@@ -16867,6 +16874,8 @@ SLES-53484:
 SLES-53485:
   name: "Car Racing Challenge"
   region: "PAL-E"
+  gameFixes:
+    - XGKickHack # Fixes distant car textures.
 SLES-53487:
   name: "Forty 4 Party"
   region: "PAL-E"
@@ -25988,6 +25997,8 @@ SLPM-62563:
 SLPM-62564:
   name: "Simple 2000 Series Vol. 68 - The Tousou Highway - Nagoya - Tokyo"
   region: "NTSC-J"
+  gameFixes:
+    - XGKickHack # Fixes distant car textures.
 SLPM-62565:
   name: "Boboboubo Boubobo - Atsumare!! Taikan Boubobo [Doukonban]"
   region: "NTSC-J"
@@ -30822,6 +30833,8 @@ SLPM-66212:
   name: "Sega Rally 2006"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    cpuCLUTRender: 1 # Fixes rainbow textures.
 SLPM-66213:
   name: "BioHazard 4"
   region: "NTSC-J"
