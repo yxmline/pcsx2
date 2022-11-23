@@ -1221,6 +1221,9 @@ SCAJ-20158:
   region: "NTSC-Unk"
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SCAJ-20159:
   name: "Soul Calibur III"
   region: "NTSC-Ch"
@@ -18954,6 +18957,9 @@ SLES-54305:
   compat: 5
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLES-54306:
   name: "Cartoon Network Racing"
   region: "PAL-E"
@@ -23418,6 +23424,9 @@ SLKA-25320:
   compat: 5
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLKA-25321:
   name: "K.League - Winning Eleven 9 - Asia Championship"
   region: "NTSC-K"
@@ -24434,11 +24443,17 @@ SLPM-61130:
   region: "NTSC-J"
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLPM-61132:
   name: "Ikusa Gami [Trial Version]"
   region: "NTSC-J"
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLPM-61133:
   name: "Soul Calibur III [Trial Version]"
   region: "NTSC-J"
@@ -30732,6 +30747,9 @@ SLPM-66184:
   region: "NTSC-J"
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLPM-66185:
   name: "Game ni Nattayo! Dokuro-chan [Limited Edition]"
   region: "NTSC-J"
@@ -34069,6 +34087,9 @@ SLPM-74227:
   region: "NTSC-J"
   gameFixes:
     - VIF1StallHack # Fixes black screen on boot.
+  gsHWFixes:
+    autoFlush: 1 # Fixes missing bloom effects.
+    halfPixelOffset: 2 # Fixes misaligned lighting and bloom.
 SLPM-74228:
   name: "Fuuun Bakumatsu-den [PlayStation 2 The Best]"
   region: "NTSC-J"
