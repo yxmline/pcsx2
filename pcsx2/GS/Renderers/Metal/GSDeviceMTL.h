@@ -237,6 +237,7 @@ public:
 	MRCOwned<id<MTLFence>> m_spin_fence;
 
 	// Functions and Pipeline States
+	MRCOwned<id<MTLComputePipelineState>> m_cas_pipeline[2];
 	MRCOwned<id<MTLRenderPipelineState>> m_convert_pipeline[static_cast<int>(ShaderConvert::Count)];
 	MRCOwned<id<MTLRenderPipelineState>> m_present_pipeline[static_cast<int>(PresentShader::Count)];
 	MRCOwned<id<MTLRenderPipelineState>> m_convert_pipeline_copy[2];
@@ -350,10 +351,16 @@ public:
 	void DoInterlace(GSTexture* sTex, GSTexture* dTex, int shader, bool linear, float yoffset, int bufIdx) override;
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) override;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
+
+#ifndef PCSX2_CORE
 	void DoExternalFX(GSTexture* sTex, GSTexture* dTex) override;
+#endif
+
+	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) override;
 
 	MRCOwned<id<MTLFunction>> LoadShader(NSString* name);
 	MRCOwned<id<MTLRenderPipelineState>> MakePipeline(MTLRenderPipelineDescriptor* desc, id<MTLFunction> vertex, id<MTLFunction> fragment, NSString* name);
+	MRCOwned<id<MTLComputePipelineState>> MakeComputePipeline(id<MTLFunction> compute, NSString* name);
 	bool Create() override;
 
 	void ClearRenderTarget(GSTexture* t, const GSVector4& c) override;
