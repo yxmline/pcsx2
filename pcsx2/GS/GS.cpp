@@ -1354,6 +1354,10 @@ void GSApp::Init()
 	m_gs_texture_preloading.push_back(GSSetting(static_cast<u32>(TexturePreloadingLevel::Partial), "Partial", ""));
 	m_gs_texture_preloading.push_back(GSSetting(static_cast<u32>(TexturePreloadingLevel::Full), "Full", "Hash Cache"));
 
+	m_gs_tex_display_list.push_back(GSSetting(static_cast<u32>(GSPostBilinearMode::Off), "None", ""));
+	m_gs_tex_display_list.push_back(GSSetting(static_cast<u32>(GSPostBilinearMode::BilinearSmooth), "Bilinear (Smooth)", ""));
+	m_gs_tex_display_list.push_back(GSSetting(static_cast<u32>(GSPostBilinearMode::BilinearSharp), "Bilinear (Sharp)", ""));
+
 	m_gs_generic_list.push_back(GSSetting(-1, "Automatic", "Default"));
 	m_gs_generic_list.push_back(GSSetting(0, "Force-Disabled", ""));
 	m_gs_generic_list.push_back(GSSetting(1, "Force-Enabled", ""));
@@ -1399,6 +1403,10 @@ void GSApp::Init()
 	m_gs_tv_shaders.push_back(GSSetting(4, "Wave filter", ""));
 	m_gs_tv_shaders.push_back(GSSetting(5, "Lottes CRT filter", ""));
 
+	m_gs_casmode.push_back(GSSetting(static_cast<u32>(GSCASMode::Disabled), "Disabled", ""));
+	m_gs_casmode.push_back(GSSetting(static_cast<u32>(GSCASMode::SharpenOnly), "Sharpen Only", "Internal Resolution"));
+	m_gs_casmode.push_back(GSSetting(static_cast<u32>(GSCASMode::SharpenAndResize), "Sharpen And Resize", "Display Resolution"));
+
 	m_gs_hw_download_mode.push_back(GSSetting(static_cast<u32>(GSHardwareDownloadMode::Enabled), "Accurate", "Recommended"));
 	m_gs_hw_download_mode.push_back(GSSetting(static_cast<u32>(GSHardwareDownloadMode::NoReadbacks), "Disable Readbacks", "Synchronize GS Thread"));
 	m_gs_hw_download_mode.push_back(GSSetting(static_cast<u32>(GSHardwareDownloadMode::Unsynchronized), "Unsynchronized", "Non-Deterministic"));
@@ -1442,7 +1450,7 @@ void GSApp::Init()
 	m_default_configuration["DumpPaletteTextures"]                        = "1";
 	m_default_configuration["extrathreads"]                               = "2";
 	m_default_configuration["extrathreads_height"]                        = "4";
-	m_default_configuration["filter"]                                     = std::to_string(static_cast<s8>(BiFiltering::PS2));
+	m_default_configuration["filter"]                                     = std::to_string(static_cast<u8>(BiFiltering::PS2));
 	m_default_configuration["FullscreenMode"]                             = "";
 	m_default_configuration["fxaa"]                                       = "0";
 	m_default_configuration["HWDownloadMode"]                             = std::to_string(static_cast<u8>(GSHardwareDownloadMode::Enabled));
@@ -1455,7 +1463,7 @@ void GSApp::Init()
 	m_default_configuration["pcrtc_overscan"]                             = "0";
 	m_default_configuration["IntegerScaling"]                             = "0";
 	m_default_configuration["deinterlace_mode"]                           = std::to_string(static_cast<s8>(GSInterlaceMode::Automatic));
-	m_default_configuration["linear_present"]                             = "1";
+	m_default_configuration["linear_present_mode"]                        = std::to_string(static_cast<s8>(GSPostBilinearMode::BilinearSmooth));
 	m_default_configuration["LoadTextureReplacements"]                    = "0";
 	m_default_configuration["LoadTextureReplacementsAsync"]               = "1";
 	m_default_configuration["MaxAnisotropy"]                              = "0";
@@ -1504,6 +1512,8 @@ void GSApp::Init()
 	m_default_configuration["ThreadedPresentation"]                       = "0";
 	m_default_configuration["TriFilter"]                                  = std::to_string(static_cast<s8>(TriFiltering::Automatic));
 	m_default_configuration["TVShader"]                                   = "0";
+	m_default_configuration["CASMode"]                                    = std::to_string(static_cast<u8>(GSCASMode::Disabled));
+	m_default_configuration["CASSharpness"]                               = "50";
 	m_default_configuration["upscale_multiplier"]                         = "1";
 	m_default_configuration["UseBlitSwapChain"]                           = "0";
 	m_default_configuration["UseDebugDevice"]                             = "0";
