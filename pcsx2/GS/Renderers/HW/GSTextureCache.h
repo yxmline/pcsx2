@@ -93,8 +93,8 @@ public:
 		bool Inside(u32 bp, u32 bw, u32 psm, const GSVector4i& rect);
 		bool Overlaps(u32 bp, u32 bw, u32 psm, const GSVector4i& rect);
 
-		void ResizeTexture(int new_width, int new_height);
-		void ResizeTexture(int new_width, int new_height, GSVector2 new_scale);
+		bool ResizeTexture(int new_width, int new_height, bool recycle_old = true);
+		bool ResizeTexture(int new_width, int new_height, GSVector2 new_scale, bool recycle_old = true);
 	};
 
 	struct PaletteKey
@@ -332,6 +332,7 @@ public:
 	void Read(Source* t, const GSVector4i& r);
 	void RemoveAll();
 	void RemovePartial();
+	void AddDirtyRectTarget(Target* target, GSVector4i rect, u32 psm, u32 bw);
 
 	Source* LookupSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, const GSVector4i& r, const GSVector2i* lod);
 	Source* LookupDepthSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, const GSVector4i& r, bool palette = false);
