@@ -27245,7 +27245,7 @@ SLPM-65139:
   region: "NTSC-J"
   compat: 5
 SLPM-65140:
-  name: "Jojo's Bizarre Adventure 5"
+  name: "Jojo no Kimyou na Bouken - Ougon no Kaze"
   region: "NTSC-J"
 SLPM-65141:
   name: "Tsuzuse Gareijiri"
@@ -36916,6 +36916,8 @@ SLPS-25352:
   name: "Espgaluda"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPS-25353:
   name: "Xenosaga Freaks"
   region: "NTSC-J"
