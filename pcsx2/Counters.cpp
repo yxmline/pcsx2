@@ -36,12 +36,12 @@
 
 #ifndef PCSX2_CORE
 #include "gui/App.h"
+#include "Recording/InputRecordingControls.h"
 #else
 #include "PAD/Host/PAD.h"
+#include "Recording/InputRecording.h"
 #include "VMManager.h"
 #endif
-
-#include "Recording/InputRecordingControls.h"
 
 using namespace Threading;
 
@@ -612,7 +612,9 @@ static __fi void VSyncStart(u32 sCycle)
 	{
 		// It is imperative that any frame locking that must happen occurs before Vsync is started
 		// Not doing so would sacrifice a frame of a savestate-based recording when loading any savestate
+#ifndef PCSX2_CORE
 		g_InputRecordingControls.HandlePausingAndLocking();
+#endif
 	}
 
 #ifdef PCSX2_CORE
@@ -674,10 +676,12 @@ static __fi void GSVSync()
 
 static __fi void VSyncEnd(u32 sCycle)
 {
+#ifndef PCSX2_CORE
 	if (EmuConfig.EnableRecordingTools)
 	{
 		g_InputRecordingControls.CheckPauseStatus();
 	}
+#endif
 
 	if(EmuConfig.Trace.Enabled && EmuConfig.Trace.EE.m_EnableAll)
 		SysTrace.EE.Counters.Write( "    ================  EE COUNTER VSYNC END (frame: %d)  ================", g_FrameCount );

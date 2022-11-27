@@ -15,13 +15,30 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "ui_InputRecordingViewer.h"
 
-namespace InputRec
+#include "pcsx2/Recording/InputRecordingFile.h"
+
+class InputRecordingViewer final : public QMainWindow
 {
-	void log(const std::string& log);
-	void consoleLog(const std::string& log);
-	void consoleMultiLog(const std::vector<std::string>& logs);
-} // namespace inputRec
+	Q_OBJECT
+
+public:
+	explicit InputRecordingViewer(QWidget* parent = nullptr);
+	~InputRecordingViewer() = default;
+
+private Q_SLOTS:
+	void openFile();
+	void closeFile();
+
+private:
+	Ui::InputRecordingViewer m_ui;
+
+	InputRecordingFile m_file;
+	bool m_file_open;
+
+	void loadTable();
+	QTableWidgetItem* createRowItem(std::tuple<u8, u8> analog);
+	QTableWidgetItem* createRowItem(bool pressed);
+	QTableWidgetItem* createRowItem(std::tuple<bool, u8> buttonInfo);
+};

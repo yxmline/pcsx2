@@ -37,6 +37,7 @@
 #include "pcsx2/HostSettings.h"
 #include "pcsx2/PerformanceMetrics.h"
 #include "pcsx2/Recording/InputRecording.h"
+#include "pcsx2/Recording/InputRecordingControls.h"
 
 #include "AboutDialog.h"
 #include "AutoUpdaterDialog.h"
@@ -52,6 +53,7 @@
 #include "Settings/InterfaceSettingsWidget.h"
 #include "SettingWidgetBinder.h"
 #include "svnrev.h"
+#include "Tools/InputRecording/InputRecordingViewer.h"
 #include "Tools/InputRecording/NewInputRecordingDlg.h"
 
 #ifdef _WIN32
@@ -386,6 +388,7 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionInputRecStop, &QAction::triggered, this, &MainWindow::onInputRecStopActionTriggered);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecConsoleLogs, "Logging", "EnableInputRecordingLogs", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(nullptr, m_ui.actionInputRecControllerLogs, "Logging", "EnableControllerLogs", false);
+	connect(m_ui.actionInputRecOpenViewer, &QAction::triggered, this, &MainWindow::onInputRecOpenViewer);
 
 	// These need to be queued connections to stop crashing due to menus opening/closing and switching focus.
 	connect(m_game_list_widget, &GameListWidget::refreshProgress, this, &MainWindow::onGameListRefreshProgress);
@@ -1635,7 +1638,7 @@ void MainWindow::onInputRecNewActionTriggered()
 	const bool wasRunning = s_vm_valid;
 	if (wasRunning && !wasPaused)
 	{
-		VMManager::SetPaused(true);
+		g_emu_thread->setVMPaused(true);
 	}
 
 	NewInputRecordingDlg dlg(this);
@@ -1643,29 +1646,37 @@ void MainWindow::onInputRecNewActionTriggered()
 
 	if (result == QDialog::Accepted)
 	{
-		if (g_InputRecording.Create(
-				dlg.getFilePath(),
-				dlg.getInputRecType() == InputRecording::Type::FROM_SAVESTATE,
-				dlg.getAuthorName()))
-		{
-			return;
-		}
+		Host::RunOnCPUThread([&, filePath = dlg.getFilePath(),
+								 fromSavestate = dlg.getInputRecType() == InputRecording::Type::FROM_SAVESTATE,
+								 authorName = dlg.getAuthorName()]() {
+			if (g_InputRecording.create(
+					filePath,
+					fromSavestate,
+					authorName))
+			{
+				QtHost::RunOnUIThread([&]() {
+					m_ui.actionInputRecNew->setEnabled(false);
+					m_ui.actionInputRecStop->setEnabled(true);
+					m_ui.actionReset->setEnabled(!g_InputRecording.isTypeSavestate());
+				});
+			}
+		});
 	}
 
 	if (wasRunning && !wasPaused)
 	{
-		VMManager::SetPaused(false);
+		g_emu_thread->setVMPaused(false);
 	}
 }
-
-#include "pcsx2/Recording/InputRecordingControls.h"
 
 void MainWindow::onInputRecPlayActionTriggered()
 {
 	const bool wasPaused = s_vm_paused;
 
 	if (!wasPaused)
-		g_InputRecordingControls.PauseImmediately();
+	{
+		g_emu_thread->setVMPaused(true);
+	}
 
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::ExistingFile);
@@ -1676,30 +1687,49 @@ void MainWindow::onInputRecPlayActionTriggered()
 	{
 		fileNames = dialog.selectedFiles();
 	}
-
-	if (fileNames.length() > 0)
+	else
 	{
-		if (g_InputRecording.IsActive())
+		if (!wasPaused)
 		{
-			g_InputRecording.Stop();
-		}
-		if (g_InputRecording.Play(fileNames.first().toStdString()))
-		{
+			g_emu_thread->setVMPaused(false);
 			return;
 		}
 	}
 
-	if (!wasPaused)
+	if (fileNames.length() > 0)
 	{
-		g_InputRecordingControls.Resume();
+		if (g_InputRecording.isActive())
+		{
+			Host::RunOnCPUThread([]() {
+				g_InputRecording.stop();
+			});
+			m_ui.actionInputRecStop->setEnabled(false);
+		}
+		Host::RunOnCPUThread([&, filename = fileNames.first().toStdString()]() {
+			if (g_InputRecording.play(filename))
+			{
+				QtHost::RunOnUIThread([&]() {
+					m_ui.actionInputRecNew->setEnabled(false);
+					m_ui.actionInputRecStop->setEnabled(true);
+					m_ui.actionReset->setEnabled(!g_InputRecording.isTypeSavestate());
+				});
+			}
+		});
 	}
 }
 
 void MainWindow::onInputRecStopActionTriggered()
 {
-	if (g_InputRecording.IsActive())
+	if (g_InputRecording.isActive())
 	{
-		g_InputRecording.Stop();
+		Host::RunOnCPUThread([&]() {
+			g_InputRecording.stop();
+			QtHost::RunOnUIThread([&]() {
+				m_ui.actionInputRecNew->setEnabled(true);
+				m_ui.actionInputRecStop->setEnabled(false);
+				m_ui.actionReset->setEnabled(true);
+			});
+		});
 	}
 }
 
@@ -1707,6 +1737,32 @@ void MainWindow::onInputRecOpenSettingsTriggered()
 {
 	// TODO - Vaser - Implement
 }
+
+InputRecordingViewer* MainWindow::getInputRecordingViewer()
+{
+	if (!m_input_recording_viewer)
+	{
+		m_input_recording_viewer = new InputRecordingViewer(this);
+	}
+
+	return m_input_recording_viewer;
+}
+
+void MainWindow::updateInputRecordingActions(bool started)
+{
+	m_ui.actionInputRecNew->setEnabled(started);
+	m_ui.actionInputRecPlay->setEnabled(started);
+}
+
+void MainWindow::onInputRecOpenViewer()
+{
+	InputRecordingViewer* viewer = getInputRecordingViewer();
+	if (!viewer->isVisible())
+	{
+		viewer->show();
+	}
+}
+
 
 void MainWindow::onVMStarting()
 {
@@ -1725,6 +1781,7 @@ void MainWindow::onVMStarted()
 	updateEmulationActions(true, true);
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
+	updateInputRecordingActions(true);
 }
 
 void MainWindow::onVMPaused()
@@ -1778,6 +1835,7 @@ void MainWindow::onVMStopped()
 	updateWindowTitle();
 	updateWindowState();
 	updateStatusBarWidgetVisibility();
+	updateInputRecordingActions(false);
 
 	if (m_display_widget)
 	{

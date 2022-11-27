@@ -60,6 +60,8 @@
 
 #include "IconsFontAwesome5.h"
 
+#include "Recording/InputRecording.h"
+
 #include "common/emitter/tools.h"
 #ifdef _M_X86
 #include "common/emitter/x86_intrin.h"
@@ -367,7 +369,7 @@ std::string VMManager::GetGameSettingsPath(const std::string_view& game_serial, 
 
 	return game_serial.empty() ?
 			   Path::Combine(EmuFolders::GameSettings, fmt::format("{:08X}.ini", game_crc)) :
-               Path::Combine(EmuFolders::GameSettings, fmt::format("{}_{:08X}.ini", sanitized_serial, game_crc));
+			   Path::Combine(EmuFolders::GameSettings, fmt::format("{}_{:08X}.ini", sanitized_serial, game_crc));
 }
 
 std::string VMManager::GetInputProfilePath(const std::string_view& name)
@@ -1123,6 +1125,12 @@ void VMManager::Reset()
 	// gameid change, so apply settings
 	if (game_was_started)
 		UpdateRunningGame(true, false);
+
+	if (g_InputRecording.isActive())
+	{
+		g_InputRecording.handleReset();
+		GetMTGS().PresentCurrentFrame();
+	}
 }
 
 std::string VMManager::GetSaveStateFileName(const char* game_serial, u32 game_crc, s32 slot)
@@ -1177,6 +1185,11 @@ bool VMManager::DoLoadState(const char* filename)
 		SaveState_UnzipFromDisk(filename);
 		UpdateRunningGame(false, false);
 		Host::OnSaveStateLoaded(filename, true);
+		if (g_InputRecording.isActive())
+		{
+			g_InputRecording.handleLoadingSavestate();
+			GetMTGS().PresentCurrentFrame();
+		}
 		return true;
 	}
 	catch (Exception::BaseException& e)
@@ -1544,6 +1557,23 @@ void VMManager::Internal::VSyncOnCPUThread()
 	}
 
 	Host::CPUThreadVSync();
+
+	if (EmuConfig.EnableRecordingTools)
+	{
+		// This code is called _before_ Counter's vsync end, and _after_ vsync start
+		if (g_InputRecording.isActive())
+		{
+			// Process any outstanding recording actions (ie. toggle mode, stop the recording, etc)
+			g_InputRecording.processRecordQueue();
+			g_InputRecording.getControls().processControlQueue();
+			// Increment our internal frame counter, used to keep track of when we hit the end, etc.
+			g_InputRecording.incFrameCounter();
+			g_InputRecording.handleExceededFrameCounter();
+		}
+		// At this point, the PAD data has been read from the user for the current frame
+		// so we can either read from it, or overwrite it!
+		g_InputRecording.handleControllerDataUpdate();
+	}
 }
 
 void VMManager::CheckForCPUConfigChanges(const Pcsx2Config& old_config)
