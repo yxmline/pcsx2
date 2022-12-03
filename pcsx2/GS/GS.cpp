@@ -22,12 +22,12 @@
 #include "GSGL.h"
 #include "GSUtil.h"
 #include "GSExtra.h"
-#include "Renderers/SW/GSRendererSW.h"
 #include "Renderers/Null/GSRendererNull.h"
 #include "Renderers/Null/GSDeviceNull.h"
 #include "Renderers/HW/GSRendererHW.h"
 #include "Renderers/HW/GSTextureReplacements.h"
 #include "GSLzma.h"
+#include "MultiISA.h"
 
 #include "common/Console.h"
 #include "common/FileSystem.h"
@@ -91,14 +91,9 @@ int GSinit()
 	// const type qualifier from all the affected variables.
 	GSinitConfig();
 
-
+	GSVertexSW::InitStatic();
 
 	GSUtil::Init();
-
-	if (g_const == nullptr)
-		return -1;
-	else
-		g_const->Init();
 
 #ifdef _WIN32
 	s_hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -267,7 +262,7 @@ static bool DoGSOpen(GSRendererType renderer, u8* basemem)
 		else
 		{
 			const int threads = theApp.GetConfigI("extrathreads");
-			g_gs_renderer = std::make_unique<GSRendererSW>(threads);
+			g_gs_renderer = std::unique_ptr<GSRenderer>(MULTI_ISA_SELECT(makeGSRendererSW)(threads));
 		}
 	}
 	catch (std::exception& ex)

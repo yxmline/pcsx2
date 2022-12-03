@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2021 PCSX2 Dev Team
+ *  Copyright (C) 2002-2022  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -15,28 +15,13 @@
 
 #pragma once
 
-#include "GSScanlineEnvironment.h"
-#include "GS/GSUtil.h"
 #include "GS/MultiISA.h"
-#include <xbyak/xbyak.h>
+#include "mpeg2lib/Mpeg.h"
 
-MULTI_ISA_UNSHARED_START
+MULTI_ISA_DEF(void IPUWorker();)
 
-class GSSetupPrimCodeGenerator : public Xbyak::CodeGenerator
-{
-	void operator=(const GSSetupPrimCodeGenerator&);
+// Quantization matrix
+extern rgb16_t g_ipu_vqclut[16]; //clut conversion table
+extern u16 g_ipu_thresh[2]; //thresholds for color conversions
 
-	GSScanlineSelector m_sel;
-	GSScanlineLocalData& m_local;
-	bool m_rip;
-
-	struct
-	{
-		u32 z : 1, f : 1, t : 1, c : 1;
-	} m_en;
-
-public:
-	GSSetupPrimCodeGenerator(void* param, u64 key, void* code, size_t maxsize);
-};
-
-MULTI_ISA_UNSHARED_END
+alignas(16) extern u8 g_ipu_indx4[16*16/2];

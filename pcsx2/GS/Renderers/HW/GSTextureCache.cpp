@@ -20,14 +20,9 @@
 #include "GS/GSGL.h"
 #include "GS/GSIntrin.h"
 #include "GS/GSUtil.h"
+#include "GS/GSXXH.h"
 #include "common/Align.h"
 #include "common/HashCombine.h"
-
-//#define DISABLE_HW_TEXTURE_CACHE 1
-
-#define XXH_STATIC_LINKING_ONLY 1
-#define XXH_INLINE_ALL 1
-#include "xxhash.h"
 
 u8* GSTextureCache::m_temp;
 
@@ -2685,7 +2680,7 @@ void GSTextureCache::Source::Flush(u32 count, int layer)
 
 		if ((r > tr).mask() & 0xff00)
 		{
-			(mem.*rtx)(off, r, buff, pitch, m_TEXA);
+			rtx(mem, off, r, buff, pitch, m_TEXA);
 
 			m_texture->Update(r.rintersect(tr), buff, pitch, layer);
 		}
@@ -2695,13 +2690,13 @@ void GSTextureCache::Source::Flush(u32 count, int layer)
 
 			if (m_texture->Map(m, &r, layer))
 			{
-				(mem.*rtx)(off, r, m.bits, m.pitch, m_TEXA);
+				rtx(mem, off, r, m.bits, m.pitch, m_TEXA);
 
 				m_texture->Unmap();
 			}
 			else
 			{
-				(mem.*rtx)(off, r, buff, pitch, m_TEXA);
+				rtx(mem, off, r, buff, pitch, m_TEXA);
 
 				m_texture->Update(r, buff, pitch, layer);
 			}
@@ -3239,8 +3234,8 @@ u64 GSTextureCache::PaletteKeyHash::operator()(const PaletteKey& key) const
 {
 	ASSERT(key.pal == 16 || key.pal == 256);
 	return key.pal == 16 ?
-		XXH3_64bits(key.clut, sizeof(key.clut[0]) * 16) :
-		XXH3_64bits(key.clut, sizeof(key.clut[0]) * 256);
+		GSXXH3_64bits(key.clut, sizeof(key.clut[0]) * 16) :
+		GSXXH3_64bits(key.clut, sizeof(key.clut[0]) * 256);
 };
 
 // GSTextureCache::PaletteKeyEqual
@@ -3391,17 +3386,17 @@ __fi static void BlockHashReset(BlockHashState& st)
 
 __fi static void BlockHashAccumulate(BlockHashState& st, const u8* bp)
 {
-	XXH3_64bits_update(&st, bp, BLOCK_SIZE);
+	GSXXH3_64bits_update(&st, bp, BLOCK_SIZE);
 }
 
 __fi static void BlockHashAccumulate(BlockHashState& st, const u8* bp, u32 size)
 {
-	XXH3_64bits_update(&st, bp, size);
+	GSXXH3_64bits_update(&st, bp, size);
 }
 
 __fi static GSTextureCache::HashType FinishBlockHash(BlockHashState& st)
 {
-	return XXH3_64bits_digest(&st);
+	return GSXXH3_64bits_digest(&st);
 }
 
 static void HashTextureLevel(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, BlockHashState& hash_st, u8* temp)
@@ -3433,7 +3428,7 @@ static void HashTextureLevel(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, Blo
 		const GSLocalMemory::readTexture rtx = psm.rtxP;
 
 		// Use temp buffer for expanding, since we may not need to update.
-		(mem.*rtx)(off, block_rect, temp, pitch, TEXA);
+		rtx(mem, off, block_rect, temp, pitch, TEXA);
 
 		// Hash the expanded texture.
 		u8* ptr = temp;
@@ -3499,7 +3494,7 @@ void GSTextureCache::PreloadTexture(const GIFRegTEX0& TEX0, const GIFRegTEXA& TE
 	GSTexture::GSMap map;
 	if (rect.eq(block_rect) && tex->Map(map, &rect, level))
 	{
-		(mem.*rtx)(off, block_rect, map.bits, map.pitch, TEXA);
+		rtx(mem, off, block_rect, map.bits, map.pitch, TEXA);
 		tex->Unmap();
 	}
 	else
@@ -3508,7 +3503,7 @@ void GSTextureCache::PreloadTexture(const GIFRegTEX0& TEX0, const GIFRegTEXA& TE
 		pitch = Common::AlignUpPow2(pitch, 32);
 
 		u8* buff = m_temp;
-		(mem.*rtx)(off, block_rect, buff, pitch, TEXA);
+		rtx(mem, off, block_rect, buff, pitch, TEXA);
 		tex->Update(rect, buff, pitch, level);
 	}
 }

@@ -18,14 +18,18 @@
 #include "GS/GSGL.h"
 #include "common/StringUtil.h"
 
+MULTI_ISA_UNSHARED_IMPL;
+
+GSRenderer* CURRENT_ISA::makeGSRendererSW(int threads)
+{
+	return new GSRendererSW(threads);
+}
+
 #define LOG 0
 
 static FILE* s_fp = LOG ? fopen("c:\\temp1\\_.txt", "w") : NULL;
 
-CONSTINIT const GSVector4 GSVertexSW::m_pos_scale = GSVector4::cxpr(1.0f / 16, 1.0f / 16, 1.0f, 128.0f);
-#if _M_SSE >= 0x501
-CONSTINIT const GSVector8 GSVertexSW::m_pos_scale2 = GSVector8::cxpr(1.0f / 16, 1.0f / 16, 1.0f, 128.0f, 1.0f / 16, 1.0f / 16, 1.0f, 128.0f);
-#endif
+static constexpr GSVector4 s_pos_scale = GSVector4::cxpr(1.0f / 16, 1.0f / 16, 1.0f, 128.0f);
 
 GSRendererSW::GSRendererSW(int threads)
 	: GSRenderer(), m_fzb(NULL)
@@ -172,7 +176,7 @@ GSTexture* GSRendererSW::GetOutput(int i, int& y_offset)
 		const GSLocalMemory::psm_t& psm = GSLocalMemory::m_psm[DISPFB.PSM];
 
 		// Top left rect
-		(m_mem.*psm.rtx)(m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), r.ralign<Align_Outside>(psm.bs), m_output, pitch, m_env.TEXA);
+		psm.rtx(m_mem, m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), r.ralign<Align_Outside>(psm.bs), m_output, pitch, m_env.TEXA);
 
 		int top = (h_wrap) ? ((r.bottom - r.top) * pitch) : 0;
 		int left = (w_wrap) ? (r.right - r.left) * (GSLocalMemory::m_psm[DISPFB.PSM].bpp / 8) : 0;
@@ -181,18 +185,18 @@ GSTexture* GSRendererSW::GetOutput(int i, int& y_offset)
 
 		// Top right rect
 		if (w_wrap)
-			(m_mem.*psm.rtx)(m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rw.ralign<Align_Outside>(psm.bs), &m_output[left], pitch, m_env.TEXA);
+			psm.rtx(m_mem, m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rw.ralign<Align_Outside>(psm.bs), &m_output[left], pitch, m_env.TEXA);
 
 		// Bottom left rect
 		if (h_wrap)
-			(m_mem.*psm.rtx)(m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rh.ralign<Align_Outside>(psm.bs), &m_output[top], pitch, m_env.TEXA);
+			psm.rtx(m_mem, m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rh.ralign<Align_Outside>(psm.bs), &m_output[top], pitch, m_env.TEXA);
 
 		// Bottom right rect
 		if (h_wrap && w_wrap)
 		{
 			// Needs also rw with the start/end height of rh, fills in the bottom right rect which will be missing if both overflow.
 			const GSVector4i rwh(rw.left, rh.top, rw.right, rh.bottom);
-			(m_mem.*psm.rtx)(m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rwh.ralign<Align_Outside>(psm.bs), &m_output[top + left], pitch, m_env.TEXA);
+			psm.rtx(m_mem, m_mem.GetOffset(DISPFB.Block(), DISPFB.FBW, DISPFB.PSM), rwh.ralign<Align_Outside>(psm.bs), &m_output[top + left], pitch, m_env.TEXA);
 		}
 
 		m_texture[i]->Update(out_r, m_output, pitch);
@@ -223,9 +227,20 @@ GSTexture* GSRendererSW::GetFeedbackOutput()
 	return nullptr;
 }
 
+MULTI_ISA_DEF(void GSVertexSWInitStatic();)
+
+#if MULTI_ISA_COMPILE_ONCE
+GSVertexSW::ConvertVertexBufferPtr GSVertexSW::s_cvb[4][2][2][2];
+void GSVertexSW::InitStatic()
+{
+	MULTI_ISA_SELECT(GSVertexSWInitStatic)();
+}
+#endif
+
+MULTI_ISA_UNSHARED_START
 
 template <u32 primclass, u32 tme, u32 fst, u32 q_div>
-void GSVertexSW::ConvertVertexBuffer(GSDrawingContext* RESTRICT ctx, GSVertexSW* RESTRICT dst, const GSVertex* RESTRICT src, size_t count)
+void ConvertVertexBuffer(const GSDrawingContext* RESTRICT ctx, GSVertexSW* RESTRICT dst, const GSVertex* RESTRICT src, size_t count)
 {
 	// FIXME q_div wasn't added to AVX2 code path.
 
@@ -274,7 +289,7 @@ void GSVertexSW::ConvertVertexBuffer(GSDrawingContext* RESTRICT ctx, GSVertexSW*
 
 		if (primclass == GS_SPRITE_CLASS)
 		{
-			dst->p = GSVector4(xy).xyyw(GSVector4(xyzuvf)) * m_pos_scale;
+			dst->p = GSVector4(xy).xyyw(GSVector4(xyzuvf)) * s_pos_scale;
 
 			xyzuvf = xyzuvf.min_u32(z_max);
 			t = t.insert32<1, 3>(GSVector4::cast(xyzuvf));
@@ -282,7 +297,7 @@ void GSVertexSW::ConvertVertexBuffer(GSDrawingContext* RESTRICT ctx, GSVertexSW*
 		else
 		{
 			double z = static_cast<double>(static_cast<u32>(xyzuvf.extract32<1>()));
-			dst->p = (GSVector4(xy) * m_pos_scale).upld(GSVector4::f64(z, 0.0));
+			dst->p = (GSVector4(xy) * s_pos_scale).upld(GSVector4::f64(z, 0.0));
 			t = t.blend32<8>(GSVector4(xyzuvf << 7));
 		}
 
@@ -296,22 +311,23 @@ void GSVertexSW::ConvertVertexBuffer(GSDrawingContext* RESTRICT ctx, GSVertexSW*
 	}
 }
 
-// clang-format off
-GSVertexSW::ConvertVertexBufferPtr GSVertexSW::s_cvb[4][2][2][2] = {
-#define InitCVB3(P, T, F) { &GSVertexSW::ConvertVertexBuffer<P, T, F, 0>, &GSVertexSW::ConvertVertexBuffer<P, T, F, 1> }
-#define InitCVB2(P, T) { InitCVB3(P, T, 0), InitCVB3(P, T, 1) }
-#define InitCVB(P) { InitCVB2(static_cast<u32>(P), 0), InitCVB2(static_cast<u32>(P), 1) }
-
-	InitCVB(GS_POINT_CLASS),
-	InitCVB(GS_LINE_CLASS),
-	InitCVB(GS_TRIANGLE_CLASS),
-	InitCVB(GS_SPRITE_CLASS)
-
-#undef InitCVB
+void GSVertexSWInitStatic()
+{
+#define InitCVB4(P, T, F, Q) GSVertexSW::s_cvb[P][T][F][Q] = ConvertVertexBuffer<P, T, F, Q>;
+#define InitCVB3(P, T, F) InitCVB4(P, T, F, 0) InitCVB4(P, T, F, 1)
+#define InitCVB2(P, T) InitCVB3(P, T, 0) InitCVB3(P, T, 1)
+#define InitCVB1(P) InitCVB2(P, 0) InitCVB2(P, 1)
+	InitCVB1(GS_POINT_CLASS)
+	InitCVB1(GS_LINE_CLASS)
+	InitCVB1(GS_TRIANGLE_CLASS)
+	InitCVB1(GS_SPRITE_CLASS)
+#undef InitCVB1
 #undef InitCVB2
 #undef InitCVB3
-};
-// clang-format on
+#undef InitCVB4
+}
+
+MULTI_ISA_UNSHARED_END
 
 void GSRendererSW::Draw()
 {
