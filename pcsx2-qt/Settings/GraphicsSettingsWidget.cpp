@@ -336,12 +336,13 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	updateRendererDependentOptions();
 
 #ifndef PCSX2_DEVBUILD
-	// only allow disabling readbacks for per-game settings, it's too dangerous
-	m_ui.gsDownloadMode->setEnabled(m_dialog->isPerGameSettings());
-
-	// Remove texture offset and skipdraw range for global settings.
 	if (!m_dialog->isPerGameSettings())
 	{
+		// Only allow disabling readbacks for per-game settings, it's too dangerous.
+		m_ui.advancedDebugFormLayout->removeRow(2);
+		m_ui.gsDownloadMode = nullptr;
+
+		// Remove texture offset and skipdraw range for global settings.
 		m_ui.upscalingFixesLayout->removeRow(2);
 		m_ui.hardwareFixesLayout->removeRow(2);
 		m_ui.hardwareFixesLayout->removeRow(1);
@@ -358,7 +359,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 		dialog->registerWidgetHelp(m_ui.DisableInterlaceOffset, tr("Disable Interlace Offset"), tr("Unchecked"),
 			tr("Disables interlacing offset which may reduce blurring in some situations."));
 
-		dialog->registerWidgetHelp(m_ui.bilinearFiltering, tr("Bilinear Filtering"), tr("Bilinear (Sharp)"),
+		dialog->registerWidgetHelp(m_ui.bilinearFiltering, tr("Bilinear Filtering"), tr("Bilinear (Smooth)"),
 			tr("Enables bilinear post processing filter. Smooths the overall picture as it is displayed on the screen. Corrects positioning between pixels."));
 
 		dialog->registerWidgetHelp(m_ui.PCRTCOffsets, tr("Screen Offsets"), tr("Unchecked"),
