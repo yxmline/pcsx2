@@ -16141,6 +16141,10 @@ SLES-53096:
 SLES-53098:
   name: "Conspiracy - Weapons of Mass Destruction"
   region: "PAL-M5"
+  gsHWFixes:
+    autoFlush: 1 # Fixes lighting misalignment.
+  gameFixes:
+    - XGKickHack # Fixes stretched/spikey textures.
 SLES-53099:
   name: "Pilot Down - Behind Enemy Lines"
   region: "PAL-M5"
@@ -23972,6 +23976,9 @@ SLPM-55140:
     halfPixelOffset: 1 # Fixes dark sides.
 SLPM-55146:
   name: "Jikkyou Powerful Pro Yakyuu 2009"
+  region: "NTSC-J"
+SLPM-55147:
+  name: "Suggoi! Arcana Heart 2"
   region: "NTSC-J"
 SLPM-55148:
   name: "007 - Nagusame no Houshuu"
