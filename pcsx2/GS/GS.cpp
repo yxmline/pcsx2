@@ -919,12 +919,14 @@ void GSRestoreAPIState()
 	g_gs_device->RestoreAPIState();
 }
 
-bool GSSaveSnapshotToMemory(u32 width, u32 height, std::vector<u32>* pixels)
+bool GSSaveSnapshotToMemory(u32 window_width, u32 window_height, bool apply_aspect, bool crop_borders,
+	u32* width, u32* height, std::vector<u32>* pixels)
 {
 	if (!g_gs_renderer)
 		return false;
 
-	return g_gs_renderer->SaveSnapshotToMemory(width, height, pixels);
+	return g_gs_renderer->SaveSnapshotToMemory(window_width, window_height, apply_aspect, crop_borders,
+		width, height, pixels);
 }
 
 std::string format(const char* fmt, ...)
@@ -1715,16 +1717,6 @@ static void HotkeyAdjustUpscaleMultiplier(s32 delta)
 	GetMTGS().ApplySettings();
 }
 
-static void HotkeyAdjustZoom(double delta)
-{
-	const double new_zoom = std::clamp(EmuConfig.GS.Zoom + delta, 1.0, 200.0);
-	Host::AddKeyedFormattedOSDMessage("ZoomChanged", Host::OSD_QUICK_DURATION, "Zoom set to %.1f%%.", new_zoom);
-	EmuConfig.GS.Zoom = new_zoom;
-
-	// no need to go through the full settings update for this
-	GetMTGS().RunOnGSThread([new_zoom]() { GSConfig.Zoom = new_zoom; });
-}
-
 BEGIN_HOTKEY_LIST(g_gs_hotkeys)
 	{"Screenshot", "Graphics", "Save Screenshot", [](s32 pressed) {
 		if (!pressed)
@@ -1809,14 +1801,6 @@ BEGIN_HOTKEY_LIST(g_gs_hotkeys)
 		 EmuConfig.GS.InterlaceMode = new_mode;
 
 		 GetMTGS().RunOnGSThread([new_mode]() { GSConfig.InterlaceMode = new_mode; });
-	 }},
-	{"ZoomIn", "Graphics", "Zoom In", [](s32 pressed) {
-		 if (!pressed)
-			 HotkeyAdjustZoom(1.0);
-	 }},
-	{"ZoomOut", "Graphics", "Zoom Out", [](s32 pressed) {
-		 if (!pressed)
-			 HotkeyAdjustZoom(-1.0);
 	 }},
 	{"ToggleTextureDumping", "Graphics", "Toggle Texture Dumping", [](s32 pressed) {
 		 if (!pressed)
