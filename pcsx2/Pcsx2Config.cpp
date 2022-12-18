@@ -26,10 +26,69 @@
 #include "CDVD/CDVDcommon.h"
 #include "MemoryCardFile.h"
 
-#ifndef PCSX2_CORE
+#ifdef PCSX2_CORE
+#include "USB/USB.h"
+#else
+#include "USB/USBNull.h"
 #include "gui/AppConfig.h"
 #include "GS/GS.h"
 #endif
+
+const char* SettingInfo::StringDefaultValue() const
+{
+	return default_value ? default_value : "";
+}
+
+bool SettingInfo::BooleanDefaultValue() const
+{
+	return default_value ? StringUtil::FromChars<bool>(default_value).value_or(false) : false;
+}
+
+s32 SettingInfo::IntegerDefaultValue() const
+{
+	return default_value ? StringUtil::FromChars<s32>(default_value).value_or(0) : 0;
+}
+
+s32 SettingInfo::IntegerMinValue() const
+{
+	static constexpr s32 fallback_value = std::numeric_limits<s32>::min();
+	return min_value ? StringUtil::FromChars<s32>(min_value).value_or(fallback_value) : fallback_value;
+}
+
+s32 SettingInfo::IntegerMaxValue() const
+{
+	static constexpr s32 fallback_value = std::numeric_limits<s32>::max();
+	return max_value ? StringUtil::FromChars<s32>(max_value).value_or(fallback_value) : fallback_value;
+}
+
+s32 SettingInfo::IntegerStepValue() const
+{
+	static constexpr s32 fallback_value = 1;
+	return step_value ? StringUtil::FromChars<s32>(step_value).value_or(fallback_value) : fallback_value;
+}
+
+float SettingInfo::FloatDefaultValue() const
+{
+	return default_value ? StringUtil::FromChars<float>(default_value).value_or(0.0f) : 0.0f;
+}
+
+float SettingInfo::FloatMinValue() const
+{
+	static constexpr float fallback_value = std::numeric_limits<float>::min();
+	return min_value ? StringUtil::FromChars<float>(min_value).value_or(fallback_value) : fallback_value;
+}
+
+float SettingInfo::FloatMaxValue() const
+{
+	static constexpr float fallback_value = std::numeric_limits<float>::max();
+	return max_value ? StringUtil::FromChars<float>(max_value).value_or(fallback_value) : fallback_value;
+}
+
+float SettingInfo::FloatStepValue() const
+{
+	static constexpr float fallback_value = 0.1f;
+	return step_value ? StringUtil::FromChars<float>(step_value).value_or(fallback_value) : fallback_value;
+}
 
 namespace EmuFolders
 {
@@ -1021,6 +1080,62 @@ void Pcsx2Config::FramerateOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapEntry(SlomoScalar);
 }
 
+#ifdef PCSX2_CORE
+
+Pcsx2Config::USBOptions::USBOptions()
+{
+	for (u32 i = 0; i < static_cast<u32>(Ports.size()); i++)
+	{
+		Ports[i].DeviceType = -1;
+		Ports[i].DeviceSubtype = 0;
+	}
+}
+
+void Pcsx2Config::USBOptions::LoadSave(SettingsWrapper& wrap)
+{
+	for (u32 i = 0; i < static_cast<u32>(Ports.size()); i++)
+	{
+		const std::string section(USBGetConfigSection(i));
+
+		std::string device = USB::DeviceTypeIndexToName(Ports[i].DeviceType);
+		wrap.Entry(section.c_str(), "Type", device, device);
+
+		if (wrap.IsLoading())
+			Ports[i].DeviceType = USB::DeviceTypeNameToIndex(device);
+
+		const std::string subtype_key(fmt::format("{}_subtype", USB::DeviceTypeIndexToName(Ports[i].DeviceType)));
+		wrap.Entry(section.c_str(), subtype_key.c_str(), Ports[i].DeviceSubtype);
+	}
+}
+
+bool Pcsx2Config::USBOptions::Port::operator==(const USBOptions::Port& right) const
+{
+	return OpEqu(DeviceType) && OpEqu(DeviceSubtype);
+}
+
+bool Pcsx2Config::USBOptions::Port::operator!=(const USBOptions::Port& right) const
+{
+	return !this->operator==(right);
+}
+
+bool Pcsx2Config::USBOptions::operator==(const USBOptions& right) const
+{
+	for (u32 i = 0; i < static_cast<u32>(Ports.size()); i++)
+	{
+		if (!OpEqu(Ports[i]))
+			return false;
+	}
+
+	return true;
+}
+
+bool Pcsx2Config::USBOptions::operator!=(const USBOptions& right) const
+{
+	return !this->operator==(right);
+}
+
+#endif
+
 #ifdef ENABLE_ACHIEVEMENTS
 
 Pcsx2Config::AchievementsOptions::AchievementsOptions()
@@ -1141,6 +1256,9 @@ void Pcsx2Config::LoadSave(SettingsWrapper& wrap)
 
 	Debugger.LoadSave(wrap);
 	Trace.LoadSave(wrap);
+#ifdef PCSX2_CORE
+	USB.LoadSave(wrap);
+#endif
 
 #ifdef ENABLE_ACHIEVEMENTS
 	Achievements.LoadSave(wrap);

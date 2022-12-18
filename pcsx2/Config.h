@@ -17,6 +17,7 @@
 
 #include "common/emitter/tools.h"
 #include "common/General.h"
+#include <array>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,115 @@ class SettingsInterface;
 class SettingsWrapper;
 
 enum class CDVD_SourceType : uint8_t;
+
+/// Generic setting information which can be reused in multiple components.
+struct SettingInfo
+{
+	using GetOptionsCallback = std::vector<std::pair<std::string, std::string>>(*)();
+
+	enum class Type
+	{
+		Boolean,
+		Integer,
+		IntegerList,
+		Float,
+		String,
+		StringList,
+		Path,
+	};
+
+	Type type;
+	const char* name;
+	const char* display_name;
+	const char* description;
+	const char* default_value;
+	const char* min_value;
+	const char* max_value;
+	const char* step_value;
+	const char* format;
+	const char* const* options; // For integer lists.
+	GetOptionsCallback get_options; // For string lists.
+	float multiplier;
+
+	const char* StringDefaultValue() const;
+	bool BooleanDefaultValue() const;
+	s32 IntegerDefaultValue() const;
+	s32 IntegerMinValue() const;
+	s32 IntegerMaxValue() const;
+	s32 IntegerStepValue() const;
+	float FloatDefaultValue() const;
+	float FloatMinValue() const;
+	float FloatMaxValue() const;
+	float FloatStepValue() const;
+};
+
+enum class GenericInputBinding : u8;
+
+// TODO(Stenzek): Move to InputCommon.h or something?
+struct InputBindingInfo
+{
+	enum class Type : u8
+	{
+		Unknown,
+		Button,
+		Axis,
+		HalfAxis,
+		Motor,
+		Pointer, // Receive relative mouse movement events, bind_index is offset by the axis.
+		Keyboard, // Receive host key events, bind_index is offset by the key code.
+		Device, // Used for special-purpose device selection, e.g. force feedback.
+		Macro,
+	};
+
+	const char* name;
+	const char* display_name;
+	Type bind_type;
+	u16 bind_index;
+	GenericInputBinding generic_mapping;
+};
+
+/// Generic input bindings. These roughly match a DualShock 4 or XBox One controller.
+/// They are used for automatic binding to PS2 controller types, and for big picture mode navigation.
+enum class GenericInputBinding : u8
+{
+	Unknown,
+
+	DPadUp,
+	DPadRight,
+	DPadLeft,
+	DPadDown,
+
+	LeftStickUp,
+	LeftStickRight,
+	LeftStickDown,
+	LeftStickLeft,
+	L3,
+
+	RightStickUp,
+	RightStickRight,
+	RightStickDown,
+	RightStickLeft,
+	R3,
+
+	Triangle, // Y on XBox pads.
+	Circle, // B on XBox pads.
+	Cross, // A on XBox pads.
+	Square, // X on XBox pads.
+
+	Select, // Share on DS4, View on XBox pads.
+	Start, // Options on DS4, Menu on XBox pads.
+	System, // PS button on DS4, Guide button on XBox pads.
+
+	L1, // LB on Xbox pads.
+	L2, // Left trigger on XBox pads.
+	R1, // RB on XBox pads.
+	R2, // Right trigger on Xbox pads.
+
+	SmallMotor, // High frequency vibration.
+	LargeMotor, // Low frequency vibration.
+
+	Count,
+};
 
 enum GamefixId
 {
@@ -1002,6 +1112,35 @@ struct Pcsx2Config
 		}
 	};
 
+#ifdef PCSX2_CORE
+	// ------------------------------------------------------------------------
+	struct USBOptions
+	{
+		enum : u32
+		{
+			NUM_PORTS = 2
+		};
+
+		struct Port
+		{
+			s32 DeviceType;
+			u32 DeviceSubtype;
+
+			bool operator==(const USBOptions::Port& right) const;
+			bool operator!=(const USBOptions::Port& right) const;
+		};
+
+		std::array<Port, NUM_PORTS> Ports;
+
+		USBOptions();
+		void LoadSave(SettingsWrapper& wrap);
+
+		bool operator==(const USBOptions& right) const;
+		bool operator!=(const USBOptions& right) const;
+	};
+#endif
+
+
 	// ------------------------------------------------------------------------
 	// Options struct for each memory card.
 	//
@@ -1096,6 +1235,9 @@ struct Pcsx2Config
 	FramerateOptions Framerate;
 	SPU2Options SPU2;
 	DEV9Options DEV9;
+#ifdef PCSX2_CORE
+	USBOptions USB;
+#endif
 
 	TraceLogFilters Trace;
 
