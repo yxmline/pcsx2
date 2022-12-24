@@ -337,6 +337,9 @@ PBPX-95601:
 PCPX-96303:
   name: "6-gatsu Hatsubai Title Promotion Disc (Aconcagua - Boku no Natsuyasumi - TVDJ)"
   region: "NTSC-J"
+PCPX-96306:
+  name: "Bikkuri Mouse"
+  region: "NTSC-J"
 PCPX-96311:
   name: "Gran Turismo 3 Trial Disk Volume 1"
   region: "NTSC-J"
@@ -36149,6 +36152,8 @@ SLPS-25088:
 SLPS-25094:
   name: "Reveal Fantasia"
   region: "NTSC-J"
+  gameFixes:
+    - InstantDMAHack # Fixes NULL GIFChain hang.
 SLPS-25095:
   name: "Uchuu Senkan Yamato - Iscandar he no Tsuioku"
   region: "NTSC-J"
@@ -36507,6 +36512,8 @@ SLPS-25200:
 SLPS-25201:
   name: "Reveal Fantasia"
   region: "NTSC-J"
+  gameFixes:
+    - InstantDMAHack # Fixes NULL GIFChain hang.
 SLPS-25202:
   name: "dot hack - Quarantine Part 4"
   region: "NTSC-J"
@@ -38314,6 +38321,9 @@ SLPS-25691:
   name: "Captain Tsubasa"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes extreme ghosting.
+    wildArmsHack: 1 # Aligns vertical blurring.
 SLPS-25693:
   name: "Shinseiki GPX - Road to the Infinity 3"
   region: "NTSC-J"
@@ -42055,6 +42065,8 @@ SLUS-20535:
   name: "NASCAR Thunder 2003"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    roundSprite: 1 # Fix horizontal and vertical lines when racing.
 SLUS-20536:
   name: "NBA Live 2003"
   region: "NTSC-U"
