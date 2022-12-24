@@ -28,6 +28,7 @@
 #include "IopBios.h"
 #include "IopHw.h"
 #include "Common.h"
+#include "VMManager.h"
 
 #include <time.h>
 
@@ -44,10 +45,6 @@
 #include "common/Path.h"
 #include "common/Perf.h"
 #include "DebugTools/Breakpoints.h"
-
-#ifndef PCSX2_CORE
-#include "gui/SysThreads.h"
-#endif
 
 #include "fmt/core.h"
 
@@ -1416,9 +1413,7 @@ static bool psxDynarecCheckBreakpoint()
 		return false;
 
 	CBreakPoints::SetBreakpointTriggered(true);
-#ifndef PCSX2_CORE
-	GetCoreThread().PauseSelfDebug();
-#endif
+	VMManager::SetPaused(true);
 
 	// Exit the EE too.
 	Cpu->ExitExecution();
@@ -1432,9 +1427,7 @@ static bool psxDynarecMemcheck()
 		return false;
 
 	CBreakPoints::SetBreakpointTriggered(true);
-#ifndef PCSX2_CORE
-	GetCoreThread().PauseSelfDebug();
-#endif
+	VMManager::SetPaused(true);
 
 	// Exit the EE too.
 	Cpu->ExitExecution();
@@ -1572,6 +1565,7 @@ void psxRecompileNextInstruction(bool delayslot, bool swapped_delayslot)
 	// add breakpoint
 	if (!delayslot)
 	{
+		// Broken on x64
 		psxEncodeBreakpoint();
 		psxEncodeMemcheck();
 	}

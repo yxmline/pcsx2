@@ -21,10 +21,7 @@
 #include "PerformanceMetrics.h"
 #include "common/AlignedMalloc.h"
 #include "common/StringUtil.h"
-
-#ifdef PCSX2_CORE
 #include "VMManager.h"
-#endif
 
 #define ENABLE_DRAW_STATS 0
 
@@ -38,7 +35,7 @@ static int compute_best_thread_height(int threads)
 	// - but not too small to keep the threading overhead low
 	// - ideal value between 3 and 5, or log2(64 / number of threads)
 
-	int th = theApp.GetConfigI("extrathreads_height");
+	int th = GSConfig.SWExtraThreadsHeight;
 
 	if (th > 0 && th < 9)
 		return th;
@@ -1185,7 +1182,6 @@ void GSRasterizerList::OnWorkerStartup(int i)
 
 	Threading::ThreadHandle handle(Threading::ThreadHandle::GetForCallingThread());
 
-#ifdef PCSX2_CORE
 	if (EmuConfig.Cpu.AffinityControlMode != 0)
 	{
 		const std::vector<u32>& procs = VMManager::GetSortedProcessorList();
@@ -1198,7 +1194,6 @@ void GSRasterizerList::OnWorkerStartup(int i)
 			handle.SetAffinity(affinity);
 		}
 	}
-#endif
 
 	PerformanceMetrics::SetGSSWThread(i, std::move(handle));
 }

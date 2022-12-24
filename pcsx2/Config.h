@@ -734,6 +734,7 @@ struct Pcsx2Config
 		int ShadeBoost_Brightness{50};
 		int ShadeBoost_Contrast{50};
 		int ShadeBoost_Saturation{50};
+		int PNGCompressionLevel{1};
 
 		int SaveN{0};
 		int SaveL{5000};
@@ -747,18 +748,12 @@ struct Pcsx2Config
 		int VideoCaptureBitrate{DEFAULT_VIDEO_CAPTURE_BITRATE};
 
 		std::string Adapter;
+		std::string HWDumpDirectory;
+		std::string SWDumpDirectory;
 
 		GSOptions();
 
 		void LoadSave(SettingsWrapper& wrap);
-
-#ifndef PCSX2_CORE
-		/// Because some GS settings are stored in a separate INI in wx, we need a way to reload them.
-		/// This is because the SettingsWrapper is only created on full save/load.
-		void ReloadIniSettings();
-#else
-		void LoadSaveIniSettings(SettingsWrapper& wrap);
-#endif
 
 		/// Sets user hack values to defaults when user hacks are not enabled.
 		void MaskUserHacks();
@@ -879,7 +874,6 @@ struct Pcsx2Config
 		};
 		static const char* DnsModeNames[];
 
-#ifdef PCSX2_CORE
 		struct HostEntry
 		{
 			std::string Url;
@@ -900,7 +894,6 @@ struct Pcsx2Config
 				return !this->operator==(right);
 			}
 		};
-#endif
 
 		bool EthEnable{false};
 		NetApi EthApi{NetApi::Unset};
@@ -918,9 +911,7 @@ struct Pcsx2Config
 		DnsMode ModeDNS1{DnsMode::Auto};
 		DnsMode ModeDNS2{DnsMode::Auto};
 
-#ifdef PCSX2_CORE
 		std::vector<HostEntry> EthHosts;
-#endif
 
 		bool HddEnable{false};
 		std::string HddFile;
@@ -953,9 +944,7 @@ struct Pcsx2Config
 				   OpEqu(ModeDNS1) &&
 				   OpEqu(ModeDNS2) &&
 
-#ifdef PCSX2_CORE
 				   OpEqu(EthHosts) &&
-#endif
 
 				   OpEqu(HddEnable) &&
 				   OpEqu(HddFile) &&
@@ -1120,7 +1109,6 @@ struct Pcsx2Config
 		}
 	};
 
-#ifdef PCSX2_CORE
 	// ------------------------------------------------------------------------
 	struct USBOptions
 	{
@@ -1146,8 +1134,6 @@ struct Pcsx2Config
 		bool operator==(const USBOptions& right) const;
 		bool operator!=(const USBOptions& right) const;
 	};
-#endif
-
 
 	// ------------------------------------------------------------------------
 	// Options struct for each memory card.
@@ -1206,12 +1192,10 @@ struct Pcsx2Config
 		EnableNoInterlacingPatches : 1,
 		// TODO - Vaser - where are these settings exposed in the Qt UI?
 		EnableRecordingTools : 1,
-#ifdef PCSX2_CORE
 		EnableGameFixes : 1, // enables automatic game fixes
 		SaveStateOnShutdown : 1, // default value for saving state on shutdown
 		EnableDiscordPresence : 1, // enables discord rich presence integration
 		InhibitScreensaver : 1,
-#endif
 		// when enabled uses BOOT2 injection, skipping sony bios splashes
 		UseBOOT2Injection : 1,
 		BackupSavestate : 1,
@@ -1243,9 +1227,7 @@ struct Pcsx2Config
 	FramerateOptions Framerate;
 	SPU2Options SPU2;
 	DEV9Options DEV9;
-#ifdef PCSX2_CORE
 	USBOptions USB;
-#endif
 
 	TraceLogFilters Trace;
 
@@ -1281,10 +1263,6 @@ struct Pcsx2Config
 	{
 		return !this->operator==(right);
 	}
-
-	// You shouldn't assign to this class, because it'll mess with the runtime variables (Current...).
-	// But you can still use this to copy config. Only needed until we drop wx.
-	void CopyConfig(const Pcsx2Config& cfg);
 
 	/// Copies runtime configuration settings (e.g. frame limiter state).
 	void CopyRuntimeConfig(Pcsx2Config& cfg);
