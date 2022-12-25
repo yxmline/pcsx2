@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2010  PCSX2 Dev Team
+ *  Copyright (C) 2002-2022  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -15,10 +15,20 @@
 
 #pragma once
 
-extern void iDumpRegisters(u32 startpc, u32 temp);
-extern void iDumpPsxRegisters(u32 startpc, u32 temp);
-extern void iDumpVU0Registers();
-extern void iDumpVU1Registers();
-extern void iDumpBlock(u32 ee_pc, u32 ee_size, uptr x86_pc, u32 x86_size);
-extern void iDumpBlock( int startpc, u8 * ptr );
-extern void iIopDumpBlock( int startpc, u8 * ptr );
+#ifdef _WIN32
+
+#include "common/RedtapeWindows.h"
+
+// warning : variable 's_hrErrorLast' set but not used [-Wunused-but-set-variable]
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
+#include <wil/com.h>
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+#endif

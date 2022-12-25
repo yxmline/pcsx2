@@ -27,7 +27,6 @@
 #include "System/RecTypes.h"
 
 #include "vtlb.h"
-#include "Dump.h"
 
 #include "VMManager.h"
 #include "GS.h"
@@ -80,7 +79,7 @@ bool s_nBlockInterlocked = false; // Block is VU0 interlocked
 u32 pc; // recompiler pc
 int g_branch; // set for branch
 
-alignas(16) GPR_reg64 g_cpuConstRegs[32] = {0};
+alignas(16) GPR_reg64 g_cpuConstRegs[32] = {};
 u32 g_cpuHasConstReg = 0, g_cpuFlushedConstReg = 0;
 bool g_cpuFlushedPC, g_cpuFlushedCode, g_recompilingDelaySlot, g_maySignalException;
 
@@ -118,12 +117,6 @@ static u32 s_saveHasConstReg = 0, s_saveFlushedConstReg = 0;
 static EEINST* s_psaveInstInfo = NULL;
 
 static u32 s_savenBlockCycles = 0;
-
-#ifdef PCSX2_DEBUG
-static u32 dumplog = 0;
-#else
-#define dumplog 0
-#endif
 
 static void iBranchTest(u32 newpc = 0xffffffff);
 static void ClearRecLUT(BASEBLOCK* base, int count);
@@ -809,7 +802,7 @@ void recClear(u32 addr, u32 size)
 
 	int toRemoveLast = blockidx;
 
-	while (pexblock = recBlocks[blockidx])
+	while ((pexblock = recBlocks[blockidx]))
 	{
 		u32 blockstart = pexblock->startpc;
 		u32 blockend = pexblock->startpc + pexblock->size * 4;
@@ -847,12 +840,12 @@ void recClear(u32 addr, u32 size)
 
 	upperextent = std::min(upperextent, ceiling);
 
-	for (int i = 0; pexblock = recBlocks[i]; i++)
+	for (int i = 0; (pexblock = recBlocks[i]); i++)
 	{
 		if (s_pCurBlock == PC_GETBLOCK(pexblock->startpc))
 			continue;
 		u32 blockend = pexblock->startpc + pexblock->size * 4;
-		if (pexblock->startpc >= addr && pexblock->startpc < addr + size * 4 || pexblock->startpc < addr && blockend > addr)
+		if ((pexblock->startpc >= addr && pexblock->startpc < addr + size * 4) || (pexblock->startpc < addr && blockend > addr))
 		{
 			if (!IsDevBuild)
 				Console.Error("[EE] Impossible block clearing failure");
@@ -1957,7 +1950,7 @@ void recompileNextInstruction(bool delayslot, bool swapped_delay_slot)
 				cpuRegs.code = memRead32(p);
 				if (_Opcode_ == 022 && _Rs_ == 2) // CFC2
 					// rd is fs
-					if (_Rd_ == 16 && s & 1 || _Rd_ == 17 && s & 2 || _Rd_ == 18 && s & 4)
+					if ((_Rd_ == 16 && s & 1) || (_Rd_ == 17 && s & 2) || (_Rd_ == 18 && s & 4))
 					{
 						std::string disasm;
 						Console.Warning("Possible old value used in COP2 code. If the game is broken, please report to http://github.com/pcsx2/pcsx2.");
@@ -1994,24 +1987,9 @@ void recompileNextInstruction(bool delayslot, bool swapped_delay_slot)
 // (Called from recompiled code)]
 // This function is called from the recompiler prior to starting execution of *every* recompiled block.
 // Calling of this function can be enabled or disabled through the use of EmuConfig.Recompiler.PreBlockChecks
+#ifdef TRACE_BLOCKS
 static void PreBlockCheck(u32 blockpc)
 {
-	/*static int lastrec = 0;
-	static int curcount = 0;
-	const int skip = 0;
-
-    if( blockpc != 0x81fc0 ) {//&& lastrec != g_lastpc ) {
-		curcount++;
-
-		if( curcount > skip ) {
-			iDumpRegisters(blockpc, 1);
-			curcount = 0;
-		}
-
-		lastrec = blockpc;
-	}*/
-
-#ifdef TRACE_BLOCKS
 #if 0
 	static FILE* fp = nullptr;
 	static bool fp_opened = false;
@@ -2060,13 +2038,7 @@ static void PreBlockCheck(u32 blockpc)
 	if (cpuRegs.cycle == 0)
 		pauseAAA();
 #endif
-#endif
 }
-
-#ifdef PCSX2_DEBUG
-// Array of cpuRegs.pc block addresses to dump.  USeful for selectively dumping potential
-// problem blocks, and seeing what the MIPS code equates to.
-static u32 s_recblocks[] = {0};
 #endif
 
 // Called when a block under manual protection fails it's pre-execution integrity check.
@@ -2205,11 +2177,6 @@ static void recRecompile(const u32 startpc)
 {
 	u32 i = 0;
 	u32 willbranch3 = 0;
-
-#ifdef PCSX2_DEBUG
-	if (dumplog & 4)
-		iDumpRegisters(startpc, 0);
-#endif
 
 	pxAssert(startpc);
 
@@ -2383,7 +2350,7 @@ static void recRecompile(const u32 startpc)
 
 			case 2: // J
 			case 3: // JAL
-				s_branchTo = _InstrucTarget_ << 2 | (i + 4) & 0xf0000000;
+				s_branchTo = (_InstrucTarget_ << 2) | ((i + 4) & 0xf0000000);
 				s_nEndBlock = i + 8;
 				goto StartRecomp;
 
@@ -2463,7 +2430,7 @@ StartRecomp:
 			if (cpuRegs.code == 0)
 				continue;
 			// cache, sync
-			else if (_Opcode_ == 057 || _Opcode_ == 0 && _Funct_ == 017)
+			else if (_Opcode_ == 057 || (_Opcode_ == 0 && _Funct_ == 017))
 				continue;
 			// imm arithmetic
 			else if ((_Opcode_ & 070) == 010 || (_Opcode_ & 076) == 030)
@@ -2563,20 +2530,6 @@ StartRecomp:
 			COP2FlagHackPass().Run(startpc, s_nEndBlock, s_pInstCache + 1);
 	}
 
-#ifdef PCSX2_DEBUG
-	// dump code
-	for (u32 recblock : s_recblocks)
-	{
-		if (startpc == recblock)
-		{
-			iDumpBlock(startpc, recPtr);
-		}
-	}
-
-	if (dumplog & 1)
-		iDumpBlock(startpc, recPtr);
-#endif
-
 #ifdef DUMP_BLOCKS
 	ZydisDecoder disas_decoder;
 	ZydisDecoderInit(&disas_decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_ADDRESS_WIDTH_64);
@@ -2641,11 +2594,6 @@ StartRecomp:
 		}
 	}
 
-#ifdef PCSX2_DEBUG
-	if (dumplog & 1)
-		iDumpBlock(startpc, recPtr);
-#endif
-
 	pxAssert((pc - startpc) >> 2 <= 0xffff);
 	s_pCurBlockEx->size = (pc - startpc) >> 2;
 
@@ -2655,7 +2603,7 @@ StartRecomp:
 		int i;
 
 		i = recBlocks.LastIndex(HWADDR(pc) - 4);
-		while (oldBlock = recBlocks[i--])
+		while ((oldBlock = recBlocks[i--]))
 		{
 			if (oldBlock == s_pCurBlockEx)
 				continue;
