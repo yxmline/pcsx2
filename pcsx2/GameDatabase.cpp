@@ -17,7 +17,6 @@
 
 #include "GameDatabase.h"
 #include "Host.h"
-#include "Patch.h"
 #include "vtlb.h"
 
 #include "common/FileSystem.h"
@@ -128,7 +127,20 @@ void GameDatabase::parseAndInsert(const std::string_view& serial, const c4::yml:
 		{
 			int vuVal = -1;
 			node["roundModes"]["vuRoundMode"] >> vuVal;
-			gameEntry.vuRoundMode = static_cast<GameDatabaseSchema::RoundMode>(vuVal);
+			gameEntry.vu0RoundMode = static_cast<GameDatabaseSchema::RoundMode>(vuVal);
+			gameEntry.vu1RoundMode = static_cast<GameDatabaseSchema::RoundMode>(vuVal);
+		}
+		if (node["roundModes"].has_child("vu0RoundMode"))
+		{
+			int vuVal = -1;
+			node["roundModes"]["vu0RoundMode"] >> vuVal;
+			gameEntry.vu0RoundMode = static_cast<GameDatabaseSchema::RoundMode>(vuVal);
+		}
+		if (node["roundModes"].has_child("vu1RoundMode"))
+		{
+			int vuVal = -1;
+			node["roundModes"]["vu1RoundMode"] >> vuVal;
+			gameEntry.vu1RoundMode = static_cast<GameDatabaseSchema::RoundMode>(vuVal);
 		}
 	}
 	if (node.has_child("clampModes"))
@@ -143,7 +155,20 @@ void GameDatabase::parseAndInsert(const std::string_view& serial, const c4::yml:
 		{
 			int vuVal = -1;
 			node["clampModes"]["vuClampMode"] >> vuVal;
-			gameEntry.vuClampMode = static_cast<GameDatabaseSchema::ClampMode>(vuVal);
+			gameEntry.vu0ClampMode = static_cast<GameDatabaseSchema::ClampMode>(vuVal);
+			gameEntry.vu1ClampMode = static_cast<GameDatabaseSchema::ClampMode>(vuVal);
+		}
+		if (node["clampModes"].has_child("vu0ClampMode"))
+		{
+			int vuVal = -1;
+			node["clampModes"]["vu0ClampMode"] >> vuVal;
+			gameEntry.vu0ClampMode = static_cast<GameDatabaseSchema::ClampMode>(vuVal);
+		}
+		if (node["clampModes"].has_child("vu1ClampMode"))
+		{
+			int vuVal = -1;
+			node["clampModes"]["vu1ClampMode"] >> vuVal;
+			gameEntry.vu1ClampMode = static_cast<GameDatabaseSchema::ClampMode>(vuVal);
 		}
 	}
 
@@ -265,6 +290,35 @@ void GameDatabase::parseAndInsert(const std::string_view& serial, const c4::yml:
 		}
 	}
 
+	if (node.has_child("dynaPatches") && node["dynaPatches"].has_children())
+	{
+		for (const ryml::NodeRef& n : node["dynaPatches"].children())
+		{
+			DynamicPatch patch;
+
+			if (n.has_child("pattern") && n["pattern"].has_children())
+			{
+				for (const ryml::NodeRef& db_pattern : n["pattern"].children())
+				{
+					DynamicPatchEntry entry;
+					db_pattern["offset"] >> entry.offset;
+					db_pattern["value"] >> entry.value;
+
+					patch.pattern.push_back(entry);
+				}
+				for (const ryml::NodeRef& db_replacement : n["replacement"].children())
+				{
+					DynamicPatchEntry entry;
+					db_replacement["offset"] >> entry.offset;
+					db_replacement["value"] >> entry.value;
+
+					patch.replacement.push_back(entry);
+				}
+			}
+			gameEntry.dynaPatches.push_back(patch);
+		}
+	}
+
 	s_game_db.emplace(std::move(serial), std::move(gameEntry));
 }
 
@@ -350,19 +404,35 @@ u32 GameDatabaseSchema::GameEntry::applyGameFixes(Pcsx2Config& config, bool appl
 		}
 	}
 
-	if (vuRoundMode != GameDatabaseSchema::RoundMode::Undefined)
+	if (vu0RoundMode != GameDatabaseSchema::RoundMode::Undefined)
 	{
-		const SSE_RoundMode vuRM = (SSE_RoundMode)enum_cast(vuRoundMode);
+		const SSE_RoundMode vuRM = (SSE_RoundMode)enum_cast(vu0RoundMode);
 		if (EnumIsValid(vuRM))
 		{
 			if (applyAuto)
 			{
-				PatchesCon->WriteLn("(GameDB) Changing VU0/VU1 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
-				config.Cpu.sseVUMXCSR.SetRoundMode(vuRM);
+				PatchesCon->WriteLn("(GameDB) Changing VU0 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
+				config.Cpu.sseVU0MXCSR.SetRoundMode(vuRM);
 				num_applied_fixes++;
 			}
 			else
-				PatchesCon->Warning("[GameDB] Skipping changing VU0/VU1 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
+				PatchesCon->Warning("[GameDB] Skipping changing VU0 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
+		}
+	}
+
+	if (vu1RoundMode != GameDatabaseSchema::RoundMode::Undefined)
+	{
+		const SSE_RoundMode vuRM = (SSE_RoundMode)enum_cast(vu1RoundMode);
+		if (EnumIsValid(vuRM))
+		{
+			if (applyAuto)
+			{
+				PatchesCon->WriteLn("(GameDB) Changing VU1 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
+				config.Cpu.sseVU1MXCSR.SetRoundMode(vuRM);
+				num_applied_fixes++;
+			}
+			else
+				PatchesCon->Warning("[GameDB] Skipping changing VU1 roundmode to %d [%s]", vuRM, EnumToString(vuRM));
 		}
 	}
 
@@ -381,19 +451,34 @@ u32 GameDatabaseSchema::GameEntry::applyGameFixes(Pcsx2Config& config, bool appl
 			PatchesCon->Warning("[GameDB] Skipping changing EE/FPU clamp mode [mode=%d]", clampMode);
 	}
 
-	if (vuClampMode != GameDatabaseSchema::ClampMode::Undefined)
+	if (vu0ClampMode != GameDatabaseSchema::ClampMode::Undefined)
 	{
-		const int clampMode = enum_cast(vuClampMode);
+		const int clampMode = enum_cast(vu0ClampMode);
 		if (applyAuto)
 		{
-			PatchesCon->WriteLn("(GameDB) Changing VU0/VU1 clamp mode [mode=%d]", clampMode);
-			config.Cpu.Recompiler.vuOverflow = (clampMode >= 1);
-			config.Cpu.Recompiler.vuExtraOverflow = (clampMode >= 2);
-			config.Cpu.Recompiler.vuSignOverflow = (clampMode >= 3);
+			PatchesCon->WriteLn("(GameDB) Changing VU0 clamp mode [mode=%d]", clampMode);
+			config.Cpu.Recompiler.vu0Overflow = (clampMode >= 1);
+			config.Cpu.Recompiler.vu0ExtraOverflow = (clampMode >= 2);
+			config.Cpu.Recompiler.vu0SignOverflow = (clampMode >= 3);
 			num_applied_fixes++;
 		}
 		else
-			PatchesCon->Warning("[GameDB] Skipping changing VU0/VU1 clamp mode [mode=%d]", clampMode);
+			PatchesCon->Warning("[GameDB] Skipping changing VU0 clamp mode [mode=%d]", clampMode);
+	}
+
+	if (vu1ClampMode != GameDatabaseSchema::ClampMode::Undefined)
+	{
+		const int clampMode = enum_cast(vu1ClampMode);
+		if (applyAuto)
+		{
+			PatchesCon->WriteLn("(GameDB) Changing VU1 clamp mode [mode=%d]", clampMode);
+			config.Cpu.Recompiler.vu1Overflow = (clampMode >= 1);
+			config.Cpu.Recompiler.vu1ExtraOverflow = (clampMode >= 2);
+			config.Cpu.Recompiler.vu1SignOverflow = (clampMode >= 3);
+			num_applied_fixes++;
+		}
+		else
+			PatchesCon->Warning("[GameDB] Skipping changing VU1 clamp mode [mode=%d]", clampMode);
 	}
 
 	// TODO - config - this could be simplified with maps instead of bitfields and enums

@@ -14,27 +14,35 @@
  */
 
 #pragma once
+#include "common/Pcsx2Defs.h"
+#include <cstdio>
 
-#include <QtWidgets/QWidget>
-
-#include "ui_AdvancedSettingsWidget.h"
-
-class SettingsDialog;
-
-class AdvancedSettingsWidget : public QWidget
+namespace Common
 {
-	Q_OBJECT
+	class WAVWriter
+	{
+	public:
+		WAVWriter();
+		~WAVWriter();
 
-public:
-	AdvancedSettingsWidget(SettingsDialog* dialog, QWidget* parent);
-	~AdvancedSettingsWidget();
+		__fi u32 GetSampleRate() const { return m_sample_rate; }
+		__fi u32 GetNumChannels() const { return m_num_channels; }
+		__fi u32 GetNumFrames() const { return m_num_frames; }
+		__fi bool IsOpen() const { return (m_file != nullptr); }
 
-private:
-	int getGlobalClampingModeIndex(int vunum) const;
-	int getClampingModeIndex(int vunum) const;
-	void setClampingMode(int vunum, int index);
+		bool Open(const char* filename, u32 sample_rate, u32 num_channels);
+		void Close();
 
-	SettingsDialog* m_dialog;
+		void WriteFrames(const s16* samples, u32 num_frames);
 
-	Ui::AdvancedSystemSettingsWidget m_ui;
-};
+	private:
+		using SampleType = s16;
+
+		bool WriteHeader();
+
+		std::FILE* m_file = nullptr;
+		u32 m_sample_rate = 0;
+		u32 m_num_channels = 0;
+		u32 m_num_frames = 0;
+	};
+} // namespace Common

@@ -36,6 +36,7 @@
 #include "DEV9/DEV9.h"
 #include "Elfheader.h"
 #include "FW.h"
+#include "GameDatabase.h"
 #include "GS.h"
 #include "GSDumpReplayer.h"
 #include "HostDisplay.h"
@@ -558,11 +559,16 @@ void VMManager::LoadPatches(const std::string& serial, u32 crc, bool show_messag
 	if (EmuConfig.EnablePatches)
 	{
 		const GameDatabaseSchema::GameEntry* game = GameDatabase::findGame(serial);
-		const std::string* patches = game ? game->findPatch(crc) : nullptr;
-		if (patches && (patch_count = LoadPatchesFromString(*patches)) > 0)
+		if (game)
 		{
-			PatchesCon->WriteLn(Color_Green, "(GameDB) Patches Loaded: %d", patch_count);
-			fmt::format_to(std::back_inserter(message), "{} game patches", patch_count);
+			const std::string* patches = game->findPatch(crc);
+			if (patches && (patch_count = LoadPatchesFromString(*patches)) > 0)
+			{
+				PatchesCon->WriteLn(Color_Green, "(GameDB) Patches Loaded: %d", patch_count);
+				fmt::format_to(std::back_inserter(message), "{} game patches", patch_count);
+			}
+
+			LoadDynamicPatches(game->dynaPatches);
 		}
 	}
 
@@ -1033,7 +1039,7 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 
 	s_cpu_implementation_changed = false;
 	s_cpu_provider_pack->ApplyConfig();
-	SetCPUState(EmuConfig.Cpu.sseMXCSR, EmuConfig.Cpu.sseVUMXCSR);
+	SetCPUState(EmuConfig.Cpu.sseMXCSR, EmuConfig.Cpu.sseVU0MXCSR, EmuConfig.Cpu.sseVU1MXCSR);
 	SysClearExecutionCache();
 	memBindConditionalHandlers();
 
@@ -1632,7 +1638,7 @@ void VMManager::CheckForCPUConfigChanges(const Pcsx2Config& old_config)
 	}
 
 	Console.WriteLn("Updating CPU configuration...");
-	SetCPUState(EmuConfig.Cpu.sseMXCSR, EmuConfig.Cpu.sseVUMXCSR);
+	SetCPUState(EmuConfig.Cpu.sseMXCSR, EmuConfig.Cpu.sseVU0MXCSR, EmuConfig.Cpu.sseVU1MXCSR);
 	SysClearExecutionCache();
 	memBindConditionalHandlers();
 
@@ -1947,14 +1953,17 @@ void VMManager::WarnAboutUnsafeSettings()
 		messages += ICON_FA_FIRST_AID " CRC Fix Level is not set to default, this may break effects in some games.\n";
 	if (EmuConfig.GS.HWDownloadMode != GSHardwareDownloadMode::Enabled)
 		messages += ICON_FA_DOWNLOAD " Hardware Download Mode is not set to Accurate, this may break rendering in some games.\n";
-	if (EmuConfig.Cpu.sseMXCSR.GetRoundMode() != SSEround_Chop || EmuConfig.Cpu.sseVUMXCSR.GetRoundMode() != SSEround_Chop)
+	if (EmuConfig.Cpu.sseMXCSR.GetRoundMode() != SSEround_Chop)
 		messages += ICON_FA_MICROCHIP " EE FPU Round Mode is not set to default, this may break some games.\n";
 	if (!EmuConfig.Cpu.Recompiler.fpuOverflow || EmuConfig.Cpu.Recompiler.fpuExtraOverflow || EmuConfig.Cpu.Recompiler.fpuFullMode)
 		messages += ICON_FA_MICROCHIP " EE FPU Clamp Mode is not set to default, this may break some games.\n";
-	if (EmuConfig.Cpu.sseVUMXCSR.GetRoundMode() != SSEround_Chop)
+	if (EmuConfig.Cpu.sseVU0MXCSR.GetRoundMode() != SSEround_Chop || EmuConfig.Cpu.sseVU1MXCSR.GetRoundMode() != SSEround_Chop)
 		messages += ICON_FA_MICROCHIP " VU Round Mode is not set to default, this may break some games.\n";
-	if (!EmuConfig.Cpu.Recompiler.vuOverflow || EmuConfig.Cpu.Recompiler.vuExtraOverflow || EmuConfig.Cpu.Recompiler.vuSignOverflow)
+	if (!EmuConfig.Cpu.Recompiler.vu0Overflow || EmuConfig.Cpu.Recompiler.vu0ExtraOverflow || EmuConfig.Cpu.Recompiler.vu0SignOverflow ||
+		!EmuConfig.Cpu.Recompiler.vu1Overflow || EmuConfig.Cpu.Recompiler.vu1ExtraOverflow || EmuConfig.Cpu.Recompiler.vu1SignOverflow)
+	{
 		messages += ICON_FA_MICROCHIP " VU Clamp Mode is not set to default, this may break some games.\n";
+	}
 	if (!EmuConfig.EnableGameFixes)
 		messages += ICON_FA_GAMEPAD " Game Fixes are not enabled. Compatibility with some games may be affected.\n";
 	if (!EmuConfig.EnablePatches)

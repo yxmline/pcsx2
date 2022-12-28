@@ -18,8 +18,7 @@
 #include "pcsx2/Config.h"
 
 #include "SPU2/Global.h"
-#include "SPU2/Host/Dialogs.h"
-#include "SPU2/Host/Config.h"
+#include "SPU2/Config.h"
 #include "common/FileSystem.h"
 #include "common/Path.h"
 #include "common/StringUtil.h"
@@ -50,14 +49,6 @@ std::string DMA7LogFileName;
 std::string CoresDumpFileName;
 std::string MemDumpFileName;
 std::string RegDumpFileName;
-
-void CfgSetSettingsDir(const char* dir)
-{
-}
-
-void CfgSetLogDir(const char* dir)
-{
-}
 
 FILE* OpenBinaryLog(const char* logfile)
 {

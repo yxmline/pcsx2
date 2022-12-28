@@ -14,13 +14,10 @@
  */
 
 #include "PrecompiledHeader.h"
-#include "Global.h"
-#include "spu2.h"
-#include "Dma.h"
-#include "Host/Dialogs.h"
+#include "SPU2/Global.h"
+#include "SPU2/spu2.h"
+#include "SPU2/Dma.h"
 #include "R3000A.h"
-
-using namespace Threading;
 
 static int ConsoleSampleRate = 48000;
 int SampleRate = 48000;
@@ -33,16 +30,6 @@ u32 lClocks = 0;
 //  DMA 4/7 Callbacks from Core Emulator
 // --------------------------------------------------------------------------------------
 
-
-void SPU2setSettingsDir(const char* dir)
-{
-	CfgSetSettingsDir(dir);
-}
-
-void SPU2setLogDir(const char* dir)
-{
-	CfgSetLogDir(dir);
-}
 
 void SPU2readDMA4Mem(u16* pMem, u32 size) // size now in 16bit units
 {
