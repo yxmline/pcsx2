@@ -114,15 +114,6 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.cropRight, "EmuCore/GS", "CropRight", 0);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_ui.cropBottom, "EmuCore/GS", "CropBottom", 0);
 
-	dialog->registerWidgetHelp(m_ui.widescreenPatches, tr("Enable Widescreen Patches"), tr("Unchecked"),
-		tr("Automatically loads and applies widescreen patches on game start. Can cause issues."));
-
-	dialog->registerWidgetHelp(m_ui.noInterlacingPatches, tr("Enable No-Interlacing Patches"), tr("Unchecked"),
-		tr("Automatically loads and applies no-interlacing patches on game start. Can cause issues."));
-
-	connect(m_ui.integerScaling, &QCheckBox::stateChanged, this, &GraphicsSettingsWidget::onIntegerScalingChanged);
-	onIntegerScalingChanged();
-
 	connect(m_ui.fullscreenModes, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &GraphicsSettingsWidget::onFullscreenModeChanged);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -339,6 +330,11 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 
 	// Display tab
 	{
+		dialog->registerWidgetHelp(m_ui.widescreenPatches, tr("Enable Widescreen Patches"), tr("Unchecked"),
+			tr("Automatically loads and applies widescreen patches on game start. Can cause issues."));
+
+		dialog->registerWidgetHelp(m_ui.noInterlacingPatches, tr("Enable No-Interlacing Patches"), tr("Unchecked"),
+			tr("Automatically loads and applies no-interlacing patches on game start. Can cause issues."));
 
 		dialog->registerWidgetHelp(m_ui.DisableInterlaceOffset, tr("Disable Interlace Offset"), tr("Unchecked"),
 			tr("Disables interlacing offset which may reduce blurring in some situations."));
@@ -370,8 +366,10 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsDialog* dialog, QWidget* 
 
 		dialog->registerWidgetHelp(m_ui.screenshotSize, tr("Screenshot Size"), tr("Screen Resolution"),
 			tr("Determines the resolution at which screenshots will be saved. Internal resolutions preserve more detail at the cost of file size."));
+
 		dialog->registerWidgetHelp(m_ui.screenshotFormat, tr("Screenshot Format"), tr("PNG"),
 			tr("Selects the format which will be used to save screenshots. JPEG produces smaller files, but loses detail."));
+
 		dialog->registerWidgetHelp(m_ui.screenshotQuality, tr("Screenshot Quality"), tr("50%"),
 			tr("Selects the quality at which screenshots will be compressed. Higher values preserve more detail for JPEG, and reduce file size for PNG."));
 
@@ -692,11 +690,6 @@ void GraphicsSettingsWidget::onFullscreenModeChanged(int index)
 		m_dialog->setStringSettingValue("EmuCore/GS", "FullscreenMode", std::nullopt);
 
 	g_emu_thread->applySettings();
-}
-
-void GraphicsSettingsWidget::onIntegerScalingChanged()
-{
-	m_ui.bilinearFiltering->setEnabled(!m_ui.integerScaling->isChecked());
 }
 
 void GraphicsSettingsWidget::onTrilinearFilteringChanged()
