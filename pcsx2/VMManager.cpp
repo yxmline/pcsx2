@@ -83,7 +83,6 @@ namespace VMManager
 	static void CheckForGSConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForFramerateConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForPatchConfigChanges(const Pcsx2Config& old_config);
-	static void CheckForSPU2ConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForDEV9ConfigChanges(const Pcsx2Config& old_config);
 	static void CheckForMemoryCardConfigChanges(const Pcsx2Config& old_config);
 	static void EnforceAchievementsChallengeModeSettings();
@@ -204,7 +203,7 @@ void VMManager::SetState(VMState state)
 			frameLimitReset();
 		}
 
-		SPU2SetOutputPaused(state == VMState::Paused);
+		SPU2::SetOutputPaused(state == VMState::Paused);
 		if (state == VMState::Paused)
 			Host::OnVMPaused();
 		else
@@ -268,9 +267,9 @@ bool VMManager::Internal::InitializeGlobals()
 		return false;
 	}
 
-	if (!SPU2init())
+	if (!SPU2::Initialize())
 	{
-		Host::ReportErrorAsync("Error", "Failed to initialize SPU2 (SPU2init()).");
+		Host::ReportErrorAsync("Error", "Failed to initialize SPU2.");
 		return false;
 	}
 
@@ -286,7 +285,7 @@ bool VMManager::Internal::InitializeGlobals()
 void VMManager::Internal::ReleaseGlobals()
 {
 	USBshutdown();
-	SPU2shutdown();
+	SPU2::Shutdown();
 	GSshutdown();
 
 #ifdef _WIN32
@@ -972,12 +971,12 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 	};
 
 	Console.WriteLn("Opening SPU2...");
-	if (!SPU2open())
+	if (!SPU2::Open())
 	{
 		Host::ReportErrorAsync("Startup Error", "Failed to initialize SPU2.");
 		return false;
 	}
-	ScopedGuard close_spu2(&SPU2close);
+	ScopedGuard close_spu2(&SPU2::Close);
 
 	Console.WriteLn("Opening PAD...");
 	if (PADinit() != 0 || PADopen(g_host_display->GetWindowInfo()) != 0)
@@ -1129,7 +1128,7 @@ void VMManager::Shutdown(bool save_resume_state)
 	R3000A::ioman::reset();
 	vtlb_Shutdown();
 	USBclose();
-	SPU2close();
+	SPU2::Close();
 	PADclose();
 	DEV9close();
 	DoCDVDclose();
@@ -1445,6 +1444,7 @@ void VMManager::SetLimiterMode(LimiterModeType type)
 
 	EmuConfig.LimiterMode = type;
 	gsUpdateFrequency(EmuConfig);
+	SPU2::OnTargetSpeedChanged();
 }
 
 void VMManager::FrameAdvance(u32 num_frames /*= 1*/)
@@ -1700,47 +1700,6 @@ void VMManager::CheckForPatchConfigChanges(const Pcsx2Config& old_config)
 	ReloadPatches(true, true);
 }
 
-void VMManager::CheckForSPU2ConfigChanges(const Pcsx2Config& old_config)
-{
-	if (EmuConfig.SPU2 == old_config.SPU2)
-		return;
-
-	// TODO: Don't reinit on volume changes.
-
-	Console.WriteLn("Updating SPU2 configuration");
-
-	// kinda lazy, but until we move spu2 over...
-	freezeData fd = {};
-	if (SPU2freeze(FreezeAction::Size, &fd) != 0)
-	{
-		Console.Error("(CheckForSPU2ConfigChanges) Failed to get SPU2 freeze size");
-		return;
-	}
-
-	std::unique_ptr<u8[]> fd_data = std::make_unique<u8[]>(fd.size);
-	fd.data = fd_data.get();
-	if (SPU2freeze(FreezeAction::Save, &fd) != 0)
-	{
-		Console.Error("(CheckForSPU2ConfigChanges) Failed to freeze SPU2");
-		return;
-	}
-
-	const bool psxmode = SPU2IsRunningPSXMode();
-
-	SPU2close();
-	if (!SPU2open(psxmode ? PS2Modes::PSX : PS2Modes::PS2))
-	{
-		Console.Error("(CheckForSPU2ConfigChanges) Failed to reopen SPU2, we'll probably crash :(");
-		return;
-	}
-
-	if (SPU2freeze(FreezeAction::Load, &fd) != 0)
-	{
-		Console.Error("(CheckForSPU2ConfigChanges) Failed to unfreeze SPU2");
-		return;
-	}
-}
-
 void VMManager::CheckForDEV9ConfigChanges(const Pcsx2Config& old_config)
 {
 	if (EmuConfig.DEV9 == old_config.DEV9)
@@ -1808,7 +1767,7 @@ void VMManager::CheckForConfigChanges(const Pcsx2Config& old_config)
 		CheckForCPUConfigChanges(old_config);
 		CheckForFramerateConfigChanges(old_config);
 		CheckForPatchConfigChanges(old_config);
-		CheckForSPU2ConfigChanges(old_config);
+		SPU2::CheckForConfigChanges(old_config);
 		CheckForDEV9ConfigChanges(old_config);
 		CheckForMemoryCardConfigChanges(old_config);
 		USB::CheckForConfigChanges(old_config);
@@ -1937,8 +1896,8 @@ void VMManager::WarnAboutUnsafeSettings()
 		messages += ICON_FA_COMPACT_DISC " Fast CDVD is enabled, this may break games.\n";
 	if (EmuConfig.Speedhacks.EECycleRate != 0 || EmuConfig.Speedhacks.EECycleSkip != 0)
 		messages += ICON_FA_TACHOMETER_ALT " Cycle rate/skip is not at default, this may crash or make games run too slow.\n";
-	if (EmuConfig.SPU2.SynchMode != Pcsx2Config::SPU2Options::SynchronizationMode::TimeStretch)
-		messages += ICON_FA_VOLUME_MUTE " Audio is not using time stretch synchronization, this may break FMVs.\n";
+	if (EmuConfig.SPU2.SynchMode == Pcsx2Config::SPU2Options::SynchronizationMode::ASync)
+		messages += ICON_FA_VOLUME_MUTE " Audio is using async mix, expect desynchronization in FMVs.\n";
 	if (EmuConfig.GS.UpscaleMultiplier < 1.0f)
 		messages += ICON_FA_TV " Upscale multiplier is below native, this will break rendering.\n";
 	if (EmuConfig.GS.HWMipmap != HWMipmapLevel::Automatic)

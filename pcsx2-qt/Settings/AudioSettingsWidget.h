@@ -33,8 +33,11 @@ private Q_SLOTS:
 	void expansionModeChanged();
 	void outputModuleChanged();
 	void outputBackendChanged();
-	void updateVolumeLabel();
-	void updateLatencyLabel();
+	void updateDevices();
+	void volumeChanged(int value);
+	void updateTargetLatencyRange();
+	void updateLatencyLabels();
+	void onMinimalOutputLatencyStateChanged();
 	void updateTimestretchSequenceLengthLabel();
 	void updateTimestretchSeekwindowLengthLabel();
 	void updateTimestretchOverlapLabel();
@@ -43,4 +46,5 @@ private Q_SLOTS:
 private:
 	SettingsDialog* m_dialog;
 	Ui::AudioSettingsWidget m_ui;
+	u32 m_output_device_latency = 0;
 };

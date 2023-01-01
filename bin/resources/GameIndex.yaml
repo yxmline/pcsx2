@@ -3068,6 +3068,7 @@ SCES-50878:
   compat: 5
   gsHWFixes:
     alignSprite: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCES-50885:
   name: "Ape Escape 2"
   region: "PAL-E"
@@ -6668,6 +6669,7 @@ SCPS-55017:
   compat: 3
   gsHWFixes:
     alignSprite: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCPS-55018:
   name: "Kingdom of Scribbling"
   region: "NTSC-J"
@@ -6875,6 +6877,7 @@ SCPS-56006:
   compat: 5
   gsHWFixes:
     alignSprite: 1
+    texturePreloading: 1 # Performs much better with partial preload.
 SCPS-56008:
   name: "Fatal Frame"
   region: "NTSC-K"
@@ -19401,6 +19404,11 @@ SLES-54384:
 SLES-54385:
   name: "Atelier Iris 2 - The Azoth of Destiny"
   region: "PAL-E"
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes font artifacts for health and other sprites.
+    texturePreloading: 0 # Improves performance and prevents it disabling itself regardless.
 SLES-54388:
   name: "Kim Possible - What's the Switch"
   region: "PAL-M3"
@@ -25786,6 +25794,9 @@ SLPM-62418:
   name: "Hudson Selection Vol.3 - PC Genjin"
   region: "NTSC-J"
   compat: 5
+SLPM-62421:
+  name: "Ishikura Noboru Kudan no Igo Kouza - Joukyuu-hen Mezase, Jitsuryoku Shodan!"
+  region: "NTSC-J"
 SLPM-62422:
   name: "Hudson Selection Vol.4 - Takahashi Meijin no Bouken Jima"
   region: "NTSC-J"
@@ -30279,6 +30290,11 @@ SLPM-65984:
 SLPM-65985:
   name: "Iris no Atelier - Eternal Mana 2"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes font artifacts for health and other sprites.
+    texturePreloading: 0 # Improves performance and prevents it disabling itself regardless.
 SLPM-65986:
   name: "Quartett! The Stage of Love [Limited Edition]"
   region: "NTSC-J"
@@ -31923,6 +31939,8 @@ SLPM-66436:
   name: "Iris no Atelier - Grand Fantasm"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    roundSprite: 1 # Fixes vertical lines in FMVs, character portraits and other sprites.
 SLPM-66437:
   name: "Soul Link Extension"
   region: "NTSC-J"
@@ -32336,6 +32354,11 @@ SLPM-66536:
 SLPM-66537:
   name: "Iris no Atelier - Eternal Mana 2 [Gust Best Price]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes font artifacts for health and other sprites.
+    texturePreloading: 0 # Improves performance and prevents it disabling itself regardless.
 SLPM-66538:
   name: "GI Jockey 4 2006"
   region: "NTSC-J"
@@ -33483,6 +33506,8 @@ SLPM-66848:
 SLPM-66849:
   name: "Iris no Atelier - Grand Fantasm [Gust Best Price]"
   region: "NTSC-J"
+  gsHWFixes:
+    roundSprite: 1 # Fixes vertical lines in FMVs, character portraits and other sprites.
 SLPM-66850:
   name: "Arcana Heart"
   region: "NTSC-J"
@@ -36271,6 +36296,7 @@ SLPS-25100:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPS-25102:
   name: "Project Arms"
   region: "NTSC-J"
@@ -39437,6 +39463,7 @@ SLPS-73209:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLPS-73210:
   name: "Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -41210,6 +41237,7 @@ SLUS-20328:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-20329:
   name: "Pro Race Driver"
   region: "NTSC-U"
@@ -46194,6 +46222,11 @@ SLUS-21327:
   name: "Atelier Iris 2 - The Azoth of Destiny"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Flickering in FMV.
+  gsHWFixes:
+    roundSprite: 1 # Fixes font artifacts for health and other sprites.
+    texturePreloading: 0 # Improves performance and prevents it disabling itself regardless.
 SLUS-21328:
   name: "Pac-Man World Rally"
   region: "NTSC-U"
@@ -49119,6 +49152,7 @@ SLUS-28012:
   region: "NTSC-U"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-28013:
   name: "Dual Hearts [Trade Demo]"
   region: "NTSC-U"
@@ -49364,6 +49398,7 @@ SLUS-29034:
   region: "NTSC-U"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 1 # Performs much better with partial preload.
 SLUS-29035:
   name: "Eidos Demo Disc"
   region: "NTSC-U"
