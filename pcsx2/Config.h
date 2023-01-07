@@ -626,7 +626,7 @@ struct Pcsx2Config
 					DisableShaderCache : 1,
 					DisableDualSourceBlend : 1,
 					DisableFramebufferFetch : 1,
-					ThreadedPresentation : 1,
+					DisableThreadedPresentation : 1,
 					SkipDuplicateFrames : 1,
 					OsdShowMessages : 1,
 					OsdShowSpeed : 1,
@@ -648,7 +648,6 @@ struct Pcsx2Config
 					PreloadFrameWithGSData : 1,
 					WrapGSMem : 1,
 					Mipmap : 1,
-					PointListPalette : 1,
 					ManualUserHacks : 1,
 					UserHacks_AlignSpriteX : 1,
 					UserHacks_AutoFlush : 1,
@@ -716,6 +715,8 @@ struct Pcsx2Config
 		int SWExtraThreads{2};
 		int SWExtraThreadsHeight{4};
 		int TVShader{0};
+		s16 GetSkipCountFunctionId{-1};
+		s16 BeforeDrawFunctionId{-1};
 		int SkipDrawStart{0};
 		int SkipDrawEnd{0};
 

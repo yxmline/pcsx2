@@ -275,7 +275,6 @@ bool GSreopen(bool recreate_display, const Pcsx2Config::GSOptions& old_config)
 
 	u8* basemem = g_gs_renderer->GetRegsMem();
 	const u32 gamecrc = g_gs_renderer->GetGameCRC();
-	const int gamecrc_options = g_gs_renderer->GetGameCRCOptions();
 	g_gs_renderer->Destroy();
 	g_gs_renderer.reset();
 	g_gs_device->Destroy();
@@ -332,7 +331,7 @@ bool GSreopen(bool recreate_display, const Pcsx2Config::GSOptions& old_config)
 		return false;
 	}
 
-	g_gs_renderer->SetGameCRC(gamecrc, gamecrc_options);
+	g_gs_renderer->SetGameCRC(gamecrc);
 	return true;
 }
 
@@ -559,9 +558,9 @@ void GSThrottlePresentation()
 	Threading::SleepUntil(s_next_manual_present_time);
 }
 
-void GSsetGameCRC(u32 crc, int options)
+void GSsetGameCRC(u32 crc)
 {
-	g_gs_renderer->SetGameCRC(crc, options);
+	g_gs_renderer->SetGameCRC(crc);
 }
 
 GSVideoMode GSgetDisplayMode()
@@ -683,7 +682,7 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 			GSConfig.UseDebugDevice != old_config.UseDebugDevice ||
 			GSConfig.UseBlitSwapChain != old_config.UseBlitSwapChain ||
 			GSConfig.DisableShaderCache != old_config.DisableShaderCache ||
-			GSConfig.ThreadedPresentation != old_config.ThreadedPresentation
+			GSConfig.DisableThreadedPresentation != old_config.DisableThreadedPresentation
 		);
 		if (!GSreopen(do_full_restart, old_config))
 			pxFailRel("Failed to do full GS reopen");
@@ -693,7 +692,6 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 	// Options which aren't using the global struct yet, so we need to recreate all GS objects.
 	if (
 		GSConfig.UpscaleMultiplier != old_config.UpscaleMultiplier ||
-		GSConfig.CRCHack != old_config.CRCHack ||
 		GSConfig.SWExtraThreads != old_config.SWExtraThreads ||
 		GSConfig.SWExtraThreadsHeight != old_config.SWExtraThreadsHeight)
 	{
@@ -707,10 +705,11 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 	// For example, flushing the texture cache when mipmap settings change.
 
 	if (GSConfig.CRCHack != old_config.CRCHack ||
-		GSConfig.PointListPalette != old_config.PointListPalette)
+		GSConfig.UpscaleMultiplier != old_config.UpscaleMultiplier ||
+		GSConfig.GetSkipCountFunctionId != old_config.GetSkipCountFunctionId ||
+		GSConfig.BeforeDrawFunctionId != old_config.BeforeDrawFunctionId)
 	{
-		// for automatic mipmaps, we need to reload the crc
-		g_gs_renderer->SetGameCRC(g_gs_renderer->GetGameCRC(), g_gs_renderer->GetGameCRCOptions());
+		g_gs_renderer->UpdateCRCHacks();
 	}
 
 	// renderer-specific options (e.g. auto flush, TC offset)

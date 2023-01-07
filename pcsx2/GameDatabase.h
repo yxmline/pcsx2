@@ -70,7 +70,6 @@ namespace GameDatabaseSchema
 		AlignSprite,
 		MergeSprite,
 		WildArmsHack,
-		PointListPalette,
 
 		// integer settings
 		Mipmap,
@@ -85,6 +84,8 @@ namespace GameDatabaseSchema
 		CPUSpriteRenderBW,
 		CPUCLUTRender,
 		GPUPaletteConversion,
+		GetSkipCount,
+		BeforeDraw,
 
 		Count
 	};
