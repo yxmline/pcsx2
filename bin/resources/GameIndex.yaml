@@ -3513,6 +3513,9 @@ SCES-52033:
         // Cop2 problems.
         patch=0,EE,003953F8,word,48438000
         patch=0,EE,003735FC,word,4B06521B
+        author=YukiXXL
+        // Speed Correction (25 FPS)
+        patch=1,EE,00175E1C,extended,00000019
 SCES-52042:
   name: "Formula One 2004"
   region: "PAL-M6"
@@ -12245,27 +12248,37 @@ SLES-51252:
   name: "Lord of the Rings, The - The Two Towers"
   region: "PAL-M3"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLES-51253:
   name: "Seigneur des Anneaux - Les Deux Tours"
   region: "PAL-F"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLES-51254:
   name: "Herr der Ringe, Der - Die Zwei Türme"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLES-51255:
   name: "Signore Degli Anelli, Il - Le Due Torri"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLES-51256:
   name: "Señor de Los Anillos, El - Las Dos Torres"
   region: "PAL-S"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLES-51257:
@@ -16658,6 +16671,8 @@ SLES-53224:
 SLES-53225:
   name: "Dreamworks Madagascar"
   region: "PAL-E"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
@@ -16665,12 +16680,16 @@ SLES-53226:
   name: "Dreamworks Madagascar"
   region: "PAL-F-G"
   compat: 5
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
 SLES-53227:
   name: "Dreamworks Madagascar"
   region: "PAL-M3"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
@@ -16700,12 +16719,16 @@ SLES-53238:
 SLES-53242:
   name: "Dreamworks Madagascar"
   region: "PAL-P"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
 SLES-53246:
   name: "Madagascar"
   region: "PAL-S"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
@@ -16911,6 +16934,8 @@ SLES-53371:
 SLES-53373:
   name: "Dreamworks Madagascar"
   region: "PAL-NL"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
@@ -28070,6 +28095,8 @@ SLPM-65211:
 SLPM-65212:
   name: "Lord of the Rings, The - The Two Towers"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fixes white shiny weapons.
 SLPM-65213:
@@ -34461,6 +34488,8 @@ SLPM-67004:
 SLPM-67005:
   name: "Lord of the Rings, The - The Two Towers [EA Best Hits]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLPM-67006:
@@ -34651,6 +34680,8 @@ SLPM-67545:
 SLPM-67546:
   name: "Lord of the Rings - The Two Towers"
   region: "NTSC-K"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLPM-67550:
@@ -36129,6 +36160,8 @@ SLPS-20425:
 SLPS-20426:
   name: "Dreamworks Madagascar"
   region: "NTSC-J"
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
@@ -39853,12 +39886,16 @@ SLPS-29002:
 SLPS-29003:
   name: "Lord of the Rings - The Two Towers [Collector's Box]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLPS-29004:
   name: "Lord of the Rings, The - The Two Towers"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLPS-29005:
@@ -42951,6 +42988,8 @@ SLUS-20578:
   name: "Lord of the Rings, The - The Two Towers"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned lighting and other effects.
   clampModes:
     vuClampMode: 3 # Fix white shiny weapons.
 SLUS-20579:
@@ -45117,6 +45156,8 @@ SLUS-21015:
   name: "Dreamworks Madagascar"
   region: "NTSC-U"
   compat: 5
+  roundModes:
+    vu1RoundMode: 0 # Fixes graphical issues.
   gsHWFixes:
     roundSprite: 2 # Improves bloom alignment and clarity.
     halfPixelOffset: 2 # Improves bloom alignment and clarity.
