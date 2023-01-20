@@ -15,14 +15,9 @@
 
 #pragma once
 
-namespace SPU2
-{
-extern float FinalVolume;
-}
-
 struct StereoOut32
 {
-	static StereoOut32 Empty;
+	static const StereoOut32 Empty;
 
 	s32 Left;
 	s32 Right;
@@ -38,11 +33,6 @@ struct StereoOut32
 		, Right(right)
 	{
 	}
-
-	StereoOut32(const StereoOut16& src);
-	explicit StereoOut32(const StereoOutFloat& src);
-
-	StereoOut16 DownSample() const;
 
 	StereoOut32 operator*(const int& factor) const
 	{
@@ -69,15 +59,8 @@ struct StereoOut32
 	{
 		return StereoOut32(Left / src, Right / src);
 	}
-
-	void ResampleFrom(const StereoOut32& src)
-	{
-		this->Left = src.Left << 2;
-		this->Right = src.Right << 2;
-	}
 };
 
 extern void Mix();
-extern s32 clamp_mix(s32 x, u8 bitshift = 0);
-
-extern StereoOut32 clamp_mix(const StereoOut32& sample, u8 bitshift = 0);
+extern s32 clamp_mix(s32 x);
+extern StereoOut32 clamp_mix(StereoOut32 sample);
