@@ -3118,8 +3118,6 @@ SCES-50887:
   name: "Alpine Racer 3"
   region: "PAL-M5"
   compat: 5
-  gsHWFixes:
-    deinterlace: 9 # Game requires Adaptive BFF de-interlacing when auto.
 SCES-50888:
   name: "Pac-Man World 2"
   region: "PAL-M5"
@@ -6632,8 +6630,6 @@ SCPS-51005:
 SCPS-51006:
   name: "Alpine Racer 3"
   region: "NTSC-J"
-  gsHWFixes:
-    deinterlace: 9 # Game requires Adaptive BFF de-interlacing when auto.
 SCPS-51008:
   name: "Wave Rally"
   region: "NTSC-J"
@@ -11913,6 +11909,8 @@ SLES-51117:
   region: "PAL-M5"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    autoFlush: 1 # Fixes the sun flare.
+    halfPixelOffset: 2 # Fixes the sun flare.
 SLES-51118:
   name: "Wizardry - Tales of the Forsaken Land"
   region: "PAL-E"
@@ -20045,6 +20043,7 @@ SLES-54521:
   gsHWFixes:
     mipmap: 2 # Better characters and environment.
     trilinearFiltering: 1 # Using mipmaps, so may as well.
+    autoFlush: 1 # Fixes texture corruptions.
     getSkipCount: "GSC_BlueTongueGames" # Mipmap rendering on CPU.
 SLES-54527:
   name: "Flushed Away"
@@ -25216,6 +25215,8 @@ SLPM-62026:
 SLPM-62027:
   name: "Snowboard Heaven"
   region: "NTSC-J"
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes fmv.
 SLPM-62028:
   name: "Greatest Striker"
   region: "NTSC-J"
@@ -25810,6 +25811,8 @@ SLPM-62262:
 SLPM-62263:
   name: "Snowboard Heaven"
   region: "NTSC-J"
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes fmv.
 SLPM-62264:
   name: "Shin Contra"
   region: "NTSC-J"
@@ -35591,8 +35594,6 @@ SLPS-20178:
 SLPS-20181:
   name: "Alpine Racer 3"
   region: "NTSC-J"
-  gsHWFixes:
-    deinterlace: 9 # Game requires Adaptive BFF de-interlacing when auto.
 SLPS-20183:
   name: "Motto Golful Golf"
   region: "NTSC-J"
@@ -42655,6 +42656,8 @@ SLUS-20502:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    autoFlush: 1 # Fixes the sun flare.
+    halfPixelOffset: 2 # Fixes the sun flare.
 SLUS-20504:
   name: "Tony Hawk's Pro Skater 4"
   region: "NTSC-U"
@@ -47697,6 +47700,7 @@ SLUS-21469:
   gsHWFixes:
     mipmap: 2 # Better characters and environment.
     trilinearFiltering: 1 # Using mipmaps, so may as well.
+    autoFlush: 1 # Fixes texture corruptions.
     getSkipCount: "GSC_BlueTongueGames" # Render mipmaps on the CPU.
 SLUS-21470:
   name: "Bratz - Forever Diamondz"
