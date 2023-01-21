@@ -2905,6 +2905,9 @@ SCES-50408:
   speedHacks:
     InstantVU1SpeedHack: 0 # Fixes noodles.
     MTVUSpeedHack: 0
+  gsHWFixes:
+    mipmap: 2 # Fixes missing floor texture.
+    trilinearFiltering: 1 # Fixes fog effect.
 SCES-50409:
   name: "MotoGP 2"
   region: "PAL-M5"
@@ -5618,6 +5621,9 @@ SCPS-15017:
   speedHacks:
     InstantVU1SpeedHack: 0 # Fixes noodles.
     MTVUSpeedHack: 0
+  gsHWFixes:
+    mipmap: 2 # Fixes missing floor texture.
+    trilinearFiltering: 1 # Fixes fog effect.
 SCPS-15018:
   name: "Train Simulator Real, The - Yamanote Sen"
   region: "NTSC-J"
@@ -6274,6 +6280,9 @@ SCPS-19201:
   speedHacks:
     InstantVU1SpeedHack: 0 # Fixes noodles.
     MTVUSpeedHack: 0
+  gsHWFixes:
+    mipmap: 2 # Fixes missing floor texture.
+    trilinearFiltering: 1 # Fixes fog effect.
 SCPS-19202:
   name: "Extermination [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -7284,6 +7293,9 @@ SCUS-97167:
   speedHacks:
     InstantVU1SpeedHack: 0 # Fixes noodles.
     MTVUSpeedHack: 0
+  gsHWFixes:
+    mipmap: 2 # Fixes missing floor texture.
+    trilinearFiltering: 1 # Fixes fog effect.
 SCUS-97169:
   name: "Drakan - The Ancients' Gates [Demo]"
   region: "NTSC-U"
@@ -48428,6 +48440,8 @@ SLUS-21642:
 SLUS-21643:
   name: "Bratz - The Movie"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 3 # Removes ghosting of bloom and shadows.
 SLUS-21644:
   name: "Nickelodeon SpongeBob's Atlantis SquarePantis"
   region: "NTSC-U"
@@ -50699,6 +50713,13 @@ TCES-52033:
     halfPixelOffset: 2 # Corrects light position.
   gameFixes:
     - EETimingHack # Fixes random hangs.
+  patches:
+    0DDA2728:
+      content: |-
+        author=YukiXXL
+        // Speed Correction (25 FPS)
+        patch=1,EE,00175a7c,extended,00000019
+        patch=1,EE,00175848,extended,00000019
 TCES-52042:
   name: "Formula One 04 Beta Trial Code"
   region: "PAL-E"
