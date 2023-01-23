@@ -941,9 +941,6 @@
     <ClCompile Include="DEV9\PacketReader\EthernetFrame.cpp">
       <Filter>System\Ps2\DEV9\PacketReader</Filter>
     </ClCompile>
-    <ClCompile Include="DEV9\PacketReader\NetLib.cpp">
-      <Filter>System\Ps2\DEV9\PacketReader</Filter>
-    </ClCompile>
     <ClCompile Include="DEV9\pcap_io.cpp">
       <Filter>System\Ps2\DEV9</Filter>
     </ClCompile>
@@ -1832,6 +1829,9 @@
       <Filter>System\Ps2\DEV9\PacketReader\IP</Filter>
     </ClInclude>
     <ClInclude Include="DEV9\PacketReader\EthernetFrame.h">
+      <Filter>System\Ps2\DEV9\PacketReader</Filter>
+    </ClInclude>
+    <ClInclude Include="DEV9\PacketReader\MAC_Address.h">
       <Filter>System\Ps2\DEV9\PacketReader</Filter>
     </ClInclude>
     <ClInclude Include="DEV9\PacketReader\NetLib.h">

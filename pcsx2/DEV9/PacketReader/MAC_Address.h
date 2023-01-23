@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2021  PCSX2 Dev Team
+ *  Copyright (C) 2002-2023  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -15,42 +15,23 @@
 
 #pragma once
 
-#include "DEV9/net.h"
-#include "MAC_Address.h"
-#include "Payload.h"
-
 namespace PacketReader
 {
-	enum struct EtherType : u16
+#pragma pack(push, 1)
+	struct MAC_Address
 	{
-		null = 0x0000,
-		IPv4 = 0x0800,
-		ARP = 0x0806,
-		//Tags extend the ether header length
-		VlanQTag = 0x8100,
-		VlanServiceQTag = 0x88A8,
-		VlanDoubleQTag = 0x9100
+		union
+		{
+			u8 bytes[6];
+			struct
+			{
+				u32 integer03;
+				u16 short45;
+			} u;
+		};
+
+		bool operator==(const MAC_Address& other) const { return (this->u.integer03 == other.u.integer03) && (this->u.short45 == other.u.short45); }
+		bool operator!=(const MAC_Address& other) const { return (this->u.integer03 != other.u.integer03) || (this->u.short45 != other.u.short45); }
 	};
-
-	class EthernetFrame
-	{
-	public:
-		MAC_Address destinationMAC{};
-		MAC_Address sourceMAC{};
-
-		u16 protocol = 0;
-		int headerLength = 14;
-		//Length
-	private:
-		std::unique_ptr<Payload> payload;
-
-	public:
-		//Takes ownership of payload
-		EthernetFrame(Payload* data);
-		EthernetFrame(NetPacket* pkt);
-
-		Payload* GetPayload();
-
-		void WritePacket(NetPacket* pkt);
-	};
+#pragma pack(pop)
 } // namespace PacketReader

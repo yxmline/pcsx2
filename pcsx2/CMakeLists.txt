@@ -339,7 +339,6 @@ set(pcsx2DEV9Sources
 	DEV9/PacketReader/IP/IP_Options.cpp
 	DEV9/PacketReader/IP/IP_Packet.cpp
 	DEV9/PacketReader/EthernetFrame.cpp
-	DEV9/PacketReader/NetLib.cpp
 	DEV9/Sessions/BaseSession.cpp
 	DEV9/Sessions/ICMP_Session/ICMP_Session.cpp
 	DEV9/Sessions/TCP_Session/TCP_Session.cpp
@@ -380,6 +379,7 @@ set(pcsx2DEV9Headers
 	DEV9/PacketReader/IP/IP_Packet.h
 	DEV9/PacketReader/IP/IP_Payload.h
 	DEV9/PacketReader/EthernetFrame.h
+	DEV9/PacketReader/MAC_Address.h
 	DEV9/PacketReader/NetLib.h
 	DEV9/PacketReader/Payload.h
 	DEV9/pcap_io.h
