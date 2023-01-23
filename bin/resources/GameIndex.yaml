@@ -1154,7 +1154,6 @@ SCAJ-20143:
   name: "Armored Core - Last Raven"
   region: "NTSC-Unk"
   gsHWFixes:
-    preloadFrameData: 1 # Fixes black screen while in a mech.
     roundSprite: 2 # Fixes HUD artifacts.
 SCAJ-20144:
   name: "Zhuo Hou La 3"
@@ -9053,6 +9052,8 @@ SLAJ-25066:
 SLAJ-25068:
   name: "Shin Sangoku Musou 4 - Mushoden"
   region: "NTSC-Unk"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLAJ-25072:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-Unk"
@@ -15857,12 +15858,21 @@ SLES-52895:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
 SLES-52896:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-F-G"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
 SLES-52897:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-I"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
 SLES-52898:
   name: "King of Fighters - Maximum Impact"
   region: "PAL-E-JP"
@@ -16092,6 +16102,9 @@ SLES-52984:
 SLES-52985:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
 SLES-52986:
   name: "Bob Esponja La Película"
   region: "PAL-S"
@@ -18309,7 +18322,6 @@ SLES-53820:
   name: "Armored Core - Last Raven"
   region: "PAL-E"
   gsHWFixes:
-    preloadFrameData: 1 # Fixes black screen while in a mech.
     roundSprite: 2 # Fixes HUD artifacts.
 SLES-53821:
   name: "Radio Helicopter II"
@@ -18398,12 +18410,18 @@ SLES-53857:
 SLES-53860:
   name: "Dynasty Warriors 5 - Xtreme Legends"
   region: "PAL-E"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLES-53861:
   name: "Dynasty Warriors 5 - Xtreme Legends"
   region: "PAL-F"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLES-53862:
   name: "Dynasty Warriors 5 - Xtreme Legends"
   region: "PAL-G"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLES-53863:
   name: "Pool Paradise - International Edition"
   region: "PAL-M5"
@@ -19700,6 +19718,8 @@ SLES-54385:
 SLES-54388:
   name: "Kim Possible - What's the Switch"
   region: "PAL-M3"
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes extreme EE and VU usage.
 SLES-54389:
   name: "Tony Hawk's Project 8"
   region: "PAL-E"
@@ -24083,6 +24103,8 @@ SLKA-25328:
 SLKA-25329:
   name: "Shin Sangoku Musou 4 - Mushoden"
   region: "NTSC-K"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLKA-25331:
   name: "Marc Ecko's Getting Up - Contents Under Pressure"
   region: "NTSC-K"
@@ -31159,6 +31181,8 @@ SLPM-66100:
 SLPM-66101:
   name: "Shin Sangoku Musou 4 - Mushoden"
   region: "NTSC-J"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLPM-66102:
   name: "Zwei!! [Taito the Best]"
   region: "NTSC-J"
@@ -35015,6 +35039,8 @@ SLPM-74249:
 SLPM-74250:
   name: "Shin Sangoku Musou 4 Mushoden [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLPM-74251:
   name: "Shin Onimusha - Dawn of Dreams [PlayStation 2 the Best - Reprint Disc 1]"
   region: "NTSC-J"
@@ -38122,7 +38148,6 @@ SLPS-25462:
   name: "Armored Core - Last Raven"
   region: "NTSC-J"
   gsHWFixes:
-    preloadFrameData: 1 # Fixes black screen while in a mech.
     roundSprite: 2 # Fixes HUD artifacts.
   memcardFilters:
     - SLPS-25338
@@ -40297,7 +40322,6 @@ SLPS-73247:
   name: "Armored Core - Last Raven [PlayStation 2 The Best]"
   region: "NTSC-J"
   gsHWFixes:
-    preloadFrameData: 1 # Fixes black screen while in a mech.
     roundSprite: 2 # Fixes HUD artifacts.
   memcardFilters:
     - SLPS-25338
@@ -44573,6 +44597,9 @@ SLUS-20904:
   name: "SpongeBob SquarePants - The Movie"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
 SLUS-20905:
   name: "Incredibles, The"
   region: "NTSC-U"
@@ -46713,6 +46740,8 @@ SLUS-21299:
   name: "Dynasty Warriors 5 - Xtreme Legends"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    autoFlush: 1 # Fixes sun luminosity.
 SLUS-21300:
   name: "Over the Hedge"
   region: "NTSC-U"
@@ -46939,7 +46968,6 @@ SLUS-21338:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    preloadFrameData: 1 # Fixes black screen while in a mech.
     roundSprite: 2 # Fixes HUD artifacts.
 SLUS-21339:
   name: "Puzzle Collection - Crosswords & More!"
@@ -47537,6 +47565,8 @@ SLUS-21436:
 SLUS-21437:
   name: "Disney's Kim Possible - What's the Switch"
   region: "NTSC-U"
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes extreme EE and VU usage.
 SLUS-21438:
   name: "Cartoon Network Racing"
   region: "NTSC-U"
