@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2021 PCSX2 Dev Team
+ *  Copyright (C) 2002-2010  PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -13,19 +13,27 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "PrecompiledHeader.h"
+#include "General.h"
 
-class GSCodeBuffer
+// --------------------------------------------------------------------------------------
+//  PageProtectionMode  (implementations)
+// --------------------------------------------------------------------------------------
+std::string PageProtectionMode::ToString() const
 {
-	std::vector<void*> m_buffers;
-	size_t m_blocksize;
-	size_t m_pos, m_reserved;
-	u8* m_ptr;
+	std::string modeStr;
 
-public:
-	GSCodeBuffer(size_t blocksize = 4096 * 64); // 256k
-	virtual ~GSCodeBuffer();
+	if (m_read)
+		modeStr += "Read";
+	if (m_write)
+		modeStr += "Write";
+	if (m_exec)
+		modeStr += "Exec";
 
-	void* GetBuffer(size_t size);
-	void ReleaseBuffer(size_t size);
-};
+	if (modeStr.empty())
+		return "NoAccess";
+	if (modeStr.length() <= 5)
+		modeStr += "Only";
+
+	return modeStr;
+}

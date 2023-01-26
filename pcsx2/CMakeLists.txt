@@ -150,6 +150,7 @@ set(pcsx2Sources
 	Vif_Codes.cpp
 	Vif_Transfer.cpp
 	Vif_Unpack.cpp
+	VirtualMemory.cpp
 	vtlb.cpp
 	VU0.cpp
 	VUmicro.cpp
@@ -201,7 +202,6 @@ set(pcsx2Headers
 	PerformanceMetrics.h
 	PrecompiledHeader.h
 	R3000A.h
-	R5900Exceptions.h
 	R5900.h
 	R5900OpcodeTables.h
 	SaveState.h
@@ -217,6 +217,7 @@ set(pcsx2Headers
 	Vif_Dma.h
 	Vif.h
 	Vif_Unpack.h
+	VirtualMemory.h
 	vtlb.h
 	VUflags.h
 	VUmicro.h
@@ -494,7 +495,6 @@ set(pcsx2GSSources
 	GS/GSAlignedClass.cpp
 	GS/GSCapture.cpp
 	GS/GSClut.cpp
-	GS/GSCodeBuffer.cpp
 	GS/GSCrc.cpp
 	GS/GSDrawingContext.cpp
 	GS/GSDump.cpp
@@ -529,12 +529,10 @@ set(pcsx2GSSources
 
 # GS headers
 set(pcsx2GSHeaders
-	GS/config.h
 	GS/GSAlignedClass.h
 	GS/GSBlock.h
 	GS/GSCapture.h
 	GS/GSClut.h
-	GS/GSCodeBuffer.h
 	GS/GSCrc.h
 	GS/GSDrawingContext.h
 	GS/GSDrawingEnvironment.h
@@ -985,10 +983,6 @@ set(pcsx2RecordingHeaders
 	${rec_src}/Utilities/InputRecordingLogger.h
 )
 
-# System headers
-set(pcsx2SystemHeaders
-	System/RecTypes.h)
-
 # Windows sources
 set(pcsx2WindowsSources
 	CDVD/Windows/DriveUtility.cpp
@@ -1114,7 +1108,6 @@ target_sources(PCSX2 PRIVATE
 	${pcsx2FrontendHeaders}
 	${pcsx2ps2Sources}
 	${pcsx2ps2Headers}
-	${pcsx2SystemHeaders}
 )
 
 # platform sources

@@ -19,13 +19,11 @@
 #include "Memory.h"
 #include "R3000A.h"
 
-#include "R5900Exceptions.h"
 #include "R5900OpcodeTables.h"
 #include "iR5900.h"
 #include "iR5900Analysis.h"
 #include "BaseblockEx.h"
-#include "System/RecTypes.h"
-
+#include "VirtualMemory.h"
 #include "vtlb.h"
 
 #include "VMManager.h"
@@ -60,8 +58,8 @@
 using namespace x86Emitter;
 using namespace R5900;
 
-static std::atomic<bool> eeRecIsReset(false);
-static std::atomic<bool> eeRecNeedsReset(false);
+static bool eeRecIsReset = false;
+static bool eeRecNeedsReset = false;
 static bool eeCpuExecuting = false;
 static bool eeRecExitRequested = false;
 static bool g_resetEeScalingStats = false;
@@ -617,17 +615,17 @@ alignas(16) static u8 manual_counter[Ps2MemSize::MainRam >> 12];
 ////////////////////////////////////////////////////
 static void recResetRaw()
 {
+	eeRecNeedsReset = false;
+	if (eeRecIsReset)
+		return;
+
+	Console.WriteLn(Color_StrongBlack, "EE/iR5900-32 Recompiler Reset");
+
 	Perf::ee.reset();
 
 	EE::Profiler.Reset();
 
 	recAlloc();
-
-	eeRecNeedsReset = false;
-	if (eeRecIsReset.exchange(true))
-		return;
-
-	Console.WriteLn(Color_StrongBlack, "EE/iR5900-32 Recompiler Reset");
 
 	recMem->Reset();
 	ClearRecLUT((BASEBLOCK*)recLutReserve_RAM, recLutSize);
@@ -648,6 +646,7 @@ static void recResetRaw()
 
 	g_branch = 0;
 	g_resetEeScalingStats = true;
+	eeRecIsReset = true;
 }
 
 static void recShutdown()
@@ -667,34 +666,14 @@ static void recShutdown()
 	Perf::dump();
 }
 
-static void recResetEE()
-{
-	if (eeCpuExecuting)
-	{
-		// get outta here as soon as we can
-		eeRecNeedsReset = true;
-		eeRecExitRequested = true;
-		return;
-	}
-
-	recResetRaw();
-}
-
 void recStep()
 {
 }
 
 static fastjmp_buf m_SetJmp_StateCheck;
-static std::unique_ptr<BaseR5900Exception> m_cpuException;
-static std::unique_ptr<BaseException> m_Exception;
 
 static void recExitExecution()
 {
-	// Without SEH we'll need to hop to a safehouse point outside the scope of recompiled
-	// code.  C++ exceptions can't cross the mighty chasm in the stackframe that the recompiler
-	// creates.  However, the longjump is slow so we only want to do one when absolutely
-	// necessary:
-
 	fastjmp_jmp(&m_SetJmp_StateCheck, 1);
 }
 
@@ -702,10 +681,30 @@ static void recSafeExitExecution()
 {
 	// If we're currently processing events, we can't safely jump out of the recompiler here, because we'll
 	// leave things in an inconsistent state. So instead, we flag it for exiting once cpuEventTest() returns.
-	if (eeEventTestIsActive)
-		eeRecExitRequested = true;
-	else
-		recExitExecution();
+	// Exiting in the middle of a rec block with the registers unsaved would be a bad idea too..
+	eeRecExitRequested = true;
+
+	// Force an event test at the end of this block.
+	if (!eeEventTestIsActive)
+		cpuRegs.nextEventCycle = 0;
+}
+
+static void recResetEE()
+{
+	if (eeCpuExecuting)
+	{
+		// get outta here as soon as we can
+		eeRecNeedsReset = true;
+		recSafeExitExecution();
+		return;
+	}
+
+	recResetRaw();
+}
+
+static void recCancelInstruction()
+{
+	pxFailRel("recCancelInstruction() called, this should never happen!");
 }
 
 static void recExecute()
@@ -713,12 +712,9 @@ static void recExecute()
 	// Reset before we try to execute any code, if there's one pending.
 	// We need to do this here, because if we reset while we're executing, it sets the "needs reset"
 	// flag, which triggers a JIT exit (the fastjmp_set below), and eventually loops back here.
-	eeRecIsReset.store(false);
-	if (eeRecNeedsReset.load())
+	eeRecIsReset = false;
+	if (eeRecNeedsReset)
 		recResetRaw();
-
-	m_cpuException = nullptr;
-	m_Exception = nullptr;
 
 	// setjmp will save the register context and will return 0
 	// A call to longjmp will restore the context (included the eip/rip)
@@ -738,11 +734,6 @@ static void recExecute()
 	}
 
 	eeCpuExecuting = false;
-
-	if (m_cpuException)
-		m_cpuException->Rethrow();
-	if (m_Exception)
-		m_Exception->Rethrow();
 
 	// FIXME Warning thread unsafe
 	Perf::dump();
@@ -2688,25 +2679,6 @@ StartRecomp:
 	s_pCurBlockEx = NULL;
 }
 
-// The only *safe* way to throw exceptions from the context of recompiled code.
-// The exception is cached and the recompiler is exited safely using either an
-// SEH unwind (MSW) or setjmp/longjmp (GCC).
-static void recThrowException(const BaseR5900Exception& ex)
-{
-	if (!eeCpuExecuting)
-		ex.Rethrow();
-	m_cpuException = std::unique_ptr<BaseR5900Exception>(ex.Clone());
-	recExitExecution();
-}
-
-static void recThrowException(const BaseException& ex)
-{
-	if (!eeCpuExecuting)
-		ex.Rethrow();
-	m_Exception = std::unique_ptr<BaseException>(ex.Clone());
-	recExitExecution();
-}
-
 R5900cpu recCpu = {
 	recReserve,
 	recShutdown,
@@ -2716,6 +2688,5 @@ R5900cpu recCpu = {
 	recExecute,
 
 	recSafeExitExecution,
-	recThrowException,
-	recThrowException,
+	recCancelInstruction,
 	recClear};

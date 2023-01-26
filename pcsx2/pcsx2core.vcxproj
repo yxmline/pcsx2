@@ -280,7 +280,6 @@
     <ClCompile Include="GS\GSBlock.cpp" />
     <ClCompile Include="GS\GSCapture.cpp" />
     <ClCompile Include="GS\GSClut.cpp" />
-    <ClCompile Include="GS\GSCodeBuffer.cpp" />
     <ClCompile Include="GS\GSCrc.cpp" />
     <ClCompile Include="GS\Renderers\Common\GSDevice.cpp" />
     <ClCompile Include="GS\Renderers\DX11\GSDevice11.cpp" />
@@ -353,6 +352,7 @@
     <ClCompile Include="USB\usb-pad\usb-seamic.cpp" />
     <ClCompile Include="USB\usb-printer\usb-printer.cpp" />
     <ClCompile Include="USB\USB.cpp" />
+    <ClCompile Include="VirtualMemory.cpp" />
     <ClCompile Include="VMManager.cpp" />
     <ClCompile Include="windows\Optimus.cpp" />
     <ClCompile Include="Pcsx2Config.cpp" />
@@ -606,7 +606,6 @@
     <ClInclude Include="SPU2\regs.h" />
     <ClInclude Include="SPU2\Mixer.h" />
     <ClInclude Include="SPU2\spu2.h" />
-    <ClInclude Include="GS\config.h" />
     <ClInclude Include="GS\Renderers\OpenGL\GLLoader.h" />
     <ClInclude Include="GS\Renderers\OpenGL\GLState.h" />
     <ClInclude Include="GS\GS.h" />
@@ -618,7 +617,6 @@
     <ClInclude Include="GS\GSBlock.h" />
     <ClInclude Include="GS\GSCapture.h" />
     <ClInclude Include="GS\GSClut.h" />
-    <ClInclude Include="GS\GSCodeBuffer.h" />
     <ClInclude Include="GS\GSCrc.h" />
     <ClInclude Include="GS\Renderers\Common\GSDevice.h" />
     <ClInclude Include="GS\Renderers\DX11\GSDevice11.h" />
@@ -714,8 +712,6 @@
     <ClInclude Include="SaveState.h" />
     <ClInclude Include="SingleRegisterTypes.h" />
     <ClInclude Include="System.h" />
-    <ClInclude Include="System\SysThreads.h" />
-    <ClInclude Include="System\RecTypes.h" />
     <ClInclude Include="Counters.h" />
     <ClInclude Include="Dmac.h" />
     <ClInclude Include="Hardware.h" />
@@ -723,6 +719,7 @@
     <ClInclude Include="ps2\HwInternal.h" />
     <ClInclude Include="Cache.h" />
     <ClInclude Include="Memory.h" />
+    <ClInclude Include="VirtualMemory.h" />
     <ClInclude Include="VMManager.h" />
     <ClInclude Include="vtlb.h" />
     <ClInclude Include="MTVU.h" />
@@ -747,7 +744,6 @@
     <ClInclude Include="SPR.h" />
     <ClInclude Include="Gif.h" />
     <ClInclude Include="R5900.h" />
-    <ClInclude Include="R5900Exceptions.h" />
     <ClInclude Include="R5900OpcodeTables.h" />
     <ClInclude Include="COP0.h" />
     <ClInclude Include="x86\iCOP0.h" />

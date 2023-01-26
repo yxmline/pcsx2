@@ -992,9 +992,6 @@
     <ClCompile Include="GS\GSClut.cpp">
       <Filter>System\Ps2\GS</Filter>
     </ClCompile>
-    <ClCompile Include="GS\GSCodeBuffer.cpp">
-      <Filter>System\Ps2\GS</Filter>
-    </ClCompile>
     <ClCompile Include="GS\GSCrc.cpp">
       <Filter>System\Ps2\GS</Filter>
     </ClCompile>
@@ -1388,6 +1385,9 @@
     <ClCompile Include="GSDumpReplayer.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="VirtualMemory.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Patch.h">
@@ -1421,12 +1421,6 @@
       <Filter>System\Include</Filter>
     </ClInclude>
     <ClInclude Include="System.h">
-      <Filter>System\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="System\SysThreads.h">
-      <Filter>System\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="System\RecTypes.h">
       <Filter>System\Include</Filter>
     </ClInclude>
     <ClInclude Include="Counters.h">
@@ -1508,9 +1502,6 @@
       <Filter>System\Ps2\EmotionEngine\DMAC\Gif</Filter>
     </ClInclude>
     <ClInclude Include="R5900.h">
-      <Filter>System\Ps2\EmotionEngine\EE</Filter>
-    </ClInclude>
-    <ClInclude Include="R5900Exceptions.h">
       <Filter>System\Ps2\EmotionEngine\EE</Filter>
     </ClInclude>
     <ClInclude Include="R5900OpcodeTables.h">
@@ -1903,9 +1894,6 @@
     <ClInclude Include="GS\GSClut.h">
       <Filter>System\Ps2\GS</Filter>
     </ClInclude>
-    <ClInclude Include="GS\GSCodeBuffer.h">
-      <Filter>System\Ps2\GS</Filter>
-    </ClInclude>
     <ClInclude Include="GS\GSCrc.h">
       <Filter>System\Ps2\GS</Filter>
     </ClInclude>
@@ -1949,9 +1937,6 @@
       <Filter>System\Ps2\GS</Filter>
     </ClInclude>
     <ClInclude Include="GS\MultiISA.h">
-      <Filter>System\Ps2\GS</Filter>
-    </ClInclude>
-    <ClInclude Include="GS\config.h">
       <Filter>System\Ps2\GS</Filter>
     </ClInclude>
     <ClInclude Include="GS\GSPng.h">
@@ -2329,6 +2314,9 @@
     </ClInclude>
     <ClInclude Include="GS.h">
       <Filter>System\Ps2\GS\GIF</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualMemory.h">
+      <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -67,9 +67,6 @@
     <ClCompile Include="emitter\simd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VirtualMemory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="emitter\WinCpuDetect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -211,6 +208,7 @@
     <ClCompile Include="WAVWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="General.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlignedMalloc.h">
@@ -232,9 +230,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="emitter\implement\dwshift.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EventSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Exceptions.h">
@@ -532,9 +527,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EventSource.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="Vulkan\EntryPoints.inl">
       <Filter>Source Files\Vulkan</Filter>
     </None>
