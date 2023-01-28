@@ -27,10 +27,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
-#include <unistd.h>
-#ifdef __linux__
-#include <sys/ioctl.h>
-#endif
 #endif
 
 #include "sockets.h"
@@ -160,13 +156,12 @@ SocketAdapter::SocketAdapter()
 {
 	bool foundAdapter;
 
-#ifdef _WIN32
-	IP_ADAPTER_ADDRESSES adapter;
+	AdapterUtils::Adapter adapter;
 	AdapterUtils::AdapterBuffer buffer;
 
 	if (strcmp(EmuConfig.DEV9.EthDevice.c_str(), "Auto") != 0)
 	{
-		foundAdapter = AdapterUtils::GetWin32Adapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
+		foundAdapter = AdapterUtils::GetAdapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
 
 		if (!foundAdapter)
 		{
@@ -185,7 +180,7 @@ SocketAdapter::SocketAdapter()
 	}
 	else
 	{
-		foundAdapter = AdapterUtils::GetWin32AdapterAuto(&adapter, &buffer);
+		foundAdapter = AdapterUtils::GetAdapterAuto(&adapter, &buffer);
 		adapterIP = {};
 
 		if (!foundAdapter)
@@ -194,41 +189,6 @@ SocketAdapter::SocketAdapter()
 			return;
 		}
 	}
-#elif defined(__POSIX__)
-	ifaddrs adapter;
-	AdapterUtils::AdapterBuffer buffer;
-
-	if (strcmp(EmuConfig.DEV9.EthDevice.c_str(), "Auto") != 0)
-	{
-		foundAdapter = AdapterUtils::GetIfAdapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
-
-		if (!foundAdapter)
-		{
-			Console.Error("DEV9: Socket: Failed to Get Adapter");
-			return;
-		}
-
-		std::optional<IP_Address> adIP = AdapterUtils::GetAdapterIP(&adapter);
-		if (adIP.has_value())
-			adapterIP = adIP.value();
-		else
-		{
-			Console.Error("DEV9: Socket: Failed To Get Adapter IP");
-			return;
-		}
-	}
-	else
-	{
-		foundAdapter = AdapterUtils::GetIfAdapterAuto(&adapter, &buffer);
-		adapterIP = {0};
-
-		if (!foundAdapter)
-		{
-			Console.Error("DEV9: Socket: Auto Selection Failed, Check You Connection or Manually Specify Adapter");
-			return;
-		}
-	}
-#endif
 
 	//For DHCP, we need to override some settings
 	//DNS settings as per direct adapters
@@ -239,34 +199,20 @@ SocketAdapter::SocketAdapter()
 
 	InitInternalServer(&adapter, true, ps2IP, subnet, gateway);
 
-	MAC_Address hostMAC;
-	MAC_Address newMAC;
-
-#ifdef _WIN32
-	hostMAC = *(MAC_Address*)adapter.PhysicalAddress;
-#elif defined(__linux__)
-	struct ifreq ifr;
-	int fd = socket(AF_INET, SOCK_DGRAM, 0);
-	strcpy(ifr.ifr_name, adapter.ifa_name);
-	if (0 == ioctl(fd, SIOCGIFHWADDR, &ifr))
-		hostMAC = *(MAC_Address*)ifr.ifr_hwaddr.sa_data;
-	else
+	std::optional<MAC_Address> adMAC = AdapterUtils::GetAdapterMAC(&adapter);
+	if (adMAC.has_value())
 	{
-		hostMAC = ps2MAC;
-		Console.Error("Could not get MAC address for adapter: %s", adapter.ifa_name);
+		MAC_Address hostMAC = adMAC.value();
+		MAC_Address newMAC = ps2MAC;
+
+		//Lets take the hosts last 2 bytes to make it unique on Xlink
+		newMAC.bytes[5] = hostMAC.bytes[4];
+		newMAC.bytes[4] = hostMAC.bytes[5];
+
+		SetMACAddress(&newMAC);
 	}
-	::close(fd);
-#else
-	hostMAC = ps2MAC;
-	Console.Error("Could not get MAC address for adapter, OS not supported");
-#endif
-	newMAC = ps2MAC;
-
-	//Lets take the hosts last 2 bytes to make it unique on Xlink
-	newMAC.bytes[5] = hostMAC.bytes[4];
-	newMAC.bytes[4] = hostMAC.bytes[5];
-
-	SetMACAddress(&newMAC);
+	else
+		Console.Error("DEV9: Socket: Failed to get MAC address for adapter");
 
 #ifdef _WIN32
 	/* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
@@ -427,24 +373,14 @@ void SocketAdapter::reset()
 void SocketAdapter::reloadSettings()
 {
 	bool foundAdapter = false;
-#ifdef _WIN32
-	IP_ADAPTER_ADDRESSES adapter;
+
+	AdapterUtils::Adapter adapter;
 	AdapterUtils::AdapterBuffer buffer;
 
 	if (strcmp(EmuConfig.DEV9.EthDevice.c_str(), "Auto") != 0)
-		foundAdapter = AdapterUtils::GetWin32Adapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
+		foundAdapter = AdapterUtils::GetAdapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
 	else
-		foundAdapter = AdapterUtils::GetWin32AdapterAuto(&adapter, &buffer);
-
-#elif defined(__POSIX__)
-	ifaddrs adapter;
-	AdapterUtils::AdapterBuffer buffer;
-
-	if (strcmp(EmuConfig.DEV9.EthDevice.c_str(), "Auto") != 0)
-		foundAdapter = AdapterUtils::GetIfAdapter(EmuConfig.DEV9.EthDevice, &adapter, &buffer);
-	else
-		foundAdapter = AdapterUtils::GetIfAdapterAuto(&adapter, &buffer);
-#endif
+		foundAdapter = AdapterUtils::GetAdapterAuto(&adapter, &buffer);
 
 	const IP_Address ps2IP = {{{internalIP.bytes[0], internalIP.bytes[1], internalIP.bytes[2], 100}}};
 	const IP_Address subnet{{{255, 255, 255, 0}}};
@@ -563,7 +499,7 @@ bool SocketAdapter::SendUDP(ConnectionKey Key, IP_Packet* ipPkt)
 	{
 		UDP_Session* s = nullptr;
 
-		if (udp.sourcePort == udp.destinationPort || //Used for LAN games that assume the destination port
+		if (abs(udp.sourcePort - udp.destinationPort) <= 10 || //Used for games that assume the destination/source port
 			ipPkt->destinationIP == dhcpServer.broadcastIP || //Broadcast packets
 			ipPkt->destinationIP == IP_Address{{{255, 255, 255, 255}}} || //Limited Broadcast packets
 			(ipPkt->destinationIP.bytes[0] & 0xF0) == 0xE0) //Multicast address start with 0b1110
@@ -582,7 +518,7 @@ bool SocketAdapter::SendUDP(ConnectionKey Key, IP_Packet* ipPkt)
 				fKey.ps2Port = udp.sourcePort;
 				fKey.srvPort = 0;
 
-				Console.WriteLn("DEV9: Socket: Creating New UDPFixedPort with port %d", udp.destinationPort);
+				Console.WriteLn("DEV9: Socket: Creating New UDPFixedPort with port %d", udp.sourcePort);
 
 				fPort = new UDP_FixedPort(fKey, adapterIP, udp.sourcePort);
 				fPort->AddConnectionClosedHandler([&](BaseSession* session) { HandleFixedPortClosed(session); });
@@ -594,7 +530,7 @@ bool SocketAdapter::SendUDP(ConnectionKey Key, IP_Packet* ipPkt)
 				fixedUDPPorts.Add(udp.sourcePort, fPort);
 			}
 
-			Console.WriteLn("DEV9: Socket: Creating New UDP Connection from FixedPort %d", udp.destinationPort);
+			Console.WriteLn("DEV9: Socket: Creating New UDP Connection from FixedPort %d to %d", udp.sourcePort, udp.destinationPort);
 			s = fPort->NewClientSession(Key,
 				ipPkt->destinationIP == dhcpServer.broadcastIP || ipPkt->destinationIP == IP_Address{{{255, 255, 255, 255}}},
 				(ipPkt->destinationIP.bytes[0] & 0xF0) == 0xE0);

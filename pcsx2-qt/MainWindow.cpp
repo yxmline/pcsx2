@@ -157,7 +157,7 @@ void MainWindow::initialize()
 	restoreStateFromConfig();
 	switchToGameListView();
 	updateWindowTitle();
-	updateSaveStateMenus(QString(), QString(), 0);
+	updateSaveStateMenusEnableState(false);
 
 #ifdef _WIN32
 	registerForDeviceNotifications();
@@ -346,7 +346,7 @@ void MainWindow::connectSignals()
 	connect(m_ui.actionDiscordServer, &QAction::triggered, this, &MainWindow::onDiscordServerActionTriggered);
 	connect(m_ui.actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(m_ui.actionAbout, &QAction::triggered, this, &MainWindow::onAboutActionTriggered);
-	connect(m_ui.actionCheckForUpdates, &QAction::triggered, this, &MainWindow::onCheckForUpdatesActionTriggered);
+	connect(m_ui.actionCheckForUpdates, &QAction::triggered, this, [this]() { checkForUpdates(true, true); });
 	connect(m_ui.actionOpenDataDirectory, &QAction::triggered, this, &MainWindow::onToolsOpenDataDirectoryTriggered);
 	connect(m_ui.actionCoverDownloader, &QAction::triggered, this, &MainWindow::onToolsCoverDownloaderTriggered);
 	connect(m_ui.actionGridViewShowTitles, &QAction::triggered, m_game_list_widget, &GameListWidget::setShowCoverTitles);
@@ -1259,11 +1259,6 @@ void MainWindow::cancelGameListRefresh()
 	m_game_list_widget->cancelRefresh();
 }
 
-void MainWindow::invalidateSaveStateCache()
-{
-	m_save_states_invalidated = true;
-}
-
 void MainWindow::reportError(const QString& title, const QString& message)
 {
 	QMessageBox::critical(this, title, message);
@@ -1372,11 +1367,6 @@ std::optional<WindowInfo> MainWindow::getWindowInfo()
 		return QtUtils::GetWindowInfoForWidget(widget);
 	else
 		return std::nullopt;
-}
-
-void Host::InvalidateSaveStateCache()
-{
-	QMetaObject::invokeMethod(g_main_window, &MainWindow::invalidateSaveStateCache, Qt::QueuedConnection);
 }
 
 void MainWindow::onGameListRefreshProgress(const QString& status, int current, int total)
@@ -1581,14 +1571,16 @@ void MainWindow::onChangeDiscMenuAboutToHide()
 
 void MainWindow::onLoadStateMenuAboutToShow()
 {
-	if (m_save_states_invalidated)
-		updateSaveStateMenus(m_current_disc_path, m_current_game_serial, m_current_game_crc);
+	m_ui.menuLoadState->clear();
+	updateSaveStateMenusEnableState(!m_current_game_serial.isEmpty());
+	populateLoadStateMenu(m_ui.menuLoadState, m_current_disc_path, m_current_game_serial, m_current_game_crc);
 }
 
 void MainWindow::onSaveStateMenuAboutToShow()
 {
-	if (m_save_states_invalidated)
-		updateSaveStateMenus(m_current_disc_path, m_current_game_serial, m_current_game_crc);
+	m_ui.menuSaveState->clear();
+	updateSaveStateMenusEnableState(!m_current_game_serial.isEmpty());
+	populateSaveStateMenu(m_ui.menuSaveState, m_current_game_serial, m_current_game_crc);
 }
 
 void MainWindow::onViewToolbarActionToggled(bool checked)
@@ -1676,15 +1668,7 @@ void MainWindow::onAboutActionTriggered()
 	about.exec();
 }
 
-void MainWindow::onCheckForUpdatesActionTriggered()
-{
-	// Wipe out the last version, that way it displays the update if we've previously skipped it.
-	Host::RemoveBaseSettingValue("AutoUpdater", "LastVersion");
-	Host::CommitBaseSettingChanges();
-	checkForUpdates(true);
-}
-
-void MainWindow::checkForUpdates(bool display_message)
+void MainWindow::checkForUpdates(bool display_message, bool force_check)
 {
 	if (!AutoUpdaterDialog::isSupported())
 	{
@@ -1715,6 +1699,13 @@ void MainWindow::checkForUpdates(bool display_message)
 	if (m_auto_updater_dialog)
 		return;
 
+	if (force_check)
+	{
+		// Wipe out the last version, that way it displays the update if we've previously skipped it.
+		Host::RemoveBaseSettingValue("AutoUpdater", "LastVersion");
+		Host::CommitBaseSettingChanges();
+	}
+
 	m_auto_updater_dialog = new AutoUpdaterDialog(this);
 	connect(m_auto_updater_dialog, &AutoUpdaterDialog::updateCheckCompleted, this, &MainWindow::onUpdateCheckComplete);
 	m_auto_updater_dialog->queueUpdateCheck(display_message);
@@ -1734,7 +1725,7 @@ void MainWindow::startupUpdateCheck()
 	if (!Host::GetBaseBoolSettingValue("AutoUpdater", "CheckAtStartup", true))
 		return;
 
-	checkForUpdates(false);
+	checkForUpdates(false, false);
 }
 
 void MainWindow::onToolsOpenDataDirectoryTriggered()
@@ -1890,7 +1881,7 @@ void MainWindow::onVMStarting()
 	updateWindowTitle();
 
 	// prevent loading state until we're fully initialized
-	updateSaveStateMenus(QString(), QString(), 0);
+	updateSaveStateMenusEnableState(false);
 }
 
 void MainWindow::onVMStarted()
@@ -1970,7 +1961,7 @@ void MainWindow::onGameChanged(const QString& path, const QString& elf_override,
 	m_current_game_name = name;
 	m_current_game_crc = crc;
 	updateWindowTitle();
-	updateSaveStateMenus(path, serial, crc);
+	updateSaveStateMenusEnableState(!serial.isEmpty());
 }
 
 void MainWindow::showEvent(QShowEvent* event)
@@ -2826,21 +2817,14 @@ void MainWindow::populateSaveStateMenu(QMenu* menu, const QString& serial, quint
 	}
 }
 
-void MainWindow::updateSaveStateMenus(const QString& filename, const QString& serial, quint32 crc)
+void MainWindow::updateSaveStateMenusEnableState(bool enable)
 {
-	const bool load_enabled = !serial.isEmpty();
-	const bool save_enabled = !serial.isEmpty() && s_vm_valid;
-	m_ui.menuLoadState->clear();
+	const bool load_enabled = enable;
+	const bool save_enabled = enable && s_vm_valid;
 	m_ui.menuLoadState->setEnabled(load_enabled);
 	m_ui.actionLoadState->setEnabled(load_enabled);
-	m_ui.menuSaveState->clear();
 	m_ui.menuSaveState->setEnabled(save_enabled);
 	m_ui.actionSaveState->setEnabled(save_enabled);
-	m_save_states_invalidated = false;
-	if (load_enabled)
-		populateLoadStateMenu(m_ui.menuLoadState, filename, serial, crc);
-	if (save_enabled)
-		populateSaveStateMenu(m_ui.menuSaveState, serial, crc);
 }
 
 void MainWindow::doStartFile(std::optional<CDVD_SourceType> source, const QString& path)
