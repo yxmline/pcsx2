@@ -1678,8 +1678,8 @@ SCED-50041:
   name: "Tekken Tag Tournament [Demo]"
   region: "PAL-E"
   gsHWFixes:
-    alignSprite: 1
-    texturePreloading: 1
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCED-50065:
   name: "Official PlayStation 2 Magazine Demo 1"
   region: "PAL-M5"
@@ -2786,8 +2786,8 @@ SCES-50001:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    alignSprite: 1
-    texturePreloading: 1
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCES-50002:
   name: "FantaVision"
   region: "PAL-M5"
@@ -3101,8 +3101,8 @@ SCES-50878:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    alignSprite: 1
-    texturePreloading: 1 # Performs much better with partial preload.
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCES-50885:
   name: "Ape Escape 2"
   region: "PAL-E"
@@ -5038,6 +5038,12 @@ SCKA-20044:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes chromatic effect.
+SCKA-20045:
+  name: "Tekken 4"
+  region: "NTSC-K"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCKA-20047:
   name: "Armored Core Nine Breaker"
   region: "NTSC-K"
@@ -6732,7 +6738,7 @@ SCPS-55017:
   compat: 3
   gsHWFixes:
     alignSprite: 1
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCPS-55018:
   name: "Kingdom of Scribbling"
   region: "NTSC-J"
@@ -6920,7 +6926,8 @@ SCPS-56002:
   region: "NTSC-K"
   compat: 5
   gsHWFixes:
-    alignSprite: 1
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCPS-56003:
   name: "Jak and Daxter - The Precursor Legacy"
   region: "NTSC-K"
@@ -6940,7 +6947,7 @@ SCPS-56006:
   compat: 5
   gsHWFixes:
     alignSprite: 1
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SCPS-56008:
   name: "Fatal Frame"
   region: "NTSC-K"
@@ -15750,6 +15757,8 @@ SLES-52831:
 SLES-52832:
   name: "Mega Man X - Command Mission"
   region: "PAL-M3"
+  clampModes:
+    vu1ClampMode: 3 # Fixes the trophies.
 SLES-52834:
   name: "Sega Superstars Eyetoy Bundle"
   region: "PAL-M4"
@@ -17070,6 +17079,9 @@ SLES-53402:
   name: "Taxi Rider"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    mipmap: 2 # Fixes road markings.
+    trilinearFiltering: 1 # Smooths the texture transitions.
   roundModes:
     eeRoundMode: 2 # Positive rounding fixes distant white models.
     vu1RoundMode: 2 # Positive rounding fixes close white models.
@@ -26491,6 +26503,9 @@ SLPM-62482:
 SLPM-62483:
   name: "Simple 2000 Series Vol. 48 - The Taxi - Untenshu ha Kimi da"
   region: "NTSC-J"
+  gsHWFixes:
+    mipmap: 2 # Fixes road markings.
+    trilinearFiltering: 1 # Smooths the texture transitions.
   roundModes:
     eeRoundMode: 2 # Positive rounding fixes distant white models.
     vu1RoundMode: 2 # Positive rounding fixes close white models.
@@ -29634,6 +29649,8 @@ SLPM-65642:
 SLPM-65643:
   name: "RockMan X - Command Mission"
   region: "NTSC-J"
+  clampModes:
+    vu1ClampMode: 3 # Fixes the trophies.
 SLPM-65644:
   name: "Guilty Gear Isuka"
   region: "NTSC-J"
@@ -35277,7 +35294,8 @@ SLPS-20015:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    alignSprite: 1
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLPS-20016:
   name: "Dream Audition"
   region: "NTSC-J"
@@ -36923,7 +36941,7 @@ SLPS-25100:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLPS-25102:
   name: "Project Arms"
   region: "NTSC-J"
@@ -40016,6 +40034,12 @@ SLPS-29005:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 2 # Removes puppet lines shadows.
     roundSprite: 2 # Fixes font artifacts.
+SLPS-71501:
+  name: "Tekken Tag Tournament [Mega Hits]"
+  region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLPS-72501:
   name: "Final Fantasy X [Mega Hits]"
   region: "NTSC-J"
@@ -40053,6 +40077,7 @@ SLPS-73104:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLPS-73105:
   name: "Kinnikuman Generations [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -40131,7 +40156,7 @@ SLPS-73209:
   region: "NTSC-J"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLPS-73210:
   name: "Katamari Damacy [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -40615,6 +40640,7 @@ SLUS-20001:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLUS-20002:
   name: "Ridge Racer V"
   region: "NTSC-U"
@@ -41920,7 +41946,7 @@ SLUS-20328:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLUS-20329:
   name: "Pro Race Driver"
   region: "NTSC-U"
@@ -44657,6 +44683,8 @@ SLUS-20903:
   name: "Mega Man X - Command Mission"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vu1ClampMode: 3 # Fixes the trophies.
 SLUS-20904:
   name: "SpongeBob SquarePants - The Movie"
   region: "NTSC-U"
@@ -49973,7 +50001,7 @@ SLUS-28012:
   region: "NTSC-U"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLUS-28013:
   name: "Dual Hearts [Trade Demo]"
   region: "NTSC-U"
@@ -50222,7 +50250,7 @@ SLUS-29034:
   region: "NTSC-U"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
-    texturePreloading: 1 # Performs much better with partial preload.
+    texturePreloading: 0 # Performs much better with no preloading.
 SLUS-29035:
   name: "Eidos Demo Disc"
   region: "NTSC-U"
