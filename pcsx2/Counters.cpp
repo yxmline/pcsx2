@@ -445,6 +445,10 @@ u32 UpdateVSyncRate()
 
 	if (vSyncInfo.Framerate != frames_per_second || vSyncInfo.VideoMode != gsVideoMode)
 	{
+		// NBA Jam 2004 PAL will fail to display 3D on the menu if this value isn't correct on reset.
+		if (video_mode_initialized && vSyncInfo.VideoMode != gsVideoMode)
+			CSRreg.FIELD = 1;
+
 		vSyncInfo.VideoMode = gsVideoMode;
 
 		vSyncInfoCalc(&vSyncInfo, frames_per_second, total_scanlines);
@@ -457,7 +461,9 @@ u32 UpdateVSyncRate()
 
 		hsyncCounter.CycleT = vSyncInfo.hRender; // Amount of cycles before the counter will be updated
 		vsyncCounter.CycleT = vSyncInfo.Render;  // Amount of cycles before the counter will be updated
-
+		hsyncCounter.sCycle = cpuRegs.cycle;
+		vsyncCounter.sCycle = cpuRegs.cycle;
+		vsyncCounter.Mode = MODE_VRENDER;
 		cpuRcntSet();
 	}
 
