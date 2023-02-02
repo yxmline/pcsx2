@@ -1363,6 +1363,7 @@ void MainWindow::onGameListRefreshProgress(const QString& status, int current, i
 
 void MainWindow::onGameListRefreshComplete()
 {
+	m_ui.statusBar->clearMessage();
 	clearProgressBar();
 }
 
@@ -1463,7 +1464,6 @@ void MainWindow::onGameListEntryContextMenuRequested(const QPoint& point)
 
 			if (m_ui.menuDebug->menuAction()->isVisible())
 			{
-				// TODO: Hook this up once it's implemented.
 				action = menu.addAction(tr("Boot and Debug"));
 				connect(action, &QAction::triggered, [this, entry]() { DebugInterface::setPauseOnEntry(true); startGameListEntry(entry); getDebuggerWindow()->show(); });
 			}

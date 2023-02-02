@@ -32,6 +32,8 @@
   - '**/GameIndex.*'
 'Installer | Package':
   - 'build.sh'
+'Translations':
+  - 'pcsx2-qt/Translations/*'
 
 # Tools / Features
 'Debugger':
@@ -45,6 +47,9 @@
 'TAS Functionality':
   - 'pcsx2/Recording/*'
   - 'pcsx2/Recording/**/*'
+'RetroAchievements':
+  - 'pcsx2/Frontend/Achievements.*'
+  - 'pcsx2/Achievements.*'
 
 # Emulation Components
 'Counters':
