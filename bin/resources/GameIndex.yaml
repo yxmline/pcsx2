@@ -23060,6 +23060,8 @@ SLES-82042:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLES-82043:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-E-F"
@@ -23067,6 +23069,8 @@ SLES-82043:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82042"
 SLES-82044:
@@ -23076,6 +23080,8 @@ SLES-82044:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLES-82045:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-I"
@@ -23083,6 +23089,8 @@ SLES-82045:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82044"
 SLES-82046:
@@ -23092,6 +23100,8 @@ SLES-82046:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLES-82047:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-G"
@@ -23099,6 +23109,8 @@ SLES-82047:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82046"
 SLES-82048:
@@ -23108,6 +23120,8 @@ SLES-82048:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLES-82049:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-S"
@@ -23115,6 +23129,8 @@ SLES-82049:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82048"
 SLES-82050:
@@ -23124,6 +23140,8 @@ SLES-82050:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82042"
 SLES-82051:
@@ -23133,6 +23151,8 @@ SLES-82051:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82044"
 SLES-82052:
@@ -23142,6 +23162,8 @@ SLES-82052:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82046"
 SLES-82053:
@@ -23151,6 +23173,8 @@ SLES-82053:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLES-82048"
 SLKA-15002:
@@ -24226,21 +24250,37 @@ SLKA-25352:
   name: "Full Metal Alchemist - Dream Carnival"
   region: "NTSC-K"
 SLKA-25353:
-  name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 1 of 2]"
+  name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 1 of 3]"
   region: "NTSC-K"
   compat: 5
   gameFixes:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLKA-25354:
-  name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 2 of 2]"
+  name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 2 of 3]"
   region: "NTSC-K"
   compat: 5
   gameFixes:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
+  memcardFilters:
+    - "SLKA-25353"
+SLKA-25355:
+  name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 3 of 3]"
+  region: "NTSC-K"
+  compat: 5
+  gameFixes:
+    - BlitInternalFPSHack # Fixes internal FPS detection.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLKA-25353"
 SLKA-25359:
@@ -31351,12 +31391,32 @@ SLPM-66116:
   name: "NBA Live 2005 [EA Best Hits]"
   region: "NTSC-J"
 SLPM-66117:
-  name: "Metal Gear Solid 3 - Subsistence [with Headset]"
+  name: "Metal Gear Solid 3 - Subsistence [with Headset] [Disc 1 of 3]"
   region: "NTSC-J"
   gameFixes:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
+SLPM-66118:
+  name: "Metal Gear Solid 3 - Subsistence [with Headset] [Disc 2 of 3]"
+  region: "NTSC-J"
+  gameFixes:
+    - BlitInternalFPSHack # Fixes internal FPS detection.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
+SLPM-66119:
+  name: "Metal Gear Solid 3 - Subsistence [with Headset] [Disc 3 of 3]"
+  region: "NTSC-J"
+  gameFixes:
+    - BlitInternalFPSHack # Fixes internal FPS detection.
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLPM-66122:
   name: "Kingdom Hearts [Ultimate Hits]"
   region: "NTSC-J"
@@ -31742,6 +31802,8 @@ SLPM-66220:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66221:
@@ -31751,6 +31813,8 @@ SLPM-66221:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66222:
@@ -31760,6 +31824,8 @@ SLPM-66222:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66223:
@@ -31769,6 +31835,8 @@ SLPM-66223:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66224:
@@ -31778,6 +31846,8 @@ SLPM-66224:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66225:
@@ -36789,6 +36859,12 @@ SLPS-25043:
 SLPS-25044:
   name: "Evergrace 2"
   region: "NTSC-J"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes textures and flickering such as the wall and sky.
+    roundSprite: 2 # Fixes black lines in character sprites.
+    textureInsideRT: 1 # Fixes missing effects.
+    mipmap: 2 # Fixes shimmering noisy textures
+    trilinearFiltering: 1 # Fixes shimmering noisy textures
 SLPS-25045:
   name: "Lilie no Atelier - Salburg no Renkinjutsushi 3"
   region: "NTSC-J"
@@ -42028,7 +42104,10 @@ SLUS-20343:
   compat: 5
   gsHWFixes:
     preloadFrameData: 1 # Fixes textures and flickering such as the wall and sky.
-    cpuFramebufferConversion: 1 # Fixes character shadows.
+    roundSprite: 2 # Fixes black lines in character sprites.
+    textureInsideRT: 1 # Fixes missing effects.
+    mipmap: 2 # Fixes shimmering noisy textures
+    trilinearFiltering: 1 # Fixes shimmering noisy textures
 SLUS-20344:
   name: "Rez"
   region: "NTSC-U"
@@ -46532,6 +46611,8 @@ SLUS-21243:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21244:
@@ -47223,6 +47304,8 @@ SLUS-21359:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
 SLUS-21360:
   name: "Metal Gear Solid 3 - Subsistence [Disc 3 of 3]"
   region: "NTSC-U"
@@ -47230,6 +47313,8 @@ SLUS-21360:
     - BlitInternalFPSHack # Fixes internal FPS detection.
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Fixes missing letters in text such as E.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21361:
