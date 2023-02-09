@@ -151,15 +151,15 @@ protected:
 	struct
 	{
 		GSVertex* buff;
-		size_t head, tail, next, maxcount; // head: first vertex, tail: last vertex + 1, next: last indexed + 1
-		size_t xy_tail;
+		u32 head, tail, next, maxcount; // head: first vertex, tail: last vertex + 1, next: last indexed + 1
+		u32 xy_tail;
 		u64 xy[4];
 	} m_vertex;
 
 	struct
 	{
 		u32* buff;
-		size_t tail;
+		u32 tail;
 	} m_index;
 
 	void UpdateContext();
@@ -169,8 +169,9 @@ protected:
 
 	void GrowVertexBuffer();
 	bool IsAutoFlushDraw();
+	template<u32 prim, bool index_swap>
 	void HandleAutoFlush();
-	void CLUTAutoFlush();
+	void CLUTAutoFlush(u32 prim);
 
 	template <u32 prim, bool auto_flush, bool index_swap>
 	void VertexKick(u32 skip);
