@@ -9392,6 +9392,9 @@ SLED-53512:
 SLED-53537:
   name: "187 - Ride or Die [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    autoFlush: 1 # Softens bloom on objects and cars.
+    halfPixelOffset: 2 # Fixes misalgined bloom on objects and cars.
 SLED-53673:
   name: "007 - From Russia with Love [Demo]"
   region: "PAL-E"
@@ -14327,6 +14330,9 @@ SLES-52276:
   name: "187 - Ride or Die"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    autoFlush: 1 # Softens bloom on objects and cars.
+    halfPixelOffset: 2 # Fixes misalgined bloom on objects and cars.
 SLES-52277:
   name: "Riding Spirits 2"
   region: "PAL-M5"
@@ -15521,7 +15527,7 @@ SLES-52745:
   region: "PAL-M4"
 SLES-52746:
   name: "Hugo - Cannon Cruise"
-  region: "PAL-M4"
+  region: "PAL-SC"
 SLES-52747:
   name: "Dukes of Hazzard, The - The Return of General Lee"
   region: "PAL-E"
@@ -15707,7 +15713,7 @@ SLES-52816:
     cpuCLUTRender: 1 # Fixes duplicated post processing.
 SLES-52820:
   name: "Incredibles, The"
-  region: "PAL-M4"
+  region: "PAL-SC"
   gsHWFixes:
     halfPixelOffset: 1 # Fixes offset post processing.
     cpuCLUTRender: 1 # Fixes duplicated post processing.
@@ -18817,7 +18823,7 @@ SLES-54013:
   region: "PAL-E"
 SLES-54015:
   name: "Disney-Pixar's Cars"
-  region: "PAL-M3"
+  region: "PAL-SC"
 SLES-54016:
   name: "AND 1 Streetball"
   region: "PAL-M5"
@@ -22233,37 +22239,27 @@ SLES-55349:
   region: "PAL-E"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLES-55350:
   name: "Need for Speed - Undercover"
   region: "PAL-F-G"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLES-55351:
   name: "Need for Speed - Undercover"
   region: "PAL-I-S"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLES-55352:
   name: "Need for Speed - Undercover"
   region: "PAL-M4"
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLES-55353:
   name: "Need for Speed - Undercover"
   region: "PAL-M6"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLES-55354:
   name: "Shin Megami Tensei - Persona 3 FES"
   region: "PAL-E"
@@ -24716,8 +24712,6 @@ SLPM-55127:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLPM-55131:
   name: "World Soccer Winning Eleven 2009"
   region: "NTSC-J"
@@ -24915,8 +24909,6 @@ SLPM-55244:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    skipDrawStart: 1 # Removes even more blurriness and garbage texture like on top left.
-    skipDrawEnd: 1 # Removes even more blurriness and garbage texture like on top left.
 SLPM-55245:
   name: "Himawari - Pebble in the Sky"
   region: "NTSC-J"
@@ -45977,6 +45969,9 @@ SLUS-21116:
   name: "187 - Ride or Die"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    autoFlush: 1 # Softens bloom on objects and cars.
+    halfPixelOffset: 2 # Fixes misalgined bloom on objects and cars.
 SLUS-21117:
   name: "World Soccer - Winning Eleven 8 - International"
   region: "NTSC-U"
