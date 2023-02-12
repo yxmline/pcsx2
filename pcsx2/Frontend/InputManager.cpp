@@ -960,7 +960,7 @@ void InputManager::GenerateRelativeMouseEvents()
 			const float delta = static_cast<float>(state.delta.exchange(0, std::memory_order_acquire)) / 65536.0f;
 			float value = 0.0f;
 
-			if (axis < 2)
+			if (axis <= static_cast<u32>(InputPointerAxis::Y))
 			{
 				s_pointer_pos[axis] += delta * s_pointer_axis_speed[axis];
 				value = std::clamp(s_pointer_pos[axis], -1.0f, 1.0f);
@@ -975,6 +975,10 @@ void InputManager::GenerateRelativeMouseEvents()
 			}
 			else
 			{
+				// ImGui can consume mouse wheel events when the mouse is over a UI element.
+				if (delta != 0.0f && ImGuiManager::ProcessPointerAxisEvent(key, delta))
+					continue;
+
 				value = std::clamp(delta, -1.0f, 1.0f);
 			}
 
@@ -1222,16 +1226,18 @@ void InputManager::ReloadBindings(SettingsInterface& si, SettingsInterface& bind
 	for (u32 pad = 0; pad < PAD::NUM_CONTROLLER_PORTS; pad++)
 		AddPadBindings(binding_si, pad, PAD::GetDefaultPadType(pad));
 
-	const float ui_ctrl_range = 100.0f;
-	const float pointer_sensitivity = 0.05;
+	constexpr float ui_ctrl_range = 100.0f;
+	constexpr float pointer_sensitivity = 0.05f;
 	for (u32 axis = 0; axis <= static_cast<u32>(InputPointerAxis::Y); axis++)
 	{
-		s_pointer_axis_speed[axis]     = si.GetFloatValue("Pad", fmt::format("Pointer{}Speed", s_pointer_axis_names[axis]).c_str(), 40.0f) / ui_ctrl_range * pointer_sensitivity;
-		s_pointer_axis_dead_zone[axis] = std::min(si.GetFloatValue("Pad", fmt::format("Pointer{}DeadZone", s_pointer_axis_names[axis]).c_str(), 20.0f) / ui_ctrl_range, 1.0f);
-		s_pointer_axis_range[axis]     = 1.0f - s_pointer_axis_dead_zone[axis];
+		s_pointer_axis_speed[axis] = si.GetFloatValue("Pad", fmt::format("Pointer{}Speed", s_pointer_axis_names[axis]).c_str(), 40.0f) /
+									 ui_ctrl_range * pointer_sensitivity;
+		s_pointer_axis_dead_zone[axis] = std::min(
+			si.GetFloatValue("Pad", fmt::format("Pointer{}DeadZone", s_pointer_axis_names[axis]).c_str(), 20.0f) / ui_ctrl_range, 1.0f);
+		s_pointer_axis_range[axis] = 1.0f - s_pointer_axis_dead_zone[axis];
 	}
-	s_pointer_inertia = si.GetFloatValue("Pad", fmt::format("PointerInertia").c_str(), 0.0f) / ui_ctrl_range;
-	s_pointer_pos = {0.0f, 0.0f};
+	s_pointer_inertia = si.GetFloatValue("Pad", "PointerInertia", 10.0f) / ui_ctrl_range;
+	s_pointer_pos = {};
 
 	for (u32 port = 0; port < USB::NUM_PORTS; port++)
 		AddUSBBindings(binding_si, port);
