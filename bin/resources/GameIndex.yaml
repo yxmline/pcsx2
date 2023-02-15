@@ -503,6 +503,8 @@ SCAJ-20008:
   gsHWFixes:
     preloadFrameData: 1 # Fixes fog and make lights on cars work again.
     autoFlush: 1 # Fixes sun luminosity and penetration of objects.
+  gameFixes:
+    - EETimingHack # Fixes random graphical corruption.
 SCAJ-20009:
   name: "Herdy Gerdy"
   region: "NTSC-Unk"
@@ -9274,6 +9276,8 @@ SLED-51901:
 SLED-52326:
   name: "007 - Everything or Nothing [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLED-52375:
   name: "Fight Night 2004 [Demo]"
   region: "PAL-E"
@@ -10997,6 +11001,8 @@ SLES-50725:
   gsHWFixes:
     preloadFrameData: 1 # Fixes fog and make lights on cars work again.
     autoFlush: 1 # Fixes sun luminosity and penetration of objects.
+  gameFixes:
+    - EETimingHack # Fixes random graphical corruption.
 SLES-50726:
   name: "Myst III - Exile"
   region: "PAL-M6"
@@ -13916,6 +13922,8 @@ SLES-52005:
   name: "007 - Everything or Nothing"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLES-52008:
   name: "NBA Live 2004"
   region: "PAL-M5"
@@ -14008,6 +14016,8 @@ SLES-52046:
   name: "007 - Everything or Nothing"
   region: "PAL-F-G"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLES-52047:
   name: "Sims, The - Bustin' Out"
   region: "PAL-M6"
@@ -28264,6 +28274,8 @@ SLPM-65191:
   gsHWFixes:
     preloadFrameData: 1 # Fixes fog and make lights on cars work again.
     autoFlush: 1 # Fixes sun luminosity and penetration of objects.
+  gameFixes:
+    - EETimingHack # Fixes random graphical corruption.
 SLPM-65192:
   name: "NBA Live 2003"
   region: "NTSC-J"
@@ -29187,6 +29199,8 @@ SLPM-65445:
 SLPM-65446:
   name: "007 - Everything or Nothing"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLPM-65447:
   name: "Kunoichi"
   region: "NTSC-J"
@@ -29483,6 +29497,8 @@ SLPM-65539:
   gsHWFixes:
     preloadFrameData: 1 # Fixes fog and make lights on cars work again.
     autoFlush: 1 # Fixes sun luminosity and penetration of objects.
+  gameFixes:
+    - EETimingHack # Fixes random graphical corruption.
 SLPM-65540:
   name: "Galaxy Angel - Moonlit Lovers [First Limited Edition]"
   region: "NTSC-J"
@@ -30094,6 +30110,8 @@ SLPM-65724:
 SLPM-65725:
   name: "007 - Everything or Nothing [EA Best Hits]"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLPM-65726:
   name: "Star Wars - Jango Fett [EA Best Hits]"
   region: "NTSC-J"
@@ -39282,8 +39300,6 @@ SLPS-25674:
   name: "Metal Slug 6"
   region: "NTSC-J"
   compat: 5
-  gsHWFixes:
-    beforeDraw: "OI_MetalSlug6"
 SLPS-25675:
   name: "Battle Stadium D.O.N"
   region: "NTSC-J"
@@ -42979,6 +42995,8 @@ SLUS-20496:
   gsHWFixes:
     preloadFrameData: 1 # Fixes fog and make lights on cars work again.
     autoFlush: 1 # Fixes sun luminosity and penetration of objects.
+  gameFixes:
+    - EETimingHack # Fixes random graphical corruption.
 SLUS-20497:
   name: "Burnout 2 - Point of Impact"
   region: "NTSC-U"
@@ -44188,6 +44206,8 @@ SLUS-20751:
   name: "007 - Everything or Nothing"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLUS-20752:
   name: "Madden NFL 2004"
   region: "NTSC-U"
@@ -50696,6 +50716,8 @@ SLUS-29093:
 SLUS-29095:
   name: "007 - Everything or Nothing [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes lines in cutscenes.
 SLUS-29096:
   name: "Final Night 2004 [Demo]"
   region: "NTSC-U"
