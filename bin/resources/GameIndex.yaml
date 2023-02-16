@@ -9425,8 +9425,6 @@ SLED-53732:
   region: "PAL"
   gameFixes:
     - EETimingHack # Fixes garbage textures flashing on the character model.
-  gsHWFixes:
-    getSkipCount: "GSC_Spartan"
 SLED-53745:
   name: "Total Overdose [Demo]"
   region: "PAL-M5"
@@ -10017,6 +10015,8 @@ SLES-50215:
   name: "Crazy Taxi"
   region: "PAL-M4"
   compat: 5
+  gameFixes:
+    - EETimingHack # Fixes credits screen.
 SLES-50217:
   name: "Dave Mirra Freestyle BMX 2"
   region: "PAL-E-S"
@@ -17087,15 +17087,11 @@ SLES-53393:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes garbage textures flashing on the character model.
-  gsHWFixes:
-    getSkipCount: "GSC_Spartan"
 SLES-53396:
   name: "Spartan - Total Warrior"
   region: "PAL-M3"
   gameFixes:
     - EETimingHack # Fixes garbage textures flashing on the character model.
-  gsHWFixes:
-    getSkipCount: "GSC_Spartan"
 SLES-53398:
   name: "Zombie Zone"
   region: "PAL-E"
@@ -18884,10 +18880,13 @@ SLES-54018:
   name: "Jackpot Madness"
   region: "PAL-E"
 SLES-54021:
-  name: "Ruff Trigger"
+  name: "Ruff Trigger - The Vanocore Conspiracy"
   region: "PAL-M5"
   gameFixes:
     - EETimingHack # Fixes game engine errors when going ingame.
+  gsHWFixes:
+    cpuCLUTRender: 1 # Bring back blooming scattering like in software mode.
+    halfPixelOffset: 1 # Fixes misalignment like volcano lighting.
   patches:
     B02C81E5:
       content: |-
@@ -19864,6 +19863,8 @@ SLES-54402:
 SLES-54420:
   name: "Arthur and the Minimoys"
   region: "PAL-M7"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLES-54421:
   name: "Happy Feet"
   region: "PAL-M5"
@@ -22753,6 +22754,8 @@ SLES-55579:
     eeRoundMode: 1 # Fixes black textures in conjunction with VU0 clamping set to none.
   clampModes:
     vu0ClampMode: 0 # Fixes black textures and SPS.
+  gsHWFixes:
+    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto for the (starter) FMVs.
 SLES-55581:
   name: "FIFA 10"
   region: "PAL-M5"
@@ -25639,6 +25642,8 @@ SLPM-62101:
 SLPM-62102:
   name: "Crazy Taxi"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Fixes credits screen.
 SLPM-62103:
   name: "EX Okuman Chouja Game - The Money Battle"
   region: "NTSC-J"
@@ -32801,8 +32806,6 @@ SLPM-66444:
   region: "NTSC-J"
   gameFixes:
     - EETimingHack # Fixes garbage textures flashing on the character model.
-  gsHWFixes:
-    getSkipCount: "GSC_Spartan"
 SLPM-66445:
   name: "Persona 3"
   region: "NTSC-J"
@@ -39242,7 +39245,8 @@ SLPS-25657:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    getSkipCount: "GSC_FightingBeautyWulong"
+    autoFlush: 1 # Helps ghosting.
+    halfPixelOffset: 2 # Helps ghosting when upscaling.
 SLPS-25658:
   name: "Binchou-Tan - Shiwase Goyomi [Shokai Genteiban]"
   region: "NTSC-J"
@@ -41602,6 +41606,8 @@ SLUS-20202:
   name: "Crazy Taxi"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - EETimingHack # Fixes credits screen.
 SLUS-20204:
   name: "Smuggler's Run 2 - Hostile Territory"
   region: "NTSC-U"
@@ -46567,8 +46573,6 @@ SLUS-21212:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes garbage textures flashing on the character model.
-  gsHWFixes:
-    getSkipCount: "GSC_Spartan"
 SLUS-21213:
   name: "Madden NFL '06"
   region: "NTSC-U"
@@ -47135,6 +47139,8 @@ SLUS-21304:
 SLUS-21305:
   name: "Arthur and the Invisibles - The Game"
   region: "NTSC-U"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLUS-21306:
   name: "Ghost Rider"
   region: "NTSC-U"
@@ -47185,6 +47191,9 @@ SLUS-21314:
   compat: 4
   gameFixes:
     - EETimingHack # Needed to go ingame.
+  gsHWFixes:
+    cpuCLUTRender: 1 # Bring back blooming scattering like in software mode.
+    halfPixelOffset: 1 # Fixes misalignment like volcano lighting.
   patches:
     F73488D5:
       content: |-
@@ -50033,6 +50042,8 @@ SLUS-21902:
     eeRoundMode: 1 # Fixes black textures in conjunction with VU0 clamping set to none.
   clampModes:
     vu0ClampMode: 0 # Fixes black textures and SPS.
+  gsHWFixes:
+    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto for the (starter) FMVs.
 SLUS-21904:
   name: "Teenage Mutant Ninja Turtles - Smash-Up"
   region: "NTSC-U"
