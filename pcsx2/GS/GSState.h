@@ -355,7 +355,7 @@ public:
 
 		bool IsAnalogue()
 		{
-			GSVideoMode video = static_cast<GSVideoMode>(videomode + 1);
+			const GSVideoMode video = static_cast<GSVideoMode>(videomode + 1);
 			return video == GSVideoMode::NTSC || video == GSVideoMode::PAL || video == GSVideoMode::HDTV_1080I;
 		}
 
@@ -382,7 +382,7 @@ public:
 				returnValue.x = 0;
 
 			// When interlaced, the vertical base offset is doubled
-			int verticalOffset = VideoModeOffsets[videomode].w * (1 << interlaced);
+			const int verticalOffset = VideoModeOffsets[videomode].w * (1 << interlaced);
 
 			if (abs(PCRTCDisplays[0].displayOffset.y - verticalOffset) <
 				abs(PCRTCDisplays[1].displayOffset.y - verticalOffset))
@@ -422,7 +422,7 @@ public:
 		
 		bool FrameWrap()
 		{
-			GSVector4i combined_rect = GSVector4i(PCRTCDisplays[0].framebufferRect.runion(PCRTCDisplays[1].framebufferRect));
+			const GSVector4i combined_rect = GSVector4i(PCRTCDisplays[0].framebufferRect.runion(PCRTCDisplays[1].framebufferRect));
 			return combined_rect.w >= 2048 || combined_rect.z >= 2048;
 		}
 
@@ -443,7 +443,7 @@ public:
 			{
 				if (PCRTCDisplays[0].enabled && PCRTCDisplays[1].enabled)
 				{
-					GSVector4i combined_size = PCRTCDisplays[0].displayRect.runion(PCRTCDisplays[1].displayRect);
+					const GSVector4i combined_size = PCRTCDisplays[0].displayRect.runion(PCRTCDisplays[1].displayRect);
 					resolution = { combined_size.width(), combined_size.height() };
 				}
 				else if (PCRTCDisplays[0].enabled)
@@ -504,20 +504,20 @@ public:
 
 				if (combined_rect.z >= 2048)
 				{
-					int high_x = (PCRTCDisplays[0].framebufferRect.x > PCRTCDisplays[1].framebufferRect.x) ? PCRTCDisplays[0].framebufferRect.x : PCRTCDisplays[1].framebufferRect.x;
+					const int high_x = (PCRTCDisplays[0].framebufferRect.x > PCRTCDisplays[1].framebufferRect.x) ? PCRTCDisplays[0].framebufferRect.x : PCRTCDisplays[1].framebufferRect.x;
 					combined_rect.z -= GSConfig.UseHardwareRenderer() ? 2048 : high_x;
 					combined_rect.x = 0;
 				}
 
 				if (combined_rect.w >= 2048)
 				{
-					int high_y = (PCRTCDisplays[0].framebufferRect.y > PCRTCDisplays[1].framebufferRect.y) ? PCRTCDisplays[0].framebufferRect.y : PCRTCDisplays[1].framebufferRect.y;
+					const int high_y = (PCRTCDisplays[0].framebufferRect.y > PCRTCDisplays[1].framebufferRect.y) ? PCRTCDisplays[0].framebufferRect.y : PCRTCDisplays[1].framebufferRect.y;
 					combined_rect.w -= GSConfig.UseHardwareRenderer() ? 2048 : high_y;
 					combined_rect.y = 0;
 				}
 
 				// Cap the framebuffer read to the maximum display height, otherwise the hardware renderer gets messy.
-				int min_mag = std::max(1, std::min(PCRTCDisplays[0].magnification.y, PCRTCDisplays[1].magnification.y));
+				const int min_mag = std::max(1, std::min(PCRTCDisplays[0].magnification.y, PCRTCDisplays[1].magnification.y));
 				combined_rect.w = std::min(combined_rect.w, combined_rect.y + (max_height / min_mag));
 				return GSVector2i(combined_rect.z, combined_rect.w);
 			}
@@ -613,15 +613,23 @@ public:
 		// Only considered if "Anti-blur" is enabled.
 		void CalculateFramebufferOffset()
 		{
-			if (GSConfig.PCRTCAntiBlur && PCRTCDisplays[0].enabled && PCRTCSameSrc)
+			if (GSConfig.PCRTCAntiBlur && PCRTCSameSrc)
 			{
 				if (abs(PCRTCDisplays[1].framebufferOffsets.y - PCRTCDisplays[0].framebufferOffsets.y) == 1
-					&& PCRTCDisplays[0].displayOffset.y == PCRTCDisplays[1].displayOffset.y)
+					&& PCRTCDisplays[0].displayRect.y == PCRTCDisplays[1].displayRect.y)
 				{
 					if (PCRTCDisplays[1].framebufferOffsets.y < PCRTCDisplays[0].framebufferOffsets.y)
 						PCRTCDisplays[0].framebufferOffsets.y = PCRTCDisplays[1].framebufferOffsets.y;
 					else
 						PCRTCDisplays[1].framebufferOffsets.y = PCRTCDisplays[0].framebufferOffsets.y;
+				}
+				if (abs(PCRTCDisplays[1].framebufferOffsets.x - PCRTCDisplays[0].framebufferOffsets.x) == 1
+					&& PCRTCDisplays[0].displayRect.x == PCRTCDisplays[1].displayRect.x)
+				{
+					if (PCRTCDisplays[1].framebufferOffsets.x < PCRTCDisplays[0].framebufferOffsets.x)
+						PCRTCDisplays[0].framebufferOffsets.x = PCRTCDisplays[1].framebufferOffsets.x;
+					else
+						PCRTCDisplays[1].framebufferOffsets.x = PCRTCDisplays[0].framebufferOffsets.x;
 				}
 			}
 			PCRTCDisplays[0].framebufferRect.x += PCRTCDisplays[0].framebufferOffsets.x;
@@ -658,6 +666,7 @@ public:
 				{
 					const GSLocalMemory::psm_t& psm = GSLocalMemory::m_psm[PCRTCDisplays[display].PSM];
 
+					// Software mode - See note below.
 					GSVector4i r = PCRTCDisplays[display].framebufferRect;
 					r = r.ralign<Align_Outside>(psm.bs);
 
@@ -669,6 +678,7 @@ public:
 			}
 			else
 			{
+				// Software Mode Note:
 				// This code is to read the framebuffer nicely block aligned in software, then leave the remaining offset in to the block.
 				// In hardware mode this doesn't happen, it reads the whole framebuffer, so we need to keep the offset.
 				if (!GSConfig.UseHardwareRenderer())
@@ -694,6 +704,7 @@ public:
 		// If using screen offsets, calculate the positions here.
 		void CalculateDisplayOffset(bool scanmask)
 		{
+			const bool both_enabled = PCRTCDisplays[0].enabled && PCRTCDisplays[1].enabled;
 			// Offsets are generally ignored, the "hacky" way of doing the displays, but direct to framebuffers.
 			if (!GSConfig.PCRTCOffsets)
 			{
@@ -702,13 +713,16 @@ public:
 				GSVector2i zeroDisplay = NearestToZeroOffset();
 				GSVector2i baseOffset = PCRTCDisplays[zeroDisplay.y].displayOffset;
 
-				int blurOffset = abs(PCRTCDisplays[1].displayOffset.y - PCRTCDisplays[0].displayOffset.y);
-				if (GSConfig.PCRTCAntiBlur && !scanmask && blurOffset < 4)
+				if (both_enabled)
 				{
-					if (PCRTCDisplays[1].displayOffset.y > PCRTCDisplays[0].displayOffset.y)
-						PCRTCDisplays[1].displayOffset.y -= blurOffset;
-					else
-						PCRTCDisplays[0].displayOffset.y -= blurOffset;
+					int blurOffset = abs(PCRTCDisplays[1].displayOffset.y - PCRTCDisplays[0].displayOffset.y);
+					if (GSConfig.PCRTCAntiBlur && !scanmask && blurOffset < 4)
+					{
+						if (PCRTCDisplays[1].displayOffset.y > PCRTCDisplays[0].displayOffset.y)
+							PCRTCDisplays[1].displayOffset.y -= blurOffset;
+						else
+							PCRTCDisplays[0].displayOffset.y -= blurOffset;
+					}
 				}
 
 				// If there's a single pixel offset, account for it else it can throw interlacing out.
@@ -733,7 +747,7 @@ public:
 
 				// Handle difference in offset between the two displays, used in games like DmC and Time Crisis 2 (for split screen).
 				// Offset is not screen based, but relative to each other.
-				if (PCRTCDisplays[0].enabled && PCRTCDisplays[1].enabled)
+				if (both_enabled)
 				{
 					GSVector2i offset;
 
@@ -771,14 +785,18 @@ public:
 			{
 				const GSVector4i offsets = !GSConfig.PCRTCOverscan ? VideoModeOffsets[videomode] : VideoModeOffsetsOverscan[videomode];
 				GSVector2i offset = { 0, 0 };
+				GSVector2i zeroDisplay = NearestToZeroOffset();
 
-				int blurOffset = abs(PCRTCDisplays[1].displayOffset.y - PCRTCDisplays[0].displayOffset.y);
-				if (GSConfig.PCRTCAntiBlur && !scanmask && blurOffset < 4)
+				if (both_enabled)
 				{
-					if (PCRTCDisplays[1].displayOffset.y > PCRTCDisplays[0].displayOffset.y)
-						PCRTCDisplays[1].displayOffset.y -= blurOffset;
-					else
-						PCRTCDisplays[0].displayOffset.y -= blurOffset;
+					int blurOffset = abs(PCRTCDisplays[1].displayOffset.y - PCRTCDisplays[0].displayOffset.y);
+					if (GSConfig.PCRTCAntiBlur && !scanmask && blurOffset < 4)
+					{
+						if (PCRTCDisplays[1].displayOffset.y > PCRTCDisplays[0].displayOffset.y)
+							PCRTCDisplays[1].displayOffset.y -= blurOffset;
+						else
+							PCRTCDisplays[0].displayOffset.y -= blurOffset;
+					}
 				}
 
 				for (int i = 0; i < 2; i++)
@@ -791,6 +809,25 @@ public:
 					PCRTCDisplays[i].displayRect.z += offset.x;
 					PCRTCDisplays[i].displayRect.y += offset.y;
 					PCRTCDisplays[i].displayRect.w += offset.y;
+				}
+
+				if (both_enabled)
+				{
+					GSVector2i offset;
+
+					offset.x = (PCRTCDisplays[1 - zeroDisplay.x].displayRect.x - PCRTCDisplays[zeroDisplay.x].displayRect.x);
+					offset.y = (PCRTCDisplays[1 - zeroDisplay.y].displayRect.y - PCRTCDisplays[zeroDisplay.y].displayRect.y);
+
+					if (offset.x > 0 && offset.x < 4 && GSConfig.PCRTCAntiBlur)
+					{
+						PCRTCDisplays[1 - zeroDisplay.x].displayRect.x -= offset.x;
+						PCRTCDisplays[1 - zeroDisplay.x].displayRect.z -= offset.x;
+					}
+					if (offset.y > 0 && offset.y < 4 && GSConfig.PCRTCAntiBlur)
+					{
+						PCRTCDisplays[1 - zeroDisplay.y].displayRect.y -= offset.y;
+						PCRTCDisplays[1 - zeroDisplay.y].displayRect.w -= offset.y;
+					}
 				}
 			}
 		}
