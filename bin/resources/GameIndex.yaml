@@ -9052,6 +9052,8 @@ SLAJ-25072:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-Unk"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLAJ-25073:
   name: "Resident Evil 4"
@@ -9437,6 +9439,8 @@ SLED-53845:
   name: "Matrix, The - Path of Neo [Demo]"
   region: "PAL-E"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLED-53937:
   name: "Black [Demo]"
@@ -10328,8 +10332,10 @@ SLES-50355:
   gsHWFixes:
     halfPixelOffset: 3 # Fixes ghosting on Batman
 SLES-50356:
-  name: "ESPN International Winter Sports"
+  name: "Salt Lake 2002"
   region: "PAL-E"
+  gameFixes:
+    - VUSyncHack # Fixes flickering and missing textures.
 SLES-50358:
   name: "Devil May Cry"
   region: "PAL-M5"
@@ -10835,8 +10841,10 @@ SLES-50639:
   region: "PAL-E"
   compat: 5
 SLES-50640:
-  name: "Salt Lake City 2002 Olympic Winter Games"
+  name: "Salt Lake 2002"
   region: "PAL-M4"
+  gameFixes:
+    - VUSyncHack # Fixes flickering and missing textures.
 SLES-50641:
   name: "Dynasty Warriors 3"
   region: "PAL-M3"
@@ -17265,6 +17273,8 @@ SLES-53462:
   name: "Matrix, The - Path of Neo"
   region: "PAL-M5"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53463:
   name: "NHL '06"
@@ -18258,6 +18268,8 @@ SLES-53759:
   name: "Matrix, The - Path of Neo"
   region: "PAL-M5"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53760:
   name: "Rugby Challenge 2006"
@@ -18345,6 +18357,8 @@ SLES-53799:
   region: "PAL-M4"
   compat: 5
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLES-53800:
   name: "Rampage - Total Destruction"
@@ -24212,6 +24226,8 @@ SLKA-25303:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-K"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLKA-25304:
   name: "Burnout Revenge"
@@ -27664,6 +27680,9 @@ SLPM-64544:
   region: "NTSC-K"
 SLPM-64549:
   name: "Siksin-ui Seong"
+  region: "NTSC-K"
+SLPM-64552:
+  name: "Silent Scope 3"
   region: "NTSC-K"
 SLPM-65001:
   name: "Kessen"
@@ -31781,6 +31800,8 @@ SLPM-66177:
   name: "Matrix, The - Path of Neo"
   region: "NTSC-J"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLPM-66178:
   name: "pop'n music 7 [Konami The Best]"
@@ -37176,6 +37197,11 @@ SLPS-25088:
     textureInsideRT: 1 # Fixes wrong visuals for the summon Anima and The (Triple) Magus Sisters.
     getSkipCount: "GSC_FFXGames"
     beforeDraw: "OI_FFX"
+SLPS-25089:
+  name: "Salt Lake 2002"
+  region: "NTSC-J"
+  gameFixes:
+    - VUSyncHack # Fixes flickering and missing textures.
 SLPS-25094:
   name: "Reveal Fantasia"
   region: "NTSC-J"
@@ -42405,6 +42431,8 @@ SLUS-20377:
 SLUS-20378:
   name: "Salt Lake 2002"
   region: "NTSC-U"
+  gameFixes:
+    - VUSyncHack # Fixes flickering and missing textures.
   patches:
     466D1C13:
       content: |-
@@ -46971,6 +46999,8 @@ SLUS-21273:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
     halfPixelOffset: 2 # Fix effects upscaling.
 SLUS-21274:
   name: "OutRun 2006 - Coast 2 Coast"

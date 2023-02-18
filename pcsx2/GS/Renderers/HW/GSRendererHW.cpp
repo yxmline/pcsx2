@@ -1395,6 +1395,7 @@ void GSRendererHW::Draw()
 
 	m_src = nullptr;
 	m_texture_shuffle = false;
+	m_copy_16bit_to_target_shuffle = false;
 	m_tex_is_fb = false;
 
 	// The rectangle of the draw
@@ -1579,12 +1580,11 @@ void GSRendererHW::Draw()
 	{
 		GIFRegCLAMP MIP_CLAMP = context->CLAMP;
 
-		bool copy_16bit_to_target_shuffle = false;
-
 		if (rt)
 		{
 			// copy of a 16bit source in to this target, make sure it's opaque and not bilinear to reduce false positives.
-			copy_16bit_to_target_shuffle = context->TEX0.TBP0 != context->FRAME.Block() && rt->m_32_bits_fmt == true && IsOpaque() && !(context->TEX1.MMIN & 1);
+			m_copy_16bit_to_target_shuffle = context->TEX0.TBP0 != context->FRAME.Block() && rt->m_32_bits_fmt == true && IsOpaque()
+											&& !(context->TEX1.MMIN & 1) && !m_src->m_32_bits_fmt && context->FRAME.FBMSK;
 		}
 
 		// Hypothesis: texture shuffle is used as a postprocessing effect so texture will be an old target.
@@ -1592,7 +1592,7 @@ void GSRendererHW::Draw()
 		//
 		// Both input and output are 16 bits and texture was initially 32 bits!
 		m_texture_shuffle = (GSLocalMemory::m_psm[context->FRAME.PSM].bpp == 16) && (tex_psm.bpp == 16)
-			&& draw_sprite_tex && (m_src->m_32_bits_fmt || copy_16bit_to_target_shuffle);
+			&& draw_sprite_tex && (m_src->m_32_bits_fmt || m_copy_16bit_to_target_shuffle);
 
 		// Okami mustn't call this code
 		if (m_texture_shuffle && m_vertex.next < 3 && PRIM->FST && ((m_context->FRAME.FBMSK & fm_mask) == 0))
@@ -2208,7 +2208,7 @@ void GSRendererHW::EmulateTextureShuffleAndFbmask()
 		m_conf.ps.write_rg = !write_ba && features.texture_barrier && m_context->TEST.DATE;
 
 		m_conf.ps.read_ba = read_ba;
-
+		m_conf.ps.real16src = m_copy_16bit_to_target_shuffle;
 		// Please bang my head against the wall!
 		// 1/ Reduce the frame mask to a 16 bit format
 		const u32 m = m_context->FRAME.FBMSK & GSLocalMemory::m_psm[m_context->FRAME.PSM].fmsk;
@@ -3090,7 +3090,7 @@ __ri static constexpr bool IsRedundantClamp(u8 clamp, u32 clamp_min, u32 clamp_m
 	// That way trilinear etc still works.
 	const u32 textent = (1u << tsize) - 1u;
 	if (clamp == CLAMP_REGION_CLAMP)
-		return (clamp_min == 0 && clamp_max == textent);
+		return (clamp_min == 0 && clamp_max >= textent);
 	else if (clamp == CLAMP_REGION_REPEAT)
 		return (clamp_max == 0 && clamp_min == textent);
 	else
@@ -3121,10 +3121,10 @@ void GSRendererHW::EmulateTextureSampler(const GSTextureCache::Source* tex)
 	const u8 wms = EffectiveClamp(m_context->CLAMP.WMS, tex->m_region.HasX() || redundant_wms);
 	const u8 wmt = EffectiveClamp(m_context->CLAMP.WMT, tex->m_region.HasY() || redundant_wmt);
 	const bool complex_wms_wmt = !!((wms | wmt) & 2);
-	GL_CACHE("WMS: %s [%s%s] WMT: %s [%s%s] Complex: %d MINU: %d MINV: %d MINV: %d MAXV: %d",
+	GL_CACHE("WMS: %s [%s%s] WMT: %s [%s%s] Complex: %d MINU: %d MAXU: %d MINV: %d MAXV: %d",
 		clamp_modes[m_context->CLAMP.WMS], redundant_wms ? "redundant," : "", clamp_modes[wms],
 		clamp_modes[m_context->CLAMP.WMT], redundant_wmt ? "redundant," : "", clamp_modes[wmt],
-		complex_wms_wmt, m_context->CLAMP.MINU, m_context->CLAMP.MINV, m_context->CLAMP.MAXU, m_context->CLAMP.MAXV);
+		complex_wms_wmt, m_context->CLAMP.MINU, m_context->CLAMP.MAXU, m_context->CLAMP.MINV, m_context->CLAMP.MAXV);
 
 	const bool need_mipmap = IsMipMapDraw();
 	const bool shader_emulated_sampler = tex->m_palette || cpsm.fmt != 0 || complex_wms_wmt || psm.depth;
