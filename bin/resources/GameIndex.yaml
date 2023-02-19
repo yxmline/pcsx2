@@ -300,9 +300,18 @@ PBPX-95517:
 PBPX-95520:
   name: "PlayStation 2 - Demo Disc 2002"
   region: "PAL-M5"
+PBPX-95523:
+  name: "Gran Turismo 4 - Prologue [PlayStation 2 Racing Pack]"
+  region: "NTSC-J"
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 1 # Fixes weird edge shadows and depth bleed which happens on the edge as well.
+  # eeClampMode = 3  Text in races works.
+  # vuClampMode = 2  Text in GT mode works.
 PBPX-95524:
-  name: "Gran Turismo 4 - Prologue"
-  region: "NTSC-Unk"
+  name: "Gran Turismo 4 - Prologue [PlayStation 2 Racing Pack]"
+  region: "NTSC-C"
   compat: 5
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
@@ -781,8 +790,6 @@ SCAJ-20075:
 SCAJ-20076:
   name: "Armored Core - Nexus [Disc 1]"
   region: "NTSC-Unk"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -793,8 +800,6 @@ SCAJ-20076:
 SCAJ-20077:
   name: "Armored Core - Nexus [Disc 2]"
   region: "NTSC-Unk"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -16028,7 +16033,8 @@ SLES-52931:
   clampModes:
     vuClampMode: 3 # Fixes broken polygons on trees.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes stretched shadows.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    autoFlush: 1 # Fixes glitchy black rectangles.
 SLES-52934:
   name: "Guilty Gear Isuka [Preview]"
   region: "PAL-E"
@@ -22680,6 +22686,8 @@ SLES-55520:
   compat: 5
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    autoFlush: 1 # Fixes soft shadows.
 SLES-55522:
   name: "Disney-Pixar Up"
   region: "PAL-E"
@@ -23112,16 +23120,12 @@ SLES-82035:
 SLES-82036:
   name: "Armored Core - Nexus [Disc 1 of 2 - Evolution Disc]"
   region: "PAL-M5"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SLES-82036"
     - "SLES-82037"
 SLES-82037:
   name: "Armored Core - Nexus [Disc 2 of 2 - Revolution Disc]"
   region: "PAL-M5"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SLES-82036"
     - "SLES-82037"
@@ -23913,16 +23917,12 @@ SLKA-25200:
 SLKA-25201:
   name: "Armored Core Nexus Evolution [Disc 1]"
   region: "NTSC-K"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SLKA-25201"
     - "SLKA-25202"
 SLKA-25202:
   name: "Armored Core Nexus Revolution [Disc 2]"
   region: "NTSC-K"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SLKA-25201"
     - "SLKA-25202"
@@ -38030,8 +38030,6 @@ SLPS-25337:
 SLPS-25338:
   name: "Armored Core - Nexus [Disc 1]"
   region: "NTSC-J"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -38042,8 +38040,6 @@ SLPS-25338:
 SLPS-25339:
   name: "Armored Core - Nexus [Disc 2]"
   region: "NTSC-J"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -40396,8 +40392,6 @@ SLPS-73201:
 SLPS-73202:
   name: "Armored Core - Nexus [PlayStation 2 The Best] [Disc 1]"
   region: "NTSC-J"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -40408,8 +40402,6 @@ SLPS-73202:
 SLPS-73203:
   name: "Armored Core - Nexus [PlayStation 2 The Best] [Disc 2]"
   region: "NTSC-J"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SCAJ-20076"
     - "SCAJ-20077"
@@ -45453,8 +45445,6 @@ SLUS-20985:
 SLUS-20986:
   name: "Armored Core Nexus [Evolution Disc]"
   region: "NTSC-U"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   compat: 5
   memcardFilters:
     - "SLUS-20986"
@@ -45966,8 +45956,6 @@ SLUS-21078:
 SLUS-21079:
   name: "Armored Core Nexus [Revolution Disc]"
   region: "NTSC-U"
-  roundModes:
-    eeRoundMode: 0 # Fixes Z-Fighting.
   memcardFilters:
     - "SLUS-20986"
     - "SLUS-21079"
@@ -46862,7 +46850,8 @@ SLUS-21248:
   clampModes:
     vuClampMode: 3 # Fixes broken polygons on trees.
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes stretched shadows.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    autoFlush: 1 # Fixes glitchy black rectangles.
 SLUS-21249:
   name: "Yourself! Fitness - Lifestyle"
   region: "NTSC-U"
@@ -49994,6 +49983,8 @@ SLUS-21881:
   compat: 5
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
+    autoFlush: 1 # Fixes soft shadows.
   patches:
     137C792E:
       content: |-

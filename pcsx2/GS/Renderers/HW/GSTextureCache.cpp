@@ -46,14 +46,18 @@ GSTextureCache::~GSTextureCache()
 	_aligned_free(s_unswizzle_buffer);
 }
 
-void GSTextureCache::RemoveAll()
+void GSTextureCache::RemoveAll(bool readback_targets)
 {
 	m_src.RemoveAll();
 
 	for (int type = 0; type < 2; type++)
 	{
 		for (auto t : m_dst[type])
+		{
+			if (readback_targets)
+				Read(t, t->m_drawn_since_read);
 			delete t;
+		}
 
 		m_dst[type].clear();
 	}
@@ -618,7 +622,18 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, con
 				dst = t;
 
 				dst->m_32_bits_fmt |= (psm_s.bpp != 16);
-				dst->m_TEX0 = TEX0;
+				// Nicktoons Unite tries to change the width from 10 to 8 and breaks FMVs.
+				// Haunting ground has some messed textures if you don't modify the rest.
+				if (!dst->m_is_frame)
+				{
+					dst->m_TEX0 = TEX0;
+				}
+				else
+				{
+					u32 width = dst->m_TEX0.TBW;
+					dst->m_TEX0 = TEX0;
+					dst->m_TEX0.TBW = width;
+				}
 
 				break;
 			}
@@ -695,7 +710,10 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, con
 		}
 
 		if (dst)
+		{
 			dst->m_TEX0.TBW = TEX0.TBW; // Fix Jurassic Park - Operation Genesis loading disk logo.
+			dst->m_is_frame |= is_frame; // Nicktoons Unite tries to change the width from 10 to 8 and breaks FMVs.
+		}
 	}
 
 	if (dst)
@@ -1451,11 +1469,10 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 			// instead of just comparing TBPs should fix that.
 			// For example, this fixes Judgement ring rendering in Shadow Hearts 2.
 			// Be wary of old targets being misdetected, set a sensible range of 30 frames (like Display source lookups).
-			if (t->Overlaps(bp, bw, psm, r) && t->m_TEX0.TBP0 >= bp && GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) && t->m_age <= 30)
+			if (t->Overlaps(bp, bw, psm, r) && GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) && t->m_age <= 30)
 			{
-				// Enforce full invalidation if BP's don't match.
-				const GSVector4i targetr = (bp == t->m_TEX0.TBP0) ? r : t->m_valid;
-
+				// Calculate the rect offset if the BP doesn't match.
+				const GSVector4i targetr = (bp == t->m_TEX0.TBP0 && bw == t->m_TEX0.TBW) ? r : ComputeSurfaceOffset(bp, bw, psm, r, t).b2a_offset;
 				// GH Note: Read will do a StretchRect and then will sizzle data to the GS memory
 				// t->m_valid will do the full target texture whereas r.intersect(t->m_valid) will be limited
 				// to the useful part for the transfer.
@@ -1466,6 +1483,8 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 
 				// note: r.rintersect breaks Wizardry and Chaos Legion
 				// Read(t, t->m_valid) works in all tested games but is very slow in GUST titles ><
+				// Update: 18/02/2023: Chaos legion breaks because it reads the width at half of the real width.
+				// Surface offset deals with this.
 
 				// If the game has been spamming downloads, we've already read the whole texture back at this point.
 				if (t->m_drawn_since_read.rempty())
