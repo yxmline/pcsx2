@@ -299,7 +299,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 		// to offset the actual texture data to elsewhere. So, we'll just force any cases like this down
 		// the region texture path.
 		const u32 rw = ((CLAMP.MINU | CLAMP.MAXU) - CLAMP.MAXU) + 1;
-		if (rw < (1u << TEX0.TW) || CLAMP.MAXU != 0)
+		if (rw < (1u << TEX0.TW) || (CLAMP.MAXU != 0 && (rw <= (1u << TEX0.TW))))
 		{
 			region.SetX(CLAMP.MAXU, (CLAMP.MINU | CLAMP.MAXU) + 1);
 			GL_CACHE("TC: Region repeat optimization: %d width -> %d", 1 << TEX0.TW, region.GetWidth());
@@ -317,7 +317,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 	else if (CLAMP.WMT == CLAMP_REGION_REPEAT && CLAMP.MINV != 0)
 	{
 		const u32 rh = ((CLAMP.MINV | CLAMP.MAXV) - CLAMP.MAXV) + 1;
-		if (rh < (1u << TEX0.TH) || CLAMP.MAXV != 0)
+		if (rh < (1u << TEX0.TH) || (CLAMP.MAXV != 0 && (rh <= (1u << TEX0.TH))))
 		{
 			region.SetY(CLAMP.MAXV, (CLAMP.MINV | CLAMP.MAXV) + 1);
 			GL_CACHE("TC: Region repeat optimization: %d height -> %d", 1 << TEX0.TW, region.GetHeight());
@@ -579,6 +579,19 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 	m_src.m_used = true;
 
 	return src;
+}
+
+GSTextureCache::Target* GSTextureCache::FindTargetOverlap(u32 bp, u32 end_block, int type, int psm)
+{
+	u32 end_block_bp = end_block < bp ? (MAX_BP + 1) : end_block;
+
+	for (auto t : m_dst[type])
+	{
+		// Only checks that the texure starts at the requested bp, which shares data. Size isn't considered.
+		if (t->m_TEX0.TBP0 >= bp && t->m_TEX0.TBP0 < end_block_bp && GSUtil::HasSharedBits(t->m_TEX0.PSM, psm))
+			return t;
+	}
+	return nullptr;
 }
 
 GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, const GSVector2i& size, int type, bool used, u32 fbmask, const bool is_frame, const int real_w, const int real_h, bool preload)
@@ -1436,18 +1449,20 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 			for (auto it = dss.rbegin(); it != dss.rend(); ++it) // Iterate targets from LRU to MRU.
 			{
 				Target* t = *it;
-				if (GSUtil::HasSharedBits(bp, psm, t->m_TEX0.TBP0, t->m_TEX0.PSM))
-				{
-					if (GSUtil::HasCompatibleBits(psm, t->m_TEX0.PSM))
-					{
-						const GSVector4i draw_rect = (t->readbacks_since_draw > 0) ? t->m_drawn_since_read : r.rintersect(t->m_drawn_since_read);
-						Read(t, draw_rect);
 
-						t->readbacks_since_draw++;
-						if(draw_rect.rintersect(t->m_drawn_since_read).eq(t->m_drawn_since_read))
-							t->m_drawn_since_read = GSVector4i::zero();
-					}
-				}
+				if (!t->Overlaps(bp, bw, psm, r) || !GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) || t->m_age >= 30)
+					continue;
+
+				const bool bpp_match = GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[psm].bpp;
+				const bool format_match = (bp == t->m_TEX0.TBP0 && bw == t->m_TEX0.TBW && bpp_match);
+				// Calculate the rect offset if the BP doesn't match.
+				const GSVector4i targetr = (format_match) ? r.rintersect(t->m_valid) : ComputeSurfaceOffset(bp, bw, psm, r, t).b2a_offset;
+				const GSVector4i draw_rect = (t->readbacks_since_draw > 0) ? t->m_drawn_since_read : targetr.rintersect(t->m_drawn_since_read);
+				Read(t, draw_rect);
+
+				t->readbacks_since_draw++;
+				if(draw_rect.rintersect(t->m_drawn_since_read).eq(t->m_drawn_since_read))
+					t->m_drawn_since_read = GSVector4i::zero();
 			}
 		}
 		return;
@@ -1463,16 +1478,22 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 		Target* t = *it;
 		if (t->m_TEX0.PSM != PSM_PSMZ32 && t->m_TEX0.PSM != PSM_PSMZ24 && t->m_TEX0.PSM != PSM_PSMZ16 && t->m_TEX0.PSM != PSM_PSMZ16S)
 		{
+			if (!t->Overlaps(bp, bw, psm, r) || !GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) || t->m_age >= 30)
+				continue;
+
+			const bool bpp_match = GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[psm].bpp;
+			const bool format_match = (bp == t->m_TEX0.TBP0 && bw == t->m_TEX0.TBW && bpp_match);
+			// Calculate the rect offset if the BP doesn't match.
+			const GSVector4i targetr = (format_match) ? r.rintersect(t->m_valid) : ComputeSurfaceOffset(bp, bw, psm, r, t).b2a_offset;
+
 			// Some games like to offset their GS download memory addresses by
 			// using overly big source Y position values.
 			// Checking for targets that overlap with the requested memory region
 			// instead of just comparing TBPs should fix that.
 			// For example, this fixes Judgement ring rendering in Shadow Hearts 2.
 			// Be wary of old targets being misdetected, set a sensible range of 30 frames (like Display source lookups).
-			if (t->Overlaps(bp, bw, psm, r) && GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) && t->m_age <= 30)
+			if (!targetr.rempty())
 			{
-				// Calculate the rect offset if the BP doesn't match.
-				const GSVector4i targetr = (bp == t->m_TEX0.TBP0 && bw == t->m_TEX0.TBW) ? r : ComputeSurfaceOffset(bp, bw, psm, r, t).b2a_offset;
 				// GH Note: Read will do a StretchRect and then will sizzle data to the GS memory
 				// t->m_valid will do the full target texture whereas r.intersect(t->m_valid) will be limited
 				// to the useful part for the transfer.
@@ -1516,10 +1537,10 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 					}
 					else if(!targetr.rintersect(t->m_drawn_since_read).rempty()) // Block level read?
 					{
-						// Read full width of drawn area, it's not much slower and makes invalidation easier.
-						GSVector4i full_lines = GSVector4i(0, targetr.y, t->m_valid.z, targetr.w);
-						full_lines = full_lines.rintersect(t->m_drawn_since_read);
-
+						// Read the width of the draw, reading too much could wipe out dirty memory.
+						GSVector4i full_lines = GSVector4i(0, targetr.y, t->m_drawn_since_read.z, targetr.w);
+						full_lines = targetr.rintersect(t->m_drawn_since_read);
+						
 						Read(t, full_lines);
 
 						// After reading, try to cut down our "dirty" rect.
@@ -1528,12 +1549,22 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 						else
 						{
 							// Try to cut down how much we read next, if we can.
-							if (full_lines.w >= t->m_drawn_since_read.y)
+							// Fatal Frame reads in vertical strips, SOCOM 2 does horizontal, so we can handle that below.
+							if (full_lines.width() == t->m_drawn_since_read.width()
+								&& full_lines.w >= t->m_drawn_since_read.y)
 							{
 								if (full_lines.y <= t->m_drawn_since_read.y)
 									t->m_drawn_since_read.y = full_lines.w;
 								else if (full_lines.w >= t->m_drawn_since_read.w)
 									t->m_drawn_since_read.w = full_lines.y;
+							}
+							else if (full_lines.height() == t->m_drawn_since_read.height()
+									&& full_lines.z >= t->m_drawn_since_read.x)
+							{
+								if (full_lines.x <= t->m_drawn_since_read.x)
+									t->m_drawn_since_read.x = full_lines.z;
+								else if (full_lines.z >= t->m_drawn_since_read.z)
+									t->m_drawn_since_read.z = full_lines.x;
 							}
 						}
 						t->readbacks_since_draw++;
@@ -3251,20 +3282,54 @@ void GSTextureCache::Target::UpdateIfDirtyIntersects(const GSVector4i& rc)
 	}
 }
 
-void GSTextureCache::Target::UpdateValidity(const GSVector4i& rect)
+void GSTextureCache::Target::ResizeValidity(const GSVector4i& rect)
 {
-	if (m_valid.eq(GSVector4i::zero()))
-		m_valid = rect;
+	if (!m_valid.eq(GSVector4i::zero()))
+	{
+		m_valid = m_valid.rintersect(rect);
+		m_drawn_since_read = m_drawn_since_read.rintersect(rect);
+	}
 	else
-		m_valid = m_valid.runion(rect);
-
-	m_drawn_since_read = m_drawn_since_read.runion(rect);
+	{
+		m_valid = rect;
+		m_drawn_since_read = rect;
+	}
 	// Block of the bottom right texel of the validity rectangle, last valid block of the texture
 	// TODO: This is not correct when the PSM changes. e.g. a 512x448 target being shuffled will become 512x896 temporarily, and
 	// at the moment, we blow the valid rect out to twice the size. The only thing stopping everything breaking is the fact
 	// that we clamp the draw rect to the target size in GSRendererHW::Draw().
 	m_end_block = GSLocalMemory::m_psm[m_TEX0.PSM].info.bn(m_valid.z - 1, m_valid.w - 1, m_TEX0.TBP0, m_TEX0.TBW); // Valid only for color formats
 
+	// GL_CACHE("UpdateValidity (0x%x->0x%x) from R:%d,%d Valid: %d,%d", m_TEX0.TBP0, m_end_block, rect.z, rect.w, m_valid.z, m_valid.w);
+}
+
+void GSTextureCache::Target::UpdateValidity(const GSVector4i& rect, bool can_resize)
+{
+	if (m_valid.runion(rect).eq(m_valid))
+	{
+		m_drawn_since_read = m_drawn_since_read.runion(rect);
+		return;
+	}
+
+	if (can_resize)
+	{
+		if (m_valid.eq(GSVector4i::zero()))
+			m_valid = rect;
+		else
+			m_valid = m_valid.runion(rect);
+	}
+
+	if (m_drawn_since_read.eq(GSVector4i::zero()) || !can_resize)
+	{
+		m_drawn_since_read = rect.rintersect(m_valid);
+	}
+	else
+		m_drawn_since_read = m_drawn_since_read.runion(rect);
+	// Block of the bottom right texel of the validity rectangle, last valid block of the texture
+	// TODO: This is not correct when the PSM changes. e.g. a 512x448 target being shuffled will become 512x896 temporarily, and
+	// at the moment, we blow the valid rect out to twice the size. The only thing stopping everything breaking is the fact
+	// that we clamp the draw rect to the target size in GSRendererHW::Draw().
+	m_end_block = GSLocalMemory::m_psm[m_TEX0.PSM].info.bn(m_valid.z - 1, m_valid.w - 1, m_TEX0.TBP0, m_TEX0.TBW); // Valid only for color formats
 	// GL_CACHE("UpdateValidity (0x%x->0x%x) from R:%d,%d Valid: %d,%d", m_TEX0.TBP0, m_end_block, rect.z, rect.w, m_valid.z, m_valid.w);
 }
 
@@ -3284,6 +3349,7 @@ bool GSTextureCache::Target::ResizeTexture(int new_width, int new_height, GSVect
 	// These exceptions *really* need to get lost. This gets called outside of draws, which just crashes
 	// when it tries to propogate the exception back.
 	const bool clear = (new_width > width || new_height > height);
+
 	GSTexture* tex = nullptr;
 	try
 	{
@@ -3325,6 +3391,7 @@ bool GSTextureCache::Target::ResizeTexture(int new_width, int new_height, GSVect
 		delete m_texture;
 
 	m_texture = tex;
+
 	return true;
 }
 

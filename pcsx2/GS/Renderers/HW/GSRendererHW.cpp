@@ -227,7 +227,9 @@ GSTexture* GSRendererHW::GetOutput(int i, int& y_offset)
 	TEX0.TBW = curFramebuffer.FBW;
 	TEX0.PSM = curFramebuffer.PSM;
 
-	if (GSTextureCache::Target* rt = m_tc->LookupDisplayTarget(TEX0, GetOutputSize(fb_height) * GSConfig.UpscaleMultiplier, fb_width, fb_height))
+	const GSVector2i scaled_size(static_cast<int>(static_cast<float>(fb_width) * GSConfig.UpscaleMultiplier),
+		static_cast<int>(static_cast<float>(fb_height) * GSConfig.UpscaleMultiplier));
+	if (GSTextureCache::Target* rt = m_tc->LookupDisplayTarget(TEX0, scaled_size, fb_width, fb_height))
 	{
 		t = rt->m_texture;
 
@@ -1307,13 +1309,13 @@ void GSRendererHW::Draw()
 	// 2/ SuperMan really draws (0,0,0,0) color and a (0) 32-bits depth
 	// 3/ 50cents really draws (0,0,0,128) color and a (0) 24 bits depth
 	// Note: FF DoC has both buffer at same location but disable the depth test (write?) with ZTE = 0
-	const bool no_rt = (context->ALPHA.IsCd() && PRIM->ABE && (context->FRAME.PSM == 1));
-	const bool no_ds = !no_rt && (
+	const bool no_rt = (context->ALPHA.IsCd() && PRIM->ABE && (context->FRAME.PSM == 1))
+						|| (!context->TEST.DATE && (context->FRAME.FBMSK & GSLocalMemory::m_psm[context->FRAME.PSM].fmsk) == GSLocalMemory::m_psm[context->FRAME.PSM].fmsk);
+	const bool no_ds = (
 			// Depth is always pass/fail (no read) and write are discarded (tekken 5).  (Note: DATE is currently implemented with a stencil buffer => a depth/stencil buffer)
 			(zm != 0 && m_context->TEST.ZTST <= ZTST_ALWAYS && !m_context->TEST.DATE) ||
 			// Depth will be written through the RT
-			(context->FRAME.FBP == context->ZBUF.ZBP && !PRIM->TME && zm == 0 && (fm & fm_mask) == 0 && context->TEST.ZTE)
-			);
+			(!no_rt && context->FRAME.FBP == context->ZBUF.ZBP && !PRIM->TME && zm == 0 && (fm & fm_mask) == 0 && context->TEST.ZTE));
 
 	if (no_rt && no_ds)
 	{
@@ -1721,7 +1723,7 @@ void GSRendererHW::Draw()
 			m_vt.m_max.t = tmax;
 		}
 	}
-	
+
 	if (rt)
 	{
 		// Be sure texture shuffle detection is properly propagated
@@ -1730,6 +1732,8 @@ void GSRendererHW::Draw()
 		rt->m_32_bits_fmt = m_texture_shuffle || (GSLocalMemory::m_psm[context->FRAME.PSM].bpp != 16);
 	}
 
+	const bool is_mem_clear = IsConstantDirectWriteMemClear(false);
+	const bool can_update_size = !is_mem_clear && !m_texture_shuffle && !m_channel_shuffle;
 	{
 		// We still need to make sure the dimensions of the targets match.
 		const GSVector2 up_s(GetTextureScaleFactor());
@@ -1738,15 +1742,82 @@ void GSRendererHW::Draw()
 
 		if (rt)
 		{
+			const u32 old_end_block = rt->m_end_block;
+			const bool new_height = new_h > rt->m_texture->GetHeight();
+			const int old_height = rt->m_texture->GetHeight();
+
 			pxAssert(rt->m_texture->GetScale() == up_s);
 			rt->ResizeTexture(new_w, new_h, up_s);
-			rt->UpdateValidity(m_r);
+			const GSVector2i tex_size = rt->m_texture->GetSize();
+			
+			// Avoid temporary format changes, as this will change the end block and could break things.
+			if ((old_height != tex_size.y) && can_update_size)
+			{
+				const GSVector2 tex_scale = rt->m_texture->GetScale();
+				const GSVector4i new_valid = GSVector4i(0, 0, tex_size.x / tex_scale.x, tex_size.y / tex_scale.y);
+				rt->ResizeValidity(new_valid);
+			}
+			GSVector2i resolution = PCRTCDisplays.GetResolution();
+			// Limit to 2x the vertical height of the resolution (for double buffering)
+			rt->UpdateValidity(m_r, can_update_size || m_r.w <= (resolution.y * 2));
+
+			// Probably changing to double buffering, so invalidate any old target that was next to it.
+			// This resolves an issue where the PCRTC will find the old target in FMV's causing flashing.
+			// Grandia Xtreme, Onimusha Warlord.
+			if (new_height && old_end_block != rt->m_end_block)
+			{
+				GSTextureCache::Target* old_rt = nullptr;
+				old_rt = m_tc->FindTargetOverlap(old_end_block, rt->m_end_block, GSTextureCache::RenderTarget, context->FRAME.PSM);
+
+				if (old_rt && old_rt != rt && GSUtil::HasSharedBits(old_rt->m_TEX0.PSM, rt->m_TEX0.PSM))
+				{
+					const int copy_width = (old_rt->m_texture->GetWidth()) > (rt->m_texture->GetWidth()) ? (rt->m_texture->GetWidth()) : old_rt->m_texture->GetWidth();
+					const int copy_height = (old_rt->m_texture->GetHeight()) > (rt->m_texture->GetHeight() - old_height) ? (rt->m_texture->GetHeight() - old_height) : old_rt->m_texture->GetHeight();
+
+					g_gs_device->CopyRect(old_rt->m_texture, rt->m_texture, GSVector4i(0, 0, copy_width, copy_height), 0, old_height);
+
+					m_tc->InvalidateVideoMemType(GSTextureCache::RenderTarget, old_rt->m_TEX0.TBP0);
+					old_rt = nullptr;
+				}
+			}
 		}
 		if (ds)
 		{
+			const u32 old_end_block = ds->m_end_block;
+			const bool new_height = new_h > ds->m_texture->GetHeight();
+			const int old_height = ds->m_texture->GetHeight();
+
 			pxAssert(ds->m_texture->GetScale() == up_s);
 			ds->ResizeTexture(new_w, new_h, up_s);
-			ds->UpdateValidity(m_r);
+			const GSVector2i tex_size = ds->m_texture->GetSize();
+			
+			if ((old_height != tex_size.y) && can_update_size)
+			{
+				const GSVector2 tex_scale = ds->m_texture->GetScale();
+				const GSVector4i new_valid = GSVector4i(0, 0, tex_size.x / tex_scale.x, tex_size.y / tex_scale.y);
+				ds->ResizeValidity(new_valid);
+			}
+
+			GSVector2i resolution = PCRTCDisplays.GetResolution();
+			// Limit to 2x the vertical height of the resolution (for double buffering)
+			ds->UpdateValidity(m_r, can_update_size || m_r.w <= (resolution.y * 2));
+
+			if (new_height && old_end_block != ds->m_end_block)
+			{
+				GSTextureCache::Target* old_ds = nullptr;
+				old_ds = m_tc->FindTargetOverlap(old_end_block, ds->m_end_block, GSTextureCache::DepthStencil, context->ZBUF.PSM);
+
+				if (old_ds && old_ds != ds && GSUtil::HasSharedBits(old_ds->m_TEX0.PSM, ds->m_TEX0.PSM))
+				{
+					const int copy_width = (old_ds->m_texture->GetWidth()) > (ds->m_texture->GetWidth()) ? (ds->m_texture->GetWidth()) : old_ds->m_texture->GetWidth();
+					const int copy_height = (old_ds->m_texture->GetHeight()) > (ds->m_texture->GetHeight() - old_height) ? (ds->m_texture->GetHeight() - old_height) : old_ds->m_texture->GetHeight();
+
+					g_gs_device->CopyRect(old_ds->m_texture, ds->m_texture, GSVector4i(0, 0, copy_width, copy_height), 0, old_height);
+
+					m_tc->InvalidateVideoMemType(GSTextureCache::DepthStencil, old_ds->m_TEX0.TBP0);
+					old_ds = nullptr;
+				}
+			}
 		}
 	}
 
@@ -1879,12 +1950,13 @@ void GSRendererHW::Draw()
 	// Temporary source *must* be invalidated before normal, because otherwise it'll be double freed.
 	m_tc->InvalidateTemporarySource();
 
-	//
-
+	// If it's a mem clear or shuffle we don't want to resize the texture, it can cause textures to take up the entire
+	// video memory, and that is not good.
 	if ((fm & fm_mask) != fm_mask && rt)
 	{
 		//rt->m_valid = rt->m_valid.runion(r);
-		rt->UpdateValidity(m_r);
+		if(can_update_size)
+			rt->UpdateValidity(m_r);
 
 		m_tc->InvalidateVideoMem(context->offset.fb, m_r, false, false);
 
@@ -1894,7 +1966,9 @@ void GSRendererHW::Draw()
 	if (zm != 0xffffffff && ds)
 	{
 		//ds->m_valid = ds->m_valid.runion(r);
-		ds->UpdateValidity(m_r);
+		// Shouldn't be a problem as Z will be masked.
+		if (can_update_size)
+			ds->UpdateValidity(m_r);
 
 		m_tc->InvalidateVideoMem(context->offset.zb, m_r, false, false);
 
@@ -1922,7 +1996,7 @@ void GSRendererHW::Draw()
 			s = GetDrawDumpPath("%05d_f%lld_rz1_%05x_%s.bmp", s_n, frame, context->ZBUF.Block(), psm_str(context->ZBUF.PSM));
 
 			if (ds)
-				rt->m_texture->Save(s);
+				ds->m_texture->Save(s);
 		}
 
 		if (GSConfig.SaveL > 0 && (s_n - GSConfig.SaveN) > GSConfig.SaveL)
