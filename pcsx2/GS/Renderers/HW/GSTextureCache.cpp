@@ -46,18 +46,23 @@ GSTextureCache::~GSTextureCache()
 	_aligned_free(s_unswizzle_buffer);
 }
 
-void GSTextureCache::RemoveAll(bool readback_targets)
+void GSTextureCache::ReadbackAll()
+{
+	for (int type = 0; type < 2; type++)
+	{
+		for (auto t : m_dst[type])
+			Read(t, t->m_drawn_since_read);
+	}
+}
+
+void GSTextureCache::RemoveAll()
 {
 	m_src.RemoveAll();
 
 	for (int type = 0; type < 2; type++)
 	{
 		for (auto t : m_dst[type])
-		{
-			if (readback_targets)
-				Read(t, t->m_drawn_since_read);
 			delete t;
-		}
 
 		m_dst[type].clear();
 	}
@@ -594,7 +599,7 @@ GSTextureCache::Target* GSTextureCache::FindTargetOverlap(u32 bp, u32 end_block,
 	return nullptr;
 }
 
-GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, const GSVector2i& size, int type, bool used, u32 fbmask, const bool is_frame, const int real_w, const int real_h, bool preload)
+GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, const GSVector2i& size, int type, bool used, u32 fbmask, const bool is_frame, const int real_w, const int real_h, bool preload, bool is_clear)
 {
 	const GSLocalMemory::psm_t& psm_s = GSLocalMemory::m_psm[TEX0.PSM];
 	const GSVector2& new_s = static_cast<GSRendererHW*>(g_gs_renderer.get())->GetTextureScaleFactor();
@@ -801,6 +806,13 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(const GIFRegTEX0& TEX0, con
 
 	if (!dst)
 	{
+		// Skip full screen clears from making massive targets.
+		if (is_clear)
+		{
+			GL_CACHE("TC: Create RT skipped on clear draw");
+			return nullptr;
+		}
+
 		GL_CACHE("TC: Lookup %s(%s) %dx%d, miss (0x%x, %s)", is_frame ? "Frame" : "Target", to_string(type), size.x, size.y, bp, psm_str(TEX0.PSM));
 
 		dst = CreateTarget(TEX0, size.x, size.y, type, true);
@@ -1005,6 +1017,7 @@ void GSTextureCache::ExpandTarget(const GIFRegBITBLTBUF& BITBLTBUF, const GSVect
 				AddDirtyRectTarget(dst, r, TEX0.PSM, TEX0.TBW);
 				GetTargetHeight(TEX0.TBP0, TEX0.TBW, TEX0.PSM, aligned_height);
 				dst->UpdateValidity(r);
+				dst->UpdateValidBits(GSLocalMemory::m_psm[TEX0.PSM].fmsk);
 			}
 		}
 	}
@@ -1015,6 +1028,7 @@ void GSTextureCache::ExpandTarget(const GIFRegBITBLTBUF& BITBLTBUF, const GSVect
 				static_cast<int>(dst->m_texture->GetHeight() / dst->m_texture->GetScale().y))));
 		AddDirtyRectTarget(dst, clamped_r, TEX0.PSM, TEX0.TBW);
 		dst->UpdateValidity(clamped_r);
+		dst->UpdateValidBits(GSLocalMemory::m_psm[TEX0.PSM].fmsk);
 	}
 }
 // Goal: Depth And Target at the same address is not possible. On GS it is
@@ -1192,6 +1206,10 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 	if (!target)
 		return;
 
+	// Handle the case where the transfer wrapped around the end of GS memory.
+	const u32 end_bp = off.bn(rect.z - 1, rect.w - 1);
+	const u32 unwrapped_end_bp = end_bp + ((end_bp < bp) ? MAX_BLOCKS : 0);
+
 	for (int type = 0; type < 2; type++)
 	{
 		auto& list = m_dst[type];
@@ -1199,6 +1217,13 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 		{
 			auto j = i;
 			Target* t = *j;
+
+			// Don't bother checking any further if the target doesn't overlap with the write/invalidation.
+			if ((bp < t->m_TEX0.TBP0 && unwrapped_end_bp < t->m_TEX0.TBP0) || bp > t->UnwrappedEndBlock())
+			{
+				++i;
+				continue;
+			}
 
 			// GH: (I think) this code is completely broken. Typical issue:
 			// EE write an alpha channel into 32 bits texture
@@ -1345,8 +1370,6 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							GL_CACHE("TC: Dirty After Target(%s) %d (0x%x)", to_string(type),
 								t->m_texture ? t->m_texture->GetID() : 0,
 								t->m_TEX0.TBP0);
-							// TODO: do not add this rect above too
-							t->m_TEX0.TBW = bw;
 
 							if (eewrite)
 								t->m_age = 0;
@@ -1381,8 +1404,6 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 
 						if (eewrite)
 							t->m_age = 0;
-
-						t->m_TEX0.TBW = bw;
 
 						const GSVector4i dirty_r = GSVector4i(r.left, r.top + y, r.right, r.bottom + y);
 						AddDirtyRectTarget(t, dirty_r, psm, bw);
@@ -1473,18 +1494,31 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 	// (Busen0: Wizardry and Chaos Legion).
 	// Also in a few games the below code ran the Grandia3 case when it shouldn't :p
 	auto& rts = m_dst[RenderTarget];
-	for (auto it = rts.rbegin(); it != rts.rend(); ++it) // Iterate targets from LRU to MRU.
+	for (auto it = rts.rbegin(); it != rts.rend(); it++) // Iterate targets from LRU to MRU.
 	{
 		Target* t = *it;
 		if (t->m_TEX0.PSM != PSM_PSMZ32 && t->m_TEX0.PSM != PSM_PSMZ24 && t->m_TEX0.PSM != PSM_PSMZ16 && t->m_TEX0.PSM != PSM_PSMZ16S)
 		{
-			if (!t->Overlaps(bp, bw, psm, r) || !GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) || t->m_age >= 30)
+			const u32 read_start = GSLocalMemory::m_psm[psm].info.bn(r.x, r.y, bp, bw);
+			// Check the offset of the read, if they're not pointing at or inside this texture, it's probably not what we want.
+			const bool expecting_this_tex = (bp < t->m_TEX0.TBP0 && read_start >= t->m_TEX0.TBP0) || bp >= t->m_TEX0.TBP0;
+
+			if (!expecting_this_tex || !t->Overlaps(bp, bw, psm, r) || !GSUtil::HasSharedBits(psm, t->m_TEX0.PSM) || t->m_age >= 30)
 				continue;
 
 			const bool bpp_match = GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[psm].bpp;
 			const bool format_match = (bp == t->m_TEX0.TBP0 && bw == t->m_TEX0.TBW && bpp_match);
+			SurfaceOffsetKey sok;
+			sok.elems[0].bp = bp;
+			sok.elems[0].bw = bw;
+			sok.elems[0].psm = psm;
+			sok.elems[0].rect = r;
+			sok.elems[1].bp = t->m_TEX0.TBP0;
+			sok.elems[1].bw = t->m_TEX0.TBW;
+			sok.elems[1].psm = t->m_TEX0.PSM;
+			sok.elems[1].rect = t->m_valid;
 			// Calculate the rect offset if the BP doesn't match.
-			const GSVector4i targetr = (format_match) ? r.rintersect(t->m_valid) : ComputeSurfaceOffset(bp, bw, psm, r, t).b2a_offset;
+			const GSVector4i targetr = (format_match) ? r.rintersect(t->m_valid) : ComputeSurfaceOffset(sok).b2a_offset;
 
 			// Some games like to offset their GS download memory addresses by
 			// using overly big source Y position values.
@@ -1689,7 +1723,11 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 		const GSVector2 scale(src->m_texture->GetScale());
 		dst = LookupTarget(new_TEX0, GSVector2i(static_cast<int>(w * scale.x), static_cast<int>(real_height * scale.y)), src->m_type, true);
 		if (dst)
+		{
 			dst->m_texture->SetScale(scale);
+			dst->UpdateValidity(GSVector4i(dx, dy, dx + w, dy + h));
+			dst->m_valid_bits = src->m_valid_bits;
+		}
 	}
 
 	if (!src || !dst || src->m_texture->GetScale() != dst->m_texture->GetScale())
@@ -2716,6 +2754,16 @@ void GSTextureCache::Read(Target* t, const GSVector4i& r)
 			return;
 	}
 
+	// Don't overwrite bits which aren't used in the target's format.
+	// Stops Burnout 3's sky from breaking when flushing targets to local memory.
+	const GSLocalMemory::psm_t& psm = GSLocalMemory::m_psm[TEX0.PSM];
+	const u32 write_mask = t->m_valid_bits & psm.fmsk;
+	if (psm.bpp > 16 && write_mask == 0)
+	{
+		Console.Warning("Not reading back target %x PSM %s due to no write mask", TEX0.TBP0, psm_str(TEX0.PSM));
+		return;
+	}
+
 	// Yes lots of logging, but I'm not confident with this code
 	GL_PUSH("Texture Cache Read. Format(0x%x)", TEX0.PSM);
 
@@ -2761,11 +2809,9 @@ void GSTextureCache::Read(Target* t, const GSVector4i& r)
 	{
 		case PSM_PSMCT32:
 		case PSM_PSMZ32:
-			g_gs_renderer->m_mem.WritePixel32(bits, pitch, off, r);
-			break;
 		case PSM_PSMCT24:
 		case PSM_PSMZ24:
-			g_gs_renderer->m_mem.WritePixel24(bits, pitch, off, r);
+			g_gs_renderer->m_mem.WritePixel32(bits, pitch, off, r, write_mask);
 			break;
 		case PSM_PSMCT16:
 		case PSM_PSMCT16S:
@@ -3291,8 +3337,8 @@ void GSTextureCache::Target::ResizeValidity(const GSVector4i& rect)
 	}
 	else
 	{
-		m_valid = rect;
-		m_drawn_since_read = rect;
+		// No valid size, so need to resize down.
+		return;
 	}
 	// Block of the bottom right texel of the validity rectangle, last valid block of the texture
 	// TODO: This is not correct when the PSM changes. e.g. a 512x448 target being shuffled will become 512x896 temporarily, and
@@ -3333,6 +3379,10 @@ void GSTextureCache::Target::UpdateValidity(const GSVector4i& rect, bool can_res
 	// GL_CACHE("UpdateValidity (0x%x->0x%x) from R:%d,%d Valid: %d,%d", m_TEX0.TBP0, m_end_block, rect.z, rect.w, m_valid.z, m_valid.w);
 }
 
+void GSTextureCache::Target::UpdateValidBits(u32 bits_written)
+{
+	m_valid_bits |= bits_written;
+}
 
 bool GSTextureCache::Target::ResizeTexture(int new_width, int new_height, bool recycle_old)
 {

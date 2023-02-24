@@ -75,6 +75,7 @@ private:
 		CLUTDrawOnGPU,
 	};
 
+	bool HasEEUpload(GSVector4i r);
 	CLUTDrawTestResult PossibleCLUTDraw();
 	CLUTDrawTestResult PossibleCLUTDrawAggressive();
 	bool CanUseSwPrimRender(bool no_rt, bool no_ds, bool draw_sprite_tex);
@@ -166,6 +167,7 @@ public:
 	void Draw() override;
 
 	void PurgeTextureCache() override;
+	void ReadbackTextureCache() override;
 	GSTexture* LookupPaletteSource(u32 CBP, u32 CPSM, u32 CBW, GSVector2i& offset, const GSVector2i& size) override;
 
 	// Called by the texture cache to know if current texture is useful
