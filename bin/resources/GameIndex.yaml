@@ -528,6 +528,7 @@ SCAJ-20011:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
   memcardFilters:
     - "SCAJ-20011"
     - "SCPS-55014"
@@ -6720,6 +6721,7 @@ SCPS-55014:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SCPS-55015:
   name: "Zettai Zetsumei Toshi"
   region: "NTSC-J"
@@ -9631,6 +9633,8 @@ SLES-50050:
   name: "Evergrace"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLES-50051:
   name: "Eternal Ring"
   region: "PAL-E"
@@ -9638,6 +9642,7 @@ SLES-50051:
     eeRoundMode: 0 # Fixes FPU errors causing instant death in Limestone Cave.
   gsHWFixes:
     disablePartialInvalidation: 1 # Fixes graphics issues.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLES-50052:
   name: "Pool Master"
   region: "PAL-M3"
@@ -12688,6 +12693,7 @@ SLES-51399:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLES-51400:
   name: "Tenchu - Wrath of Heaven"
   region: "PAL-S"
@@ -17801,9 +17807,12 @@ SLES-53616:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-53617:
   name: "True Crime - New York City"
   region: "PAL-G"
@@ -17813,9 +17822,12 @@ SLES-53617:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-53618:
   name: "True Crime - New York City"
   region: "PAL-S"
@@ -17825,9 +17837,12 @@ SLES-53618:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-53621:
   name: "Wallace & Gromit - The Curse of the Were-Rabbit"
   region: "PAL-M5"
@@ -23463,6 +23478,7 @@ SLKA-25041:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
   memcardFilters:
     - "SLKA-25041"
     - "SLPM-67524"
@@ -32946,9 +32962,12 @@ SLPM-66473:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLPM-66474:
   name: "Odin Sphere"
   region: "NTSC-J"
@@ -34995,6 +35014,7 @@ SLPM-67524:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLPM-67526:
   name: "Ghost Vibration"
   region: "NTSC-K"
@@ -35314,9 +35334,12 @@ SLPM-74243:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLPM-74244:
   name: "Phantasy Star Universe [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -36803,6 +36826,7 @@ SLPS-25001:
     eeRoundMode: 0 # Fixes FPU errors causing instant death in Limestone Cave.
   gsHWFixes:
     disablePartialInvalidation: 1 # Fixes raphics issues.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLPS-25002:
   name: "Dead or Alive 2"
   region: "NTSC-J"
@@ -36832,6 +36856,8 @@ SLPS-25003:
   region: "NTSC-J"
   clampModes:
     eeClampMode: 3 # Fixes hanging before going in-game.
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLPS-25004:
   name: "Kensetsu Juuki Kenka Battle - Buchigire Kongou!!"
   region: "NTSC-J"
@@ -37248,6 +37274,7 @@ SLPS-25112:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLPS-25113:
   name: "Zettai Zetsumei Toshi"
   region: "NTSC-J"
@@ -37443,6 +37470,7 @@ SLPS-25169:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
   memcardFilters:
     - "SCAJ-20011"
     - "SCPS-55014"
@@ -40803,6 +40831,7 @@ SLPS-73417:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLPS-73418:
   name: "Shadow Hearts [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -40819,6 +40848,7 @@ SLPS-73420:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
   memcardFilters:
     - "SCAJ-20011"
     - "SCPS-55014"
@@ -40935,10 +40965,13 @@ SLUS-20015:
     eeRoundMode: 0 # Fixes FPU errors causing instant death in Limestone Cave.
   gsHWFixes:
     disablePartialInvalidation: 1 # Fixes graphics issues.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLUS-20016:
   name: "Evergrace"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLUS-20017:
   name: "Maximo - Ghosts to Glory"
   region: "NTSC-U"
@@ -42691,6 +42724,7 @@ SLUS-20435:
   gsHWFixes:
     halfPixelOffset: 2 # Corrects positioning of reflections on suit's surfaces.
     roundSprite: 2 # Reduces garbage on the UI whilst upscaling.
+    partialTargetInvalidation: 1 # Fixes corrupted textures.
 SLUS-20436:
   name: "Guilty Gear X2"
   region: "NTSC-U"
@@ -46027,9 +46061,12 @@ SLUS-21106:
     eeRoundMode: 0 # Fixes scene switching in intro.
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
-    preloadFrameData: 1 # Fixes static text screens.
+    partialTargetInvalidation: 1 # Needed due to procedural textures overlapping EE writes.
+    preloadFrameData: 1 # Fixes numberplates and ensures above targets are valid.
     roundSprite: 1 # Fixes lines in some post-effects.
-    cpuCLUTRender: 1 # Fixes light occlusion.
+    gpuTargetCLUT: 1 # Fixes light occlusion.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLUS-21107:
   name: "X-Men - The Official Game"
   region: "NTSC-U"
