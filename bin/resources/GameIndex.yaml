@@ -6673,7 +6673,6 @@ SCPS-55002:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SCPS-55003:
   name: "Vampire Night"
   region: "NTSC-J"
@@ -6850,7 +6849,6 @@ SCPS-55043:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SCPS-55044:
   name: "Energy Airforce"
   region: "NTSC-J"
@@ -6952,7 +6950,6 @@ SCPS-56008:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SCPS-56009:
   name: "Smash Court Pro Tournament"
   region: "NTSC-K"
@@ -9229,7 +9226,7 @@ SLED-50884:
   name: "TimeSplitters 2 [Demo]"
   region: "PAL-E"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes texture slight misalignment.
+    halfPixelOffset: 2 # Fixes texture slight misalignment.
 SLED-50895:
   name: "Medal of Honor - Frontline [Demo]"
   region: "PAL-E"
@@ -11271,7 +11268,6 @@ SLES-50821:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
   patches:
     "22E91837":
       content: |-
@@ -11479,7 +11475,7 @@ SLES-50877:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes texture slight misalignment.
+    halfPixelOffset: 2 # Fixes texture slight misalignment.
 SLES-50879:
   name: "Paris-Dakar 2"
   region: "PAL-M5"
@@ -16193,7 +16189,7 @@ SLES-52993:
   name: "TimeSplitters - Future Perfect"
   region: "PAL-M5"
   gsHWFixes:
-    halfPixelOffset: 3 # Removes ghosting of distant objects.
+    halfPixelOffset: 2 # Removes ghosting of distant objects.
 SLES-52998:
   name: "Sonic Mega Collection Plus"
   region: "PAL-M5"
@@ -25105,7 +25101,6 @@ SLPM-60167:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SLPM-60149:
   name: "Ace Combat 04 - Shattered Skies [Trial]"
   region: "NTSC-J"
@@ -37096,7 +37091,6 @@ SLPS-25074:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
   patches:
     9883194E:
       content: |-
@@ -40675,7 +40669,6 @@ SLPS-73255:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SLPS-73256:
   name: "Fatal Frame II - Crimson Butterfly [PlayStation 2 the Best - Reprint]"
   region: "NTSC-J"
@@ -40730,7 +40723,6 @@ SLPS-73405:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
 SLPS-73406:
   name: "DOA 2 - Hardcore [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -42085,7 +42077,7 @@ SLUS-20314:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes texture slight misalignment.
+    halfPixelOffset: 2 # Fixes texture slight misalignment.
 SLUS-20315:
   name: "Spyro the Dragon - Enter the Dragonfly"
   region: "NTSC-U"
@@ -42429,7 +42421,6 @@ SLUS-20388:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 2 # Reduces blurriness.
-    disablePartialInvalidation: 1 # Fixes ghost rendering.
   patches:
     339A0B8C:
       content: |-
@@ -46216,7 +46207,7 @@ SLUS-21148:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 3 # Removes ghosting of distant objects.
+    halfPixelOffset: 2 # Removes ghosting of distant objects.
 SLUS-21149:
   name: "Yourself! Fitness"
   region: "NTSC-U"
@@ -49717,7 +49708,7 @@ SLUS-21841:
   region: "NTSC-U"
   compat: 5
 SLUS-21842:
-  name: "Dragon Ball Z Infinite World"
+  name: "Dragon Ball Z - Infinite World"
   region: "NTSC-U"
   compat: 5
 SLUS-21843:
