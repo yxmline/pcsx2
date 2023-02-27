@@ -17863,6 +17863,8 @@ SLES-53634:
 SLES-53635:
   name: "NASCAR '06 - Total Team Control"
   region: "PAL-E"
+  gsHWFixes:
+    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto because shaking otherwise.
 SLES-53636:
   name: "TY the Tasmanian Tiger 3 - Night of the Quinkan"
   region: "PAL-A"
@@ -25438,6 +25440,8 @@ SLPM-62029:
   name: "Bust A Move - Dance Summit 2001"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    gpuPaletteConversion: 2 # Improves FPS drastically and reduces HC size massively.
 SLPM-62031:
   name: "Primal Image for Printer"
   region: "NTSC-J"
@@ -46868,6 +46872,8 @@ SLUS-21266:
   name: "NASCAR '06 - Total Team Control"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto because shaking otherwise.
 SLUS-21267:
   name: "Need for Speed - Most Wanted"
   region: "NTSC-U"
