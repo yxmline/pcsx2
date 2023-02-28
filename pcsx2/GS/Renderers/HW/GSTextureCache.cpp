@@ -1258,8 +1258,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 		return;
 
 	// Handle the case where the transfer wrapped around the end of GS memory.
-	const u32 end_bp = off.bn(rect.z - 1, rect.w - 1);
-	const u32 unwrapped_end_bp = end_bp + ((end_bp < bp) ? MAX_BLOCKS : 0);
+	const u32 end_bp = off.bnNoWrap(rect.z - 1, rect.w - 1);
 
 	// Ideally in the future we can turn this on unconditionally, but for now it breaks too much.
 	const bool check_inside_target = (GSConfig.UserHacks_TargetPartialInvalidation || GSConfig.UserHacks_TextureInsideRt);
@@ -1275,7 +1274,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 			Target* t = *j;
 
 			// Don't bother checking any further if the target doesn't overlap with the write/invalidation.
-			if ((bp < t->m_TEX0.TBP0 && unwrapped_end_bp < t->m_TEX0.TBP0) || bp > t->UnwrappedEndBlock())
+			if ((bp < t->m_TEX0.TBP0 && end_bp < t->m_TEX0.TBP0) || bp > t->UnwrappedEndBlock())
 			{
 				++i;
 				continue;
@@ -2927,21 +2926,23 @@ void GSTextureCache::Surface::UpdateAge()
 bool GSTextureCache::Surface::Inside(u32 bp, u32 bw, u32 psm, const GSVector4i& rect)
 {
 	// Valid only for color formats.
-	const u32 end_block = GSLocalMemory::m_psm[psm].info.bn(rect.z - 1, rect.w - 1, bp, bw);
-	return bp >= m_TEX0.TBP0 && end_block <= m_end_block;
+	const GSOffset off(GSLocalMemory::m_psm[psm].info, bp, bw, psm);
+	const u32 end_block = off.bnNoWrap(rect.z - 1, rect.w - 1);
+	return bp >= m_TEX0.TBP0 && end_block <= UnwrappedEndBlock();
 }
 
 bool GSTextureCache::Surface::Overlaps(u32 bp, u32 bw, u32 psm, const GSVector4i& rect)
 {
 	// Valid only for color formats.
-	u32 end_block = GSLocalMemory::m_psm[psm].info.bn(rect.z - 1, rect.w - 1, bp, bw);
-	u32 start_block = GSLocalMemory::m_psm[psm].info.bn(rect.x, rect.y, bp, bw);
+	const GSOffset off(GSLocalMemory::m_psm[psm].info, bp, bw, psm);
+	u32 end_block = off.bnNoWrap(rect.z - 1, rect.w - 1);
+	u32 start_block = off.bnNoWrap(rect.x, rect.y);
 	// Due to block ordering, end can be below start in a page, so if it's within a page, swap them.
 	if (end_block < start_block && ((start_block - end_block) < (1 << 5)))
 	{
 		std::swap(start_block, end_block);
 	}
-	const bool overlap = GSTextureCache::CheckOverlap(m_TEX0.TBP0, m_end_block, start_block, end_block);
+	const bool overlap = GSTextureCache::CheckOverlap(m_TEX0.TBP0, UnwrappedEndBlock(), start_block, end_block);
 	return overlap;
 }
 
@@ -2985,7 +2986,7 @@ void GSTextureCache::Source::SetPages()
 
 	m_repeating = !m_from_hash_cache && m_TEX0.IsRepeating() && !m_region.IsFixedTEX0(tw, th);
 
-	if (m_repeating && !CanPreload())
+	if (m_repeating && !m_target && !CanPreload())
 	{
 		// TODO: wrong for lupin/invalid tex0
 		m_p2t = g_gs_renderer->m_mem.GetPage2TileMap(m_TEX0);
@@ -3519,18 +3520,6 @@ void GSTextureCache::SourceMap::Add(Source* s, const GIFRegTEX0& TEX0, const GSO
 {
 	m_surfaces.insert(s);
 
-	if (s->m_target)
-	{
-		// TODO
-
-		// GH: I don't know why but it seems we only consider the first page for a render target
-		const size_t page = TEX0.TBP0 >> 5;
-
-		s->m_erase_it[page] = m_map[page].InsertFront(s);
-
-		return;
-	}
-
 	// The source pointer will be stored/duplicated in all m_map[array of pages]
 	s->m_pages.loopPages([this, s](u32 page)
 	{
@@ -3568,18 +3557,10 @@ void GSTextureCache::SourceMap::RemoveAt(Source* s)
 		s->m_texture ? s->m_texture->GetID() : 0,
 		s->m_TEX0.TBP0);
 
-	if (s->m_target)
+	s->m_pages.loopPages([this, s](u32 page)
 	{
-		const size_t page = s->m_TEX0.TBP0 >> 5;
 		m_map[page].EraseIndex(s->m_erase_it[page]);
-	}
-	else
-	{
-		s->m_pages.loopPages([this, s](u32 page)
-		{
-			m_map[page].EraseIndex(s->m_erase_it[page]);
-		});
-	}
+	});
 
 	if (s->m_from_hash_cache)
 	{
