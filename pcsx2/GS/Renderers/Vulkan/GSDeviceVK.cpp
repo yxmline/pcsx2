@@ -1143,7 +1143,6 @@ static void AddUtilityVertexAttributes(Vulkan::GraphicsPipelineBuilder& gpb)
 	gpb.AddVertexBuffer(0, sizeof(GSVertexPT1));
 	gpb.AddVertexAttribute(0, 0, VK_FORMAT_R32G32B32A32_SFLOAT, 0);
 	gpb.AddVertexAttribute(1, 0, VK_FORMAT_R32G32_SFLOAT, 16);
-	gpb.AddVertexAttribute(2, 0, VK_FORMAT_R8G8B8A8_UNORM, 28);
 	gpb.SetPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
 }
 
@@ -3156,8 +3155,9 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 	}
 
 	// We don't need the very first barrier if this is the first draw after switching to feedback loop,
-	// because the layout change in itself enforces the execution dependency.
-	const bool skip_first_barrier = (draw_rt && draw_rt->GetLayout() != VK_IMAGE_LAYOUT_GENERAL);
+	// because the layout change in itself enforces the execution dependency. HDR needs a barrier between
+	// setup and the first draw to read it. TODO: Make HDR use subpasses instead.
+	const bool skip_first_barrier = (draw_rt && draw_rt->GetLayout() != VK_IMAGE_LAYOUT_GENERAL && !pipe.ps.hdr);
 
 	OMSetRenderTargets(draw_rt, draw_ds, config.scissor, pipe.feedback_loop);
 	if (pipe.feedback_loop)

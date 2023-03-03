@@ -9490,6 +9490,7 @@ SLED-54401:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLES-50003:
@@ -9758,6 +9759,8 @@ SLES-50079:
   region: "PAL-E"
   clampModes:
     eeClampMode: 2 # Fixes Abnormal AI behavior.
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes texture corruption.
 SLES-50080:
   name: "NBA Hoopz"
   region: "PAL-M3"
@@ -16741,6 +16744,7 @@ SLES-53196:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLES-53197:
@@ -16751,6 +16755,7 @@ SLES-53197:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLES-53199:
@@ -17471,8 +17476,11 @@ SLES-53523:
   roundModes:
     vu1RoundMode: 0 # Fixes textures and crashes.
   gsHWFixes:
-    halfPixelOffset: 2 # Fixes bloom misalignment.
-    wildArmsHack: 1 # Fixes bloom misalignment.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures and water textures and reflections.
+    trilinearFiltering: 1
+    textureInsideRT: 1 # Fixes rainbow artifacting around edges of screen.
+    halfPixelOffset: 2 # Fixes misalgined bloom.
+    autoFlush: 1 # Fixes missing bloom intensity and alignment.
 SLES-53524:
   name: "Mortal Kombat - Shaolin Monks"
   region: "PAL-M5"
@@ -17919,6 +17927,7 @@ SLES-53641:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLES-53644:
@@ -17939,8 +17948,11 @@ SLES-53647:
   roundModes:
     vu1RoundMode: 0 # Fixes textures and crashes.
   gsHWFixes:
-    halfPixelOffset: 2 # Fixes bloom misalignment.
-    wildArmsHack: 1 # Fixes bloom misalignment.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures and water textures and reflections.
+    trilinearFiltering: 1
+    textureInsideRT: 1 # Fixes rainbow artifacting around edges of screen.
+    halfPixelOffset: 2 # Fixes misalgined bloom.
+    autoFlush: 1 # Fixes missing bloom intensity and alignment.
 SLES-53651:
   name: "WWII - Soldier"
   region: "PAL-E"
@@ -19835,6 +19847,7 @@ SLES-54384:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLES-54385:
@@ -24820,6 +24833,7 @@ SLPM-55141:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLPM-55146:
@@ -32778,6 +32792,7 @@ SLPM-66430:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLPM-66431:
@@ -36887,6 +36902,8 @@ SLPS-25007:
   region: "NTSC-J"
   clampModes:
     eeClampMode: 2 # Fixes Abnormal AI behavior.
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes texture corruption.
 SLPS-25008:
   name: "Sorcerous Stabber Orphen"
   region: "NTSC-J"
@@ -40779,6 +40796,8 @@ SLPS-73403:
   region: "NTSC-J"
   clampModes:
     eeClampMode: 2 # Fixes Abnormal AI behavior.
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes texture corruption.
 SLPS-73404:
   name: "Klonoa 2 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -40968,6 +40987,8 @@ SLUS-20014:
   compat: 5
   clampModes:
     eeClampMode: 2 # Fixes Abnormal AI behavior.
+  gsHWFixes:
+    textureInsideRT: 1 # Fixes texture corruption.
 SLUS-20015:
   name: "Eternal Ring"
   region: "NTSC-U"
@@ -45214,6 +45235,7 @@ SLUS-20945:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLUS-20946:
@@ -46238,8 +46260,11 @@ SLUS-21139:
   roundModes:
     vu1RoundMode: 0 # Fixes textures and crashes.
   gsHWFixes:
-    halfPixelOffset: 2 # Fixes bloom misalignment.
-    wildArmsHack: 1 # Fixes bloom misalignment.
+    mipmap: 2 # Mipmap + trilinear, improves ground textures and water textures and reflections.
+    trilinearFiltering: 1
+    textureInsideRT: 1 # Fixes rainbow artifacting around edges of screen.
+    halfPixelOffset: 2 # Fixes misalgined bloom.
+    autoFlush: 1 # Fixes missing bloom intensity and alignment.
 SLUS-21140:
   name: "Mobile Suit Gundam Seed - Never Ending Tomorrow"
   region: "NTSC-U"
@@ -47989,6 +48014,7 @@ SLUS-21439:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLUS-21440:
@@ -50907,6 +50933,7 @@ SLUS-29150:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLUS-29152:
@@ -51102,6 +51129,7 @@ SLUS-29196:
     trilinearFiltering: 1
     textureInsideRT: 2 # Fixes shadow maps.
     roundSprite: 2 # Fixes misalgined bloom.
+    mergeSprite: 1 # Fixes misalgined bloom.
     halfPixelOffset: 2 # Fixes misalgined bloom.
     autoFlush: 1 # Fixes sun occlusion and brightness.
 SLUS-29197:
