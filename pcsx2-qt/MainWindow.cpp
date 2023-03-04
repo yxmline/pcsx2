@@ -264,7 +264,7 @@ void MainWindow::setupAdditionalUi()
 		connect(action, &QAction::triggered, [scale]() { g_emu_thread->requestDisplaySize(static_cast<float>(scale)); });
 	}
 
-	updateEmulationActions(false, false);
+	updateEmulationActions(false, false, false);
 	updateDisplayRelatedActions(false, false, false);
 
 #ifdef ENABLE_RAINTEGRATION
@@ -1085,13 +1085,13 @@ void MainWindow::restoreStateFromConfig()
 	}
 }
 
-void MainWindow::updateEmulationActions(bool starting, bool running)
+void MainWindow::updateEmulationActions(bool starting, bool running, bool stopping)
 {
 	const bool starting_or_running = starting || running;
 
-	m_ui.actionStartFile->setDisabled(starting_or_running);
-	m_ui.actionStartDisc->setDisabled(starting_or_running);
-	m_ui.actionStartBios->setDisabled(starting_or_running);
+	m_ui.actionStartFile->setDisabled(starting_or_running || stopping);
+	m_ui.actionStartDisc->setDisabled(starting_or_running || stopping);
+	m_ui.actionStartBios->setDisabled(starting_or_running || stopping);
 
 	m_ui.actionPowerOff->setEnabled(running);
 	m_ui.actionPowerOffWithoutSaving->setEnabled(running);
@@ -1116,8 +1116,8 @@ void MainWindow::updateEmulationActions(bool starting, bool running)
 		m_ui.actionPause->setChecked(false);
 
 	// scanning needs to be disabled while running
-	m_ui.actionScanForNewGames->setDisabled(starting_or_running);
-	m_ui.actionRescanAllGames->setDisabled(starting_or_running);
+	m_ui.actionScanForNewGames->setDisabled(starting_or_running || stopping);
+	m_ui.actionRescanAllGames->setDisabled(starting_or_running || stopping);
 }
 
 void MainWindow::updateDisplayRelatedActions(bool has_surface, bool render_to_main, bool fullscreen)
@@ -1370,6 +1370,14 @@ bool MainWindow::requestShutdown(bool allow_confirm, bool allow_save_to_state, b
 	// batch mode, when we're going to exit anyway.
 	if (!isRenderingToMain() && isHidden() && !QtHost::InBatchMode() && !g_emu_thread->isRunningFullscreenUI())
 		updateWindowState(true);
+
+	// Clear the VM valid state early. That way we can't do anything in the UI if we take a while to shut down.
+	if (s_vm_valid)
+	{
+		s_vm_valid = false;
+		updateEmulationActions(false, false, true);
+		updateDisplayRelatedActions(false, false, false);
+	}
 
 	// Now we can actually shut down the VM.
 	g_emu_thread->shutdownVM(save_state);
@@ -1916,7 +1924,7 @@ void MainWindow::onInputRecOpenViewer()
 void MainWindow::onVMStarting()
 {
 	s_vm_valid = true;
-	updateEmulationActions(true, false);
+	updateEmulationActions(true, false, false);
 	updateWindowTitle();
 
 	// prevent loading state until we're fully initialized
@@ -1927,7 +1935,7 @@ void MainWindow::onVMStarted()
 {
 	s_vm_valid = true;
 	m_was_disc_change_request = false;
-	updateEmulationActions(true, true);
+	updateEmulationActions(true, true, false);
 	updateWindowTitle();
 	updateStatusBarWidgetVisibility();
 	updateInputRecordingActions(true);
@@ -1976,7 +1984,7 @@ void MainWindow::onVMStopped()
 	s_vm_valid = false;
 	s_vm_paused = false;
 	m_last_fps_status = QString();
-	updateEmulationActions(false, false);
+	updateEmulationActions(false, false, false);
 	updateWindowTitle();
 	updateWindowState();
 	updateStatusBarWidgetVisibility();
@@ -2057,7 +2065,7 @@ static QString getFilenameFromMimeData(const QMimeData* md)
 		// only one url accepted
 		const QList<QUrl> urls(md->urls());
 		if (urls.size() == 1)
-			filename = urls.front().toLocalFile();
+			filename = QDir::toNativeSeparators(urls.front().toLocalFile());
 	}
 
 	return filename;
@@ -2917,11 +2925,23 @@ void MainWindow::doStartFile(std::optional<CDVD_SourceType> source, const QStrin
 
 void MainWindow::doDiscChange(CDVD_SourceType source, const QString& path)
 {
+	const bool is_gs_dump = VMManager::IsGSDumpFileName(path.toStdString());
+	if (is_gs_dump != GSDumpReplayer::IsReplayingDump())
+	{
+		QMessageBox::critical(this, tr("Error"), tr("Cannot switch from game to GS dump or vice versa."));
+		return;
+	}
+	else if (is_gs_dump)
+	{
+		Host::RunOnCPUThread([path = path.toStdString()]() { GSDumpReplayer::ChangeDump(path.c_str()); });
+		return;
+	}
+
 	bool reset_system = false;
 	if (!m_was_disc_change_request)
 	{
 		QMessageBox message(QMessageBox::Question, tr("Confirm Disc Change"),
-			tr("Do you want to swap discs or boot the new image (via system reset)?"));
+			tr("Do you want to swap discs or boot the new image (via system reset)?"), QMessageBox::NoButton, this);
 		message.addButton(tr("Swap Disc"), QMessageBox::ActionRole);
 		QPushButton* reset_button = message.addButton(tr("Reset"), QMessageBox::ActionRole);
 		QPushButton* cancel_button = message.addButton(QMessageBox::Cancel);
