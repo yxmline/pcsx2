@@ -985,7 +985,7 @@ void ps_color_clamp_wrap(inout vec3 C)
 	// so we need to limit the color depth on dithered items
 #if SW_BLEND || PS_DITHER || PS_FBMASK
 
-#if PS_DFMT == FMT_16 && PS_BLEND_MIX == 0 && PS_ROUND_INV != 0
+#if PS_DFMT == FMT_16 && PS_BLEND_MIX == 0 && PS_ROUND_INV
 	C += 7.0f; // Need to round up, not down since the shader will invert
 #endif
 
@@ -1140,9 +1140,13 @@ void ps_blend(inout vec4 Color, inout vec4 As_rgba)
 			Color.rgb *= vec3(255.0f);
 		#elif PS_CLR_HW == 3
 			// Needed for Cs*Ad, Cs*Ad + Cd, Cd - Cs*Ad
-			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value
-
-			Color.rgb *= (255.0f / 128.0f);
+			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value when rgb are below 128.
+			// When any color channel is higher than 128 then adjust the compensation automatically
+			// to give us more accurate colors, otherwise they will be wrong.
+			// The higher the value (>128) the lower the compensation will be.
+			float max_color = max(max(Color.r, Color.g), Color.b);
+			float color_compensate = 255.0f / max(128.0f, max_color);
+			Color.rgb *= vec3(color_compensate);
 		#endif
 	#endif
 }

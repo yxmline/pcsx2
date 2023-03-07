@@ -743,7 +743,7 @@ void ps_dither(inout float3 C, float2 pos_xy)
 			fpos = int2(pos_xy / (float)PS_SCALE_FACTOR);
 
 		float value = DitherMatrix[fpos.x & 3][fpos.y & 3];
-		if (PS_ROUND_INV != 0)
+		if (PS_ROUND_INV)
 			C -= value;
 		else
 			C += value;
@@ -756,7 +756,7 @@ void ps_color_clamp_wrap(inout float3 C)
 	// so we need to limit the color depth on dithered items
 	if (SW_BLEND || PS_DITHER || PS_FBMASK)
 	{
-		if (PS_DFMT == FMT_16 && PS_BLEND_MIX == 0 && PS_ROUND_INV != 0)
+		if (PS_DFMT == FMT_16 && PS_BLEND_MIX == 0 && PS_ROUND_INV)
 			C += 7.0f; // Need to round up, not down since the shader will invert
 
 		// Standard Clamp
@@ -872,9 +872,13 @@ void ps_blend(inout float4 Color, inout float4 As_rgba, float2 pos_xy)
 		else if (PS_CLR_HW == 3)
 		{
 			// Needed for Cs*Ad, Cs*Ad + Cd, Cd - Cs*Ad
-			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value
-
-			Color.rgb *= (255.0f / 128.0f);
+			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value when rgb are below 128.
+			// When any color channel is higher than 128 then adjust the compensation automatically
+			// to give us more accurate colors, otherwise they will be wrong.
+			// The higher the value (>128) the lower the compensation will be.
+			float max_color = max(max(Color.r, Color.g), Color.b);
+			float color_compensate = 255.0f / max(128.0f, max_color);
+			Color.rgb *= (float3)color_compensate;
 		}
 	}
 }
