@@ -60,7 +60,9 @@
 
 namespace GSRunner
 {
+	static void InitializeConsole();
 	static bool InitializeConfig();
+	static bool ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& params);
 
 	static bool CreatePlatformWindow();
 	static void DestroyPlatformWindow();
@@ -77,6 +79,7 @@ alignas(16) static SysMtgsThread s_mtgs_thread;
 static std::string s_output_prefix;
 static s32 s_loop_count = 1;
 static std::optional<bool> s_use_window;
+static bool s_no_console = false;
 
 // Owned by the GS thread.
 static u32 s_dump_frame_number = 0;
@@ -112,7 +115,7 @@ bool GSRunner::InitializeConfig()
 	si.SetBoolValue("EmuCore", "EnablePerGameSettings", false);
 
 	// force logging
-	si.SetBoolValue("Logging", "EnableSystemConsole", true);
+	si.SetBoolValue("Logging", "EnableSystemConsole", !s_no_console);
 	si.SetBoolValue("Logging", "EnableTimestamps", true);
 	si.SetBoolValue("Logging", "EnableVerbose", true);
 
@@ -282,7 +285,7 @@ void Host::ReleaseHostDisplay(bool clear_state)
 
 HostDisplay::PresentResult Host::BeginPresentFrame(bool frame_skip)
 {
-	if (s_loop_number == 0)
+	if (s_loop_number == 0 && !s_output_prefix.empty())
 	{
 		// when we wrap around, don't race other files
 		GSJoinSnapshotThreads();
@@ -453,7 +456,15 @@ static void PrintCommandLineHelp(const char* progname)
 	std::fprintf(stderr, "\n");
 }
 
-static bool ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& params)
+void GSRunner::InitializeConsole()
+{
+	const char* var = std::getenv("PCSX2_NOCONSOLE");
+	s_no_console = (var && StringUtil::FromChars<bool>(var).value_or(false));
+	if (!s_no_console)
+		CommonHost::InitializeEarlyConsole();
+}
+
+bool GSRunner::ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& params)
 {
 	bool no_more_args = false;
 	for (int i = 1; i < argc; i++)
@@ -556,6 +567,19 @@ static bool ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& param
 
 				continue;
 			}
+			else if (CHECK_ARG_PARAM("-upscale"))
+			{
+				const float upscale = StringUtil::FromChars<float>(argv[++i]).value_or(0.0f);
+				if (upscale < 0.5f)
+				{
+					Console.WriteLn("Invalid upscale multiplier");
+					return false;
+				}
+
+				Console.WriteLn(fmt::format("Setting upscale multiplier to {}", upscale));
+				s_settings_interface.SetFloatValue("EmuCore/GS", "upscale_multiplier", upscale);
+				continue;
+			}
 			else if (CHECK_ARG_PARAM("-logfile"))
 			{
 				const char* logfile = argv[++i];
@@ -573,7 +597,7 @@ static bool ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& param
 			else if (CHECK_ARG("-noshadercache"))
 			{
 				Console.WriteLn("Disabling shader cache");
-				s_settings_interface.SetBoolValue("EmuCore/GS", "disable_shader_cache", false);
+				s_settings_interface.SetBoolValue("EmuCore/GS", "disable_shader_cache", true);
 				continue;
 			}
 			else if (CHECK_ARG("-window"))
@@ -637,7 +661,7 @@ static bool ParseCommandLineArgs(int argc, char* argv[], VMBootParameters& param
 
 int main(int argc, char* argv[])
 {
-	CommonHost::InitializeEarlyConsole();
+	GSRunner::InitializeConsole();
 
 	if (!GSRunner::InitializeConfig())
 	{
@@ -646,7 +670,7 @@ int main(int argc, char* argv[])
 	}
 
 	VMBootParameters params;
-	if (!ParseCommandLineArgs(argc, argv, params))
+	if (!GSRunner::ParseCommandLineArgs(argc, argv, params))
 		return EXIT_FAILURE;
 
 	PerformanceMetrics::SetCPUThread(Threading::ThreadHandle::GetForCallingThread());
@@ -656,7 +680,7 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (s_use_window.value_or(false) && !GSRunner::CreatePlatformWindow())
+	if (s_use_window.value_or(true) && !GSRunner::CreatePlatformWindow())
 	{
 		Console.Error("Failed to create window.");
 		return EXIT_FAILURE;
