@@ -11871,6 +11871,9 @@ SLES-51043:
   name: "Spyro - Enter the Dragonfly"
   region: "PAL-M6"
   compat: 5
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
   patches:
     0EF1D4BA:
       content: |-
@@ -20625,6 +20628,8 @@ SLES-54628:
 SLES-54629:
   name: "Shin Megami Tensei - Devil Summoner - Raidou Kuzunoha vs. the Soulless Army"
   region: "PAL-E"
+  gsHWFixes:
+    minimumBlendingLevel: 3 # Fixes broken effect rendering.
 SLES-54630:
   name: "Chi Vuol Essere Milionario - Party Edition"
   region: "PAL-I"
@@ -32400,6 +32405,8 @@ SLPM-66246:
   name: "Devil Summoner - Kuzunoha Raidou tai Chouriki Heidan"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    minimumBlendingLevel: 3 # Fixes broken effect rendering.
 SLPM-66247:
   name: "Meine Liebe II - Hokori to Seigi to Ai"
   region: "NTSC-J"
@@ -33882,6 +33889,8 @@ SLPM-66633:
 SLPM-66634:
   name: "Devil Summoner - Kuzunoha Raidou tai Chouriki Heidan [Atlus Best Collection]"
   region: "NTSC-J"
+  gsHWFixes:
+    minimumBlendingLevel: 3 # Fixes broken effect rendering.
 SLPM-66635:
   name: "Wind - A Breath of Heart [Alchemist Best Collection]"
   region: "NTSC-J"
@@ -42540,6 +42549,9 @@ SLUS-20315:
   name: "Spyro the Dragon - Enter the Dragonfly"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
   patches:
     4B8E0DE8:
       content: |-
@@ -48371,6 +48383,8 @@ SLUS-21431:
   name: "Shin Megami Tensei - Devil Summoner - Raidou Kuzunoha vs. The Soulless Army"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    minimumBlendingLevel: 3 # Fixes broken effect rendering.
 SLUS-21432:
   name: "NRA Gun Club"
   region: "NTSC-U"
@@ -50883,6 +50897,8 @@ SLUS-28063:
 SLUS-28064:
   name: "Shin Megami Tensei - Devil Summoner [Trade Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    minimumBlendingLevel: 3 # Fixes broken effect rendering.
 SLUS-28065:
   name: "Odin Sphere [Trade Demo]"
   region: "NTSC-U"
