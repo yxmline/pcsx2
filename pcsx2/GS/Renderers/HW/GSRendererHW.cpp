@@ -219,6 +219,7 @@ GSTexture* GSRendererHW::GetOutput(int i, float& scale, int& y_offset)
 
 	if (GSTextureCache::Target* rt = m_tc->LookupDisplayTarget(TEX0, framebufferSize, GetTextureScaleFactor()))
 	{
+		rt->Update(false);
 		t = rt->m_texture;
 		scale = rt->m_scale;
 
@@ -259,6 +260,7 @@ GSTexture* GSRendererHW::GetFeedbackOutput(float& scale)
 	if (!rt)
 		return nullptr;
 
+	rt->Update(false);
 	GSTexture* t = rt->m_texture;
 	scale = rt->m_scale;
 
@@ -970,47 +972,19 @@ void GSRendererHW::InvalidateLocalMem(const GIFRegBITBLTBUF& BITBLTBUF, const GS
 	if (clut)
 		return; // FIXME
 
-	const u32 incoming_end = GSLocalMemory::m_psm[BITBLTBUF.SPSM].info.bn(r.z - 1, r.w - 1, BITBLTBUF.SBP, BITBLTBUF.SBW);
 	std::vector<GSState::GSUploadQueue>::iterator iter = GSRendererHW::GetInstance()->m_draw_transfers.end();
-
 	bool skip = false;
 	// If the EE write overlaps the readback and was done since the last draw, there's no need to read it back.
-	// Dog's life and Ratchet Gladiator do this.
+	// Dog's life does this.
 	while (iter != GSRendererHW::GetInstance()->m_draw_transfers.begin())
 	{
 		--iter;
 
-		if (!GSUtil::HasSharedBits(iter->blit.DPSM, BITBLTBUF.SPSM) || iter->draw != s_n)
+		if (!(iter->draw == s_n && BITBLTBUF.SBP == iter->blit.DBP && iter->blit.DPSM == BITBLTBUF.SPSM && r.eq(iter->rect)))
 			continue;
-
-		// Make sure write covers the read area.
-		const u32 ee_write_end = GSLocalMemory::m_psm[iter->blit.DPSM].info.bn(iter->rect.z - 1, iter->rect.w - 1, iter->blit.DBP, iter->blit.DBW);
-		if (!(iter->blit.DBP < incoming_end && ee_write_end > BITBLTBUF.SBP))
-			continue;
-
-		GSTextureCache::SurfaceOffsetKey sok;
-		sok.elems[0].bp = BITBLTBUF.SBP;
-		sok.elems[0].bw = BITBLTBUF.SBW;
-		sok.elems[0].psm = BITBLTBUF.SPSM;
-		sok.elems[0].rect = r;
-		sok.elems[1].bp = iter->blit.DBP;
-		sok.elems[1].bw = iter->blit.DBW;
-		sok.elems[1].psm = iter->blit.DPSM;
-		sok.elems[1].rect = iter->rect;
-
-		// Calculate the rect offset if the BP doesn't match.
-		const GSVector4i targetr = GSUtil::HasCompatibleBits(iter->blit.DPSM, BITBLTBUF.SPSM) ? r : m_tc->ComputeSurfaceOffset(sok).b2a_offset;
-
-		// Possibly incompatible or missed, we don't know, so let's assume it's a fail.
-		if (targetr.rempty())
-			continue;
-
-		//u32 ee_write_end = GSLocalMemory::m_psm[iter->blit.DPSM].info.bn(iter->rect.z - 1, iter->rect.w - 1, iter->blit.DBP, iter->blit.DBW);
-		// If the format, and location doesn't match, but also the upload is at least the size of the target, don't preload.
-		if (iter->rect.rintersect(targetr).eq(targetr))
-		{
-			skip = true;
-		}
+		m_tc->InvalidateVideoMem(m_mem.GetOffset(BITBLTBUF.SBP, BITBLTBUF.SBW, BITBLTBUF.SPSM), r);
+		skip = true;
+		break;
 	}
 
 	if(!skip)
@@ -1574,7 +1548,7 @@ void GSRendererHW::Draw()
 		{
 			// Force enable preloading if any of the existing data is needed.
 			// e.g. NFSMW only writes the alpha channel, and needs the RGB preloaded.
-			if (((fm & fm_mask) != fm_mask) || // Some channels masked
+			if ((fm & fm_mask) != 0 && ((fm & fm_mask) != fm_mask) || // Some channels masked
 				!IsOpaque()) // Blending enabled
 			{
 				GL_INS("Forcing preload due to partial/blended CLUT draw");
@@ -2079,11 +2053,14 @@ void GSRendererHW::Draw()
 			rt->ResizeTexture(new_w, new_h);
 
 			if (!m_texture_shuffle && !m_channel_shuffle)
+			{
 				rt->ResizeValidity(rt->GetUnscaledRect());
+				rt->ResizeDrawn(rt->GetUnscaledRect());
+			}
 
 			// Limit to 2x the vertical height of the resolution (for double buffering)
 			rt->UpdateValidity(m_r, can_update_size || m_r.w <= (resolution.y * 2));
-
+			rt->UpdateDrawn(m_r, can_update_size || m_r.w <= (resolution.y * 2));
 			// Probably changing to double buffering, so invalidate any old target that was next to it.
 			// This resolves an issue where the PCRTC will find the old target in FMV's causing flashing.
 			// Grandia Xtreme, Onimusha Warlord.
@@ -2116,10 +2093,14 @@ void GSRendererHW::Draw()
 			ds->ResizeTexture(new_w, new_h);
 
 			if (!m_texture_shuffle && !m_channel_shuffle)
+			{
 				ds->ResizeValidity(ds->GetUnscaledRect());
+				ds->ResizeDrawn(ds->GetUnscaledRect());
+			}
 
 			// Limit to 2x the vertical height of the resolution (for double buffering)
 			ds->UpdateValidity(m_r, can_update_size || m_r.w <= (resolution.y * 2));
+			ds->UpdateDrawn(m_r, can_update_size || m_r.w <= (resolution.y * 2));
 
 			if (!new_rect && new_height && old_end_block != ds->m_end_block)
 			{

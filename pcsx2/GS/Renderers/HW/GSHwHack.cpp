@@ -293,17 +293,29 @@ bool GSHwHack::GSC_BlackAndBurnoutSky(GSRendererHW& r, const GSFrameInfo& fi, in
 	const GIFRegTEX0& TEX0 = RCONTEXT->TEX0;
 	const GIFRegALPHA& ALPHA = RCONTEXT->ALPHA;
 	const GIFRegFRAME& FRAME = RCONTEXT->FRAME;
-	if (RPRIM->PRIM == GS_SPRITE && !RPRIM->IIP && RPRIM->TME && !RPRIM->FGE && RPRIM->ABE && !RPRIM->AA1 && !RPRIM->FST && !RPRIM->FIX && TEX0.TBW == 16 && TEX0.TW == 10 && TEX0.TCC && !TEX0.TFX && TEX0.PSM == PSM_PSMT8 && TEX0.CPSM == PSM_PSMCT32 && !TEX0.CSM && TEX0.TH == 8 && ALPHA.A == ALPHA.B && ALPHA.D == 0 && FRAME.FBW == 16 && FRAME.PSM == PSM_PSMCT32)
-	{
-		// Readback clouds being rendered during level loading.
-		// Later the alpha channel from the 32 bit frame buffer is used as an 8 bit indexed texture to draw
-		// the clouds on top of the sky at each frame.
-		// Burnout 3 PAL 50Hz: 0x3ba0 => 0x1e80.
-		GL_INS("OO_BurnoutGames - Readback clouds renderered from TEX0.TBP0 = 0x%04x (TEX0.CBP = 0x%04x) to FBP = 0x%04x", TEX0.TBP0, TEX0.CBP, FRAME.Block());
-		r.SwPrimRender(r, true);
-		skip = 1;
-	}
 
+	if (RPRIM->PRIM == GS_SPRITE && !RPRIM->IIP && RPRIM->TME && !RPRIM->FGE && RPRIM->ABE && !RPRIM->AA1 && !RPRIM->FST && !RPRIM->FIX &&
+		ALPHA.A == ALPHA.B && ALPHA.D == 0 && FRAME.PSM == PSM_PSMCT32 && TEX0.CPSM == PSM_PSMCT32 && TEX0.TCC && !TEX0.TFX && !TEX0.CSM)
+	{
+		if (TEX0.TBW == 16 && TEX0.TW == 10 && TEX0.PSM == PSM_PSMT8 && TEX0.TH == 8 && FRAME.FBW == 16)
+		{
+			// Readback clouds being rendered during level loading.
+			// Later the alpha channel from the 32 bit frame buffer is used as an 8 bit indexed texture to draw
+			// the clouds on top of the sky at each frame.
+			// Burnout 3 PAL 50Hz: 0x3ba0 => 0x1e80.
+			GL_INS("OO_BurnoutGames - Readback clouds renderered from TEX0.TBP0 = 0x%04x (TEX0.CBP = 0x%04x) to FBP = 0x%04x", TEX0.TBP0, TEX0.CBP, FRAME.Block());
+			r.SwPrimRender(r, true);
+			skip = 1;
+		}
+		if (TEX0.TBW == 2 && TEX0.TW == 7 && ((TEX0.PSM == PSM_PSMT4 && FRAME.FBW == 3) || (TEX0.PSM == PSM_PSMT8 && FRAME.FBW == 2)) && TEX0.TH == 6 && (FRAME.FBMSK & 0xFFFFFF) == 0xFFFFFF)
+		{
+			// Rendering of the glass smashing effect and some chassis decal in to the alpha channel of the FRAME on boot (before the menu).
+			// This gets ejected from the texture cache due to old age, but never gets written back.
+			GL_INS("OO_BurnoutGames - Render glass smash from TEX0.TBP0 = 0x%04x (TEX0.CBP = 0x%04x) to FBP = 0x%04x", TEX0.TBP0, TEX0.CBP, FRAME.Block());
+			r.SwPrimRender(r, true);
+			skip = 1;
+		}
+	}
 	return true;
 }
 
@@ -560,24 +572,6 @@ bool GSHwHack::GSC_SteambotChronicles(GSRendererHW& r, const GSFrameInfo& fi, in
 			{
 				skip = 19; // "speedhack", makes the game very light, vaporized water can disappear when not looked at directly, possibly some interface still, other value to try: 6 breaks menu background, possibly nothing(?) during gameplay, but it's slower, hence not much of a speedhack anymore
 			}
-		}
-	}
-
-	return true;
-}
-
-bool GSHwHack::GSC_YakuzaGames(GSRendererHW& r, const GSFrameInfo& fi, int& skip)
-{
-	if (skip == 0)
-	{
-		if (!s_nativeres && !fi.TME && (fi.FBP == 0x1c20 || fi.FBP == 0x1e20 || fi.FBP == 0x1620) && (fi.TBP0 == 0xe00 || fi.TBP0 == 0x1000 || fi.TBP0 == 0x800) && fi.TPSM == PSM_PSMZ24 && fi.FPSM == PSM_PSMCT32
-			/*&& fi.FBMSK == 0xffffff && fi.TZTST && !GSUtil::HasSharedBits(fi.FBP, fi.FPSM, fi.TBP0, fi.TPSM)*/)
-		{
-			// Don't enable hack on native res if crc is below aggressive.
-			// Upscaling issues, removes glow/blur effect which fixes ghosting.
-			// Skip 3 removes most of the post effect which doesn't upscale well, but causes a depth effect to completely mess up.
-			// Skip 9 removes both the depth and blur effect, which seems to work okay.
-			skip = 9;
 		}
 	}
 
@@ -1217,7 +1211,6 @@ const GSHwHack::Entry<GSRendererHW::GSC_Ptr> GSHwHack::s_get_skip_count_function
 
 	// Upscaling hacks
 	CRC_F(GSC_UltramanFightingEvolution, CRCHackLevel::Partial),
-	CRC_F(GSC_YakuzaGames, CRCHackLevel::Partial),
 
 	// Accurate Blending
 	CRC_F(GSC_GetawayGames, CRCHackLevel::Full), // Blending High

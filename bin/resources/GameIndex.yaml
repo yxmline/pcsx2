@@ -1234,6 +1234,7 @@ SCAJ-20157:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCAJ-20158:
@@ -1262,10 +1263,10 @@ SCAJ-20161:
   region: "NTSC-J"
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
 SCAJ-20162:
   name: "Rogue Galaxy"
   region: "NTSC-Unk"
@@ -1299,10 +1300,10 @@ SCAJ-20167:
   region: "NTSC-C-J"
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
 SCAJ-20168:
   name: "Rule of Rose"
   region: "NTSC-Unk"
@@ -1375,6 +1376,7 @@ SCAJ-20179:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
 SCAJ-20180:
   name: "Xenosaga Episode III - Also Sprach Zarathustra [Disc 2 of 2]"
@@ -1383,6 +1385,7 @@ SCAJ-20180:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
 SCAJ-20181:
   name: "Minna no Tennis"
@@ -2117,9 +2120,7 @@ SCED-52049:
   clampModes:
     vuClampMode: 3 # Fixes minor SPS on characters.
   gsHWFixes:
-    preloadFrameData: 1 # Fixes bad textures on Jake.
-    halfPixelOffset: 1 # Fixes double image.
-    cpuCLUTRender: 1 # Fixes Jake going black in Smellovision.
+    halfPixelOffset: 2 # Fixes double image.
 SCED-52051:
   name: "Official PlayStation 2 Magazine Demo 43"
   region: "PAL-M5"
@@ -3338,9 +3339,7 @@ SCES-51248:
     vuClampMode: 3 # Fixes minor SPS on characters.
   gsHWFixes:
     roundSprite: 1 # Fix lines in the sky.
-    preloadFrameData: 1 # Fixes bad textures on Jake.
-    halfPixelOffset: 1 # Fixes double image.
-    cpuCLUTRender: 1 # Fixes Jake going black in Smellovision.
+    halfPixelOffset: 2 # Fixes double image.
 SCES-51426:
   name: "Getaway, The"
   region: "PAL-M5"
@@ -3450,6 +3449,7 @@ SCES-51635:
     halfPixelOffset: 2 # Fixes lighting/shadows.
     preloadFrameData: 1 # Fixes sun flickering.
     autoFlush: 1 # Fixes sun through objects.
+    bilinearUpscale: 1 # Smooths out sun glare textures like native.
 SCES-51648:
   name: "Everquest - Online Adventures"
   region: "PAL-E-I"
@@ -3925,6 +3925,7 @@ SCES-53285:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCES-53286:
@@ -4108,10 +4109,10 @@ SCES-53851:
   compat: 5
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
   patches:
     default:
       content: |-
@@ -5178,6 +5179,7 @@ SCKA-20060:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCKA-20061:
@@ -5240,10 +5242,10 @@ SCKA-20069:
   region: "NTSC-K"
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
 SCKA-20070:
   name: "Ace Combat Zero - The Belkan War"
   region: "NTSC-K"
@@ -6113,6 +6115,7 @@ SCPS-15099:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCPS-15100:
@@ -6123,6 +6126,7 @@ SCPS-15100:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCPS-15101:
@@ -6153,10 +6157,10 @@ SCPS-15106:
   compat: 5
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
   patches:
     626552EB:
       content: |-
@@ -6579,6 +6583,7 @@ SCPS-19321:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCPS-19322:
@@ -6632,10 +6637,10 @@ SCPS-19326:
   region: "NTSC-J"
   gameFixes:
     - XGKickHack # Fixes SPS.
-    - SoftwareRendererFMVHack # Fixes vertical lines in FMVs that aren't fixed with merge sprite.
   gsHWFixes:
     mergeSprite: 1 # Fixes vertical lines in-game.
     preloadFrameData: 1 # Fixes some missing effects.
+    partialTargetInvalidation: 1 # Fixes offset invalidation for post effect.
 SCPS-19327:
   name: "Ape Escape 3 [PlayStation 2 the Best - Reprint]"
   region: "NTSC-J"
@@ -6651,6 +6656,7 @@ SCPS-19328:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCPS-19329:
@@ -8325,6 +8331,7 @@ SCUS-97465:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCUS-97466:
@@ -8441,6 +8448,7 @@ SCUS-97485:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCUS-97486:
@@ -8461,6 +8469,7 @@ SCUS-97487:
   gsHWFixes:
     mipmap: 1 # Fixes broken textures.
     disablePartialInvalidation: 1 # Prevents world geometry and some models from vanishing when pausing or opening vendor.
+    partialTargetInvalidation: 1 # Fixes bad textures being read back during scene transitions.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 1 # Helps fix misaligned bloom.
 SCUS-97488:
@@ -9263,6 +9272,7 @@ SLED-50117:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLED-50286:
   name: "Red Faction [Demo]"
   region: "PAL-E"
@@ -10327,6 +10337,7 @@ SLES-50273:
   region: "PAL-M5"
   gsHWFixes:
     preloadFrameData: 1 # Reduces black ground textures.
+    textureInsideRT: 1 # Helps fix black textures.
 SLES-50274:
   name: "Arctic Thunder"
   region: "PAL-M3"
@@ -10502,6 +10513,7 @@ SLES-50383:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-50384:
   name: "Metal Gear Solid 2 - Sons of Liberty"
   region: "PAL-I"
@@ -10509,6 +10521,7 @@ SLES-50384:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-50385:
   name: "Metal Gear Solid 2 - Sons of Liberty"
   region: "PAL-S"
@@ -10516,6 +10529,7 @@ SLES-50385:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-50386:
   name: "Crash Bandicoot - The Wrath of Cortex"
   region: "PAL-M6"
@@ -12062,6 +12076,8 @@ SLES-51113:
   compat: 5
   gameFixes:
     - DMABusyHack # Fixes the corrupted fade effect in cutscenes.
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-51114:
   name: "Pro Evolution Soccer 2"
   region: "PAL-M5"
@@ -13419,10 +13435,16 @@ SLES-51752:
 SLES-51753:
   name: "True Crime - Streets of L.A."
   region: "PAL-E"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
 SLES-51754:
   name: "True Crime - Streets of L.A."
   region: "PAL-M5"
   compat: 3
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
 SLES-51755:
   name: "Disney-Pixar's Finding Nemo"
   region: "PAL-E"
@@ -19437,8 +19459,6 @@ SLES-54171:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes flickering.
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLES-54172:
   name: "Garfield 2 - Tale of Two Kitties"
   region: "PAL-M11"
@@ -22285,8 +22305,6 @@ SLES-55242:
   memcardFilters: # Allows import of Yakuza 1 data.
     - "SLES-55242"
     - "SLES-54171"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLES-55243:
   name: "FIFA 09"
   region: "PAL-E"
@@ -23175,6 +23193,7 @@ SLES-82009:
     - DMABusyHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-82010:
   name: "Metal Gear Solid 2, Document of"
   region: "PAL-E"
@@ -23741,6 +23760,8 @@ SLKA-25066:
   name: "Zone of the Enders - The 2nd Runner SE"
   region: "NTSC-K"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLKA-25067:
   name: "Unlimited Saga"
   region: "NTSC-K"
@@ -24359,16 +24380,12 @@ SLKA-25280:
   memcardFilters:
     - "SLKA-25280"
     - "SLKA-25342"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLKA-25281:
   name: "Ryu ga Gotoku 2 [Disc 2 of 2]"
   region: "NTSC-K"
   memcardFilters:
     - "SLKA-25280"
     - "SLKA-25342"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLKA-25284:
   name: "Sakura Taisen 3"
   region: "NTSC-K"
@@ -24561,8 +24578,6 @@ SLKA-25341:
 SLKA-25342:
   name: "Ryu ga Gotoku"
   region: "NTSC-K"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLKA-25346:
   name: "Prince of Persia - The Two Thrones"
   region: "NTSC-K"
@@ -24748,6 +24763,7 @@ SLKA-35001:
     - DMABusyHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLKA-35003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-K"
@@ -25659,6 +25675,7 @@ SLPM-61147:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
 SLPM-61148:
   name: "Growlanser V - Generations [Taikenban Demo]"
@@ -25785,6 +25802,7 @@ SLPM-62043:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-62044:
   name: "RC Revenge Pro"
   region: "NTSC-J"
@@ -28256,6 +28274,7 @@ SLPM-65077:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
   memcardFilters:
     - "SLPM-65078"
     - "SLPM-65077"
@@ -28266,6 +28285,7 @@ SLPM-65078:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
   memcardFilters:
     - "SLPM-65078"
     - "SLPM-65077"
@@ -28784,6 +28804,8 @@ SLPM-65235:
 SLPM-65236:
   name: "Anubis - Zone of the Enders"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-65237:
   name: "Z.O.E. - Zone of the Enders [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -29208,6 +29230,8 @@ SLPM-65361:
   name: "Anubis - Zone of the Enders Special Edition [Limited Edition]"
   region: "NTSC-J"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-65362:
   name: "NHK Tensai Bit-Kun - Guramon Battle"
   region: "NTSC-J"
@@ -29672,6 +29696,8 @@ SLPM-65499:
 SLPM-65500:
   name: "Anubis - Zone of the Enders Special Edition"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-65501:
   name: "Onimusha [Mega Hits!]"
   region: "NTSC-J"
@@ -30439,6 +30465,9 @@ SLPM-65728:
 SLPM-65729:
   name: "True Crime - Streets of L.A."
   region: "NTSC-J"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
 SLPM-65730:
   name: "Rockman X8"
   region: "NTSC-J"
@@ -30542,6 +30571,7 @@ SLPM-65754:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-65755:
   name: "Samurai Western - Katsugeki Samurai-dou"
   region: "NTSC-J"
@@ -31389,6 +31419,8 @@ SLPM-65990:
 SLPM-65991:
   name: "Anubis - Zone of the Enders Special Edition [Konami Dendou Collection]"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-65994:
   name: "Remember 11 - The Age of Infinity [Superlite 2000 Series]"
   region: "NTSC-J"
@@ -31398,9 +31430,7 @@ SLPM-65995:
   clampModes:
     vuClampMode: 3 # Fixes minor SPS on characters.
   gsHWFixes:
-    preloadFrameData: 1 # Fixes bad textures on Jake.
-    halfPixelOffset: 1 # Fixes double image.
-    cpuCLUTRender: 1 # Fixes Jake going black in Smellovision.
+    halfPixelOffset: 2 # Fixes double image.
 SLPM-65996:
   name: "Hametsu no Mars [Limited Edition]"
   region: "NTSC-J"
@@ -31756,6 +31786,9 @@ SLPM-66097:
 SLPM-66098:
   name: "True Crime - Streets of L.A. [CapKore]"
   region: "NTSC-J"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
 SLPM-66099:
   name: "Harukanaru Toki no Naka de 3 - Izayoiki [Premium Box-Triple Pack]"
   region: "NTSC-J"
@@ -32064,8 +32097,6 @@ SLPM-66167:
 SLPM-66168:
   name: "Ryu Ga Gotoku"
   region: "NTSC-J"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-66169:
   name: "J-League Winning Eleven 9 - Asia Championship"
   region: "NTSC-J"
@@ -33417,6 +33448,7 @@ SLPM-66503:
     - DMABusyHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-66504:
   name: "Onimusha 2 [Mega Hits]"
   region: "NTSC-J"
@@ -33771,8 +33803,6 @@ SLPM-66602:
     - "SLPM-66168"
     - "SLPM-74234"
     - "SLPM-74253"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-66603:
   name: "Ryu ga Gotoku 2 [Disc 2 of 2]"
   region: "NTSC-J"
@@ -33782,8 +33812,6 @@ SLPM-66603:
     - "SLPM-66168"
     - "SLPM-74234"
     - "SLPM-74253"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-66604:
   name: "Galaxy Angel - Moonlit Lovers [Banpresido the Best]"
   region: "NTSC-J"
@@ -34553,6 +34581,7 @@ SLPM-66792:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-66793:
   name: "Metal Gear Solid 2 - Sons of Liberty [20th Anniversary Edition] [Disc 2 of 2]"
   region: "NTSC-J"
@@ -34560,6 +34589,7 @@ SLPM-66793:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-66794:
   name: "Metal Gear Solid 3 - Snake Eater [20th Anniversary Edition]"
   region: "NTSC-J"
@@ -35211,6 +35241,7 @@ SLPM-67002:
     - DMABusyHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-67003:
   name: "Sakura Taisen - Atsuki Chishioni"
   region: "NTSC-J"
@@ -35236,6 +35267,7 @@ SLPM-67008:
   region: "NTSC-J"
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-67009:
   name: "Sakura Taisen V - Saraba Itoshiki Hito Yo"
   region: "NTSC-J"
@@ -35334,6 +35366,7 @@ SLPM-67515:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-67518:
   name: "Onimusha 2 Samurai's Destiny"
   region: "NTSC-K"
@@ -35452,6 +35485,7 @@ SLPM-68503:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-68504:
   name: "Tokimeki Memorial 3 - Special Sound Track"
   region: "NTSC-J"
@@ -35634,8 +35668,6 @@ SLPM-74233:
 SLPM-74234:
   name: "Ryu Ga Gotoku [PlayStation 2 The Best]"
   region: "NTSC-J"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-74235:
   name: "Sengoku Musou [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -35746,8 +35778,6 @@ SLPM-74252:
 SLPM-74253:
   name: "Ryu ga Gotoku [PlayStation 2 the Best - Reprint]"
   region: "NTSC-J"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-74254:
   name: "EX Jinsei Game II [PlayStation 2 the Best - Reprint]"
   region: "NTSC-J"
@@ -35758,6 +35788,7 @@ SLPM-74255:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-74256:
   name: "Metal Gear Solid 2 - Sons of Liberty [PlayStation 2 The Best] [Disc 2 of 2]"
   region: "NTSC-J"
@@ -35765,6 +35796,7 @@ SLPM-74256:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLPM-74259:
   name: "Odin Sphere [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -35807,8 +35839,6 @@ SLPM-74301:
     - "SLPM-66168"
     - "SLPM-74234"
     - "SLPM-74253"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLPM-74402:
   name: "Capcom vs. SNK 2 [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -36973,7 +37003,7 @@ SLPS-20442:
   name: "Daito Giken Koushiki Pachi-Slot Simulator Banchou"
   region: "NTSC-J"
 SLPS-20443:
-  name: "Blocks Club with Bumpy Trot"
+  name: "Blokus Club with Bumpy Trot"
   region: "NTSC-J"
 SLPS-20444:
   name: "Simple 2000 Series Vol. 90 - The OneeChanBara 2"
@@ -37702,7 +37732,7 @@ SLPS-25124:
   name: "G-Breaker 2 - Doumei no Hangeki"
   region: "NTSC-J"
 SLPS-25125:
-  name: "Iris [Limited Edition]"
+  name: "Jitsumei Jikkyou Keiba - Dream Classic 2002"
   region: "NTSC-J"
 SLPS-25127:
   name: "Air"
@@ -39531,6 +39561,7 @@ SLPS-25640:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
   memcardFilters: # Allows import of Xenosaga II save data.
     - "SLPS-25640"
@@ -39543,6 +39574,7 @@ SLPS-25641:
     autoFlush: 1 # Fixes shadows in cutscenes.
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows (probably texture cache issue).
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
   memcardFilters:
     - "SLPS-25640"
@@ -41466,11 +41498,12 @@ SLUS-20047:
   region: "NTSC-U"
   compat: 5
 SLUS-20048:
-  name: "Legion - Legend of Excalibur"
+  name: "Legion - The Legend of Excalibur"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
     preloadFrameData: 1 # Reduces black ground textures.
+    textureInsideRT: 1 # Helps fix black textures.
 SLUS-20049:
   name: "MLB Slugfest 2003"
   region: "NTSC-U"
@@ -41791,6 +41824,7 @@ SLUS-20144:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLUS-20145:
   name: "Ring of Red"
   region: "NTSC-U"
@@ -43645,6 +43679,8 @@ SLUS-20545:
   name: "Zone of the Enders - The 2nd Runner"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLUS-20546:
   name: "Evolution Snowboarding"
   region: "NTSC-U"
@@ -43673,6 +43709,9 @@ SLUS-20550:
   name: "True Crime - Streets of L.A."
   region: "NTSC-U"
   compat: 3
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
 SLUS-20552:
   name: "Grand Theft Auto - Vice City"
   region: "NTSC-U"
@@ -43689,6 +43728,7 @@ SLUS-20554:
     - DMABusyHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLUS-20555:
   name: "Reel Fishing 3"
   region: "NTSC-U"
@@ -46050,9 +46090,7 @@ SLUS-21018:
   clampModes:
     vuClampMode: 3 # Fixes minor SPS on characters.
   gsHWFixes:
-    preloadFrameData: 1 # Fixes bad textures on Jake.
-    halfPixelOffset: 1 # Fixes double image.gsHWFixes:
-    cpuCLUTRender: 1 # Fixes Jake going black in Smellovision.
+    halfPixelOffset: 2 # Fixes double image.
 SLUS-21019:
   name: "Technic Beat"
   region: "NTSC-U"
@@ -46599,6 +46637,7 @@ SLUS-21127:
     halfPixelOffset: 2 # Fixes lighting/shadows.
     preloadFrameData: 1 # Fixes sun flickering.
     autoFlush: 1 # Fixes sun through objects.
+    bilinearUpscale: 1 # Smooths out sun glare textures like native.
 SLUS-21128:
   name: "Blitz - The League"
   region: "NTSC-U"
@@ -47866,8 +47905,6 @@ SLUS-21348:
   compat: 5
   gameFixes:
     - EETimingHack # Fixes flickering.
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLUS-21349:
   name: "Taito Legends 2"
   region: "NTSC-U"
@@ -48137,6 +48174,7 @@ SLUS-21389:
     autoFlush: 1
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows.
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
   memcardFilters: # Allows import of Xenosaga II save data.
     - "SLUS-21389"
@@ -48286,6 +48324,7 @@ SLUS-21417:
     autoFlush: 1
     halfPixelOffset: 1 # Fixes lighting misalignment and reduces ground shadows.
     roundSprite: 2 # Fixes font artifacts.
+    textureInsideRT: 1 # Fixes bad crystal surfaces.
     getSkipCount: "GSC_XenosagaE3"
   memcardFilters:
     - "SLUS-21389"
@@ -49934,8 +49973,6 @@ SLUS-21769:
   memcardFilters: # Allows import of Yakuza 1 data.
     - "SLUS-21769"
     - "SLUS-21348"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLUS-21770:
   name: "Madden NFL '09"
   region: "NTSC-U"
@@ -50926,6 +50963,7 @@ SLUS-29003:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
+    partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLUS-29004:
   name: "Unison & Dead or Alive 2 Hardcore [Demo]"
   region: "NTSC-U"
@@ -51557,8 +51595,6 @@ SLUS-29194:
 SLUS-29195:
   name: "Yakuza [Demo]"
   region: "NTSC-U"
-  gsHWFixes:
-    getSkipCount: "GSC_YakuzaGames"
 SLUS-29196:
   name: "Destroy All Humans! 2 [Demo]"
   region: "NTSC-U"
