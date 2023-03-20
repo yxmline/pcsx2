@@ -1554,62 +1554,6 @@ bool GSTextureCache::PrepareDownloadTexture(u32 width, u32 height, GSTexture::Fo
 	return true;
 }
 
-// Expands targets where the write from the EE overlaps the edge of a render target and uses the same base pointer.
-void GSTextureCache::ExpandTarget(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r)
-{
-	GIFRegTEX0 TEX0;
-	TEX0.TBP0 = BITBLTBUF.DBP;
-	TEX0.TBW = BITBLTBUF.DBW;
-	TEX0.PSM = BITBLTBUF.DPSM;
-	Target* dst = nullptr;
-	auto& list = m_dst[RenderTarget];
-	RGBAMask rgba;
-	rgba._u32 = GSUtil::GetChannelMask(TEX0.PSM);
-
-	for (auto i = list.begin(); i != list.end(); ++i)
-	{
-		Target* t = *i;
-
-		if (TEX0.TBP0 == t->m_TEX0.TBP0 && GSLocalMemory::m_psm[TEX0.PSM].bpp == GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp && t->Overlaps(TEX0.TBP0, TEX0.TBW, TEX0.PSM, r))
-		{
-			list.MoveFront(i.Index());
-
-			dst = t;
-			break;
-		}
-	}
-
-	if (!dst)
-		return;
-
-	// Only expand the target when the FBW matches. Otherwise, games like GT4 will end up with the main render target
-	// being 2000+ due to unrelated EE writes.
-	if (TEX0.TBW == dst->m_TEX0.TBW)
-	{
-		// Round up to the nearest even height, like the draw target allocator.
-		const s32 aligned_height = Common::AlignUpPow2(r.w, 2);
-		if (r.z > dst->m_unscaled_size.x || aligned_height > dst->m_unscaled_size.y)
-		{
-			// We don't recycle here, because most of the time when this happens it's strange-sized textures
-			// which are being expanded one-line-at-a-time.
-			if (dst->ResizeTexture(std::max(r.z, dst->m_unscaled_size.x),
-					std::max(aligned_height, dst->m_unscaled_size.y), false))
-			{
-				AddDirtyRectTarget(dst, r, TEX0.PSM, TEX0.TBW, rgba);
-				GetTargetHeight(TEX0.TBP0, TEX0.TBW, TEX0.PSM, aligned_height);
-				dst->UpdateValidity(r);
-				dst->UpdateValidBits(GSLocalMemory::m_psm[TEX0.PSM].fmsk);
-			}
-		}
-	}
-	else
-	{
-		const GSVector4i clamped_r(r.rintersect(dst->GetUnscaledRect()));
-		AddDirtyRectTarget(dst, clamped_r, TEX0.PSM, TEX0.TBW, rgba);
-		dst->UpdateValidity(clamped_r);
-		dst->UpdateValidBits(GSLocalMemory::m_psm[TEX0.PSM].fmsk);
-	}
-}
 // Goal: Depth And Target at the same address is not possible. On GS it is
 // the same memory but not on the Dx/GL. Therefore a write to the Depth/Target
 // must invalidate the Target/Depth respectively
@@ -2199,8 +2143,6 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 				if (!expecting_this_tex)
 					continue;
 
-				z_found = true;
-
 				t->readbacks_since_draw++;
 
 				GSVector2i page_size = GSLocalMemory::m_psm[t->m_TEX0.PSM].pgs;
@@ -2273,9 +2215,15 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 						continue;
 				}
 
-				Read(t, draw_rect);
-				if (draw_rect.rintersect(t->m_drawn_since_read).eq(t->m_drawn_since_read))
-					t->m_drawn_since_read = GSVector4i::zero();
+				if (!draw_rect.rempty())
+				{
+					Read(t, draw_rect);
+
+					z_found = true;
+
+					if (draw_rect.rintersect(t->m_drawn_since_read).eq(t->m_drawn_since_read))
+						t->m_drawn_since_read = GSVector4i::zero();
+				}
 			}
 		}
 		if (z_found)
@@ -2393,6 +2341,11 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 			if (targetr.rintersect(t->m_dirty.GetTotalRect(t->m_TEX0, t->m_unscaled_size)).eq(targetr))
 				return;
 
+			// Need to check the drawn area first.
+			// Shadow Hearts From the New World tries to double buffer, then because we don't support rendering inside an RT, it makes a new one.
+			// This makes sure any misdetection doesn't accidentally break the drawn area or skip download completely.
+			targetr = targetr.rintersect(t->m_drawn_since_read);
+
 			if (!targetr.rempty())
 			{
 				if (GSConfig.HWDownloadMode != GSHardwareDownloadMode::Enabled)
@@ -2401,7 +2354,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 					continue;
 				}
 
-				Read(t, targetr.rintersect(t->m_drawn_since_read));
+				Read(t, targetr);
 
 				// Try to cut down how much we read next, if we can.
 				// Fatal Frame reads in vertical strips, SOCOM 2 does horizontal, so we can handle that below.
@@ -2409,7 +2362,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 				{
 					t->m_drawn_since_read = GSVector4i::zero();
 				}
-				else if (targetr.width() == t->m_drawn_since_read.width()
+				else if (targetr.xzxz().eq(t->m_drawn_since_read.xzxz())
 					&& targetr.w >= t->m_drawn_since_read.y)
 				{
 					if (targetr.y <= t->m_drawn_since_read.y)
@@ -2417,7 +2370,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 					else if (targetr.w >= t->m_drawn_since_read.w)
 						t->m_drawn_since_read.w = targetr.y;
 				}
-				else if (targetr.height() == t->m_drawn_since_read.height()
+				else if (targetr.ywyw().eq(t->m_drawn_since_read.ywyw())
 					&& targetr.z >= t->m_drawn_since_read.x)
 				{
 					if (targetr.x <= t->m_drawn_since_read.x)
