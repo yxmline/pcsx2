@@ -817,8 +817,30 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 
 					const u32 channel_mask = GSUtil::GetChannelMask(psm);
 					const u32 channels = t->m_dirty.GetDirtyChannels() & channel_mask;
+
+					// If the source is reading the rt, make sure it's big enough.
+					if (t && GSUtil::HasCompatibleBits(psm, t->m_TEX0.PSM))
+					{
+						GSVector4i dirty_rect = t->m_dirty.GetTotalRect(t->m_TEX0, GSVector2i(new_rect.z, new_rect.w));
+						const GSVector2i size_delta = { (dirty_rect.z - t->m_valid.z), (dirty_rect.w - t->m_valid.w) };
+						if (size_delta.x > 0 || size_delta.y > 0)
+						{
+							RGBAMask rgba;
+							rgba._u32 = GSUtil::GetChannelMask(t->m_TEX0.PSM);
+							// Dirty the expanded areas.
+							AddDirtyRectTarget(t, GSVector4i(t->m_valid.x, t->m_valid.w, t->m_valid.z + std::max(0, size_delta.x), t->m_valid.w + std::max(0, size_delta.y)), t->m_TEX0.PSM, t->m_TEX0.TBW, rgba);
+							AddDirtyRectTarget(t, GSVector4i(t->m_valid.z, t->m_valid.y, t->m_valid.z + std::max(0, size_delta.x), t->m_valid.w + std::max(0, size_delta.y)), t->m_TEX0.PSM, t->m_TEX0.TBW, rgba);
+							const GSVector4i valid_rect = { t->m_valid.x, t->m_valid.y, t->m_valid.z + std::max(0, size_delta.x), t->m_valid.w + std::max(0, size_delta.y) };
+							t->UpdateValidity(valid_rect);
+							t->UpdateValidBits(GSLocalMemory::m_psm[t->m_TEX0.PSM].fmsk);
+							GetTargetHeight(TEX0.TBP0, TEX0.TBW, TEX0.PSM, t->m_valid.w);
+							const int new_w = std::max(t->m_unscaled_size.x, t->m_valid.z);
+							const int new_h = std::max(t->m_unscaled_size.y, t->m_valid.w);
+							t->ResizeTexture(new_w, new_h);
+						}
+					}
 					// If not all channels are clean/dirty or only part of the rect is dirty, we need to update the target.
-					if (((channels & channel_mask) != channel_mask || partial) && !rect_clean)
+					if (((channels & channel_mask) != channel_mask || partial))
 						t->Update(false);
 				}
 				else
@@ -992,41 +1014,6 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 			}
 		}
 
-		if (tex_in_rt)
-		{
-			GSVector2i size_delta = { ((x_offset + (1 << TEX0.TW)) - dst->m_valid.z), ((y_offset + (1 << TEX0.TH)) - dst->m_valid.w) };
-			RGBAMask rgba;
-			rgba._u32 = GSUtil::GetChannelMask(psm);
-
-			if (size_delta.x > 0)
-			{
-				// Expand the target if it's only partially inside it.
-				const GSVector4i dirty_rect = { dst->m_valid.z, 0, x_offset + (1 << TEX0.TW), dst->m_valid.w };
-
-				if (dirty_rect.z > dst->m_valid.z)
-				{
-					dst->UpdateValidity(dirty_rect);
-
-					AddDirtyRectTarget(dst, dirty_rect, dst->m_TEX0.PSM, dst->m_TEX0.TBW, rgba);
-				}
-			}
-
-			if (size_delta.y > 0)
-			{
-				// Expand the target if it's only partially inside it.
-				const GSVector4i dirty_rect = { 0, dst->m_valid.w, dst->m_valid.z, y_offset + (1 << TEX0.TH) };
-
-				if (dirty_rect.w > dst->m_valid.w)
-				{
-					dst->UpdateValidity(dirty_rect);
-
-					AddDirtyRectTarget(dst, dirty_rect, dst->m_TEX0.PSM, dst->m_TEX0.TBW, rgba);
-				}
-			}
-
-			if (dst->m_valid.z > dst->m_unscaled_size.x || dst->m_valid.w > dst->m_unscaled_size.y)
-				dst->ResizeTexture(dst->m_valid.z, dst->m_valid.w);
-		}
 		// Pure depth texture format will be fetched by LookupDepthSource.
 		// However guess what, some games (GoW) read the depth as a standard
 		// color format (instead of a depth format). All pixels are scrambled
