@@ -6764,6 +6764,8 @@ SCPS-51004:
 SCPS-51005:
   name: "Samurai"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Stops crash after intro movie.
 SCPS-51006:
   name: "Alpine Racer 3"
   region: "NTSC-J"
@@ -9270,7 +9272,6 @@ SLAJ-25077:
   region: "NTSC-Unk"
   memcardFilters:
     - "SLAJ-25077"
-    - "SLPM-55122"
     - "SLPM-66307"
     - "SLPM-74247"
     - "SLAJ-25035"
@@ -11815,7 +11816,7 @@ SLES-50921:
   name: "Way of the Samurai"
   region: "PAL-M3"
   gameFixes:
-    - EETimingHack # Stops crash after intro movie
+    - EETimingHack # Stops crash after intro movie.
 SLES-50922:
   name: "Terminator, The - Dawn of Fate"
   region: "PAL-M5"
@@ -25173,21 +25174,8 @@ SLPM-55121:
   name: "Fukakutei Sekai no Tantei Shinshi - Akugyou Souma no Jiken File"
   region: "NTSC-J"
 SLPM-55122:
-  name: "Sengoku Musou 2"
+  name: "Gundam Musou 2"
   region: "NTSC-J"
-  memcardFilters:
-    - "SLAJ-25077"
-    - "SLPM-55122"
-    - "SLPM-66307"
-    - "SLPM-74247"
-    - "SLAJ-25035"
-    - "SLPM-65517"
-    - "SLPM-74212"
-    - "SLPM-74235"
-    - "SLAJ-25048"
-    - "SLPM-65718"
-    - "SLPM-74224"
-    - "SLPM-74249"
 SLPM-55127:
   name: "Need for Speed - Undercover"
   region: "NTSC-J"
@@ -28278,6 +28266,18 @@ SLPM-65025:
 SLPM-65026:
   name: "beatmania IIDX 4th style -new songs collection-"
   region: "NTSC-J"
+SLPM-65031:
+  name: "Kessen 2"
+  region: "NTSC-J"
+  patches:
+    7C012435:
+      content: |-
+        comment=COP2 flag instance patch by refraction
+        // A mac flag check just after a vsub which gets in the way, rearranging.
+        patch=0,EE,0016ae90,word,48438800
+        patch=0,EE,0016ae94,word,4BE521AC
+        patch=0,EE,0016ae98,word,30848000
+        patch=0,EE,0016ae9c,word,4BE72B3C
 SLPM-65032:
   name: "Tokyo Bus Guide - Annai"
   region: "NTSC-J"
@@ -35658,6 +35658,11 @@ SLPM-68005:
     mipmap: 2 # Fixes blurry textures.
     trilinearFiltering: 1 # Fixes blurry textures.
     cpuFramebufferConversion: 1 # Fixes right side of the screen from garbage textures.
+SLPM-68017:
+  name: "Shin Onimusha - Dawn of Dreams [Saikyou Save Data]"
+  region: "NTSC-J"
+  memcardFilters:
+    - "SLPM-66275"
 SLPM-68018:
   name: "Virtua Fighter - 10th Anniversary Edition"
   region: "NTSC-J"
@@ -35809,6 +35814,8 @@ SLPM-74221:
 SLPM-74222:
   name: "Samurai Kanzenban [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Stops crash after intro movie.
 SLPM-74224:
   name: "Sengoku Musou Mushoden [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -35854,6 +35861,8 @@ SLPM-74232:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
     getSkipCount: "GSC_ShinOnimusha"
+  memcardFilters:
+    - "SLPM-66275"
 SLPM-74233:
   name: "Shin Onimusha - Dawn of Dreams [PlayStation 2 The Best][Disc 2]"
   region: "NTSC-J"
@@ -35934,7 +35943,6 @@ SLPM-74247:
   region: "NTSC-J"
   memcardFilters:
     - "SLAJ-25077"
-    - "SLPM-55122"
     - "SLPM-66307"
     - "SLPM-74247"
     - "SLAJ-25035"
@@ -35964,6 +35972,8 @@ SLPM-74251:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes misalignment and upscaling lines.
     getSkipCount: "GSC_ShinOnimusha"
+  memcardFilters:
+    - "SLPM-66275"
 SLPM-74252:
   name: "Shin Onimusha - Dawn of Dreams [PlayStation 2 the Best - Reprint Disc 2]"
   region: "NTSC-J"
@@ -36048,6 +36058,8 @@ SLPM-74404:
 SLPM-74405:
   name: "Samurai Complete Edition [PlayStation 2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Stops crash after intro movie.
 SLPM-74406:
   name: "World Rally Championship [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -36557,6 +36569,8 @@ SLPS-20177:
 SLPS-20178:
   name: "Samurai"
   region: "NTSC-J"
+  gameFixes:
+    - EETimingHack # Stops crash after intro movie.
 SLPS-20181:
   name: "Alpine Racer 3"
   region: "NTSC-J"
@@ -43273,7 +43287,7 @@ SLUS-20407:
   region: "NTSC-U"
   compat: 5
   gameFixes:
-    - EETimingHack # Stops crash after intro movie
+    - EETimingHack # Stops crash after intro movie.
 SLUS-20408:
   name: "Pitfall - The Lost Expedition"
   region: "NTSC-U"
