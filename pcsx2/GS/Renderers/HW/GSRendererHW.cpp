@@ -4074,16 +4074,22 @@ void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Target*
 	const float oy = static_cast<float>(static_cast<int>(m_context->XYOFFSET.OFY));
 	float ox2 = -1.0f / rtsize.x;
 	float oy2 = -1.0f / rtsize.y;
-
+	float mod_xy = 0.0f;
 	//This hack subtracts around half a pixel from OFX and OFY.
 	//
 	//The resulting shifted output aligns better with common blending / corona / blurring effects,
 	//but introduces a few bad pixels on the edges.
-
-	if (rt && rt->OffsetHack_modxy > 1.0f)
+	if (!rt)
 	{
-		ox2 *= rt->OffsetHack_modxy;
-		oy2 *= rt->OffsetHack_modxy;
+		mod_xy = GetModXYOffset();
+	}
+	else
+		mod_xy = rt->OffsetHack_modxy;
+
+	if (mod_xy > 1.0f)
+	{
+		ox2 *= mod_xy;
+		oy2 *= mod_xy;
 	}
 
 	m_conf.cb_vs.vertex_scale = GSVector2(sx, sy);
