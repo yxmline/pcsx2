@@ -16019,8 +16019,9 @@ SLES-52812:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52813:
   name: "Incredibles, The"
   region: "PAL-NL-F"
@@ -16028,48 +16029,54 @@ SLES-52813:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52814:
   name: "Incredibles, The"
   region: "PAL-I"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52815:
   name: "Disney-Pixar's The Incredibles"
   region: "PAL-G"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52816:
   name: "Increíbles, Los"
   region: "PAL-S"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52820:
   name: "Incredibles, The"
   region: "PAL-SC"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52821:
   name: "Incredibles, The"
   region: "PAL-P"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52822:
   name: "Prince of Persia - Warrior Within"
   region: "PAL-M6"
@@ -16215,23 +16222,29 @@ SLES-52895:
   region: "PAL-E"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52896:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-F-G"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52897:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-I"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52898:
   name: "King of Fighters - Maximum Impact"
   region: "PAL-E-JP"
@@ -16470,16 +16483,20 @@ SLES-52985:
   name: "Spongebob SquarePants - The Movie"
   region: "PAL-G"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52986:
   name: "Bob Esponja - La Película"
   region: "PAL-S"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-52988:
   name: "Mega Man X8"
   region: "PAL-M5"
@@ -17624,16 +17641,18 @@ SLES-53473:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-53474:
   name: "Incredibles, The - Rise of the Underminer"
   region: "PAL-M3"
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-53480:
   name: "Harvest Moon - A Wonderful Life [Special Edition]"
   region: "PAL-E"
@@ -18290,8 +18309,9 @@ SLES-53658:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLES-53659:
   name: "Brothers In Arms - Earned in Blood"
   region: "PAL-M5"
@@ -20465,10 +20485,14 @@ SLES-54487:
 SLES-54488:
   name: "WWE SmackDown! vs. RAW 2007"
   region: "PAL-I"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54489:
   name: "WWE SmackDown! vs. RAW 2007"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54490:
   name: "God Hand"
   region: "PAL-M5"
@@ -21271,6 +21295,7 @@ SLES-54793:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54795:
   name: "Falling Stars"
   region: "PAL-M6"
@@ -21481,6 +21506,7 @@ SLES-54879:
   region: "PAL-M5"
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54880:
   name: "NBA 2K8"
   region: "PAL-M5"
@@ -22502,12 +22528,14 @@ SLES-55250:
   region: "PAL-A"
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-55251:
   name: "WWE SmackDown vs. Raw 2009"
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-55252:
   name: "NHL 2K9"
   region: "PAL-M5"
@@ -23087,6 +23115,8 @@ SLES-55545:
   name: "WWE SmackDown vs. Raw 2010"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLES-55546:
   name: "Secret Saturdays, The - Beasts of the 5th Sun"
   region: "PAL-M5"
@@ -24406,8 +24436,9 @@ SLKA-25226:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLKA-25227:
   name: "Neo Contra"
   region: "NTSC-K"
@@ -24811,6 +24842,7 @@ SLKA-25365:
   region: "NTSC-K"
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLKA-25366:
   name: "Naruto - Uzumaki Chronicles 2"
   region: "NTSC-K"
@@ -24908,6 +24940,12 @@ SLKA-25443:
   name: "Musou Orochi Maou Sairin"
   region: "NTSC-K"
   compat: 5
+SLKA-25451:
+  name: "WWE SmackDown! vs. Raw 2008"
+  region: "NTSC-K"
+  gsHWFixes:
+    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLKA-25459:
   name: "Transformers - Revenge of the Fallen"
   region: "NTSC-K"
@@ -30777,8 +30815,9 @@ SLPM-65759:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLPM-65760:
   name: "Grand Theft Auto III [Capcom The Best]"
   region: "NTSC-J"
@@ -32634,8 +32673,11 @@ SLPM-66248:
   name: "Mr. Incredible - Kyouteki Underminer Toujou"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLPM-66249:
   name: "Growlanser V - Generations [Limited Edition]"
   region: "NTSC-J"
@@ -34080,6 +34122,8 @@ SLPM-66626:
 SLPM-66627:
   name: "WWE SmackDown! vs. RAW 2007"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLPM-66628:
   name: "OutRun 2 SP [First Print Limited Edition]"
   region: "NTSC-J"
@@ -34988,6 +35032,7 @@ SLPM-66863:
   region: "NTSC-J"
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLPM-66864:
   name: "Umisho"
   region: "NTSC-J"
@@ -45713,9 +45758,11 @@ SLUS-20904:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
+    trilinearFiltering: 1
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
-    textureInsideRT: 1 # Helps align bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLUS-20905:
   name: "Incredibles, The"
   region: "NTSC-U"
@@ -45723,8 +45770,9 @@ SLUS-20905:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes offset post processing.
-    cpuCLUTRender: 1 # Fixes duplicated post processing.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
+    cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLUS-20906:
   name: "Fight Night 2004"
   region: "NTSC-U"
@@ -47383,8 +47431,9 @@ SLUS-21217:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves the street's textures to match sw renderer.
     trilinearFiltering: 1
-    halfPixelOffset: 1 # Fixes bloom misalignment when upscaling.
+    halfPixelOffset: 2 # Fixes bloom misalignment when upscaling.
     cpuCLUTRender: 1 # Fixes duplicated bloom when upscaling.
+    partialTargetInvalidation: 1 # Helps align bloom when upscaling.
 SLUS-21218:
   name: "Tak - The Great Juju Challenge"
   region: "NTSC-U"
@@ -48700,6 +48749,8 @@ SLUS-21427:
   name: "WWE SmackDown! vs. RAW 2007"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21428:
   name: "Bionicle Heroes"
   region: "NTSC-U"
@@ -49684,6 +49735,7 @@ SLUS-21645:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21646:
   name: "Tiger Woods PGA Tour 08"
   region: "NTSC-U"
@@ -50461,6 +50513,7 @@ SLUS-21810:
   compat: 5
   gsHWFixes:
     halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21811:
   name: "MotoGP 08"
   region: "NTSC-U"
@@ -50837,6 +50890,8 @@ SLUS-21901:
   name: "WWE SmackDown vs. Raw 2010"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21902:
   name: "Bakugan - Battle Brawlers"
   region: "NTSC-U"
