@@ -24,12 +24,9 @@ public:
 	{
 		NoTitle,
 		GetawayGames,
-		HauntingGround,
 		ICO,
-		KOF2002,
 		PolyphonyDigitalGames,
 		SMTNocturne,
-		SVCChaos,
 		Tekken5,
 		TitleCount,
 	};
