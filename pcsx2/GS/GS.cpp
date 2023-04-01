@@ -108,6 +108,8 @@ void GSshutdown()
 
 void GSclose()
 {
+	GSTextureReplacements::Shutdown();
+
 	if (g_gs_renderer)
 	{
 		g_gs_renderer->Destroy();
@@ -127,24 +129,6 @@ void GSclose()
 
 static RenderAPI GetAPIForRenderer(GSRendererType renderer)
 {
-#if defined(_WIN32)
-	// On Windows, we use DX11 for software, since it's always available.
-	constexpr RenderAPI default_api = RenderAPI::D3D11;
-#elif defined(__APPLE__)
-	// For Macs, default to Metal.
-	constexpr RenderAPI default_api = RenderAPI::Metal;
-#else
-	// For Linux, default to OpenGL (because of hardware compatibility), if we
-	// have it, otherwise Vulkan (if we have it).
-#if defined(ENABLE_OPENGL)
-	constexpr RenderAPI default_api = RenderAPI::OpenGL;
-#elif defined(ENABLE_VULKAN)
-	constexpr RenderAPI default_api = RenderAPI::Vulkan;
-#else
-	constexpr RenderAPI default_api = RenderAPI::None;
-#endif
-#endif
-
 	switch (renderer)
 	{
 		case GSRendererType::OGL:
@@ -167,7 +151,7 @@ static RenderAPI GetAPIForRenderer(GSRendererType renderer)
 #endif
 
 		default:
-			return default_api;
+			return GetAPIForRenderer(GSUtil::GetPreferredRenderer());
 	}
 }
 
@@ -290,6 +274,7 @@ bool GSreopen(bool recreate_display, bool recreate_renderer, const Pcsx2Config::
 	const u32 gamecrc = g_gs_renderer->GetGameCRC();
 	if (recreate_renderer)
 	{
+		GSTextureReplacements::Shutdown();
 		g_gs_renderer->Destroy();
 		g_gs_renderer.reset();
 	}
@@ -773,7 +758,8 @@ void GSUpdateConfig(const Pcsx2Config::GSOptions& new_config)
 		g_gs_device->ClearSamplerCache();
 
 	// texture dumping/replacement options
-	GSTextureReplacements::UpdateConfig(old_config);
+	if (GSConfig.UseHardwareRenderer())
+		GSTextureReplacements::UpdateConfig(old_config);
 
 	// clear the hash texture cache since we might have replacements now
 	// also clear it when dumping changes, since we want to dump everything being used
