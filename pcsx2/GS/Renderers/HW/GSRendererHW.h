@@ -28,19 +28,6 @@ MULTI_ISA_DEF(void GSRendererHWPopulateFunctions(GSRendererHW& renderer);)
 
 class GSHwHack;
 
-struct GSFrameInfo
-{
-	u32 FBP;
-	u32 FPSM;
-	u32 FBMSK;
-	u32 ZBP;
-	u32 ZMSK;
-	u32 ZTST;
-	u32 TME;
-	u32 TBP0;
-	u32 TPSM;
-};
-
 class GSRendererHW : public GSRenderer
 {
 	MULTI_ISA_FRIEND(GSRendererHWFunctions);
@@ -52,7 +39,7 @@ public:
 private:
 	static constexpr float SSR_UV_TOLERANCE = 1.0f;
 
-	using GSC_Ptr = bool(*)(GSRendererHW& r, const GSFrameInfo& fi, int& skip);	// GSC - Get Skip Count
+	using GSC_Ptr = bool(*)(GSRendererHW& r, int& skip);	// GSC - Get Skip Count
 	using OI_Ptr = bool(*)(GSRendererHW& r, GSTexture* rt, GSTexture* ds, GSTextureCache::Source* t); // OI - Before draw
 
 	// Require special argument
@@ -109,6 +96,30 @@ private:
 	GSVector4i GetSplitTextureShuffleDrawRect() const;
 
 	GSVector4i m_r = {};
+	
+	// We modify some of the context registers to optimize away unnecessary operations.
+	// Instead of messing with the real context, we copy them and use those instead.
+	struct
+	{
+		GIFRegTEX0 TEX0;
+		GIFRegCLAMP CLAMP;
+		GIFRegTEST TEST;
+		GIFRegFRAME FRAME;
+		GIFRegZBUF ZBUF;
+
+		__ri bool DepthRead() const { return TEST.ZTE && TEST.ZTST >= 2; }
+
+		__ri bool DepthWrite() const
+		{
+			if (TEST.ATE && TEST.ATST == ATST_NEVER &&
+				TEST.AFAIL != AFAIL_ZB_ONLY) // alpha test, all pixels fail, z buffer is not updated
+			{
+				return false;
+			}
+
+			return ZBUF.ZMSK == 0 && TEST.ZTE != 0; // ZTE == 0 is bug on the real hardware, write is blocked then
+		}
+	} m_cached_ctx;
 
 	// CRC Hacks
 	bool IsBadFrame();
@@ -182,4 +193,7 @@ public:
 
 	/// Called by the texture cache to know for certain whether there is a channel shuffle.
 	bool TestChannelShuffle(GSTextureCache::Target* src);
+
+	/// Returns true if the specified texture address matches the frame or Z buffer.
+	bool IsTBPFrameOrZ(u32 tbp) const;
 };
