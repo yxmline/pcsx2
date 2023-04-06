@@ -39,7 +39,7 @@
 #include "GameDatabase.h"
 #include "GS.h"
 #include "GSDumpReplayer.h"
-#include "HostDisplay.h"
+#include "Host.h"
 #include "HostSettings.h"
 #include "INISettingsInterface.h"
 #include "IopBios.h"
@@ -993,7 +993,7 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 	ScopedGuard close_spu2(&SPU2::Close);
 
 	Console.WriteLn("Opening PAD...");
-	if (PADinit() != 0 || PADopen(g_host_display->GetWindowInfo()) != 0)
+	if (PADinit() != 0 || PADopen() != 0)
 	{
 		Host::ReportErrorAsync("Startup Error", "Failed to initialize PAD.");
 		return false;
@@ -1196,7 +1196,7 @@ void VMManager::Reset()
 
 	SysClearExecutionCache();
 	memBindConditionalHandlers();
-	UpdateVSyncRate();
+	UpdateVSyncRate(true);
 	frameLimitReset();
 	cpuReset();
 
@@ -1591,6 +1591,18 @@ void VMManager::SetPaused(bool paused)
 	SetState(paused ? VMState::Paused : VMState::Running);
 }
 
+VsyncMode Host::GetEffectiveVSyncMode()
+{
+	const bool has_vm = VMManager::GetState() != VMState::Shutdown;
+
+	// Force vsync off when not running at 100% speed.
+	if (has_vm && EmuConfig.GS.LimitScalar != 1.0f)
+		return VsyncMode::Off;
+
+	// Otherwise use the config setting.
+	return EmuConfig.GS.VsyncEnable;
+}
+
 const std::string& VMManager::Internal::GetElfOverride()
 {
 	return s_elf_override;
@@ -1701,7 +1713,7 @@ void VMManager::CheckForGSConfigChanges(const Pcsx2Config& old_config)
 		EmuConfig.LimiterMode = GetInitialLimiterMode();
 
 	gsUpdateFrequency(EmuConfig);
-	UpdateVSyncRate();
+	UpdateVSyncRate(true);
 	frameLimitReset();
 	GetMTGS().ApplySettings();
 }
@@ -1713,7 +1725,7 @@ void VMManager::CheckForFramerateConfigChanges(const Pcsx2Config& old_config)
 
 	Console.WriteLn("Updating frame rate configuration");
 	gsUpdateFrequency(EmuConfig);
-	UpdateVSyncRate();
+	UpdateVSyncRate(true);
 	frameLimitReset();
 }
 
