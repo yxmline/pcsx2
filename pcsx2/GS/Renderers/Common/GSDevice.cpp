@@ -105,7 +105,6 @@ const char* GSDevice::RenderAPIToString(RenderAPI api)
 		CASE(Metal);
 		CASE(Vulkan);
 		CASE(OpenGL);
-		CASE(OpenGLES);
 #undef CASE
 		// clang-format on
 	default:
@@ -196,22 +195,31 @@ bool GSDevice::GetHostRefreshRate(float* refresh_rate)
 
 bool GSDevice::UpdateImGuiFontTexture()
 {
+	ImGuiIO& io = ImGui::GetIO();
+
 	unsigned char* pixels;
 	int width, height;
-	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
 	const GSVector4i r(0, 0, width, height);
 	const int pitch = sizeof(u32) * width;
 
-	if (m_imgui_font && m_imgui_font->GetWidth() == width && m_imgui_font->GetHeight() == height)
-		return m_imgui_font->Update(r, pixels, pitch);
+	if (m_imgui_font && m_imgui_font->GetWidth() == width && m_imgui_font->GetHeight() == height &&
+		m_imgui_font->Update(r, pixels, pitch))
+	{
+		io.Fonts->SetTexID(m_imgui_font->GetNativeHandle());
+		return true;
+	}
 
 	GSTexture* new_font = CreateTexture(width, height, 1, GSTexture::Format::Color);
 	if (!new_font || !new_font->Update(r, pixels, pitch))
+	{
+		io.Fonts->SetTexID(m_imgui_font ? m_imgui_font->GetNativeHandle() : nullptr);
 		return false;
+	}
 
-	if (m_imgui_font)
-		Recycle(m_imgui_font);
+	// Don't bother recycling, it's unlikely we're going to reuse the same size as imgui for rendering.
+	delete m_imgui_font;
 
 	m_imgui_font = new_font;
 	ImGui::GetIO().Fonts->SetTexID(new_font->GetNativeHandle());
@@ -314,7 +322,7 @@ void GSDevice::Recycle(GSTexture* t)
 bool GSDevice::UsesLowerLeftOrigin() const
 {
 	const RenderAPI api = GetRenderAPI();
-	return (api == RenderAPI::OpenGL || api == RenderAPI::OpenGLES);
+	return (api == RenderAPI::OpenGL);
 }
 
 void GSDevice::AgePool()
