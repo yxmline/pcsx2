@@ -94,6 +94,8 @@ CPCS-01020:
   compat: 5
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 GUST-00009:
   name: "Mana Khemia - Alchemists of Al-Revis [Premium Box]"
   region: "NTSC-J"
@@ -2452,6 +2454,8 @@ SCED-52946:
 SCED-52952:
   name: "Jak 3 [Demo]"
   region: "PAL-M5"
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -3827,6 +3831,8 @@ SCES-52460:
   name: "Jak 3"
   region: "PAL-M7"
   compat: 5
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -5179,6 +5185,8 @@ SCKA-20039:
 SCKA-20040:
   name: "Jak 3"
   region: "NTSC-K"
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -8034,6 +8042,8 @@ SCUS-97330:
   name: "Jak 3"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -8291,6 +8301,8 @@ SCUS-97411:
 SCUS-97412:
   name: "Jak 3 [Demo]"
   region: "NTSC-U"
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -8794,6 +8806,8 @@ SCUS-97515:
 SCUS-97516:
   name: "Jak 3 [Greatest Hits]"
   region: "NTSC-U"
+  gameFixes:
+    - InstantDMAHack # Fixes holes in face geometry.
   gsHWFixes:
     mipmap: 2 # Fixes broken textures.
     trilinearFiltering: 1 # Fixes water textures.
@@ -12274,7 +12288,7 @@ SLES-51113:
   region: "PAL-M5"
   compat: 5
   gameFixes:
-    - DMABusyHack # Fixes the corrupted fade effect in cutscenes.
+    - InstantDMAHack # Fixes cut-off text.
   gsHWFixes:
     partialTargetInvalidation: 1 # Fixes cutscene blur effects.
 SLES-51114:
@@ -16943,6 +16957,8 @@ SLES-53099:
     - InstantDMAHack # Game has weird DMA handling (possible cache things?).
   roundModes:
     vu1RoundMode: 0 # Fixes shadow rendering.
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Improves speed by a moderate amount.
 SLES-53100:
   name: "Scooby-Doo! Unmasked"
   region: "PAL-M4"
@@ -17497,22 +17513,26 @@ SLES-53390:
   region: "PAL-E"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes Spider-Man's eye texture colour.
+    vu1ClampMode: 0 # Fixes Spider-Man's eye texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLES-53391:
   name: "Ultimate Spider-Man"
   region: "PAL-M5"
   clampModes:
-    vuClampMode: 0 # Fixes Spider-Man's eye texture colour.
+    vu1ClampMode: 0 # Fixes Spider-Man's eye texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLES-53393:
   name: "Spartan - Total Warrior"
   region: "PAL-M5"
@@ -18433,12 +18453,14 @@ SLES-53672:
   name: "Ultimate Spider-Man [Limited]"
   region: "PAL-E"
   clampModes:
-    vuClampMode: 0 # Fixes Fixes Spider-Man's eye texture colour.
+    vu1ClampMode: 0 # Fixes Fixes Spider-Man's eye texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLES-53676:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "PAL-E"
@@ -24546,6 +24568,8 @@ SLKA-25219:
   compat: 5
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 SLKA-25221:
   name: "Busin 0 - Wizardry Alternative Neo"
   region: "NTSC-K"
@@ -31332,6 +31356,8 @@ SLPM-65869:
   compat: 5
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 SLPM-65870:
   name: "Magic Teacher Negima - Honor Version"
   region: "NTSC-J"
@@ -32944,6 +32970,8 @@ SLPM-66280:
   compat: 5
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 SLPM-66281:
   name: "Sonic Riders"
   region: "NTSC-J"
@@ -33402,12 +33430,14 @@ SLPM-66404:
   name: "Ultimate Spider-Man"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes Spider-Man's eye texture colour.
+    vu1ClampMode: 0 # Fixes Spider-Man's eye texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLPM-66405:
   name: "Radirgy Precious"
   region: "NTSC-J"
@@ -36135,6 +36165,8 @@ SLPM-74245:
   region: "NTSC-J"
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 SLPM-74246:
   name: "Capcom vs. SNK 2 - Millionaire Fighting 2001 [PlayStation 2 the Best - Reprint]"
   region: "NTSC-J"
@@ -36160,6 +36192,8 @@ SLPM-74248:
   region: "NTSC-J"
   clampModes:
     vuClampMode: 3 # Fixes lighting on character models as caves and other locations don't turn mobs into glow-in-the-dark creatures by themselves.
+  gsHWFixes:
+    maximumBlendingLevel: 0 # Fixes unnecessary load on the GPU.
 SLPM-74249:
   name: "Sengoku Musou Mushoden [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -45746,12 +45780,14 @@ SLUS-20870:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes wrong texture colour.
+    vu1ClampMode: 0 # Fixes wrong texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLUS-20871:
   name: "Naval Ops - Commander"
   region: "NTSC-U"
@@ -48044,12 +48080,14 @@ SLUS-21285:
   name: "Ultimate Spider-Man [Limited Edition]"
   region: "NTSC-U"
   clampModes:
-    vuClampMode: 0 # Fixes Spider-Man's eyes texture.
+    vu1ClampMode: 0 # Fixes Spider-Man's eyes texture.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 SLUS-21286:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "NTSC-U"
@@ -52360,12 +52398,14 @@ TCPS-10158:
   name: "Ultimate Spider-Man"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes Spider-Man's eye texture colour.
+    vu1ClampMode: 0 # Fixes Spider-Man's eye texture colour.
   gsHWFixes:
     cpuSpriteRenderBW: 2 # Fixes textures.
     partialTargetInvalidation: 1 # Fixes texture distortion.
     mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
     trilinearFiltering: 1
+    autoFlush: 1 # Fixes shadow alignment along with HPO Special (Normal looks better but causes top left glitches).
+    halfPixelOffset: 2
 TCPS-10159:
   name: "Suzuki TT Super Bikes - Real Road Racing"
   region: "NTSC-J"
