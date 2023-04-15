@@ -163,7 +163,7 @@ bool GSDeviceOGL::Create(const WindowInfo& wi, VsyncMode vsync)
 		GLint max_vertex_ssbos = 0;
 		glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &max_vertex_ssbos);
 		DevCon.WriteLn("GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS: %d", max_vertex_ssbos);
-		m_features.vs_expand = (max_vertex_ssbos > 0);
+		m_features.vs_expand = (max_vertex_ssbos > 0 && GLAD_GL_ARB_gpu_shader5);
 	}
 	if (!m_features.vs_expand)
 		Console.Warning("Vertex expansion is not supported. This will reduce performance.");
@@ -876,8 +876,8 @@ void GSDeviceOGL::DrawPrimitive()
 void GSDeviceOGL::DrawIndexedPrimitive()
 {
 	g_perfmon.Put(GSPerfMon::DrawCalls, 1);
-	glDrawElementsBaseVertex(m_draw_topology, static_cast<u32>(m_index.count), GL_UNSIGNED_INT,
-		reinterpret_cast<void*>(static_cast<u32>(m_index.start) * sizeof(u32)), static_cast<GLint>(m_vertex.start));
+	glDrawElementsBaseVertex(m_draw_topology, static_cast<u32>(m_index.count), GL_UNSIGNED_SHORT,
+		reinterpret_cast<void*>(static_cast<u32>(m_index.start) * sizeof(u16)), static_cast<GLint>(m_vertex.start));
 }
 
 void GSDeviceOGL::DrawIndexedPrimitive(int offset, int count)
@@ -885,8 +885,8 @@ void GSDeviceOGL::DrawIndexedPrimitive(int offset, int count)
 	//ASSERT(offset + count <= (int)m_index.count);
 
 	g_perfmon.Put(GSPerfMon::DrawCalls, 1);
-	glDrawElementsBaseVertex(m_draw_topology, count, GL_UNSIGNED_INT,
-		reinterpret_cast<void*>((static_cast<u32>(m_index.start) + static_cast<u32>(offset)) * sizeof(u32)),
+	glDrawElementsBaseVertex(m_draw_topology, count, GL_UNSIGNED_SHORT,
+		reinterpret_cast<void*>((static_cast<u32>(m_index.start) + static_cast<u32>(offset)) * sizeof(u16)),
 		static_cast<GLint>(m_vertex.start));
 }
 
@@ -1127,14 +1127,18 @@ std::string GSDeviceOGL::GenGlslHeader(const std::string_view& entry, GLenum typ
 	std::string header;
 
 	// Intel's GL driver doesn't like the readonly qualifier with 3.3 GLSL.
-	if (m_features.vs_expand)
+	if (m_features.vs_expand && GLAD_GL_VERSION_4_3)
 	{
 		header = "#version 430 core\n";
 	}
 	else
 	{
 		header = "#version 330 core\n";
-		header += "#extension GL_ARB_shading_language_420pack: require\n";
+		header += "#extension GL_ARB_shading_language_420pack : require\n";
+		if (GLAD_GL_ARB_gpu_shader5)
+			header += "#extension GL_ARB_gpu_shader5 : require\n";
+		if (m_features.vs_expand)
+			header += "#extension GL_ARB_shader_storage_buffer_object: require\n";
 	}
 
 	if (GLAD_GL_ARB_shader_draw_parameters)
@@ -1546,15 +1550,15 @@ void GSDeviceOGL::DrawMultiStretchRects(
 void GSDeviceOGL::DoMultiStretchRects(const MultiStretchRect* rects, u32 num_rects, const GSVector2& ds)
 {
 	const u32 vertex_reserve_size = num_rects * 4 * sizeof(GSVertexPT1);
-	const u32 index_reserve_size = num_rects * 6 * sizeof(u32);
+	const u32 index_reserve_size = num_rects * 6 * sizeof(u16);
 	auto vertex_map = m_vertex_stream_buffer->Map(sizeof(GSVertexPT1), vertex_reserve_size);
-	auto index_map = m_index_stream_buffer->Map(sizeof(u32), index_reserve_size);
+	auto index_map = m_index_stream_buffer->Map(sizeof(u16), index_reserve_size);
 	m_vertex.start = vertex_map.index_aligned;
 	m_index.start = index_map.index_aligned;
 
 	// Don't use primitive restart here, it ends up slower on some drivers.
 	GSVertexPT1* verts = reinterpret_cast<GSVertexPT1*>(vertex_map.pointer);
-	u32* idx = reinterpret_cast<u32*>(index_map.pointer);
+	u16* idx = reinterpret_cast<u16*>(index_map.pointer);
 	u32 icount = 0;
 	u32 vcount = 0;
 	for (u32 i = 0; i < num_rects; i++)
@@ -1585,7 +1589,7 @@ void GSDeviceOGL::DoMultiStretchRects(const MultiStretchRect* rects, u32 num_rec
 	m_vertex.count = vcount;
 	m_index.count = icount;
 	m_vertex_stream_buffer->Unmap(vcount * sizeof(GSVertexPT1));
-	m_index_stream_buffer->Unmap(icount * sizeof(u32));
+	m_index_stream_buffer->Unmap(icount * sizeof(u16));
 
 	PSSetShaderResource(0, rects[0].src);
 	PSSetSamplerState(rects[0].linear ? m_convert.ln : m_convert.pt);
@@ -1805,8 +1809,8 @@ void GSDeviceOGL::IASetVertexBuffer(const void* vertices, size_t count)
 
 void GSDeviceOGL::IASetIndexBuffer(const void* index, size_t count)
 {
-	const u32 size = static_cast<u32>(count) * sizeof(u32);
-	auto res = m_index_stream_buffer->Map(sizeof(u32), size);
+	const u32 size = static_cast<u32>(count) * sizeof(u16);
+	auto res = m_index_stream_buffer->Map(sizeof(u16), size);
 	m_index.start = res.index_aligned;
 	m_index.count = count;
 	std::memcpy(res.pointer, index, size);
@@ -1997,18 +2001,7 @@ void GSDeviceOGL::RenderImGui()
 			m_vertex_stream_buffer->Unmap(size);
 		}
 
-		// Bit awkward, because this is using 16-bit indices, not 32-bit.
-		u32 index_start;
-		{
-			static_assert(sizeof(ImDrawIdx) == sizeof(u16));
-
-			const u32 size = static_cast<u32>(cmd_list->IdxBuffer.Size) * sizeof(ImDrawIdx);
-			auto res = m_index_stream_buffer->Map(sizeof(u16), size);
-			index_start = res.index_aligned;
-			std::memcpy(res.pointer, cmd_list->IdxBuffer.Data, size);
-			m_index_stream_buffer->Unmap(size);
-			m_index_stream_buffer->Bind();
-		}
+		IASetIndexBuffer(cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size);
 
 		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
 		{
@@ -2036,7 +2029,7 @@ void GSDeviceOGL::RenderImGui()
 			}
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, GL_UNSIGNED_SHORT,
-				(void*)(intptr_t)((pcmd->IdxOffset + index_start) * sizeof(ImDrawIdx)), pcmd->VtxOffset + vertex_start);
+				(void*)(intptr_t)((pcmd->IdxOffset + m_index.start) * sizeof(ImDrawIdx)), pcmd->VtxOffset + vertex_start);
 		}
 
 		g_perfmon.Put(GSPerfMon::DrawCalls, cmd_list->CmdBuffer.Size);

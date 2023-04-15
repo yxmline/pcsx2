@@ -161,7 +161,7 @@ typedef GSVector4  VectorF;
 #define LOCAL_STEP local.d4
 #endif
 
-void GSDrawScanline::CSetupPrim(const GSVertexSW* vertex, const u32* index, const GSVertexSW& dscan, GSScanlineLocalData& local)
+void GSDrawScanline::CSetupPrim(const GSVertexSW* vertex, const u16* index, const GSVertexSW& dscan, GSScanlineLocalData& local)
 {
 	const GSScanlineGlobalData& global = GlobalFromLocal(local);
 	GSScanlineSelector sel = global.sel;
@@ -452,9 +452,13 @@ __ri static void WritePixel(const T& src, int addr, int i, u32 psm, const GSScan
 
 void GSDrawScanline::CDrawScanline(int pixels, int left, int top, const GSVertexSW& scan, GSScanlineLocalData& local)
 {
+	CDrawScanline(pixels, left, top, scan, local, GlobalFromLocal(local).sel);
+}
+
+__ri void GSDrawScanline::CDrawScanline(int pixels, int left, int top, const GSVertexSW& scan, GSScanlineLocalData& local, GSScanlineSelector sel)
+{
 	const GSScanlineGlobalData& global = GlobalFromLocal(local);
 
-	GSScanlineSelector sel = global.sel;
 	constexpr int vlen = sizeof(VectorF) / sizeof(float);
 
 #if _M_SSE < 0x501
@@ -1729,17 +1733,10 @@ void GSDrawScanline::CDrawScanline(int pixels, int left, int top, const GSVertex
 
 void GSDrawScanline::CDrawEdge(int pixels, int left, int top, const GSVertexSW& scan, GSScanlineLocalData& local)
 {
-	// This sucks. But so does not jitting!
-	const GSScanlineGlobalData* old_gd = local.gd;
-	GSScanlineGlobalData gd;
-	std::memcpy(&gd, &local.gd, sizeof(gd));
-	gd.sel.zwrite = 0;
-	gd.sel.edge = 1;
-	local.gd = &gd;
-
-	CDrawScanline(pixels, left, top, scan, local);
-
-	local.gd = old_gd;
+	GSScanlineSelector sel = local.gd->sel;
+	sel.zwrite = 0;
+	sel.edge = 1;
+	CDrawScanline(pixels, left, top, scan, local, sel);
 }
 
 template <class T, bool masked>

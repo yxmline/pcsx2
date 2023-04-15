@@ -2576,7 +2576,7 @@ bool GSTextureCache::ShuffleMove(u32 BP, u32 BW, u32 PSM, int sx, int sy, int dx
 
 #undef V
 
-	static constexpr u32 indices[6] = { 0, 1, 2, 2, 1, 3 };
+	static constexpr u16 indices[6] = { 0, 1, 2, 2, 1, 3 };
 
 	// If we ever do this sort of thing somewhere else, extract this to a helper function.
 	GSHWDrawConfig config;
@@ -5127,13 +5127,13 @@ GSTextureCache::SourceRegion GSTextureCache::SourceRegion::AdjustForMipmap(u32 l
 	if (HasX())
 	{
 		const u32 new_minx = GetMinX() >> level;
-		const u32 new_maxx = std::max<u32>(GetMaxX() >> level, new_minx + 1);
+		const u32 new_maxx = new_minx + std::max(GetWidth() >> level, 1u);
 		ret.SetX(new_minx, new_maxx);
 	}
 	if (HasY())
 	{
 		const u32 new_miny = GetMinY() >> level;
-		const u32 new_maxy = std::max<u32>(GetMaxY() >> level, new_miny + 1);
+		const u32 new_maxy = new_miny + std::max(GetHeight() >> level, 1u);
 		ret.SetY(new_miny, new_maxy);
 	}
 	return ret;

@@ -159,6 +159,23 @@ void GSState::Reset(bool hardware_reset)
 	{
 		m_env.CTXT[i].UpdateScissor();
 
+		// What is this nonsense? Basically, GOW does a 32x448 draw after resetting the GS, thinking the PSM for the framebuffer is going
+		// to be set to C24, therefore the alpha bits get left alone. Because of the reset, in PCSX2, it ends up as C32, and the TC gets
+		// confused, leading to a later texture load using this render target instead of local memory. It's a problem because the game
+		// uploads texture data on startup to the beginning of VRAM, and never overwrites it.
+		//
+		// In the software renderer, if we let the draw happen, it gets scissored to 1x1 (because the scissor is inclusive of the
+		// upper bounds). This doesn't seem to destroy the chest texture, presumably it's further out in memory.
+		//
+		// Hardware test show that VRAM gets corrupted on CSR reset, but the first page remains intact. We're guessing this has something
+		// to do with DRAM refresh, and perhaps the internal counters used for refresh also getting reset. We're obviously not going
+		// to emulate this, but to work around the aforementioned issue, in the hardware renderers, we set the scissor to an out of
+		// bounds value. This means that draws get skipped until the game sets a proper scissor up, which is definitely going to happen
+		// after reset (otherwise it'd only ever render 1x1).
+		//
+		if (!hardware_reset && GSConfig.UseHardwareRenderer())
+			m_env.CTXT[i].scissor.ex = GSVector4i::xffffffff();
+
 		m_env.CTXT[i].offset.fb = m_mem.GetOffset(m_env.CTXT[i].FRAME.Block(), m_env.CTXT[i].FRAME.FBW, m_env.CTXT[i].FRAME.PSM);
 		m_env.CTXT[i].offset.zb = m_mem.GetOffset(m_env.CTXT[i].ZBUF.Block(), m_env.CTXT[i].FRAME.FBW, m_env.CTXT[i].ZBUF.PSM);
 		m_env.CTXT[i].offset.fzb4 = m_mem.GetPixelOffset4(m_env.CTXT[i].FRAME, m_env.CTXT[i].ZBUF);
@@ -1025,17 +1042,20 @@ void GSState::GIFRegHandlerXYOFFSET(const GIFReg* RESTRICT r)
 {
 	GL_REG("XYOFFSET_%d = 0x%x_%x", i, r->U32[1], r->U32[0]);
 
-	const GSVector4i o = (GSVector4i)r->XYOFFSET & GSVector4i::x0000ffff();
-
-	m_env.CTXT[i].XYOFFSET = o;
+	const u64 r_masked = r->U64 & 0x0000FFFF0000FFFFu;
 
 	if (i == m_prev_env.PRIM.CTXT)
 	{
-		if (m_prev_env.CTXT[i].XYOFFSET.U64 ^ m_env.CTXT[i].XYOFFSET.U64)
+		if (m_prev_env.CTXT[i].XYOFFSET.U64 != r_masked)
 			m_dirty_gs_regs |= (1 << DIRTY_REG_XYOFFSET);
 		else
 			m_dirty_gs_regs &= ~(1 << DIRTY_REG_XYOFFSET);
 	}
+
+	if (m_env.CTXT[i].XYOFFSET.U64 == r_masked)
+		return;
+
+	m_env.CTXT[i].XYOFFSET.U64 = r_masked;
 
 	m_env.CTXT[i].UpdateScissor();
 
@@ -1159,16 +1179,18 @@ void GSState::GIFRegHandlerTEXFLUSH(const GIFReg* RESTRICT r)
 template <int i>
 void GSState::GIFRegHandlerSCISSOR(const GIFReg* RESTRICT r)
 {
-	m_env.CTXT[i].SCISSOR = r->SCISSOR;
-
 	if (i == m_prev_env.PRIM.CTXT)
 	{
-		if (m_prev_env.CTXT[i].SCISSOR.U64 != m_env.CTXT[i].SCISSOR.U64)
+		if (m_prev_env.CTXT[i].SCISSOR.U64 != r->SCISSOR.U64)
 			m_dirty_gs_regs |= (1 << DIRTY_REG_SCISSOR);
 		else
 			m_dirty_gs_regs &= ~(1 << DIRTY_REG_SCISSOR);
 	}
 
+	if (m_env.CTXT[i].SCISSOR.U64 == r->SCISSOR.U64)
+		return;
+
+	m_env.CTXT[i].SCISSOR = r->SCISSOR;
 	m_env.CTXT[i].UpdateScissor();
 
 	UpdateScissor();
@@ -2616,31 +2638,31 @@ void GSState::GrowVertexBuffer()
 {
 	const u32 maxcount = std::max<u32>(m_vertex.maxcount * 3 / 2, 10000);
 
-	GSVertex* vertex = (GSVertex*)_aligned_malloc(sizeof(GSVertex) * maxcount, 32);
+	GSVertex* vertex = static_cast<GSVertex*>(_aligned_malloc(sizeof(GSVertex) * maxcount, 32));
 	// Worst case index list is a list of points with vs expansion, 6 indices per point
-	u32* index = (u32*)_aligned_malloc(sizeof(u32) * maxcount * 6, 32);
+	u16* index = static_cast<u16*>(_aligned_malloc(sizeof(u16) * maxcount * 6, 32));
 
-	if (vertex == NULL || index == NULL)
+	if (!vertex || !index)
 	{
 		const u32 vert_byte_count = sizeof(GSVertex) * maxcount;
-		const u32 idx_byte_count = sizeof(u32) * maxcount * 3;
+		const u32 idx_byte_count = sizeof(u16) * maxcount * 3;
 
-		Console.Error("GS: failed to allocate %zu bytes for verticles and %zu for indices.",
+		Console.Error("GS: failed to allocate %zu bytes for vertices and %zu for indices.",
 			vert_byte_count, idx_byte_count);
 
 		throw GSError();
 	}
 
-	if (m_vertex.buff != NULL)
+	if (m_vertex.buff)
 	{
-		memcpy(vertex, m_vertex.buff, sizeof(GSVertex) * m_vertex.tail);
+		std::memcpy(vertex, m_vertex.buff, sizeof(GSVertex) * m_vertex.tail);
 
 		_aligned_free(m_vertex.buff);
 	}
 
-	if (m_index.buff != NULL)
+	if (m_index.buff)
 	{
-		memcpy(index, m_index.buff, sizeof(u32) * m_index.tail);
+		std::memcpy(index, m_index.buff, sizeof(u16) * m_index.tail);
 
 		_aligned_free(m_index.buff);
 	}
@@ -3041,21 +3063,24 @@ static constexpr u32 MaxVerticesForPrim(u32 prim)
 {
 	switch (prim)
 	{
+			// Four indices per 1 vertex.
 		case GS_POINTLIST:
 		case GS_INVALID:
-			// Needed due to expansion in hardware renderers.
+
+			// Indices are shifted left by 2 to form quads.
+		case GS_LINELIST:
+		case GS_LINESTRIP:
 			return (std::numeric_limits<u16>::max() / 4) - 4;
 
+			// Four indices per two vertices.
 		case GS_SPRITE:
 			return (std::numeric_limits<u16>::max() / 2) - 2;
 
-		case GS_LINELIST:
-		case GS_LINESTRIP:
 		case GS_TRIANGLELIST:
 		case GS_TRIANGLESTRIP:
 		case GS_TRIANGLEFAN:
 		default:
-			return 0;
+			return (std::numeric_limits<u16>::max() - 3);
 	}
 }
 
@@ -3207,19 +3232,19 @@ __forceinline void GSState::VertexKick(u32 skip)
 		m_backed_up_ctx = m_env.PRIM.CTXT;
 	}
 
-	u32* RESTRICT buff = &m_index.buff[m_index.tail];
+	u16* RESTRICT buff = &m_index.buff[m_index.tail];
 
 	switch (prim)
 	{
 		case GS_POINTLIST:
-			buff[0] = head + 0;
+			buff[0] = static_cast<u16>(head + 0);
 			m_vertex.head = head + 1;
 			m_vertex.next = head + 1;
 			m_index.tail += 1;
 			break;
 		case GS_LINELIST:
-			buff[0] = head + (index_swap ? 1 : 0);
-			buff[1] = head + (index_swap ? 0 : 1);
+			buff[0] = static_cast<u16>(head + (index_swap ? 1 : 0));
+			buff[1] = static_cast<u16>(head + (index_swap ? 0 : 1));
 			m_vertex.head = head + 2;
 			m_vertex.next = head + 2;
 			m_index.tail += 2;
@@ -3232,16 +3257,16 @@ __forceinline void GSState::VertexKick(u32 skip)
 				head = next;
 				m_vertex.tail = next + 2;
 			}
-			buff[0] = head + (index_swap ? 1 : 0);
-			buff[1] = head + (index_swap ? 0 : 1);
+			buff[0] = static_cast<u16>(head + (index_swap ? 1 : 0));
+			buff[1] = static_cast<u16>(head + (index_swap ? 0 : 1));
 			m_vertex.head = head + 1;
 			m_vertex.next = head + 2;
 			m_index.tail += 2;
 			break;
 		case GS_TRIANGLELIST:
-			buff[0] = head + (index_swap ? 2 : 0);
-			buff[1] = head + 1;
-			buff[2] = head + (index_swap ? 0 : 2);
+			buff[0] = static_cast<u16>(head + (index_swap ? 2 : 0));
+			buff[1] = static_cast<u16>(head + 1);
+			buff[2] = static_cast<u16>(head + (index_swap ? 0 : 2));
 			m_vertex.head = head + 3;
 			m_vertex.next = head + 3;
 			m_index.tail += 3;
@@ -3255,24 +3280,24 @@ __forceinline void GSState::VertexKick(u32 skip)
 				head = next;
 				m_vertex.tail = next + 3;
 			}
-			buff[0] = head + (index_swap ? 2 : 0);
-			buff[1] = head + 1;
-			buff[2] = head + (index_swap ? 0 : 2);
+			buff[0] = static_cast<u16>(head + (index_swap ? 2 : 0));
+			buff[1] = static_cast<u16>(head + 1);
+			buff[2] = static_cast<u16>(head + (index_swap ? 0 : 2));
 			m_vertex.head = head + 1;
 			m_vertex.next = head + 3;
 			m_index.tail += 3;
 			break;
 		case GS_TRIANGLEFAN:
 			// TODO: remove gaps, next == head && head < tail - 3 || next > head && next < tail - 2 (very rare)
-			buff[0] = index_swap ? (tail - 1) : (head + 0);
-			buff[1] = tail - 2;
-			buff[2] = index_swap ? (head + 0) : (tail - 1);
+			buff[0] = static_cast<u16>(index_swap ? (tail - 1) : (head + 0));
+			buff[1] = static_cast<u16>(tail - 2);
+			buff[2] = static_cast<u16>(index_swap ? (head + 0) : (tail - 1));
 			m_vertex.next = tail;
 			m_index.tail += 3;
 			break;
 		case GS_SPRITE:
-			buff[0] = head + 0;
-			buff[1] = head + 1;
+			buff[0] = static_cast<u16>(head + 0);
+			buff[1] = static_cast<u16>(head + 1);
 			m_vertex.head = head + 2;
 			m_vertex.next = head + 2;
 			m_index.tail += 2;
