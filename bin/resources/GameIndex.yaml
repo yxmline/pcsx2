@@ -3044,6 +3044,7 @@ SCES-50410:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
 SCES-50411:
   name: "Vampire Night"
   region: "PAL-M5"
@@ -12124,11 +12125,6 @@ SLES-51043:
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
     trilinearFiltering: 1
-  patches:
-    0EF1D4BA:
-      content: |-
-        comment=Spyro PAL startup fix
-        patch=1,EE,001E763C,word,24020001
 SLES-51044:
   name: "Burnout 2 - Point of Impact"
   region: "PAL-M5"
@@ -21862,24 +21858,28 @@ SLES-54947:
   region: "PAL-M6"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLES-54948:
   name: "Dogz"
   region: "PAL-M9"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLES-54949:
   name: "Catz"
   region: "PAL-M6"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLES-54950:
   name: "Catz"
   region: "PAL-M9"
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLES-54951:
   name: "Ben 10 - Protector of Earth"
@@ -25801,6 +25801,7 @@ SLPM-60149:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
     getSkipCount: "GSC_AceCombat4"
 SLPM-60172:
   name: "Itadaki Street 3 - Okuman Chouja ni Shiteageru"
@@ -37983,6 +37984,7 @@ SLPS-25052:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
     getSkipCount: "GSC_AceCombat4"
 SLPS-25053:
   name: "Eikan wa Kimi ni - Koushien no Hasha"
@@ -41371,6 +41373,7 @@ SLPS-73205:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
     getSkipCount: "GSC_AceCombat4"
 SLPS-73206:
   name: "Super Robot Taisen Alpha 2nd [PlayStation 2 The Best]"
@@ -41778,6 +41781,7 @@ SLPS-73410:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
     getSkipCount: "GSC_AceCombat4"
 SLPS-73411:
   name: "Armored Core 2 - Another Age [PlayStation 2 The Best]"
@@ -42432,6 +42436,7 @@ SLUS-20152:
     roundSprite: 2 # Fixes font and HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
+    gpuTargetCLUT: 1 # Fixes broken sun.
     getSkipCount: "GSC_AceCombat4"
   patches:
     A32F7CD0:
@@ -43133,17 +43138,12 @@ SLUS-20314:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes texture slight misalignment.
 SLUS-20315:
-  name: "Spyro the Dragon - Enter the Dragonfly"
+  name: "Spyro - Enter the Dragonfly"
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
     mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
     trilinearFiltering: 1
-  patches:
-    4B8E0DE8:
-      content: |-
-        comment=Spyro NTSC startup fix
-        patch=1,EE,001e71dc,word,24020001
 SLUS-20316:
   name: "WWF SmackDown! - Just Bring It!"
   region: "NTSC-U"
@@ -50122,6 +50122,7 @@ SLUS-21674:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLUS-21675:
   name: "Petz - Catz 2"
@@ -50129,6 +50130,7 @@ SLUS-21675:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    halfPixelOffset: 1 # Fixes bloom misalignment.
     partialTargetInvalidation: 1 # Fixes black sqaures effect.
 SLUS-21676:
   name: "Dancing with the Stars"
