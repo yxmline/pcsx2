@@ -1,10 +1,13 @@
 <RCC>
 	<qresource>
-		<file>icons/applications-system-24.png</file>
 		<file>icons/AppIcon.png</file>
+		<file>icons/applications-system-24.png</file>
+		<file>icons/black/32/discord.png</file>
+		<file>icons/black/32/github.png</file>
 		<file>icons/black/index.theme</file>
 		<file>icons/black/svg/arrow-left-right-line.svg</file>
 		<file>icons/black/svg/artboard-2-line.svg</file>
+		<file>icons/black/svg/at.svg</file>
 		<file>icons/black/svg/book-open-line.svg</file>
 		<file>icons/black/svg/brush-line.svg</file>
 		<file>icons/black/svg/checkbox-multiple-blank-line.svg</file>
@@ -56,18 +59,18 @@
 		<file>icons/black/svg/usb-fill.svg</file>
 		<file>icons/black/svg/volume-up-line.svg</file>
 		<file>icons/black/svg/window-2-line.svg</file>
-		<file>icons/discord.png</file>
-		<file>icons/forum.png</file>
-		<file>icons/github.png</file>
 		<file>icons/logo.png</file>
 		<file>icons/media-optical-24.png</file>
 		<file>icons/media-optical-gear-24.png</file>
 		<file>icons/media-optical.png</file>
 		<file>icons/QT.png</file>
 		<file>icons/update.png</file>
+		<file>icons/white/32/discord.png</file>
+		<file>icons/white/32/github.png</file>
 		<file>icons/white/index.theme</file>
 		<file>icons/white/svg/arrow-left-right-line.svg</file>
 		<file>icons/white/svg/artboard-2-line.svg</file>
+		<file>icons/white/svg/at.svg</file>
 		<file>icons/white/svg/book-open-line.svg</file>
 		<file>icons/white/svg/brush-line.svg</file>
 		<file>icons/white/svg/checkbox-multiple-blank-line.svg</file>

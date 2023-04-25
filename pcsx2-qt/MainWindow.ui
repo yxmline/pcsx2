@@ -439,8 +439,8 @@
     <string>&amp;GitHub Repository...</string>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
-     <normaloff>:/icons/github.png</normaloff>:/icons/github.png</iconset>
+    <iconset theme="github">
+     <normaloff>.</normaloff>.</iconset>
    </property>
   </action>
   <action name="actionSupportForums">
@@ -448,8 +448,8 @@
     <string>Support &amp;Forums...</string>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
-     <normaloff>:/icons/forum.png</normaloff>:/icons/forum.png</iconset>
+    <iconset theme="at">
+     <normaloff>.</normaloff>.</iconset>
    </property>
   </action>
   <action name="actionDiscordServer">
@@ -457,8 +457,8 @@
     <string>&amp;Discord Server...</string>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
-     <normaloff>:/icons/discord.png</normaloff>:/icons/discord.png</iconset>
+    <iconset theme="discord">
+     <normaloff>.</normaloff>.</iconset>
    </property>
   </action>
   <action name="actionCheckForUpdates">
