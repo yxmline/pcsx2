@@ -20,11 +20,12 @@
 #include "MainWindow.h"
 #include "SettingWidgetBinder.h"
 #include "SettingsDialog.h"
+#include "QtHost.h"
 
 static const char* THEME_NAMES[] = {
 	QT_TRANSLATE_NOOP("InterfaceSettingsWidget", "Native"),
 	//: Ignore what Crowdin says in this string about "[Light]/[Dark]" being untouchable here, these are not variables in this case and must be translated.
-	QT_TRANSLATE_NOOP("InterfaceSettingsWidget", "Fusion [Light]"),
+	QT_TRANSLATE_NOOP("InterfaceSettingsWidget", "Fusion [Light/Dark]"),
 	//: Ignore what Crowdin says in this string about "[Light]/[Dark]" being untouchable here, these are not variables in this case and must be translated.
 	QT_TRANSLATE_NOOP("InterfaceSettingsWidget", "Dark Fusion (Gray) [Dark]"),
 	//: Ignore what Crowdin says in this string about "[Light]/[Dark]" being untouchable here, these are not variables in this case and must be translated.
@@ -91,7 +92,7 @@ InterfaceSettingsWidget::InterfaceSettingsWidget(SettingsDialog* dialog, QWidget
 	connect(m_ui.renderToSeparateWindow, &QCheckBox::stateChanged, this, &InterfaceSettingsWidget::onRenderToSeparateWindowChanged);
 
 	SettingWidgetBinder::BindWidgetToEnumSetting(sif, m_ui.theme, "UI", "Theme", THEME_NAMES, THEME_VALUES,
-		MainWindow::DEFAULT_THEME_NAME);
+		QtHost::GetDefaultThemeName());
 	connect(m_ui.theme, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() { emit themeChanged(); });
 
 	// Per-game settings is special, we don't want to bind it if we're editing per-game settings.
