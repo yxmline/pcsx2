@@ -653,9 +653,9 @@ void GSRendererHW::MergeSprite(GSTextureCache::Source* tex)
 			}
 
 #if 0
-			GSVector4 delta_p = m_vt.m_max.p - m_vt.m_min.p;
-			GSVector4 delta_t = m_vt.m_max.t - m_vt.m_min.t;
-			bool is_blit = PrimitiveOverlap() == PRIM_OVERLAP_NO;
+			const GSVector4 delta_p = m_vt.m_max.p - m_vt.m_min.p;
+			const GSVector4 delta_t = m_vt.m_max.t - m_vt.m_min.t;
+			const bool is_blit = PrimitiveOverlap() == PRIM_OVERLAP_NO;
 			GL_INS("PP SAMPLER: Dp %f %f Dt %f %f. Is blit %d, is paving %d, count %d", delta_p.x, delta_p.y, delta_t.x, delta_t.y, is_blit, is_paving, m_vertex.tail);
 #endif
 
@@ -1524,6 +1524,7 @@ void GSRendererHW::Draw()
 			GL_CACHE("Disabling Z buffer because all tests will pass.");
 
 		m_cached_ctx.TEST.ZTST = ZTST_ALWAYS;
+		m_cached_ctx.ZBUF.ZMSK = true;
 	}
 
 	if (no_rt && no_ds)
@@ -3314,7 +3315,7 @@ void GSRendererHW::EmulateBlending(bool& DATE_PRIMID, bool& DATE_BARRIER, bool& 
 
 	// For stat to optimize accurate option
 #if 0
-	GL_INS("BLEND_INFO: %u/%u/%u/%u. Clamp:%u. Prim:%d number %u (drawlist %u) (sw %d)",
+	GL_INS("BLEND_INFO: %u/%u/%u/%u. Clamp:%u. Prim:%d number %u (drawlist %zu) (sw %d)",
 		m_conf.ps.blend_a, m_conf.ps.blend_b, m_conf.ps.blend_c, m_conf.ps.blend_d,
 		m_env.COLCLAMP.CLAMP, m_vt.m_primclass, m_vertex.next, m_drawlist.size(), sw_blending);
 #endif
@@ -4319,7 +4320,10 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	// No point outputting colours if we're just writing depth.
 	// We might still need the framebuffer for DATE, though.
 	if (!rt || m_conf.colormask.wrgba == 0)
+	{
 		m_conf.ps.DisableColorOutput();
+		m_conf.colormask.wrgba = 0;
+	}
 
 	if (m_conf.ps.scanmsk & 2)
 		DATE_PRIMID = false; // to have discard in the shader work correctly
