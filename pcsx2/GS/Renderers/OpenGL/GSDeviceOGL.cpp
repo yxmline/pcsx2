@@ -551,8 +551,6 @@ void GSDeviceOGL::Destroy()
 
 		m_gl_context->DoneCurrent();
 		m_gl_context.reset();
-
-		ReleaseWindow();
 	}
 }
 
@@ -673,7 +671,6 @@ bool GSDeviceOGL::UpdateWindow()
 	if (!m_gl_context->ChangeSurface(m_window_info))
 	{
 		Console.Error("Failed to change surface");
-		ReleaseWindow();
 		return false;
 	}
 
@@ -2396,7 +2393,7 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 	psel.vs = config.vs;
 	psel.ps.key_hi = config.ps.key_hi;
 	psel.ps.key_lo = config.ps.key_lo;
-	psel.pad = 0;
+	std::memset(psel.pad, 0, sizeof(psel.pad));
 
 	SetupPipeline(psel);
 
