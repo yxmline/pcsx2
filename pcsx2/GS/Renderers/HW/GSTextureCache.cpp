@@ -2436,15 +2436,17 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 
 	// DX11/12 is a bit lame and can't partial copy depth targets. We could do this with a blit instead,
 	// but so far haven't seen anything which needs it.
+	const GSLocalMemory::psm_t& spsm_s = GSLocalMemory::m_psm[SPSM];
+	const GSLocalMemory::psm_t& dpsm_s = GSLocalMemory::m_psm[DPSM];
 	if (GSConfig.Renderer == GSRendererType::DX11 || GSConfig.Renderer == GSRendererType::DX12)
 	{
-		if (GSLocalMemory::m_psm[SPSM].depth || GSLocalMemory::m_psm[DPSM].depth)
+		if (spsm_s.depth || dpsm_s.depth)
 			return false;
 	}
 
 	// Look for an exact match on the targets.
-	GSTextureCache::Target* src = GetExactTarget(SBP, SBW, SPSM);
-	GSTextureCache::Target* dst = GetExactTarget(DBP, DBW, DPSM);
+	GSTextureCache::Target* src = GetExactTarget(SBP, SBW, spsm_s.depth ? DepthStencil : RenderTarget);
+	GSTextureCache::Target* dst = GetExactTarget(DBP, DBW, dpsm_s.depth ? DepthStencil : RenderTarget);
 
 	// Beware of the case where a game might create a larger texture by moving a bunch of chunks around.
 	// We use dx/dy == 0 and the TBW check as a safeguard to make sure these go through to local memory.
@@ -2517,7 +2519,8 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	// Make sure the copy doesn't go out of bounds (it shouldn't).
 	if ((scaled_dx + scaled_w) > dst->m_texture->GetWidth() || (scaled_dy + scaled_h) > dst->m_texture->GetHeight())
 		return false;
-	GL_CACHE("HW Move 0x%x to 0x%x <%d,%d->%d,%d> -> <%d,%d->%d,%d>", SBP, DBP, sx, sy, sx + w, sy, h, dx, dy, dx + w, dy + h);
+	GL_CACHE("HW Move 0x%x[BW:%u PSM:%s] to 0x%x[BW:%u PSM:%s] <%d,%d->%d,%d> -> <%d,%d->%d,%d>", SBP, SBW,
+		psm_str(SPSM), DBP, DBW, psm_str(DPSM), sx, sy, sx + w, sy + h, dx, dy, dx + w, dy + h);
 	g_gs_device->CopyRect(src->m_texture, dst->m_texture,
 		GSVector4i(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h),
 		scaled_dx, scaled_dy);
@@ -2652,14 +2655,17 @@ bool GSTextureCache::ShuffleMove(u32 BP, u32 BW, u32 PSM, int sx, int sy, int dx
 	return true;
 }
 
-GSTextureCache::Target* GSTextureCache::GetExactTarget(u32 BP, u32 BW, u32 PSM) const
+GSTextureCache::Target* GSTextureCache::GetExactTarget(u32 BP, u32 BW, int type)
 {
-	auto& rts = m_dst[GSLocalMemory::m_psm[PSM].depth ? DepthStencil : RenderTarget];
+	auto& rts = m_dst[type];
 	for (auto it = rts.begin(); it != rts.end(); ++it) // Iterate targets from MRU to LRU.
 	{
 		Target* t = *it;
-		if (t->m_TEX0.TBP0 == BP && t->m_TEX0.TBW == BW && t->m_TEX0.PSM == PSM)
+		if (t->m_TEX0.TBP0 == BP && t->m_TEX0.TBW == BW)
+		{
+			rts.MoveFront(it.Index());
 			return t;
+		}
 	}
 
 	return nullptr;
