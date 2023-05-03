@@ -95,6 +95,7 @@ __fi void VifUnpackSSE_Dynarec::SetMasks(int cS) const
 		xMOVAPS(xmmRow, ptr128[&vif.MaskRow]);
 		MSKPATH3_LOG("Moving row");
 	}
+
 	if (m3 && doMask)
 	{
 		MSKPATH3_LOG("Merging Cols");
@@ -111,7 +112,7 @@ void VifUnpackSSE_Dynarec::doMaskWrite(const xRegisterSSE& regX) const
 {
 	pxAssertDev(regX.Id <= 1, "Reg Overflow! XMM2 thru XMM6 are reserved for masking.");
 
-	int cc = std::min(vCL, 3);
+	const int cc = std::min(vCL, 3);
 	u32 m0 = (vB.mask >> (cc * 8)) & 0xff; //The actual mask example 0xE4 (protect, col, row, clear)
 	u32 m3 = ((m0 & 0xaa) >> 1) & ~m0; //all the upper bits (cols shifted right) cancelling out any write protects 0x10
 	u32 m2 = (m0 & 0x55) & (~m0 >> 1); // all the lower bits (rows)cancelling out any write protects 0x04
@@ -121,19 +122,20 @@ void VifUnpackSSE_Dynarec::doMaskWrite(const xRegisterSSE& regX) const
 	makeMergeMask(m3);
 	makeMergeMask(m4);
 
+	// Everything is write protected, don't touch it, saveReg can't handle a mask of 0.
+	if (doMask && m4 == 0xf)
+		return;
+
 	if (doMask && m2) // Merge MaskRow
 	{
-		mergeVectors(regX, xmmRow, xmmTemp, m2);
+		mVUmergeRegs(regX, xmmRow, m2);
 	}
+
 	if (doMask && m3) // Merge MaskCol
 	{
-		mergeVectors(regX, xRegisterSSE(xmmCol0.Id + cc), xmmTemp, m3);
+		mVUmergeRegs(regX, xRegisterSSE(xmmCol0.Id + cc), m3);
 	}
-	if (doMask && m4) // Merge Write Protect
-	{
-		xMOVAPS(xmmTemp, ptr[dstIndirect]);
-		mergeVectors(regX, xmmTemp, xmmTemp, m4);
-	}
+	
 	if (doMode)
 	{
 		u32 m5 = ~(m2 | m3 | m4) & 0xf;
@@ -146,14 +148,14 @@ void VifUnpackSSE_Dynarec::doMaskWrite(const xRegisterSSE& regX) const
 			xPXOR(xmmTemp, xmmTemp);
 			if (doMode == 3)
 			{
-				mergeVectors(xmmRow, regX, xmmTemp, m5);
+				mVUmergeRegs(xmmRow, regX, m5);
 			}
 			else
 			{
-				mergeVectors(xmmTemp, xmmRow, xmmTemp, m5);
+				mVUmergeRegs(xmmTemp, xmmRow, m5);
 				xPADD.D(regX, xmmTemp);
 				if (doMode == 2)
-					mergeVectors(xmmRow, regX, xmmTemp, m5);
+					mVUmergeRegs(xmmRow, regX, m5);
 			}
 		}
 		else
@@ -170,7 +172,11 @@ void VifUnpackSSE_Dynarec::doMaskWrite(const xRegisterSSE& regX) const
 			}
 		}
 	}
-	xMOVAPS(ptr32[dstIndirect], regX);
+
+	if (doMask && m4) // Merge Write Protect
+		mVUsaveReg(regX, ptr32[dstIndirect], m4 ^ 0xf, false);
+	else
+		xMOVAPS(ptr32[dstIndirect], regX);
 }
 
 void VifUnpackSSE_Dynarec::writeBackRow() const
@@ -276,15 +282,16 @@ void VifUnpackSSE_Dynarec::CompileRoutine()
 	// Value passed determines # of col regs we need to load
 	SetMasks(isFill ? blockSize : cycleSize);
 
+	// Need a zero register for V2_32/V3 unpacks.
+	if ((upkNum >= 8 && upkNum <= 10) || upkNum == 4)
+		xXOR.PS(zeroReg, zeroReg);
+
 	while (vNum)
 	{
-
-
 		ShiftDisplacementWindow(dstIndirect, arg1reg);
 
 		if (UnpkNoOfIterations == 0)
 			ShiftDisplacementWindow(srcIndirect, arg2reg); //Don't need to do this otherwise as we arent reading the source.
-
 
 		if (vCL < cycleSize)
 		{
@@ -303,9 +310,14 @@ void VifUnpackSSE_Dynarec::CompileRoutine()
 		}
 		else if (isFill)
 		{
-			//Filling doesn't need anything fancy, it's pretty much a normal write, just doesnt increment the source.
-			//DevCon.WriteLn("filling mode!");
-			xUnpack(upkNum);
+			// Filling doesn't need anything fancy, it's pretty much a normal write, just doesnt increment the source.
+			// If all vectors read a row or column or are masked, we don't need to process the source at all.
+			const int cc = std::min(vCL, 3);
+			u32 m0 = (vB.mask >> (cc * 8)) & 0xff;
+			m0 = (m0 >> 1) | m0;
+
+			if ((m0 & 0x55) != 0x55)
+				xUnpack(upkNum);
 			xMovDest();
 
 			dstIndirect += 16;
@@ -323,6 +335,7 @@ void VifUnpackSSE_Dynarec::CompileRoutine()
 
 	if (doMode >= 2)
 		writeBackRow();
+
 	xRET();
 }
 

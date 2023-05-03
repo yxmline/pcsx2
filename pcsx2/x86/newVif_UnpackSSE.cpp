@@ -24,22 +24,8 @@
 #define xMOV64(regX, loc)  xMOVUPS (regX, loc)
 #define xMOV128(regX, loc) xMOVUPS (regX, loc)
 
-alignas(16) static const u32 SSEXYZWMask[4][4] =
-{
-	{0xffffffff, 0xffffffff, 0xffffffff, 0x00000000},
-	{0xffffffff, 0xffffffff, 0x00000000, 0xffffffff},
-	{0xffffffff, 0x00000000, 0xffffffff, 0xffffffff},
-	{0x00000000, 0xffffffff, 0xffffffff, 0xffffffff}
-};
-
 //alignas(__pagesize) static u8 nVifUpkExec[__pagesize*4];
 static RecompiledCodeReserve* nVifUpkExec = NULL;
-
-// Merges xmm vectors without modifying source reg
-void mergeVectors(xRegisterSSE dest, xRegisterSSE src, xRegisterSSE temp, int xyzw)
-{
-	mVUmergeRegs(dest, src, xyzw);
-}
 
 // =====================================================================================================
 //  VifUnpackSSE_Base Section
@@ -52,6 +38,7 @@ VifUnpackSSE_Base::VifUnpackSSE_Base()
 	, IsAligned(0)
 	, dstIndirect(arg1reg)
 	, srcIndirect(arg2reg)
+	, zeroReg(xmm15)
 	, workReg(xmm1)
 	, destReg(xmm0)
 {
@@ -83,7 +70,6 @@ void VifUnpackSSE_Base::xPMOVXX16(const xRegisterSSE& regX) const
 
 void VifUnpackSSE_Base::xUPK_S_32() const
 {
-
 	switch (UnpkLoopIteration)
 	{
 		case 0:
@@ -104,7 +90,6 @@ void VifUnpackSSE_Base::xUPK_S_32() const
 
 void VifUnpackSSE_Base::xUPK_S_16() const
 {
-
 	switch (UnpkLoopIteration)
 	{
 		case 0:
@@ -125,7 +110,6 @@ void VifUnpackSSE_Base::xUPK_S_16() const
 
 void VifUnpackSSE_Base::xUPK_S_8() const
 {
-
 	switch (UnpkLoopIteration)
 	{
 		case 0:
@@ -151,25 +135,23 @@ void VifUnpackSSE_Base::xUPK_S_8() const
 
 void VifUnpackSSE_Base::xUPK_V2_32() const
 {
-
 	if (UnpkLoopIteration == 0)
 	{
 		xMOV128(workReg, ptr32[srcIndirect]);
 		xPSHUF.D(destReg, workReg, 0x44); //v1v0v1v0
 		if (IsAligned)
-			xAND.PS(destReg, ptr128[SSEXYZWMask[0]]); //zero last word - tested on ps2
+			xBLEND.PS(destReg, zeroReg, 0x8); //zero last word - tested on ps2
 	}
 	else
 	{
 		xPSHUF.D(destReg, workReg, 0xEE); //v3v2v3v2
 		if (IsAligned)
-			xAND.PS(destReg, ptr128[SSEXYZWMask[0]]); //zero last word - tested on ps2
+			xBLEND.PS(destReg, zeroReg, 0x8); //zero last word - tested on ps2
 	}
 }
 
 void VifUnpackSSE_Base::xUPK_V2_16() const
 {
-
 	if (UnpkLoopIteration == 0)
 	{
 		xPMOVXX16(workReg);
@@ -183,7 +165,6 @@ void VifUnpackSSE_Base::xUPK_V2_16() const
 
 void VifUnpackSSE_Base::xUPK_V2_8() const
 {
-
 	if (UnpkLoopIteration == 0)
 	{
 		xPMOVXX8(workReg);
@@ -197,15 +178,13 @@ void VifUnpackSSE_Base::xUPK_V2_8() const
 
 void VifUnpackSSE_Base::xUPK_V3_32() const
 {
-
 	xMOV128(destReg, ptr128[srcIndirect]);
 	if (UnpkLoopIteration != IsAligned)
-		xAND.PS(destReg, ptr128[SSEXYZWMask[0]]);
+		xBLEND.PS(destReg, zeroReg, 0x8); //zero last word - tested on ps2
 }
 
 void VifUnpackSSE_Base::xUPK_V3_16() const
 {
-
 	xPMOVXX16(destReg);
 
 	//With V3-16, it takes the first vector from the next position as the W vector
@@ -215,17 +194,14 @@ void VifUnpackSSE_Base::xUPK_V3_16() const
 	int result = (((UnpkLoopIteration / 4) + 1 + (4 - IsAligned)) & 0x3);
 
 	if ((UnpkLoopIteration & 0x1) == 0 && result == 0)
-	{
-		xAND.PS(destReg, ptr128[SSEXYZWMask[0]]); //zero last word on QW boundary if whole 32bit word is used - tested on ps2
-	}
+		xBLEND.PS(destReg, zeroReg, 0x8); //zero last word - tested on ps2
 }
 
 void VifUnpackSSE_Base::xUPK_V3_8() const
 {
-
 	xPMOVXX8(destReg);
 	if (UnpkLoopIteration != IsAligned)
-		xAND.PS(destReg, ptr128[SSEXYZWMask[0]]);
+		xBLEND.PS(destReg, zeroReg, 0x8); //zero last word - tested on ps2
 }
 
 void VifUnpackSSE_Base::xUPK_V4_32() const
@@ -245,7 +221,6 @@ void VifUnpackSSE_Base::xUPK_V4_8() const
 
 void VifUnpackSSE_Base::xUPK_V4_5() const
 {
-
 	xMOV16      (workReg, ptr32[srcIndirect]);
 	xPSHUF.D    (workReg, workReg, _v0);
 	xPSLL.D     (workReg, 3);           // ABG|R5.000
@@ -284,7 +259,6 @@ void VifUnpackSSE_Base::xUnpack(int upknum) const
 		case 14: xUPK_V4_8();  break;
 		case 15: xUPK_V4_5();  break;
 
-
 		case 3:
 		case 7:
 		case 11:
@@ -319,7 +293,6 @@ void VifUnpackSSE_Simple::doMaskWrite(const xRegisterSSE& regX) const
 // ecx = dest, edx = src
 static void nVifGen(int usn, int mask, int curCycle)
 {
-
 	int usnpart  = usn * 2 * 16;
 	int maskpart = mask * 16;
 

@@ -5212,8 +5212,14 @@ bool GSRendererHW::PrimitiveCoversWithoutGaps() const
 	if (m_index.tail == 2)
 		return true;
 
-	// Borrowed from MergeSprite().
+	// Check that the height matches. Xenosaga 3 draws a letterbox around
+	// the FMV with a sprite at the top and bottom of the framebuffer.
 	const GSVertex* v = &m_vertex.buff[0];
+	const int first_dpY = v[1].XYZ.Y - v[0].XYZ.Y;
+	if ((first_dpY >> 4) != m_r.w)
+		return false;
+
+	// Borrowed from MergeSprite().
 	const int first_dpX = v[1].XYZ.X - v[0].XYZ.X;
 	for (u32 i = 0; i < m_vertex.next; i += 2)
 	{
@@ -5232,6 +5238,7 @@ bool GSRendererHW::IsConstantDirectWriteMemClear()
 	if (direct_draw && !PRIM->TME // Direct write
 		&& !(m_draw_env->SCANMSK.MSK & 2)
 		&& !m_cached_ctx.TEST.ATE // no alpha test
+		&& !m_cached_ctx.TEST.DATE // no destination alpha test
 		&& (!m_cached_ctx.TEST.ZTE || m_cached_ctx.TEST.ZTST == ZTST_ALWAYS) // no depth test
 		&& (m_vt.m_eq.rgba == 0xFFFF || m_vertex.next == 2) // constant color write
 		&& m_r.x == 0 && m_r.y == 0) // Likely full buffer write
