@@ -4845,6 +4845,9 @@ SCES-55489:
 SCES-55496:
   name: "Secret Agent Clank"
   region: "PAL-M12"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SCES-55510:
   name: "Jak and Daxter - The Lost Frontier"
   region: "PAL-M12"
@@ -7276,6 +7279,12 @@ SCUS-21295:
   compat: 5
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    recommendedBlendingLevel: 3 # Fixes water and grass textures.
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SCUS-21494:
   name: "Need for Speed - Carbon Collector's Edition"
   region: "NTSC-U"
@@ -9140,6 +9149,8 @@ SCUS-97623:
   name: "Secret Agent Clank"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SCUS-97625:
   name: "NBA 09 - The Inside"
   region: "NTSC-U"
@@ -9620,6 +9631,14 @@ SLED-51901:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     recommendedBlendingLevel: 3 # Fixes menu transparency.
+SLED-51902:
+  name: "True Crime - Streets of L.A."
+  region: "PAL-E"
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes licences.
+    halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLED-51975:
   name: "Need for Speed - Underground [Demo]"
   region: "PAL-E"
@@ -9753,6 +9772,11 @@ SLED-53109:
   region: "PAL-M5"
   speedHacks:
     InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLED-53330:
   name: "Enthusia - Professional Racing [Demo]"
   region: "PAL"
@@ -13771,6 +13795,8 @@ SLES-51753:
   gsHWFixes:
     preloadFrameData: 1 # Fixes licences.
     halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLES-51754:
   name: "True Crime - Streets of L.A."
   region: "PAL-M5"
@@ -13778,6 +13804,8 @@ SLES-51754:
   gsHWFixes:
     preloadFrameData: 1 # Fixes licences.
     halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLES-51755:
   name: "Disney-Pixar's Finding Nemo"
   region: "PAL-E"
@@ -15778,6 +15806,8 @@ SLES-52621:
     recommendedBlendingLevel: 3 # Fixes water and grass textures.
     mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
     trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLES-52622:
   name: "Tony Hawk's Underground 2"
   region: "PAL-M4"
@@ -15787,6 +15817,8 @@ SLES-52622:
     recommendedBlendingLevel: 3 # Fixes water and grass textures.
     mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
     trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLES-52624:
   name: "X-Men Legends"
   region: "PAL-E"
@@ -16959,6 +16991,11 @@ SLES-53044:
   compat: 5
   speedHacks:
     InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLES-53045:
   name: "Street Racing Syndicate"
   region: "PAL-M5"
@@ -17212,6 +17249,11 @@ SLES-53151:
   region: "PAL-I"
   speedHacks:
     InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLES-53152:
   name: "Mashed Fully Loaded"
   region: "PAL-M5"
@@ -18152,11 +18194,23 @@ SLES-53534:
   compat: 5
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    recommendedBlendingLevel: 3 # Fixes water and grass textures.
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLES-53535:
   name: "Tony Hawk's American Wasteland"
   region: "PAL-M4"
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    recommendedBlendingLevel: 3 # Fixes water and grass textures.
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLES-53536:
   name: "London Racer - Police Madness"
   region: "PAL-M3"
@@ -23359,6 +23413,9 @@ SLES-55495:
 SLES-55496:
   name: "Secret Agent Clank"
   region: "PAL-Unk"
+  compat: 5
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLES-55499:
   name: "Disney G-Force"
   region: "PAL-M4"
@@ -24937,6 +24994,16 @@ SLKA-25281:
   memcardFilters:
     - "SLKA-25280"
     - "SLKA-25342"
+SLKA-25283:
+  name: "Juiced"
+  region: "NTSC-K"
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLKA-25284:
   name: "Sakura Taisen 3"
   region: "NTSC-K"
@@ -31091,6 +31158,8 @@ SLPM-65729:
   gsHWFixes:
     preloadFrameData: 1 # Fixes licences.
     halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLPM-65730:
   name: "Rockman X8"
   region: "NTSC-J"
@@ -32431,6 +32500,8 @@ SLPM-66098:
   gsHWFixes:
     preloadFrameData: 1 # Fixes licences.
     halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLPM-66099:
   name: "Harukanaru Toki no Naka de 3 - Izayoiki [Premium Box-Triple Pack]"
   region: "NTSC-J"
@@ -33194,6 +33265,11 @@ SLPM-66277:
   region: "NTSC-J"
   speedHacks:
     InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLPM-66278:
   name: "Shin Gouketuji Ichizoku - Bonnou Kaihou"
   region: "NTSC-J"
@@ -44548,6 +44624,8 @@ SLUS-20550:
   gsHWFixes:
     preloadFrameData: 1 # Fixes licences.
     halfPixelOffset: 3 # Fixes double image.
+    gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
+    autoFlush: 1 # Fixes sun occlusion.
 SLUS-20552:
   name: "Grand Theft Auto - Vice City"
   region: "NTSC-U"
@@ -46132,6 +46210,11 @@ SLUS-20872:
   compat: 5
   speedHacks:
     InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLUS-20873:
   name: "Silent Hill 4 - The Room"
   region: "NTSC-U"
@@ -46656,6 +46739,8 @@ SLUS-20965:
     recommendedBlendingLevel: 3 # Fixes water and grass textures.
     mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
     trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLUS-20966:
   name: "State of Emergency 2"
   region: "NTSC-U"
@@ -47935,6 +48020,12 @@ SLUS-21208:
   compat: 5
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    recommendedBlendingLevel: 3 # Fixes water and grass textures.
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
 SLUS-21209:
   name: "Urban Reign"
   region: "NTSC-U"
@@ -48487,6 +48578,12 @@ SLUS-21295:
   compat: 5
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    recommendedBlendingLevel: 3 # Fixes water and grass textures.
+    mipmap: 2 # Mipmap + trilinear, improves some textures to match sw renderer.
+    trilinearFiltering: 1
+    wildArmsHack: 1 # Reduces post-processing misalignment.
+    mergeSprite: 1 # Reduces post-processing misalignment.
   memcardFilters: # Game saves use the normal edition serial.
     - "SLUS-21208"
 SLUS-21296:
@@ -52326,6 +52423,16 @@ SLUS-29141:
 SLUS-29145:
   name: "Final Night - Round 2 [Demo]"
   region: "NTSC-U"
+SLUS-29147:
+  name: "Juiced"
+  region: "NTSC-U"
+  speedHacks:
+    InstantVU1SpeedHack: 0 # Significantly improves game speed.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes overbrightness.
+    cpuSpriteRenderBW: 1 # Fixes broken window and shadow rendering.
+    cpuSpriteRenderLevel: 2 # Needed for above.
+    autoFlush: 1 # Fixes headlight brightness.
 SLUS-29148:
   name: "Incredible Hulk, The - Ultimate Destruction [Demo]"
   region: "NTSC-U"
