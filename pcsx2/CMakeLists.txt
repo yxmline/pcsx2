@@ -589,29 +589,82 @@ set(pcsx2GSHeaders
 
 if(USE_OPENGL)
 	list(APPEND pcsx2GSSources
+		GS/Renderers/OpenGL/GLContext.cpp
 		GS/Renderers/OpenGL/GLLoader.cpp
+		GS/Renderers/OpenGL/GLProgram.cpp
+		GS/Renderers/OpenGL/GLShaderCache.cpp
 		GS/Renderers/OpenGL/GLState.cpp
+		GS/Renderers/OpenGL/GLStreamBuffer.cpp
 		GS/Renderers/OpenGL/GSDeviceOGL.cpp
 		GS/Renderers/OpenGL/GSTextureOGL.cpp
 	)
 	list(APPEND pcsx2GSHeaders
+		GS/Renderers/OpenGL/GLContext.h
 		GS/Renderers/OpenGL/GLLoader.h
+		GS/Renderers/OpenGL/GLProgram.h
+		GS/Renderers/OpenGL/GLShaderCache.h
 		GS/Renderers/OpenGL/GLState.h
+		GS/Renderers/OpenGL/GLStreamBuffer.h
 		GS/Renderers/OpenGL/GSDeviceOGL.h
 		GS/Renderers/OpenGL/GSTextureOGL.h
 	)
 	target_link_libraries(PCSX2_FLAGS INTERFACE glad)
+
+	if(WIN32)
+		list(APPEND pcsx2GSSources GS/Renderers/OpenGL/GLContextWGL.cpp)
+		list(APPEND pcsx2GSHeaders GS/Renderers/OpenGL/GLContextWGL.h)
+		target_link_libraries(PCSX2_FLAGS INTERFACE opengl32.lib)
+	elseif(APPLE)
+		list(APPEND pcsx2GSSources GS/Renderers/OpenGL/GLContextAGL.cpp)
+		list(APPEND pcsx2GSHeaders GS/Renderers/OpenGL/GLContextAGL.h)
+	else()
+		if(X11_API OR WAYLAND_API)
+			list(APPEND pcsx2GSSources GS/Renderers/OpenGL/GLContextEGL.cpp)
+			list(APPEND pcsx2GSHeaders GS/Renderers/OpenGL/GLContextEGL.h)
+			target_link_libraries(PCSX2_FLAGS INTERFACE PkgConfig::EGL)
+		endif()
+
+		if(X11_API)
+			list(APPEND pcsx2GSSources GS/Renderers/OpenGL/GLContextEGLX11.cpp)
+			list(APPEND pcsx2GSHeaders GS/Renderers/OpenGL/GLContextEGLX11.h)
+		endif()
+
+		if(WAYLAND_API)
+			list(APPEND pcsx2GSSources GS/Renderers/OpenGL/GLContextEGLWayland.cpp)
+			list(APPEND pcsx2GSHeaders GS/Renderers/OpenGL/GLContextEGLWayland.h)
+		endif()
+	endif()
 endif()
 
 if(USE_VULKAN)
 	list(APPEND pcsx2GSSources
 		GS/Renderers/Vulkan/GSDeviceVK.cpp
 		GS/Renderers/Vulkan/GSTextureVK.cpp
+		GS/Renderers/Vulkan/vk_mem_alloc.cpp
+		GS/Renderers/Vulkan/VKBuilders.cpp
+		GS/Renderers/Vulkan/VKContext.cpp
+		GS/Renderers/Vulkan/VKLoader.cpp
+		GS/Renderers/Vulkan/VKShaderCache.cpp
+		GS/Renderers/Vulkan/VKStreamBuffer.cpp
+		GS/Renderers/Vulkan/VKSwapChain.cpp
+		GS/Renderers/Vulkan/VKTexture.cpp
+		GS/Renderers/Vulkan/VKUtil.cpp
 	)
 	list(APPEND pcsx2GSHeaders
 		GS/Renderers/Vulkan/GSDeviceVK.h
 		GS/Renderers/Vulkan/GSTextureVK.h
+		GS/Renderers/Vulkan/VKBuilders.h
+		GS/Renderers/Vulkan/VKContext.h
+		GS/Renderers/Vulkan/VKEntryPoints.h
+		GS/Renderers/Vulkan/VKEntryPoints.inl
+		GS/Renderers/Vulkan/VKLoader.h
+		GS/Renderers/Vulkan/VKShaderCache.h
+		GS/Renderers/Vulkan/VKStreamBuffer.h
+		GS/Renderers/Vulkan/VKSwapChain.h
+		GS/Renderers/Vulkan/VKTexture.h
+		GS/Renderers/Vulkan/VKUtil.h
 	)
+	target_link_libraries(PCSX2_FLAGS INTERFACE Vulkan-Headers glslang)
 endif()
 
 set(pcsx2GSMetalShaders
@@ -644,16 +697,30 @@ if(WIN32)
 
 	list(APPEND pcsx2GSSources
 		GS/Renderers/DX11/D3D.cpp
+		GS/Renderers/DX11/D3D11ShaderCache.cpp
 		GS/Renderers/DX11/GSDevice11.cpp
 		GS/Renderers/DX11/GSTexture11.cpp
 		GS/Renderers/DX11/GSTextureFX11.cpp
+		GS/Renderers/DX12/D3D12Builders.cpp
+		GS/Renderers/DX12/D3D12Context.cpp
+		GS/Renderers/DX12/D3D12DescriptorHeapManager.cpp
+		GS/Renderers/DX12/D3D12ShaderCache.cpp
+		GS/Renderers/DX12/D3D12StreamBuffer.cpp
+		GS/Renderers/DX12/D3D12Texture.cpp
 		GS/Renderers/DX12/GSDevice12.cpp
 		GS/Renderers/DX12/GSTexture12.cpp
 	)
 	list(APPEND pcsx2GSHeaders
 		GS/Renderers/DX11/D3D.h
+		GS/Renderers/DX11/D3D11ShaderCache.h
 		GS/Renderers/DX11/GSDevice11.h
 		GS/Renderers/DX11/GSTexture11.h
+		GS/Renderers/DX12/D3D12Builders.h
+		GS/Renderers/DX12/D3D12Context.h
+		GS/Renderers/DX12/D3D12DescriptorHeapManager.h
+		GS/Renderers/DX12/D3D12ShaderCache.h
+		GS/Renderers/DX12/D3D12StreamBuffer.h
+		GS/Renderers/DX12/D3D12Texture.h
 		GS/Renderers/DX12/GSDevice12.h
 		GS/Renderers/DX12/GSTexture12.h
 	)
@@ -1149,6 +1216,7 @@ if(WIN32)
 		PowrProf.lib
 		d3dcompiler.lib
 		d3d11.lib
+		d3d12.lib
 		dxgi.lib
 		strmiids.lib
 		opengl32.lib

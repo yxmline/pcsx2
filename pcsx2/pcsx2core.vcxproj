@@ -41,6 +41,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\libpng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\glslang\glslang;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\cubeb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\imgui\include;$(SolutionDir)3rdparty\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\simpleini\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -100,6 +101,7 @@
     <None Include="..\bin\resources\shaders\dx11\merge.fx" />
     <None Include="..\bin\resources\shaders\dx11\shadeboost.fx" />
     <None Include="..\bin\resources\shaders\dx11\tfx.fx" />
+    <None Include="GS\Renderers\Vulkan\VKEntryPoints.inl" />
     <None Include="Utilities\folderdesc.txt" />
     <None Include="Docs\License.txt" />
     <None Include="ps2\eeHwTraceLog.inl" />
@@ -199,6 +201,27 @@
     <ClCompile Include="Frontend\ImGuiFullscreen.cpp" />
     <ClCompile Include="Frontend\ImGuiManager.cpp" />
     <ClCompile Include="Frontend\ImGuiOverlays.cpp" />
+    <ClCompile Include="GS\Renderers\DX11\D3D11ShaderCache.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12Builders.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12Context.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12DescriptorHeapManager.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12ShaderCache.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12StreamBuffer.cpp" />
+    <ClCompile Include="GS\Renderers\DX12\D3D12Texture.cpp" />
+    <ClCompile Include="GS\Renderers\OpenGL\GLContext.cpp" />
+    <ClCompile Include="GS\Renderers\OpenGL\GLContextWGL.cpp" />
+    <ClCompile Include="GS\Renderers\OpenGL\GLProgram.cpp" />
+    <ClCompile Include="GS\Renderers\OpenGL\GLShaderCache.cpp" />
+    <ClCompile Include="GS\Renderers\OpenGL\GLStreamBuffer.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKTexture.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKBuilders.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKContext.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKLoader.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKShaderCache.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKStreamBuffer.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKSwapChain.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\VKUtil.cpp" />
+    <ClCompile Include="GS\Renderers\Vulkan\vk_mem_alloc.cpp" />
     <ClCompile Include="INISettingsInterface.cpp" />
     <ClCompile Include="Frontend\InputManager.cpp" />
     <ClCompile Include="Frontend\InputSource.cpp" />
@@ -538,7 +561,28 @@
     <ClInclude Include="Frontend\ImGuiFullscreen.h" />
     <ClInclude Include="Frontend\ImGuiManager.h" />
     <ClInclude Include="Frontend\ImGuiOverlays.h" />
+    <ClInclude Include="GS\Renderers\DX11\D3D11ShaderCache.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12Builders.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12Context.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12DescriptorHeapManager.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12ShaderCache.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12StreamBuffer.h" />
+    <ClInclude Include="GS\Renderers\DX12\D3D12Texture.h" />
     <ClInclude Include="GS\Renderers\HW\GSHwHack.h" />
+    <ClInclude Include="GS\Renderers\OpenGL\GLContext.h" />
+    <ClInclude Include="GS\Renderers\OpenGL\GLContextWGL.h" />
+    <ClInclude Include="GS\Renderers\OpenGL\GLProgram.h" />
+    <ClInclude Include="GS\Renderers\OpenGL\GLShaderCache.h" />
+    <ClInclude Include="GS\Renderers\OpenGL\GLStreamBuffer.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKTexture.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKBuilders.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKContext.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKEntryPoints.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKLoader.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKShaderCache.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKStreamBuffer.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKSwapChain.h" />
+    <ClInclude Include="GS\Renderers\Vulkan\VKUtil.h" />
     <ClInclude Include="INISettingsInterface.h" />
     <ClInclude Include="Frontend\InputManager.h" />
     <ClInclude Include="Frontend\InputSource.h" />
@@ -826,8 +870,14 @@
     <ProjectReference Include="$(SolutionDir)3rdparty\imgui\imgui.vcxproj">
       <Project>{88fb34ec-845e-4f21-a552-f1573b9ed167}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\3rdparty\d3d12memalloc\d3d12memalloc.vcxproj">
+      <Project>{d45cec7a-3171-40dd-975d-e1544cf16139}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\3rdparty\discord-rpc\discord-rpc.vcxproj">
       <Project>{e960dfdf-1bd3-4c29-b251-d1a0919c9b09}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rdparty\glslang\glslang.vcxproj">
+      <Project>{ef6834a9-11f3-4331-bc34-21b325abb180}</Project>
     </ProjectReference>
     <ProjectReference Include="..\3rdparty\libzip\libzip.vcxproj">
       <Project>{20b2e9fe-f020-42a0-b324-956f5b06ea68}</Project>
