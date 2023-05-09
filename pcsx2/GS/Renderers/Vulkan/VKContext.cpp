@@ -389,7 +389,7 @@ bool VKContext::SelectDeviceExtensions(ExtensionList* extension_list, bool enabl
 
 #ifdef _WIN32
 	m_optional_extensions.vk_ext_full_screen_exclusive =
-		SupportsExtension(VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME, false);
+		enable_surface && SupportsExtension(VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME, false);
 #endif
 
 	return true;
@@ -410,6 +410,7 @@ bool VKContext::SelectDeviceFeatures(const VkPhysicalDeviceFeatures* required_fe
 	m_device_features.fragmentStoresAndAtomics = available_features.fragmentStoresAndAtomics;
 	m_device_features.textureCompressionBC = available_features.textureCompressionBC;
 	m_device_features.samplerAnisotropy = available_features.samplerAnisotropy;
+	m_device_features.geometryShader = available_features.geometryShader;
 
 	return true;
 }
@@ -930,6 +931,35 @@ bool VKContext::CreateTextureStreamBuffer()
 	}
 
 	return true;
+}
+
+VkRenderPass VKContext::GetRenderPassForRestarting(VkRenderPass pass)
+{
+	for (const auto& it : m_render_pass_cache)
+	{
+		if (it.second != pass)
+			continue;
+
+		RenderPassCacheKey modified_key;
+		modified_key.key = it.first;
+		if (modified_key.color_load_op == VK_ATTACHMENT_LOAD_OP_CLEAR)
+			modified_key.color_load_op = VK_ATTACHMENT_LOAD_OP_LOAD;
+		if (modified_key.depth_load_op == VK_ATTACHMENT_LOAD_OP_CLEAR)
+			modified_key.depth_load_op = VK_ATTACHMENT_LOAD_OP_LOAD;
+		if (modified_key.stencil_load_op == VK_ATTACHMENT_LOAD_OP_CLEAR)
+			modified_key.stencil_load_op = VK_ATTACHMENT_LOAD_OP_LOAD;
+
+		if (modified_key.key == it.first)
+			return pass;
+
+		auto fit = m_render_pass_cache.find(modified_key.key);
+		if (fit != m_render_pass_cache.end())
+			return fit->second;
+
+		return CreateCachedRenderPass(modified_key);
+	}
+
+	return pass;
 }
 
 VkCommandBuffer VKContext::GetCurrentInitCommandBuffer()
