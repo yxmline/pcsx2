@@ -415,6 +415,7 @@ Pcsx2Config::GSOptions::GSOptions()
 	UseBlitSwapChain = false;
 	DisableShaderCache = false;
 	DisableFramebufferFetch = false;
+	DisableVertexShaderExpand = false;
 	DisableThreadedPresentation = false;
 	SkipDuplicateFrames = false;
 	OsdShowMessages = true;
@@ -445,6 +446,7 @@ Pcsx2Config::GSOptions::GSOptions()
 	UserHacks_DisableDepthSupport = false;
 	UserHacks_DisablePartialInvalidation = false;
 	UserHacks_DisableSafeFeatures = false;
+	UserHacks_DisableRenderFixes = false;
 	UserHacks_MergePPSprite = false;
 	UserHacks_WildHack = false;
 	UserHacks_BilinearHack = false;
@@ -506,7 +508,6 @@ bool Pcsx2Config::GSOptions::OptionsAreEqual(const GSOptions& right) const
 
 		OpEqu(HWMipmap) &&
 		OpEqu(AccurateBlendingUnit) &&
-		OpEqu(CRCHack) &&
 		OpEqu(TextureFiltering) &&
 		OpEqu(TexturePreloading) &&
 		OpEqu(GSDumpCompression) &&
@@ -579,6 +580,7 @@ bool Pcsx2Config::GSOptions::RestartOptionsAreEqual(const GSOptions& right) cons
 		   OpEqu(DisableShaderCache) &&
 		   OpEqu(DisableDualSourceBlend) &&
 		   OpEqu(DisableFramebufferFetch) &&
+		   OpEqu(DisableVertexShaderExpand) &&
 		   OpEqu(DisableThreadedPresentation) &&
 		   OpEqu(OverrideTextureBarriers) &&
 		   OpEqu(ExclusiveFullscreenControl);
@@ -634,6 +636,7 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	GSSettingBool(DisableShaderCache);
 	GSSettingBool(DisableDualSourceBlend);
 	GSSettingBool(DisableFramebufferFetch);
+	GSSettingBool(DisableVertexShaderExpand);
 	GSSettingBool(DisableThreadedPresentation);
 	GSSettingBool(SkipDuplicateFrames);
 	GSSettingBool(OsdShowMessages);
@@ -662,6 +665,7 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	GSSettingBoolEx(UserHacks_DisableDepthSupport, "UserHacks_DisableDepthSupport");
 	GSSettingBoolEx(UserHacks_DisablePartialInvalidation, "UserHacks_DisablePartialInvalidation");
 	GSSettingBoolEx(UserHacks_DisableSafeFeatures, "UserHacks_Disable_Safe_Features");
+	GSSettingBoolEx(UserHacks_DisableRenderFixes, "UserHacks_DisableRenderFixes");
 	GSSettingBoolEx(UserHacks_MergePPSprite, "UserHacks_merge_pp_sprite");
 	GSSettingBoolEx(UserHacks_WildHack, "UserHacks_WildHack");
 	GSSettingBoolEx(UserHacks_BilinearHack, "UserHacks_BilinearHack");
@@ -703,7 +707,6 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 
 	GSSettingIntEnumEx(HWMipmap, "mipmap_hw");
 	GSSettingIntEnumEx(AccurateBlendingUnit, "accurate_blending_unit");
-	GSSettingIntEnumEx(CRCHack, "crc_hack_level");
 	GSSettingIntEnumEx(TextureFiltering, "filter");
 	GSSettingIntEnumEx(TexturePreloading, "texture_preloading");
 	GSSettingIntEnumEx(GSDumpCompression, "GSDumpCompression");
@@ -787,6 +790,7 @@ void Pcsx2Config::GSOptions::MaskUserHacks()
 	UserHacks_BilinearHack = false;
 	UserHacks_NativePaletteDraw = false;
 	UserHacks_DisableSafeFeatures = false;
+	UserHacks_DisableRenderFixes = false;
 	UserHacks_HalfBottomOverride = -1;
 	UserHacks_HalfPixelOffset = 0;
 	UserHacks_RoundSprite = 0;
