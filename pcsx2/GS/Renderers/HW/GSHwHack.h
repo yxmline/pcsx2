@@ -25,9 +25,6 @@ public:
 	static bool GSC_SakuraTaisen(GSRendererHW& r, int& skip);
 	static bool GSC_SFEX3(GSRendererHW& r, int& skip);
 	static bool GSC_Tekken5(GSRendererHW& r, int& skip);
-	static bool GSC_TombRaiderAnniversary(GSRendererHW& r, int& skip);
-	static bool GSC_TombRaiderLegend(GSRendererHW& r, int& skip);
-	static bool GSC_TombRaiderUnderWorld(GSRendererHW& r, int& skip);
 	static bool GSC_BurnoutGames(GSRendererHW& r, int& skip);
 	static bool GSC_BlackAndBurnoutSky(GSRendererHW& r, int& skip);
 	static bool GSC_MidnightClub3(GSRendererHW& r, int& skip);
@@ -52,6 +49,7 @@ public:
 	static bool GSC_BlueTongueGames(GSRendererHW& r, int& skip);
 	static bool GSC_Battlefield2(GSRendererHW& r, int& skip);
 	static bool GSC_NFSUndercover(GSRendererHW& r, int& skip);
+	static bool GSC_PolyphonyDigitalGames(GSRendererHW& r, int& skip);
 
 	static bool OI_PointListPalette(GSRendererHW& r, GSTexture* rt, GSTexture* ds, GSTextureCache::Source* t);
 	static bool OI_BigMuthaTruckers(GSRendererHW& r, GSTexture* rt, GSTexture* ds, GSTextureCache::Source* t);

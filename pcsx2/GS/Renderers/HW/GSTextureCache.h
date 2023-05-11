@@ -52,16 +52,16 @@ public:
 		bool HasY() const { return static_cast<u32>(bits >> 32) != 0; }
 		bool HasEither() const { return (bits != 0); }
 
-		void SetX(u32 min, u32 max) { bits |= (min | (max << 16)); }
-		void SetY(u32 min, u32 max) { bits |= ((static_cast<u64>(min) << 32) | (static_cast<u64>(max) << 48)); }
+		void SetX(s32 min, s32 max) { bits |= (static_cast<u64>(static_cast<u16>(min)) | (static_cast<u64>(static_cast<u16>(max) << 16))); }
+		void SetY(s32 min, s32 max) { bits |= ((static_cast<u64>(static_cast<u16>(min)) << 32) | (static_cast<u64>(static_cast<u16>(max)) << 48)); }
 
-		u32 GetMinX() const { return static_cast<u32>(bits) & 0xFFFFu; }
-		u32 GetMaxX() const { return static_cast<u32>(bits >> 16) & 0xFFFFu; }
-		u32 GetMinY() const { return static_cast<u32>(bits >> 32) & 0xFFFFu; }
-		u32 GetMaxY() const { return static_cast<u32>(bits >> 48); }
+		s32 GetMinX() const { return static_cast<s16>(bits); }
+		s32 GetMaxX() const { return static_cast<s16>((bits >> 16) & 0xFFFFu); }
+		s32 GetMinY() const { return static_cast<s16>((bits >> 32) & 0xFFFFu); }
+		s32 GetMaxY() const { return static_cast<s16>(bits >> 48); }
 
-		u32 GetWidth() const { return (GetMaxX() - GetMinX()); }
-		u32 GetHeight() const { return (GetMaxY() - GetMinY()); }
+		s32 GetWidth() const { return (GetMaxX() - GetMinX()); }
+		s32 GetHeight() const { return (GetMaxY() - GetMinY()); }
 
 		/// Returns true if the area of the region exceeds the TW/TH size (i.e. "fixed tex0").
 		bool IsFixedTEX0(GIFRegTEX0 TEX0) const;
@@ -142,6 +142,7 @@ public:
 		bool m_32_bits_fmt = false; // Allow to detect the casting of 32 bits as 16 bits texture
 		bool m_shared_texture = false;
 
+		__fi GSTexture* GetTexture() const { return m_texture; }
 		__fi int GetUnscaledWidth() const { return m_unscaled_size.x; }
 		__fi int GetUnscaledHeight() const { return m_unscaled_size.y; }
 		__fi const GSVector2i& GetUnscaledSize() const { return m_unscaled_size; }
@@ -435,6 +436,7 @@ public:
 	void DirtyRectByPage(u32 sbp, u32 spsm, u32 sbw, Target* t, GSVector4i src_r);
 
 	GSTexture* LookupPaletteSource(u32 CBP, u32 CPSM, u32 CBW, GSVector2i& offset, float* scale, const GSVector2i& size);
+	std::shared_ptr<Palette> LookupPaletteObject(u16 pal, bool need_gs_texture);
 
 	Source* LookupSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, const GIFRegCLAMP& CLAMP, const GSVector4i& r, const GSVector2i* lod);
 	Source* LookupDepthSource(const GIFRegTEX0& TEX0, const GIFRegTEXA& TEXA, const GIFRegCLAMP& CLAMP, const GSVector4i& r, bool palette = false);
