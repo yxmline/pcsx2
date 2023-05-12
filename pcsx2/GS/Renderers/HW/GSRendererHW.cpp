@@ -360,6 +360,20 @@ void GSRendererHW::ConvertSpriteTextureShuffle(bool& write_ba, bool& read_ba)
 	tex_pos &= 0xFF;
 	read_ba = (tex_pos > 112 && tex_pos < 144);
 
+	// Another way of selecting whether to read RG/BA is to use region repeat.
+	// Ace Combat 04 reads RG, writes to RGBA by setting a MINU of 1015.
+	if (m_cached_ctx.CLAMP.WMS == CLAMP_REGION_REPEAT)
+	{
+		GL_INS("REGION_REPEAT clamp with texture shuffle, FBMSK=%08x, MINU=%u, MINV=%u, MAXU=%u, MAXV=%u",
+			m_cached_ctx.FRAME.FBMSK, m_cached_ctx.CLAMP.MINU, m_cached_ctx.CLAMP.MINV, m_cached_ctx.CLAMP.MAXU,
+			m_cached_ctx.CLAMP.MAXV);
+
+		// offset coordinates swap around RG/BA.
+		const bool invert = read_ba; // (tex_pos > 112 && tex_pos < 144), i.e. 8 fixed point
+		const u32 minu = (m_cached_ctx.CLAMP.MINU & 8) ^ (invert ? 8 : 0);
+		read_ba = ((minu & 8) != 0);
+	}
+
 	if (m_split_texture_shuffle_pages > 0)
 	{
 		// Input vertices might be bad, so rewrite them.
@@ -744,11 +758,7 @@ GSVector2i GSRendererHW::GetTargetSize(const GSTextureCache::Source* tex)
 		}
 	}
 
-	const GSVector2i size = g_texture_cache->GetTargetSize(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, width, height);
-
-	GL_INS("Target size for %x %u %u: %ux%u", m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, size.x, size.y);
-
-	return size;
+	return g_texture_cache->GetTargetSize(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, width, height);
 }
 
 bool GSRendererHW::IsPossibleChannelShuffle() const
@@ -2055,10 +2065,15 @@ void GSRendererHW::Draw()
 				rt->m_TEX0 = FRAME_TEX0;
 				rt->m_TEX0.TBW = std::max(width, FRAME_TEX0.TBW);
 			}
+
+			rt->UpdateValidAlpha(FRAME_TEX0.PSM, fm);
 		}
 
 		if (ds)
+		{
 			ds->m_TEX0 = ZBUF_TEX0;
+			ds->UpdateValidAlpha(ZBUF_TEX0.PSM, zm);
+		}
 	}
 	else if (!m_texture_shuffle)
 	{
@@ -2068,11 +2083,14 @@ void GSRendererHW::Draw()
 		{
 			rt->m_TEX0.TBW = std::max(rt->m_TEX0.TBW, FRAME_TEX0.TBW);
 			rt->m_TEX0.PSM = FRAME_TEX0.PSM;
+
+			rt->UpdateValidAlpha(FRAME_TEX0.PSM, fm);
 		}
 		if (ds)
 		{
 			ds->m_TEX0.TBW = std::max(ds->m_TEX0.TBW, ZBUF_TEX0.TBW);
 			ds->m_TEX0.PSM = ZBUF_TEX0.PSM;
+			ds->UpdateValidAlpha(ZBUF_TEX0.PSM, zm);
 		}
 	}
 	if (rt)
@@ -2567,7 +2585,7 @@ void GSRendererHW::EmulateZbuffer(const GSTextureCache::Target* ds)
 	}
 }
 
-void GSRendererHW::EmulateTextureShuffleAndFbmask()
+void GSRendererHW::EmulateTextureShuffleAndFbmask(GSTextureCache::Target* rt)
 {
 	// Uncomment to disable texture shuffle emulation.
 	// m_texture_shuffle = false;
@@ -2628,7 +2646,19 @@ void GSRendererHW::EmulateTextureShuffleAndFbmask()
 		const u32 fbmask = ((m >> 3) & 0x1F) | ((m >> 6) & 0x3E0) | ((m >> 9) & 0x7C00) | ((m >> 16) & 0x8000);
 		// r = rb mask, g = ga mask
 		const GSVector2i rb_ga_mask = GSVector2i(fbmask & 0xFF, (fbmask >> 8) & 0xFF);
-		m_conf.colormask.wrgba = 0;
+
+		// Ace Combat 04 sets FBMSK to 0 for the shuffle, duplicating RG across RGBA.
+		// Given how touchy texture shuffles are, I'm not ready to make it 100% dependent on the real FBMSK yet.
+		// TODO: Remove this if, and see what breaks.
+		if (fbmask != 0)
+		{
+			m_conf.colormask.wrgba = 0;
+		}
+		else
+		{
+			m_conf.colormask.wr = m_conf.colormask.wg = (rb_ga_mask.r != 0xFF);
+			m_conf.colormask.wb = m_conf.colormask.wa = (rb_ga_mask.g != 0xFF);
+		}
 
 		// 2 Select the new mask
 		if (rb_ga_mask.r != 0xFF)
@@ -2686,6 +2716,10 @@ void GSRendererHW::EmulateTextureShuffleAndFbmask()
 		{
 			m_conf.ps.fbmask = 0;
 		}
+
+		// Set dirty alpha on target, but only if we're actually writing to it.
+		if (rt)
+			rt->m_valid_alpha |= m_conf.colormask.wa;
 
 		// Once we draw the shuffle, no more buffering.
 		m_split_texture_shuffle_pages = 0;
@@ -4204,7 +4238,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	else
 		m_prim_overlap = PRIM_OVERLAP_UNKNOW;
 
-	EmulateTextureShuffleAndFbmask();
+	EmulateTextureShuffleAndFbmask(rt);
 
 	// DATE: selection of the algorithm. Must be done before blending because GL42 is not compatible with blending
 	if (DATE)
@@ -4754,7 +4788,8 @@ GSRendererHW::CLUTDrawTestResult GSRendererHW::PossibleCLUTDraw()
 			if (HasEEUpload(r))
 				return CLUTDrawTestResult::CLUTDrawOnCPU;
 
-			GSTextureCache::Target* tgt = g_texture_cache->GetExactTarget(m_cached_ctx.TEX0.TBP0, m_cached_ctx.TEX0.TBW, m_cached_ctx.TEX0.PSM);
+			GSTextureCache::Target* tgt = g_texture_cache->GetExactTarget(
+				m_cached_ctx.TEX0.TBP0, m_cached_ctx.TEX0.TBW, GSTextureCache::RenderTarget);
 			if (tgt)
 			{
 				bool is_dirty = false;
