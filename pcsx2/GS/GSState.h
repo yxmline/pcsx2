@@ -542,16 +542,10 @@ public:
 				GSVector4i out_rect = PCRTCDisplays[display].framebufferRect;
 
 				if (out_rect.z >= 2048)
-				{
-					out_rect.z -= GSConfig.UseHardwareRenderer() ? 2048 : out_rect.x;
-					out_rect.x = 0;
-				}
+					out_rect.z -= out_rect.x;
 
 				if (out_rect.w >= 2048)
-				{
-					out_rect.w -= GSConfig.UseHardwareRenderer() ? 2048 : out_rect.y;
-					out_rect.y = 0;
-				}
+					out_rect.w -= out_rect.y;
 
 				// Cap the framebuffer read to the maximum display height, otherwise the hardware renderer gets messy.
 				const int min_mag = std::max(1, PCRTCDisplays[display].magnification.y);
@@ -565,12 +559,6 @@ public:
 				offset = (max_height / min_mag) - offset;
 				out_rect.w = std::min(out_rect.w, offset);
 
-				// Hardware mode needs a wider framebuffer as it can't offset the read.
-				if (GSConfig.UseHardwareRenderer())
-				{
-					out_rect.z += PCRTCDisplays[display].framebufferOffsets.x;
-					out_rect.w += PCRTCDisplays[display].framebufferOffsets.y;
-				}
 				return GSVector2i(out_rect.z, out_rect.w);
 			}
 		}
@@ -647,21 +635,45 @@ public:
 		{
 			if (GSConfig.PCRTCAntiBlur && PCRTCSameSrc && !scanmask)
 			{
-				if (abs(PCRTCDisplays[1].framebufferOffsets.y - PCRTCDisplays[0].framebufferOffsets.y) == 1
+				GSVector2i fb0 = GSVector2i(PCRTCDisplays[0].framebufferOffsets.x, PCRTCDisplays[0].framebufferOffsets.y);
+				GSVector2i fb1 = GSVector2i(PCRTCDisplays[1].framebufferOffsets.x, PCRTCDisplays[1].framebufferOffsets.y);
+
+				if (fb0.x + PCRTCDisplays[0].displayRect.z > 2048)
+				{
+					fb0.x -= 2048;
+					fb0.x = abs(fb0.x);
+				}
+				if (fb0.y + PCRTCDisplays[0].displayRect.w > 2048)
+				{
+					fb0.y -= 2048;
+					fb0.y = abs(fb0.y);
+				}
+				if (fb1.x + PCRTCDisplays[1].displayRect.z > 2048)
+				{
+					fb1.x -= 2048;
+					fb1.x = abs(fb1.x);
+				}
+				if (fb1.y + PCRTCDisplays[1].displayRect.w > 2048)
+				{
+					fb1.y -= 2048;
+					fb1.y = abs(fb1.y);
+				}
+
+				if (abs(fb1.y - fb0.y) == 1
 					&& PCRTCDisplays[0].displayRect.y == PCRTCDisplays[1].displayRect.y)
 				{
-					if (PCRTCDisplays[1].framebufferOffsets.y < PCRTCDisplays[0].framebufferOffsets.y)
-						PCRTCDisplays[0].framebufferOffsets.y = PCRTCDisplays[1].framebufferOffsets.y;
+					if (fb1.y < fb0.y)
+						PCRTCDisplays[0].framebufferOffsets.y = fb1.y;
 					else
-						PCRTCDisplays[1].framebufferOffsets.y = PCRTCDisplays[0].framebufferOffsets.y;
+						PCRTCDisplays[1].framebufferOffsets.y = fb0.y;
 				}
-				if (abs(PCRTCDisplays[1].framebufferOffsets.x - PCRTCDisplays[0].framebufferOffsets.x) == 1
+				if (abs(fb1.x - fb0.x) == 1
 					&& PCRTCDisplays[0].displayRect.x == PCRTCDisplays[1].displayRect.x)
 				{
-					if (PCRTCDisplays[1].framebufferOffsets.x < PCRTCDisplays[0].framebufferOffsets.x)
-						PCRTCDisplays[0].framebufferOffsets.x = PCRTCDisplays[1].framebufferOffsets.x;
+					if (fb1.x < fb0.x)
+						PCRTCDisplays[0].framebufferOffsets.x = fb1.x;
 					else
-						PCRTCDisplays[1].framebufferOffsets.x = PCRTCDisplays[0].framebufferOffsets.x;
+						PCRTCDisplays[1].framebufferOffsets.x = fb0.x;
 				}
 			}
 			PCRTCDisplays[0].framebufferRect.x += PCRTCDisplays[0].framebufferOffsets.x;
@@ -685,11 +697,15 @@ public:
 				{
 					if (PCRTCDisplays[display].framebufferRect.z >= 2048)
 					{
+						PCRTCDisplays[display].displayRect.x += 2048 - PCRTCDisplays[display].framebufferRect.x;
+						PCRTCDisplays[display].displayRect.z += 2048 - PCRTCDisplays[display].framebufferRect.x;
 						PCRTCDisplays[display].framebufferRect.x = 0;
 						PCRTCDisplays[display].framebufferRect.z -= 2048;
 					}
 					if (PCRTCDisplays[display].framebufferRect.w >= 2048)
 					{
+						PCRTCDisplays[display].displayRect.y += 2048 - PCRTCDisplays[display].framebufferRect.y;
+						PCRTCDisplays[display].displayRect.w += 2048 - PCRTCDisplays[display].framebufferRect.y;
 						PCRTCDisplays[display].framebufferRect.y = 0;
 						PCRTCDisplays[display].framebufferRect.w -= 2048;
 					}
