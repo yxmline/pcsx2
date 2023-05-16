@@ -94,6 +94,19 @@ void GSTextureCache::RemoveAll()
 	m_surface_offset_cache.clear();
 }
 
+bool GSTextureCache::FullRectDirty(Target* target)
+{
+	RGBAMask rgba;
+	rgba._u32 = GSUtil::GetChannelMask(target->m_TEX0.PSM);
+	// One complete dirty rect, not pieces (Add dirty rect function should be able to join these all together).
+	if (target->m_age > 2 && target->m_dirty.size() == 1 && rgba._u32 == target->m_dirty[0].rgba._u32 && target->m_valid.rintersect(target->m_dirty[0].r).eq(target->m_valid))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void GSTextureCache::AddDirtyRectTarget(Target* target, GSVector4i rect, u32 psm, u32 bw, RGBAMask rgba, bool req_linear)
 {
 	bool skipdirty = false;
@@ -1827,12 +1840,22 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 					GL_CACHE("TC: Dirty Target(%s) (0x%x) r(%d,%d,%d,%d)", to_string(type),
 						t->m_TEX0.TBP0, r.x, r.y, r.z, r.w);
 
-					if (eewrite)
-						t->m_age = 0;
 					
 					AddDirtyRectTarget(t, r, psm, bw, rgba);
-					
-					++i;
+
+					if (FullRectDirty(t))
+					{
+						i = list.erase(j);
+						GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+							t->m_TEX0.TBP0);
+						delete t;
+						continue;
+					}
+
+					if (eewrite)
+						t->m_age = 0;
+
+					i++;
 					continue;
 				}
 				else
@@ -1867,6 +1890,15 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 								r.z,
 								r.w);
 
+							if (FullRectDirty(t))
+							{
+								i = list.erase(j);
+								GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+									t->m_TEX0.TBP0);
+								delete t;
+								continue;
+							}
+
 							can_erase = false;
 						}
 						else
@@ -1883,6 +1915,15 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 								if (swizzle_match)
 								{
 									DirtyRectByPage(bp, psm, bw, t, r);
+
+									if (FullRectDirty(t))
+									{
+										i = list.erase(j);
+										GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+											t->m_TEX0.TBP0);
+										delete t;
+										continue;
+									}
 
 									if (eewrite)
 										t->m_age = 0;
@@ -1907,6 +1948,15 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 										new_rect.w = (r.w + (page_size.y - 1)) & ~(page_size.y - 1);
 									}
 									DirtyRectByPage(bp & ~((1 << 5) - 1), psm, bw, t, new_rect);
+
+									if (FullRectDirty(t))
+									{
+										i = list.erase(j);
+										GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+											t->m_TEX0.TBP0);
+										delete t;
+										continue;
+									}
 
 									if (eewrite)
 										t->m_age = 0;
@@ -1934,6 +1984,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 												so.b2a_offset.w, psm_str(psm), bp, bw, r.x, r.y, r.z, r.w);
 
 											AddDirtyRectTarget(t, so.b2a_offset, psm, bw, rgba);
+
 											can_erase = false;
 										}
 										else
@@ -2005,11 +2056,20 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							GL_CACHE("TC: Dirty After Target(%s) (0x%x)", to_string(type),
 								t->m_TEX0.TBP0);
 
-							if (eewrite)
-								t->m_age = 0;
-
 							const GSVector4i dirty_r = GSVector4i(r.left, r.top - y, r.right, r.bottom - y);
 							AddDirtyRectTarget(t, dirty_r, psm, bw, rgba);
+
+							if (FullRectDirty(t))
+							{
+								i = list.erase(j);
+								GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+									t->m_TEX0.TBP0);
+								delete t;
+							}
+
+							if (t && eewrite)
+								t->m_age = 0;
+
 							continue;
 						}
 					}
@@ -2035,11 +2095,20 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							t->m_TEX0.TBP0, t->m_end_block,
 							r.left, r.top + y, r.right, r.bottom + y, bw);
 
-						if (eewrite)
-							t->m_age = 0;
-
 						const GSVector4i dirty_r = GSVector4i(r.left, r.top + y, r.right, r.bottom + y);
 						AddDirtyRectTarget(t, dirty_r, psm, bw, rgba);
+
+						if (FullRectDirty(t))
+						{
+							i = list.erase(j);
+							GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+								t->m_TEX0.TBP0);
+							delete t;
+						}
+
+						if (t && eewrite)
+							t->m_age = 0;
+
 						continue;
 					}
 				}
@@ -2108,6 +2177,15 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 						{
 							DirtyRectByPage(bp, psm, bw, t, r);
 
+							if (FullRectDirty(t))
+							{
+								i = list.erase(j);
+								GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+									t->m_TEX0.TBP0);
+								delete t;
+								continue;
+							}
+
 							if (eewrite)
 								t->m_age = 0;
 						}
@@ -2151,10 +2229,19 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 						const SurfaceOffset so = ComputeSurfaceOffset(sok);
 						if (so.is_valid)
 						{
+							AddDirtyRectTarget(t, so.b2a_offset, t->m_TEX0.PSM, t->m_TEX0.TBW, rgba);
+
+							if (FullRectDirty(t))
+							{
+								i = list.erase(j);
+								GL_CACHE("TC: Remove Target(%s) (0x%x)", to_string(type),
+									t->m_TEX0.TBP0);
+								delete t;
+								continue;
+							}
+
 							if (eewrite)
 								t->m_age = 0;
-
-							AddDirtyRectTarget(t, so.b2a_offset, t->m_TEX0.PSM, t->m_TEX0.TBW, rgba);
 						}
 					}
 				}
@@ -2165,8 +2252,9 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 }
 
 // Goal: retrive the data from the GPU to the GS memory.
-// Called each time you want to read from the GS memory
-void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r)
+// Called each time you want to read from the GS memory.
+// full_flush is set when it's a Local->Local stransfer and both src and destination are the same.
+void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r, bool full_flush)
 {
 	const u32 bp = off.bp();
 	const u32 psm = off.psm();
@@ -2219,7 +2307,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 				const bool swizzle_match = GSLocalMemory::m_psm[psm].depth == GSLocalMemory::m_psm[t->m_TEX0.PSM].depth;
 				// Calculate the rect offset if the BP doesn't match.
 				GSVector4i targetr = {};
-				if (t->readbacks_since_draw > 1)
+				if (full_flush || t->readbacks_since_draw > 1)
 				{
 					targetr = t->m_drawn_since_read;
 				}
@@ -2353,7 +2441,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 			const bool swizzle_match = GSLocalMemory::m_psm[psm].depth == GSLocalMemory::m_psm[t->m_TEX0.PSM].depth;
 			// Calculate the rect offset if the BP doesn't match.
 			GSVector4i targetr = {};
-			if (t->readbacks_since_draw > 1)
+			if (full_flush || t->readbacks_since_draw > 1)
 			{
 				targetr = t->m_drawn_since_read;
 			}
@@ -2479,8 +2567,7 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	}
 
 	// TODO: In theory we could do channel swapping on the GPU, but we haven't found anything which needs it so far.
-	// Same with SBP == DBP, but this behavior could change based on direction?
-	if (SPSM != DPSM || ((SBP == DBP) && !(GSVector4i(sx, sy, sx + w, sy + h).rintersect(GSVector4i(dx, dy, dx + w, dy + h))).rempty()))
+	if (SPSM != DPSM)
 	{
 		GL_CACHE("Skipping HW move from 0x%X to 0x%X with SPSM=%u DPSM=%u", SBP, DBP, SPSM, DPSM);
 		return false;
@@ -2573,9 +2660,57 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 		return false;
 	GL_CACHE("HW Move 0x%x[BW:%u PSM:%s] to 0x%x[BW:%u PSM:%s] <%d,%d->%d,%d> -> <%d,%d->%d,%d>", SBP, SBW,
 		psm_str(SPSM), DBP, DBW, psm_str(DPSM), sx, sy, sx + w, sy + h, dx, dy, dx + w, dy + h);
-	g_gs_device->CopyRect(src->m_texture, dst->m_texture,
-		GSVector4i(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h),
-		scaled_dx, scaled_dy);
+
+	// If the copies overlap, this is a validation error, so we need to copy to a temporary texture first.
+	if ((SBP == DBP) && !(GSVector4i(sx, sy, sx + w, sy + h).rintersect(GSVector4i(dx, dy, dx + w, dy + h))).rempty())
+	{
+		GSTexture* tmp_texture = nullptr;
+		const GSVector4i src_size = GSVector4i(src->m_texture->GetSize()).xyxy();
+		try
+		{
+			tmp_texture = src->m_texture->IsDepthStencil() ?
+				g_gs_device->CreateDepthStencil(src_size.x, src_size.y, src->m_texture->GetFormat(), false) :
+				g_gs_device->CreateRenderTarget(src_size.x, src_size.y, src->m_texture->GetFormat(), false);
+		}
+		catch (const std::bad_alloc&)
+		{
+		}
+
+		if (!tmp_texture)
+		{
+			Console.Error("(HW Move) Failed to allocate temporary %dx%d texture on HW move", w, h);
+			return false;
+		}
+
+		if(tmp_texture->IsDepthStencil())
+		{
+			const GSVector4 src_rect = GSVector4(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h);
+			const GSVector4 tmp_rect = src_rect / GSVector4(src_size);
+			const GSVector4 dst_rect = GSVector4(scaled_dx, scaled_dy, (scaled_dx + scaled_w), (scaled_dy + scaled_h));
+			g_gs_device->StretchRect(src->m_texture, tmp_rect, tmp_texture, src_rect, ShaderConvert::DEPTH_COPY, false);
+			g_gs_device->StretchRect(tmp_texture, tmp_rect, dst->m_texture, dst_rect, ShaderConvert::DEPTH_COPY, false);
+		}
+		else
+		{
+			const GSVector4i src_rect = GSVector4i(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h);
+			// Fast memcpy()-like path for color targets.
+			g_gs_device->CopyRect(src->m_texture, tmp_texture,
+				src_rect,
+				scaled_sx, scaled_sy);
+
+			g_gs_device->CopyRect(tmp_texture, dst->m_texture,
+				src_rect,
+				scaled_dx, scaled_dy);
+		}
+
+		g_gs_device->Recycle(tmp_texture);
+	}
+	else
+	{
+		g_gs_device->CopyRect(src->m_texture, dst->m_texture,
+			GSVector4i(scaled_sx, scaled_sy, scaled_sx + scaled_w, scaled_sy + scaled_h),
+			scaled_dx, scaled_dy);
+	}
 
 	dst->UpdateValidity(GSVector4i(dx, dy, dx + w, dy + h));
 	// Invalidate any sources that overlap with the target (since they're now stale).
