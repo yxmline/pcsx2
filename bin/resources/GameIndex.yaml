@@ -2341,9 +2341,13 @@ SCED-52377:
 SCED-52390:
   name: "Bonus Demo 6"
   region: "PAL-M5"
+  gameFixes:
+    - XGKickHack # Fixes SPS for Formula One 2003.
 SCED-52391:
   name: "Bonus Demo 6"
   region: "PAL-M5"
+  gameFixes:
+    - XGKickHack # Fixes SPS for Formula One 2003.
 SCED-52436:
   name: "Bonus Demo 7"
   region: "PAL-M5"
@@ -12620,7 +12624,8 @@ SLES-51144:
   region: "PAL-M7"
   compat: 5
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-51145:
   name: "Monopoly Party"
   region: "PAL-M5"
@@ -12923,12 +12928,14 @@ SLES-51250:
   region: "PAL-E"
   compat: 5
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-51251:
   name: "Shox - Rally Reinvented"
   region: "PAL-E"
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-51252:
   name: "Lord of the Rings, The - The Two Towers"
   region: "PAL-M3"
@@ -16311,11 +16318,21 @@ SLES-52782:
   region: "PAL-E"
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
+    mipmap: 2 # Mipmap + trilinear, improves shimmering of terrain, matches SW.
+    trilinearFiltering: 1
+  patches:
+    0BC05D02:
+      content: |-
+        // Fixes COP2 CFC2 timing.
+        patch=1,EE,001AB900,word,48488800
+        patch=1,EE,001AB904,word,4A252942
 SLES-52783:
   name: "Call of Duty - Finest Hour"
   region: "PAL-F-S-I"
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
+    mipmap: 2 # Mipmap + trilinear, improves shimmering of terrain, matches SW.
+    trilinearFiltering: 1
   patches:
     30AE5279:
       content: |-
@@ -16327,6 +16344,14 @@ SLES-52784:
   region: "PAL-G"
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
+    mipmap: 2 # Mipmap + trilinear, improves shimmering of terrain, matches SW.
+    trilinearFiltering: 1
+  patches:
+    0BC05D02:
+      content: |-
+        // Avoids bad COP2 errors due to the instant nature of the PCSX2's COP2 handling.
+        patch=1,EE,001ab900,word,48488800
+        patch=1,EE,001ab904,word,4A252942
 SLES-52798:
   name: "Vietcong - Purple Haze"
   region: "PAL-M4"
@@ -28718,6 +28743,12 @@ SLPM-64522:
 SLPM-64523:
   name: "Marvel Vs Capcom 2"
   region: "NTSC-K"
+SLPM-64524:
+  name: "Rally Shox"
+  region: "NTSC-K"
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLPM-64525:
   name: "Guilty Gear X Plus 'By Your Side'"
   region: "NTSC-K"
@@ -37420,6 +37451,12 @@ SLPS-20243:
 SLPS-20245:
   name: "Low Rider"
   region: "NTSC-J"
+SLPS-20246:
+  name: "Rally Shox"
+  region: "NTSC-J"
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLPS-20250:
   name: "Makai Senki Disgaea [Limited Edition]"
   region: "NTSC-J"
@@ -44636,7 +44673,8 @@ SLUS-20533:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    mipmap: 1
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLUS-20534:
   name: "Cabela's Big Game Hunter"
   region: "NTSC-U"
@@ -45582,6 +45620,14 @@ SLUS-20725:
   compat: 5
   gsHWFixes:
     cpuSpriteRenderBW: 1 # Fixes textures.
+    mipmap: 2 # Mipmap + trilinear, improves shimmering of terrain, matches SW.
+    trilinearFiltering: 1
+  patches:
+    30AE5278:
+      content: |-
+        // Fixes COP2 CFC2 timing.
+        patch=1,EE,001AB900,word,48488800
+        patch=1,EE,001AB904,word,4A252942
 SLUS-20726:
   name: "ESPN - NBA Basketball"
   region: "NTSC-U"
