@@ -1174,7 +1174,7 @@ GSTextureCache::Target* GSTextureCache::FindTargetOverlap(u32 bp, u32 end_block,
 	for (auto t : m_dst[type])
 	{
 		// Only checks that the texure starts at the requested bp, which shares data. Size isn't considered.
-		if (t->m_TEX0.TBP0 >= bp && t->m_TEX0.TBP0 < end_block_bp && GSUtil::HasSharedBits(t->m_TEX0.PSM, psm))
+		if (t->m_TEX0.TBP0 >= bp && t->m_TEX0.TBP0 < end_block_bp && GSUtil::HasCompatibleBits(t->m_TEX0.PSM, psm))
 			return t;
 	}
 	return nullptr;
@@ -1524,7 +1524,7 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(GIFRegTEX0 TEX0, const GSVe
 
 				if (!eerect.rempty())
 				{
-					GL_INS("Preloading the RT DATA");
+					GL_INS("Preloading the RT DATA from updated GS Memory");
 					eerect = eerect.rintersect(newrect);
 					AddDirtyRectTarget(dst, eerect, TEX0.PSM, TEX0.TBW, rgba, GSLocalMemory::m_psm[TEX0.PSM].trbpp >= 16);
 				}
@@ -2584,8 +2584,8 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 	}
 
 	// Look for an exact match on the targets.
-	GSTextureCache::Target* src = GetExactTarget(SBP, SBW, spsm_s.depth ? DepthStencil : RenderTarget);
-	GSTextureCache::Target* dst = GetExactTarget(DBP, DBW, dpsm_s.depth ? DepthStencil : RenderTarget);
+	GSTextureCache::Target* src = GetExactTarget(SBP, SBW, spsm_s.depth ? DepthStencil : RenderTarget, SBP);
+	GSTextureCache::Target* dst = GetExactTarget(DBP, DBW, dpsm_s.depth ? DepthStencil : RenderTarget, DBP);
 
 	// Beware of the case where a game might create a larger texture by moving a bunch of chunks around.
 	// We use dx/dy == 0 and the TBW check as a safeguard to make sure these go through to local memory.
@@ -2776,13 +2776,14 @@ bool GSTextureCache::ShuffleMove(u32 BP, u32 BW, u32 PSM, int sx, int sy, int dx
 	return true;
 }
 
-GSTextureCache::Target* GSTextureCache::GetExactTarget(u32 BP, u32 BW, int type)
+GSTextureCache::Target* GSTextureCache::GetExactTarget(u32 BP, u32 BW, int type, u32 end_bp)
 {
 	auto& rts = m_dst[type];
 	for (auto it = rts.begin(); it != rts.end(); ++it) // Iterate targets from MRU to LRU.
 	{
 		Target* t = *it;
-		if (t->m_TEX0.TBP0 == BP && t->m_TEX0.TBW == BW)
+
+		if (t->m_TEX0.TBP0 == BP && t->m_TEX0.TBW == BW && t->UnwrappedEndBlock() >= end_bp)
 		{
 			rts.MoveFront(it.Index());
 			return t;
@@ -4688,22 +4689,9 @@ void GSTextureCache::Target::ResizeValidity(const GSVector4i& rect)
 	{
 		m_valid = m_valid.rintersect(rect);
 		m_drawn_since_read = m_drawn_since_read.rintersect(rect);
-		m_end_block = GSLocalMemory::m_psm[m_TEX0.PSM].info.bn(m_valid.z - 1, m_valid.w - 1, m_TEX0.TBP0, m_TEX0.TBW); // Valid only for color formats
-		// Because m_end_block, especially on Z is not remotely linear, the end of the block can be near the beginning,
-		// meaning any overlap checks on blocks could fail (FFX with Tex in RT).
-		// So if the coordinates page align, round it up to the next page and minus one.
-		const GSVector2i page_size = GSLocalMemory::m_psm[m_TEX0.PSM].pgs;
-		if ((m_valid.z & (page_size.x - 1)) == 0 && (m_valid.w & (page_size.y - 1)) == 0)
-		{
-			constexpr u32 page_mask = (1 << 5) - 1;
-			m_end_block = (((m_end_block + page_mask) & ~page_mask)) - 1;
-		}
+		m_end_block = GSLocalMemory::GetEndBlockAddress(m_TEX0.TBP0, m_TEX0.TBW, m_TEX0.PSM, m_valid);
 	}
-	else
-	{
-		// No valid size, so need to resize down.
-		return;
-	}
+	// Else No valid size, so need to resize down.
 
 	// GL_CACHE("ResizeValidity (0x%x->0x%x) from R:%d,%d Valid: %d,%d", m_TEX0.TBP0, m_end_block, rect.z, rect.w, m_valid.z, m_valid.w);
 }
@@ -4717,16 +4705,7 @@ void GSTextureCache::Target::UpdateValidity(const GSVector4i& rect, bool can_res
 		else
 			m_valid = m_valid.runion(rect);
 
-		m_end_block = GSLocalMemory::m_psm[m_TEX0.PSM].info.bn(m_valid.z - 1, m_valid.w - 1, m_TEX0.TBP0, m_TEX0.TBW); // Valid only for color formats
-		// Because m_end_block, especially on Z is not remotely linear, the end of the block can be near the beginning,
-		// meaning any overlap checks on blocks could fail (FFX with Tex in RT).
-		// So if the coordinates page align, round it up to the next page and minus one.
-		const GSVector2i page_size = GSLocalMemory::m_psm[m_TEX0.PSM].pgs;
-		if ((m_valid.z & (page_size.x - 1)) == 0 && (m_valid.w & (page_size.y - 1)) == 0)
-		{
-			constexpr u32 page_mask = (1 << 5) - 1;
-			m_end_block = (((m_end_block + page_mask) & ~page_mask)) - 1;
-		}
+		m_end_block = GSLocalMemory::GetEndBlockAddress(m_TEX0.TBP0, m_TEX0.TBW, m_TEX0.PSM, m_valid);
 	}
 	// GL_CACHE("UpdateValidity (0x%x->0x%x) from R:%d,%d Valid: %d,%d", m_TEX0.TBP0, m_end_block, rect.z, rect.w, m_valid.z, m_valid.w);
 }
