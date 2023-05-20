@@ -754,7 +754,7 @@ protected:
 	static constexpr u32 MAX_POOLED_TEXTURES = 300;
 	static constexpr u32 MAX_TEXTURE_AGE = 10;
 	static constexpr u32 NUM_CAS_CONSTANTS = 12; // 8 plus src offset x/y, 16 byte alignment
-	static constexpr u32 EXPAND_BUFFER_SIZE = sizeof(u16) * 65532 * 6;
+	static constexpr u32 EXPAND_BUFFER_SIZE = sizeof(u16) * 16383 * 6;
 
 	WindowInfo m_window_info;
 	VsyncMode m_vsync_mode = VsyncMode::Off;
@@ -881,7 +881,6 @@ public:
 	virtual void ClearRenderTarget(GSTexture* t, u32 c) = 0;
 	virtual void InvalidateRenderTarget(GSTexture* t) = 0;
 	virtual void ClearDepth(GSTexture* t) = 0;
-	virtual void ClearStencil(GSTexture* t, u8 c) = 0;
 
 	virtual void PushDebugGroup(const char* fmt, ...) = 0;
 	virtual void PopDebugGroup() = 0;

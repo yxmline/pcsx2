@@ -395,19 +395,36 @@ void GSDeviceMTL::BeginRenderPass(NSString* name, GSTexture* color, MTLLoadActio
 	              || stencil != m_current_render.stencil_target;
 	GSVector4 color_clear;
 	float depth_clear;
-	int stencil_clear;
 	bool needs_color_clear = false;
 	bool needs_depth_clear = false;
-	bool needs_stencil_clear = false;
-	if (mc) needs_color_clear   = mc->GetResetNeedsColorClear(color_clear);
-	if (md) needs_depth_clear   = md->GetResetNeedsDepthClear(depth_clear);
-	if (ms) needs_stencil_clear = ms->GetResetNeedsStencilClear(stencil_clear);
-	if (needs_color_clear   && color_load   != MTLLoadActionDontCare) color_load   = MTLLoadActionClear;
-	if (needs_depth_clear   && depth_load   != MTLLoadActionDontCare) depth_load   = MTLLoadActionClear;
-	if (needs_stencil_clear && stencil_load != MTLLoadActionDontCare) stencil_load = MTLLoadActionClear;
+	// Depth and stencil might be the same, so do all invalidation checks before resetting invalidation
+#define CHECK_CLEAR(tex, load_action, clear, ClearGetter) \
+	if (tex) \
+	{ \
+		if (tex->GetState() == GSTexture::State::Invalidated) \
+		{ \
+			load_action = MTLLoadActionDontCare; \
+		} \
+		else if (tex->GetState() == GSTexture::State::Cleared && load_action != MTLLoadActionDontCare) \
+		{ \
+			clear = tex->ClearGetter(); \
+			load_action = MTLLoadActionClear; \
+		} \
+	}
+
+	CHECK_CLEAR(mc, color_load, color_clear, GetClearColor)
+	CHECK_CLEAR(md, depth_load, depth_clear, GetClearDepth)
+#undef CHECK_CLEAR
+	// Stencil and depth are one texture, stencil clears aren't supported
+	if (ms && ms->GetState() == GSTexture::State::Invalidated)
+		stencil_load = MTLLoadActionDontCare;
 	needs_new |= mc && color_load   == MTLLoadActionClear;
 	needs_new |= md && depth_load   == MTLLoadActionClear;
-	needs_new |= ms && stencil_load == MTLLoadActionClear;
+
+	// Reset texture state
+	if (mc) mc->SetState(GSTexture::State::Dirty);
+	if (md) md->SetState(GSTexture::State::Dirty);
+	if (ms) ms->SetState(GSTexture::State::Dirty);
 
 	if (!needs_new)
 	{
@@ -453,8 +470,7 @@ void GSDeviceMTL::BeginRenderPass(NSString* name, GSTexture* color, MTLLoadActio
 	{
 		ms->m_last_write = m_current_draw;
 		desc.stencilAttachment.texture = ms->GetTexture();
-		if (stencil_load == MTLLoadActionClear)
-			desc.stencilAttachment.clearStencil = stencil_clear;
+		assert(stencil_load != MTLLoadActionClear);
 		desc.stencilAttachment.loadAction = stencil_load;
 	}
 
@@ -768,6 +784,56 @@ static MRCOwned<id<MTLBuffer>> CreatePrivateBufferWithContent(
 	return actual;
 }
 
+static MRCOwned<id<MTLSamplerState>> CreateSampler(id<MTLDevice> dev, GSHWDrawConfig::SamplerSelector sel)
+{
+	MRCOwned<MTLSamplerDescriptor*> sdesc = MRCTransfer([MTLSamplerDescriptor new]);
+	const char* minname = sel.biln ? "Ln" : "Pt";
+	const char* magname = minname;
+	[sdesc setMinFilter:sel.biln ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest];
+	[sdesc setMagFilter:sel.biln ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest];
+	switch (static_cast<GS_MIN_FILTER>(sel.triln))
+	{
+		case GS_MIN_FILTER::Nearest:
+		case GS_MIN_FILTER::Linear:
+			[sdesc setMipFilter:MTLSamplerMipFilterNotMipmapped];
+			break;
+		case GS_MIN_FILTER::Nearest_Mipmap_Nearest:
+			minname = "PtPt";
+			[sdesc setMinFilter:MTLSamplerMinMagFilterNearest];
+			[sdesc setMipFilter:MTLSamplerMipFilterNearest];
+			break;
+		case GS_MIN_FILTER::Nearest_Mipmap_Linear:
+			minname = "PtLn";
+			[sdesc setMinFilter:MTLSamplerMinMagFilterNearest];
+			[sdesc setMipFilter:MTLSamplerMipFilterLinear];
+			break;
+		case GS_MIN_FILTER::Linear_Mipmap_Nearest:
+			minname = "LnPt";
+			[sdesc setMinFilter:MTLSamplerMinMagFilterLinear];
+			[sdesc setMipFilter:MTLSamplerMipFilterNearest];
+			break;
+		case GS_MIN_FILTER::Linear_Mipmap_Linear:
+			minname = "LnLn";
+			[sdesc setMinFilter:MTLSamplerMinMagFilterLinear];
+			[sdesc setMipFilter:MTLSamplerMipFilterLinear];
+			break;
+	}
+
+	const char* taudesc = sel.tau ? "Repeat" : "Clamp";
+	const char* tavdesc = sel.tav == sel.tau ? "" : sel.tav ? "Repeat" : "Clamp";
+	[sdesc setSAddressMode:sel.tau ? MTLSamplerAddressModeRepeat : MTLSamplerAddressModeClampToEdge];
+	[sdesc setTAddressMode:sel.tav ? MTLSamplerAddressModeRepeat : MTLSamplerAddressModeClampToEdge];
+	[sdesc setRAddressMode:MTLSamplerAddressModeClampToEdge];
+
+	[sdesc setMaxAnisotropy:GSConfig.MaxAnisotropy && sel.aniso ? GSConfig.MaxAnisotropy : 1];
+	[sdesc setLodMaxClamp:(sel.lodclamp || sel.UseMipmapFiltering()) ? 0.25f : FLT_MAX];
+
+	[sdesc setLabel:[NSString stringWithFormat:@"%s%s %s%s", taudesc, tavdesc, magname, minname]];
+	MRCOwned<id<MTLSamplerState>> ret = MRCTransfer([dev newSamplerStateWithDescriptor:sdesc]);
+	pxAssertRel(ret, "Failed to create sampler!");
+	return ret;
+}
+
 bool GSDeviceMTL::Create()
 { @autoreleasepool {
 	if (!GSDevice::Create())
@@ -897,55 +963,8 @@ bool GSDeviceMTL::Create()
 		}
 
 		// Init samplers
-		MTLSamplerDescriptor* sdesc = [[MTLSamplerDescriptor new] autorelease];
-		for (size_t i = 0; i < std::size(m_sampler_hw); i++)
-		{
-			GSHWDrawConfig::SamplerSelector sel;
-			sel.key = i;
-			const char* minname = sel.biln ? "Ln" : "Pt";
-			const char* magname = minname;
-			sdesc.minFilter = sel.biln ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest;
-			sdesc.magFilter = sel.biln ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest;
-			switch (static_cast<GS_MIN_FILTER>(sel.triln))
-			{
-				case GS_MIN_FILTER::Nearest:
-				case GS_MIN_FILTER::Linear:
-					sdesc.mipFilter = MTLSamplerMipFilterNotMipmapped;
-					break;
-				case GS_MIN_FILTER::Nearest_Mipmap_Nearest:
-					minname = "PtPt";
-					sdesc.minFilter = MTLSamplerMinMagFilterNearest;
-					sdesc.mipFilter = MTLSamplerMipFilterNearest;
-					break;
-				case GS_MIN_FILTER::Nearest_Mipmap_Linear:
-					minname = "PtLn";
-					sdesc.minFilter = MTLSamplerMinMagFilterNearest;
-					sdesc.mipFilter = MTLSamplerMipFilterLinear;
-					break;
-				case GS_MIN_FILTER::Linear_Mipmap_Nearest:
-					minname = "LnPt";
-					sdesc.minFilter = MTLSamplerMinMagFilterLinear;
-					sdesc.mipFilter = MTLSamplerMipFilterNearest;
-					break;
-				case GS_MIN_FILTER::Linear_Mipmap_Linear:
-					minname = "LnLn";
-					sdesc.minFilter = MTLSamplerMinMagFilterLinear;
-					sdesc.mipFilter = MTLSamplerMipFilterLinear;
-					break;
-			}
-
-			const char* taudesc = sel.tau ? "Repeat" : "Clamp";
-			const char* tavdesc = sel.tav == sel.tau ? "" : sel.tav ? "Repeat" : "Clamp";
-			sdesc.sAddressMode = sel.tau ? MTLSamplerAddressModeRepeat : MTLSamplerAddressModeClampToEdge;
-			sdesc.tAddressMode = sel.tav ? MTLSamplerAddressModeRepeat : MTLSamplerAddressModeClampToEdge;
-			sdesc.rAddressMode = MTLSamplerAddressModeClampToEdge;
-
-			sdesc.maxAnisotropy = GSConfig.MaxAnisotropy && sel.aniso ? GSConfig.MaxAnisotropy : 1;
-			sdesc.lodMaxClamp = sel.lodclamp ? 0.25f : FLT_MAX;
-
-			[sdesc setLabel:[NSString stringWithFormat:@"%s%s %s%s", taudesc, tavdesc, magname, minname]];
-			m_sampler_hw[i] = MRCTransfer([m_dev.dev newSamplerStateWithDescriptor:sdesc]);
-		}
+		m_sampler_hw[SamplerSelector::Linear().key] = CreateSampler(m_dev.dev, SamplerSelector::Linear());
+		m_sampler_hw[SamplerSelector::Point().key] = CreateSampler(m_dev.dev, SamplerSelector::Point());
 
 		// Init depth stencil states
 		MTLDepthStencilDescriptor* dssdesc = [[MTLDepthStencilDescriptor new] autorelease];
@@ -1068,7 +1087,6 @@ bool GSDeviceMTL::Create()
 			NSString* name = [NSString stringWithCString:shaderName(conv) encoding:NSUTF8StringEncoding];
 			switch (conv)
 			{
-				case ShaderConvert::COPY:
 				case ShaderConvert::Count:
 				case ShaderConvert::DATM_0:
 				case ShaderConvert::DATM_1:
@@ -1098,6 +1116,7 @@ bool GSDeviceMTL::Create()
 					pdesc.colorAttachments[0].pixelFormat = MTLPixelFormatInvalid;
 					pdesc.depthAttachmentPixelFormat = ConvertPixelFormat(GSTexture::Format::DepthStencil);
 					break;
+				case ShaderConvert::COPY:
 				case ShaderConvert::RGBA_TO_8I: // Yes really
 				case ShaderConvert::TRANSPARENCY_FILTER:
 				case ShaderConvert::FLOAT32_TO_RGBA8:
@@ -1117,10 +1136,6 @@ bool GSDeviceMTL::Create()
 			pdesc.colorAttachments[0].pixelFormat = layer_px_fmt;
 			m_present_pipeline[i] = MakePipeline(pdesc, vs_convert, LoadShader(name), [NSString stringWithFormat:@"present_%s", shaderName(conv) + 3]);
 		}
-		pdesc.colorAttachments[0].pixelFormat = ConvertPixelFormat(GSTexture::Format::Color);
-		m_convert_pipeline_copy[0] = MakePipeline(pdesc, vs_convert, ps_copy, @"copy_color");
-		pdesc.colorAttachments[0].pixelFormat = ConvertPixelFormat(GSTexture::Format::HDRColor);
-		m_convert_pipeline_copy[1] = MakePipeline(pdesc, vs_convert, ps_copy, @"copy_hdr");
 
 		pdesc.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
 		for (size_t i = 0; i < std::size(m_convert_pipeline_copy_mask); i++)
@@ -1420,7 +1435,7 @@ void GSDeviceMTL::AccumulateCommandBufferTime(id<MTLCommandBuffer> buffer)
 void GSDeviceMTL::ClearRenderTarget(GSTexture* t, const GSVector4& c)
 {
 	if (!t) return;
-	static_cast<GSTextureMTL*>(t)->RequestColorClear(c);
+	t->SetClearColor(c);
 }
 
 void GSDeviceMTL::ClearRenderTarget(GSTexture* t, uint32 c)
@@ -1432,18 +1447,13 @@ void GSDeviceMTL::ClearRenderTarget(GSTexture* t, uint32 c)
 void GSDeviceMTL::ClearDepth(GSTexture* t)
 {
 	if (!t) return;
-	static_cast<GSTextureMTL*>(t)->RequestDepthClear(0);
-}
-
-void GSDeviceMTL::ClearStencil(GSTexture* t, uint8 c)
-{
-	if (!t) return;
-	static_cast<GSTextureMTL*>(t)->RequestStencilClear(c);
+	t->SetClearDepth(0);
 }
 
 void GSDeviceMTL::InvalidateRenderTarget(GSTexture* t)
 {
-	// TODO: Implement me
+	if (!t) return;
+	t->SetState(GSTexture::State::Invalidated);
 }
 
 std::unique_ptr<GSDownloadTexture> GSDeviceMTL::CreateDownloadTexture(u32 width, u32 height, GSTexture::Format format)
@@ -1452,9 +1462,11 @@ std::unique_ptr<GSDownloadTexture> GSDeviceMTL::CreateDownloadTexture(u32 width,
 }
 
 void GSDeviceMTL::ClearSamplerCache()
-{
-	// TODO: Implement me
-}
+{ @autoreleasepool {
+	std::fill(std::begin(m_sampler_hw), std::end(m_sampler_hw), nullptr);
+	m_sampler_hw[SamplerSelector::Linear().key] = CreateSampler(m_dev.dev, SamplerSelector::Linear());
+	m_sampler_hw[SamplerSelector::Point().key] = CreateSampler(m_dev.dev, SamplerSelector::Point());
+}}
 
 void GSDeviceMTL::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r, u32 destX, u32 destY)
 { @autoreleasepool {
@@ -1468,7 +1480,7 @@ void GSDeviceMTL::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r
 	if (r.width() < dsize.x || r.height() < dsize.y)
 		dT->FlushClears();
 	else
-		dT->InvalidateClears();
+		dT->SetState(GSTexture::State::Dirty);
 
 	EndRenderPass();
 
@@ -1490,14 +1502,25 @@ void GSDeviceMTL::CopyRect(GSTexture* sTex, GSTexture* dTex, const GSVector4i& r
 	[encoder endEncoding];
 }}
 
+void GSDeviceMTL::BeginStretchRect(NSString* name, GSTexture* dTex, MTLLoadAction action)
+{
+	if (dTex->GetFormat() == GSTexture::Format::DepthStencil)
+		BeginRenderPass(name, nullptr, MTLLoadActionDontCare, dTex, action);
+	else
+		BeginRenderPass(name, dTex, action, nullptr, MTLLoadActionDontCare);
+
+	FlushDebugEntries(m_current_render.encoder);
+	MREClearScissor();
+	DepthStencilSelector dsel = DepthStencilSelector::NoDepth();
+	dsel.zwe = dTex->GetFormat() == GSTexture::Format::DepthStencil;
+	MRESetDSS(dsel);
+}
+
 void GSDeviceMTL::DoStretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, id<MTLRenderPipelineState> pipeline, bool linear, LoadAction load_action, const void* frag_uniform, size_t frag_uniform_len)
 {
 	FlushClears(sTex);
 
-	GSTextureMTL* sT = static_cast<GSTextureMTL*>(sTex);
-	GSTextureMTL* dT = static_cast<GSTextureMTL*>(dTex);
-
-	GSVector2i ds = dT->GetSize();
+	GSVector2i ds = dTex->GetSize();
 
 	bool covers_target = static_cast<int>(dRect.x) <= 0
 	                  && static_cast<int>(dRect.y) <= 0
@@ -1506,45 +1529,39 @@ void GSDeviceMTL::DoStretchRect(GSTexture* sTex, const GSVector4& sRect, GSTextu
 	bool dontcare = load_action == LoadAction::DontCare || (load_action == LoadAction::DontCareIfFull && covers_target);
 	MTLLoadAction action = dontcare ? MTLLoadActionDontCare : MTLLoadActionLoad;
 
-	if (dT->GetFormat() == GSTexture::Format::DepthStencil)
-		BeginRenderPass(@"StretchRect", nullptr, MTLLoadActionDontCare, dT, action);
-	else
-		BeginRenderPass(@"StretchRect", dT, action, nullptr, MTLLoadActionDontCare);
-
-	FlushDebugEntries(m_current_render.encoder);
-	MREClearScissor();
-	DepthStencilSelector dsel;
-	dsel.ztst = ZTST_ALWAYS;
-	dsel.zwe = dT->GetFormat() == GSTexture::Format::DepthStencil;
-	MRESetDSS(dsel);
+	BeginStretchRect(@"StretchRect", dTex, action);
 
 	MRESetPipeline(pipeline);
-	MRESetTexture(sT, GSMTLTextureIndexNonHW);
+	MRESetTexture(sTex, GSMTLTextureIndexNonHW);
 
 	if (frag_uniform && frag_uniform_len)
 		[m_current_render.encoder setFragmentBytes:frag_uniform length:frag_uniform_len atIndex:GSMTLBufferIndexUniforms];
 
 	MRESetSampler(linear ? SamplerSelector::Linear() : SamplerSelector::Point());
 
-	DrawStretchRect(sRect, dRect, ds);
+	DrawStretchRect(sRect, dRect, GSVector2(static_cast<float>(ds.x), static_cast<float>(ds.y)));
 }
 
-void GSDeviceMTL::DrawStretchRect(const GSVector4& sRect, const GSVector4& dRect, const GSVector2i& ds)
+static std::array<GSVector4, 4> CalcStrechRectPoints(const GSVector4& sRect, const GSVector4& dRect, const GSVector2& ds)
 {
-	float left = dRect.x * 2 / ds.x - 1.0f;
-	float right = dRect.z * 2 / ds.x - 1.0f;
-	float top = 1.0f - dRect.y * 2 / ds.y;
-	float bottom = 1.0f - dRect.w * 2 / ds.y;
-
-	ConvertShaderVertex vertices[] =
-	{
-		{{left,  top},    {sRect.x, sRect.y}},
-		{{right, top},    {sRect.z, sRect.y}},
-		{{left,  bottom}, {sRect.x, sRect.w}},
-		{{right, bottom}, {sRect.z, sRect.w}}
+	static_assert(sizeof(GSDeviceMTL::ConvertShaderVertex) == sizeof(GSVector4), "Using GSVector4 as a ConvertShaderVertex");
+	GSVector4 dst = dRect;
+	dst /= GSVector4(ds.x, ds.y, ds.x, ds.y);
+	dst *= GSVector4(2, -2, 2, -2);
+	dst += GSVector4(-1, 1, -1, 1);
+	return {
+		dst.xyxy(sRect),
+		dst.zyzy(sRect),
+		dst.xwxw(sRect),
+		dst.zwzw(sRect)
 	};
+}
 
-	[m_current_render.encoder setVertexBytes:vertices length:sizeof(vertices) atIndex:GSMTLBufferIndexVertices];
+void GSDeviceMTL::DrawStretchRect(const GSVector4& sRect, const GSVector4& dRect, const GSVector2& ds)
+{
+	std::array<GSVector4, 4> vertices = CalcStrechRectPoints(sRect, dRect, ds);
+
+	[m_current_render.encoder setVertexBytes:&vertices length:sizeof(vertices) atIndex:GSMTLBufferIndexVertices];
 
 	[m_current_render.encoder drawPrimitives:MTLPrimitiveTypeTriangleStrip
 	                             vertexStart:0
@@ -1564,17 +1581,11 @@ void GSDeviceMTL::RenderCopy(GSTexture* sTex, id<MTLRenderPipelineState> pipelin
 
 void GSDeviceMTL::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, ShaderConvert shader, bool linear)
 { @autoreleasepool {
-	id<MTLRenderPipelineState> pipeline;
 
 	pxAssert(linear ? SupportsBilinear(shader) : SupportsNearest(shader));
 
-	if (shader == ShaderConvert::COPY)
-		pipeline = m_convert_pipeline_copy[dTex->GetFormat() == GSTexture::Format::Color ? 0 : 1];
-	else
-		pipeline = m_convert_pipeline[static_cast<int>(shader)];
-
-	if (!pipeline)
-		[NSException raise:@"StretchRect Missing Pipeline" format:@"No pipeline for %d", static_cast<int>(shader)];
+	id<MTLRenderPipelineState> pipeline = m_convert_pipeline[static_cast<int>(shader)];
+	pxAssertRel(pipeline, fmt::format("No pipeline for {}", shaderName(shader)).c_str());
 
 	DoStretchRect(sTex, sRect, dTex, dRect, pipeline, linear, LoadAction::DontCareIfFull, nullptr, 0);
 }}
@@ -1622,8 +1633,67 @@ void GSDeviceMTL::PresentRect(GSTexture* sTex, const GSVector4& sRect, GSTexture
 		[m_current_render.encoder setFragmentSamplerState:m_sampler_hw[linear ? SamplerSelector::Linear().key : SamplerSelector::Point().key] atIndex:0];
 		[m_current_render.encoder setFragmentTexture:static_cast<GSTextureMTL*>(sTex)->GetTexture() atIndex:0];
 		[m_current_render.encoder setFragmentBytes:&cb length:sizeof(cb) atIndex:GSMTLBufferIndexUniforms];
-		DrawStretchRect(sRect, dRect, ds);
+		DrawStretchRect(sRect, dRect, GSVector2(static_cast<float>(ds.x), static_cast<float>(ds.y)));
 	}
+}}
+
+void GSDeviceMTL::DrawMultiStretchRects(const MultiStretchRect* rects, u32 num_rects, GSTexture* dTex, ShaderConvert shader)
+{ @autoreleasepool {
+	BeginStretchRect(@"MultiStretchRect", dTex, MTLLoadActionLoad);
+
+	id<MTLRenderPipelineState> pipeline = nullptr;
+	GSTexture* sTex = rects[0].src;
+	bool linear = rects[0].linear;
+	u8 wmask = rects[0].wmask.wrgba;
+
+	const GSVector2 ds(static_cast<float>(dTex->GetWidth()), static_cast<float>(dTex->GetHeight()));
+	const Map allocation = Allocate(m_vertex_upload_buf, sizeof(ConvertShaderVertex) * 4 * num_rects);
+	std::array<GSVector4, 4>* write = static_cast<std::array<GSVector4, 4>*>(allocation.cpu_buffer);
+	const id<MTLRenderCommandEncoder> enc = m_current_render.encoder;
+	[enc setVertexBuffer:allocation.gpu_buffer
+	              offset:allocation.gpu_offset
+	             atIndex:GSMTLBufferIndexVertices];
+	u32 start = 0;
+
+	auto flush = [&](u32 i) {
+		const u32 end = i * 4;
+		const u32 vertex_count = end - start;
+		const u32 index_count = vertex_count + (vertex_count >> 1); // 6 indices per 4 vertices
+		id<MTLRenderPipelineState> new_pipeline = wmask == 0xf ? m_convert_pipeline[static_cast<int>(shader)]
+		                                                       : m_convert_pipeline_copy_mask[wmask];
+		if (new_pipeline != pipeline)
+		{
+			pipeline = new_pipeline;
+			pxAssertRel(pipeline, fmt::format("No pipeline for {}", shaderName(shader)).c_str());
+			MRESetPipeline(pipeline);
+		}
+		MRESetSampler(linear ? SamplerSelector::Linear() : SamplerSelector::Point());
+		MRESetTexture(sTex, GSMTLTextureIndexNonHW);
+		[enc drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+		                indexCount:index_count
+		                 indexType:MTLIndexTypeUInt16
+		               indexBuffer:m_expand_index_buffer
+		         indexBufferOffset:0
+		             instanceCount:1
+		                baseVertex:start
+		              baseInstance:0];
+		start = end;
+	};
+
+	for (u32 i = 0; i < num_rects; i++)
+	{
+		const MultiStretchRect& rect = rects[i];
+		if (rect.src != sTex || rect.linear != linear || rect.wmask.wrgba != wmask)
+		{
+			flush(i);
+			sTex = rect.src;
+			linear = rect.linear;
+			wmask = rect.wmask.wrgba;
+		}
+		*write++ = CalcStrechRectPoints(rect.src_rect, rect.dst_rect, ds);
+	}
+
+	flush(num_rects);
 }}
 
 void GSDeviceMTL::UpdateCLUTTexture(GSTexture* sTex, float sScale, u32 offsetX, u32 offsetY, GSTexture* dTex, u32 dOffset, u32 dSize)
@@ -1845,6 +1915,8 @@ void GSDeviceMTL::MRESetSampler(SamplerSelector sel)
 {
 	if (m_current_render.has.sampler && m_current_render.sampler_sel.key == sel.key)
 		return;
+	if (unlikely(!m_sampler_hw[sel.key]))
+		m_sampler_hw[sel.key] = CreateSampler(m_dev.dev, sel);
 	[m_current_render.encoder setFragmentSamplerState:m_sampler_hw[sel.key] atIndex:0];
 	m_current_render.sampler_sel = sel;
 	m_current_render.has.sampler = true;
@@ -1852,13 +1924,9 @@ void GSDeviceMTL::MRESetSampler(SamplerSelector sel)
 
 static void textureBarrier(id<MTLRenderCommandEncoder> enc)
 {
-	if (@available(macOS 10.14, *)) {
-		[enc memoryBarrierWithScope:MTLBarrierScopeRenderTargets
-		                afterStages:MTLRenderStageFragment
-		               beforeStages:MTLRenderStageFragment];
-	} else {
-		[enc textureBarrier];
-	}
+	[enc memoryBarrierWithScope:MTLBarrierScopeRenderTargets
+	                afterStages:MTLRenderStageFragment
+	               beforeStages:MTLRenderStageFragment];
 }
 
 void GSDeviceMTL::MRESetTexture(GSTexture* tex, int pos)
