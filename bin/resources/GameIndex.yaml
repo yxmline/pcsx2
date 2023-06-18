@@ -24016,6 +24016,7 @@ SLES-82013:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurry characters.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82018:
   name: "Cy Girls [Ice Disc]"
   region: "PAL-E-F-S"
@@ -24040,6 +24041,7 @@ SLES-82024:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurry characters.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82026:
   name: "Metal Gear Solid 3 - Snake Eater"
   region: "PAL-S"
@@ -24048,6 +24050,7 @@ SLES-82026:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurry characters.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82028:
   name: "Star Ocean 3 - Till the End of Time [Disc 1 of 2]"
   region: "PAL-E"
@@ -24096,6 +24099,7 @@ SLES-82032:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurry characters.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82034:
   name: "Xenosaga Episode II [Disc 1 of 2]"
   region: "PAL-M3"
@@ -24159,6 +24163,7 @@ SLES-82042:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82043:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-E-F"
@@ -24168,6 +24173,7 @@ SLES-82043:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82042"
 SLES-82044:
@@ -24179,6 +24185,7 @@ SLES-82044:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82045:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-I"
@@ -24188,6 +24195,7 @@ SLES-82045:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82044"
 SLES-82046:
@@ -24199,6 +24207,7 @@ SLES-82046:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82047:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-G"
@@ -24208,6 +24217,7 @@ SLES-82047:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82046"
 SLES-82048:
@@ -24219,6 +24229,7 @@ SLES-82048:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLES-82049:
   name: "Metal Gear Solid 3 - Subsistence [Disc 2 of 3]"
   region: "PAL-S"
@@ -24228,6 +24239,7 @@ SLES-82049:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82048"
 SLES-82050:
@@ -24239,6 +24251,7 @@ SLES-82050:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82042"
 SLES-82051:
@@ -24250,6 +24263,7 @@ SLES-82051:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82044"
 SLES-82052:
@@ -24261,6 +24275,7 @@ SLES-82052:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82046"
 SLES-82053:
@@ -24272,6 +24287,7 @@ SLES-82053:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLES-82048"
 SLKA-15002:
@@ -25120,6 +25136,7 @@ SLKA-25251:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLKA-25252:
   name: "Forgotten Realms - Demon Stone"
   region: "NTSC-K"
@@ -25437,6 +25454,7 @@ SLKA-25353:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLKA-25354:
   name: "Metal Gear Solid 3 - Subsistence [Limited Edition] [Disc 2 of 3]"
   region: "NTSC-K"
@@ -25447,6 +25465,7 @@ SLKA-25354:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLKA-25353"
 SLKA-25355:
@@ -25459,6 +25478,7 @@ SLKA-25355:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLKA-25353"
 SLKA-25359:
@@ -25657,6 +25677,9 @@ SLPM-55005:
     roundSprite: 1 # Fixes lines in sprites but still some lines left.
   speedHacks:
     mvuFlagSpeedHack: 0 # Fixes missing graphical effects.
+SLPM-55006:
+  name: "Akane-iro ni Somaru Saka - Parallel"
+  region: "NTSC-J"
 SLPM-55008:
   name: "Sengoku Basara X"
   region: "NTSC-J"
@@ -31627,6 +31650,7 @@ SLPM-65789:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-65790:
   name: "Metal Gear Solid 3 - Snake Eater"
   region: "NTSC-J"
@@ -31635,6 +31659,7 @@ SLPM-65790:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-65791:
   name: "S.L.A.I. - Steel Lancer Arena International"
   region: "NTSC-J"
@@ -32848,6 +32873,7 @@ SLPM-66117:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-66118:
   name: "Metal Gear Solid 3 - Subsistence [with Headset] [Disc 2 of 3]"
   region: "NTSC-J"
@@ -32857,6 +32883,7 @@ SLPM-66118:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-66119:
   name: "Metal Gear Solid 3 - Subsistence [with Headset] [Disc 3 of 3]"
   region: "NTSC-J"
@@ -32866,6 +32893,7 @@ SLPM-66119:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-66121:
   name: "Spider-Man 2 [Taito Best]"
   region: "NTSC-J"
@@ -33261,6 +33289,7 @@ SLPM-66220:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66221:
@@ -33272,6 +33301,7 @@ SLPM-66221:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66222:
@@ -33283,6 +33313,7 @@ SLPM-66222:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66223:
@@ -33294,6 +33325,7 @@ SLPM-66223:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66224:
@@ -33305,6 +33337,7 @@ SLPM-66224:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLPM-66117"
 SLPM-66225:
@@ -35581,6 +35614,7 @@ SLPM-66794:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-66796:
   name: "Metal Gear Solid - 20th Anniversary Collection"
   region: "NTSC-J"
@@ -36512,6 +36546,7 @@ SLPM-68516:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLPM-68520:
   name: "Armored Core - Last Raven [Monthly Champion magazine Special Edition]"
   region: "NTSC-J"
@@ -46755,6 +46790,7 @@ SLUS-20915:
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
     autoFlush: 2 # Fixes lens flare.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLUS-20916:
   name: "Dance Dance Revolution EXTREME"
   region: "NTSC-U"
@@ -48524,6 +48560,7 @@ SLUS-21236:
   compat: 5
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Fixes double image.
 SLUS-21237:
   name: "AND 1 Streetball"
   region: "NTSC-U"
@@ -48575,6 +48612,7 @@ SLUS-21243:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21244:
@@ -49298,6 +49336,7 @@ SLUS-21359:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
 SLUS-21360:
   name: "Metal Gear Solid 3 - Subsistence [Disc 3 of 3]"
   region: "NTSC-U"
@@ -49307,6 +49346,7 @@ SLUS-21360:
   gsHWFixes:
     autoFlush: 2 # Fixes lens flare.
     halfPixelOffset: 2 # Fixes blurriness.
+    getSkipCount: "GSC_MetalGearSolid3" # Fixes depth of field blur.
   memcardFilters:
     - "SLUS-21359"
 SLUS-21361:
