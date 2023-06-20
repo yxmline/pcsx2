@@ -55,7 +55,7 @@ private:
 	bool CanUseSwSpriteRender();
 	bool IsConstantDirectWriteMemClear();
 	bool IsDiscardingDstColor();
-	bool PrimitiveCoversWithoutGaps() const;
+	bool PrimitiveCoversWithoutGaps();
 
 	enum class CLUTDrawTestResult
 	{
@@ -147,6 +147,7 @@ private:
 	u32 m_split_clear_pages = 0; // if zero, inactive
 	u32 m_split_clear_color = 0;
 
+	std::optional<bool> m_primitive_covers_without_gaps;
 	bool m_userhacks_tcoffset = false;
 	float m_userhacks_tcoffset_x = 0.0f;
 	float m_userhacks_tcoffset_y = 0.0f;
@@ -203,6 +204,11 @@ public:
 
 	/// Returns true if the specified texture address matches the frame or Z buffer.
 	bool IsTBPFrameOrZ(u32 tbp) const;
+
+	/// Replaces vertices with the specified fullscreen quad.
+	void ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, const GSVector4i& unscaled_uv_rect,
+		const GSVector2i& unscaled_size, const GSVector4i& scissor);
+	void ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, const GSVector2i& unscaled_size);
 
 	/// Starts a HLE'ed hardware draw, which can be further customized by the caller.
 	GSHWDrawConfig& BeginHLEHardwareDraw(

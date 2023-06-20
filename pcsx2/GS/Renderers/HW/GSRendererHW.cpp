@@ -1522,6 +1522,7 @@ void GSRendererHW::Draw()
 	m_cached_ctx.TEST = context->TEST;
 	m_cached_ctx.FRAME = context->FRAME;
 	m_cached_ctx.ZBUF = context->ZBUF;
+	m_primitive_covers_without_gaps.reset();
 
 	if (IsBadFrame())
 	{
@@ -1700,7 +1701,8 @@ void GSRendererHW::Draw()
 			}
 		}
 	}
-	else if (((fm & fm_mask) != 0) || // Some channels masked
+
+	if (((fm & fm_mask) != 0) || // Some channels masked
 		!IsDiscardingDstColor() || !PrimitiveCoversWithoutGaps() || // Using Dst Color or draw has gaps
 		(process_texture && m_cached_ctx.TEX0.TBP0 >= m_cached_ctx.FRAME.Block() && m_cached_ctx.TEX0.TBP0 < frame_end_bp)) // Tex is RT
 	{
@@ -5146,7 +5148,7 @@ void GSRendererHW::OI_DoubleHalfClear(GSTextureCache::Target*& rt, GSTextureCach
 				{
 					// Only pure clear are supported for depth
 					ASSERT(color == 0);
-					g_gs_device->ClearDepth(tex);
+					g_gs_device->ClearDepth(tex, 0.0f);
 				}
 				else
 				{
@@ -5168,7 +5170,7 @@ void GSRendererHW::OI_DoubleHalfClear(GSTextureCache::Target*& rt, GSTextureCach
 				{
 					// Only pure clear are supported for depth
 					ASSERT(color == 0);
-					g_gs_device->ClearDepth(ds->m_texture);
+					g_gs_device->ClearDepth(ds->m_texture, 0.0f);
 					ds->UpdateValidity(ds->GetUnscaledRect());
 				}
 				else
@@ -5293,12 +5295,11 @@ void GSRendererHW::OI_DoGsMemClear(const GSOffset& off, const GSVector4i& r, u32
 		{
 			const GSVector4i vcolor = GSVector4i(color);
 			const u32 iterations_per_page = (pages_wide * pixels_per_page) / 4;
-
-			for (; top < page_aligned_bottom; top += pgs.y)
+			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
+			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += pages_wide)
 			{
-				auto pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(m_mem.vm32(), 0, top);
-				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(pa.value(0));
-				GSVector4i* const ptr_end = reinterpret_cast<GSVector4i*>(pa.value(0)) + iterations_per_page;
+				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
+				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
 					*(ptr++) = vcolor;
 			}
@@ -5308,12 +5309,11 @@ void GSRendererHW::OI_DoGsMemClear(const GSOffset& off, const GSVector4i& r, u32
 			const GSVector4i mask = GSVector4i::xff000000();
 			const GSVector4i vcolor = GSVector4i(color & 0x00ffffffu);
 			const u32 iterations_per_page = (pages_wide * pixels_per_page) / 4;
-
-			for (; top < page_aligned_bottom; top += pgs.y)
+			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
+			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += pages_wide)
 			{
-				auto pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(m_mem.vm32(), 0, top);
-				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(pa.value(0));
-				GSVector4i* const ptr_end = reinterpret_cast<GSVector4i*>(pa.value(0)) + iterations_per_page;
+				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
+				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
 				{
 					*ptr = (*ptr & mask) | vcolor;
@@ -5323,16 +5323,15 @@ void GSRendererHW::OI_DoGsMemClear(const GSOffset& off, const GSVector4i& r, u32
 		}
 		else if (format == 2)
 		{
-			const u16 converted_color = ((vert_color >> 16) & 0x8000) | ((vert_color >> 9) & 0x7C00) | ((vert_color >> 6) & 0x7E0) | ((vert_color >> 3) & 0x1F);
-
+			const u16 converted_color = ((vert_color >> 16) & 0x8000) | ((vert_color >> 9) & 0x7C00) |
+										((vert_color >> 6) & 0x7E0) | ((vert_color >> 3) & 0x1F);
 			const GSVector4i vcolor = GSVector4i::broadcast16(converted_color);
 			const u32 iterations_per_page = (pages_wide * pixels_per_page) / 8;
-
-			for (; top < page_aligned_bottom; top += pgs.y)
+			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
+			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += pages_wide)
 			{
-				auto pa = off.assertSizesMatch(GSLocalMemory::swizzle16).paMulti(m_mem.vm16(), 0, top);
-				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(pa.value(0));
-				GSVector4i* const ptr_end = reinterpret_cast<GSVector4i*>(pa.value(0)) + iterations_per_page;
+				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
+				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
 					*(ptr++) = vcolor;
 			}
@@ -5451,21 +5450,36 @@ bool GSRendererHW::IsDiscardingDstColor()
 		   !m_cached_ctx.TEST.DATE;
 }
 
-bool GSRendererHW::PrimitiveCoversWithoutGaps() const
+bool GSRendererHW::PrimitiveCoversWithoutGaps()
 {
+	if (m_primitive_covers_without_gaps.has_value())
+		return m_primitive_covers_without_gaps.value();
+
 	// Draw shouldn't be offset.
 	if (((m_r.eq32(GSVector4i::zero())).mask() & 0xff) != 0xff)
+	{
+		m_primitive_covers_without_gaps = false;
 		return false;
+	}
 
 	// This is potentially wrong for fans/strips...
 	if (m_vt.m_primclass == GS_TRIANGLE_CLASS)
-		return (m_index.tail == 6);
+	{
+		m_primitive_covers_without_gaps = (m_index.tail == 6);
+		return m_primitive_covers_without_gaps.value();
+	}
 	else if (m_vt.m_primclass != GS_SPRITE_CLASS)
+	{
+		m_primitive_covers_without_gaps = false;
 		return false;
+	}
 
 	// Simple case: one sprite.
 	if (m_index.tail == 2)
+	{
+		m_primitive_covers_without_gaps = true;
 		return true;
+	}
 
 	// Check that the height matches. Xenosaga 3 draws a letterbox around
 	// the FMV with a sprite at the top and bottom of the framebuffer.
@@ -5482,7 +5496,10 @@ bool GSRendererHW::PrimitiveCoversWithoutGaps() const
 		{
 			const u32 dpY = v[i + 1].XYZ.Y - v[i].XYZ.Y;
 			if (dpY != first_dpY || v[i].XYZ.Y != last_pY)
+			{
+				m_primitive_covers_without_gaps = false;
 				return false;
+			}
 
 			last_pY = v[i + 1].XYZ.Y;
 		}
@@ -5499,14 +5516,19 @@ bool GSRendererHW::PrimitiveCoversWithoutGaps() const
 		{
 			const u32 dpX = v[i + 1].XYZ.X - v[i].XYZ.X;
 			if (dpX != first_dpX || v[i].XYZ.X != last_pX)
+			{
+				m_primitive_covers_without_gaps = false;
 				return false;
+			}
 
 			last_pX = v[i + 1].XYZ.X;
 		}
 
+		m_primitive_covers_without_gaps = true;
 		return true;
 	}
 
+	m_primitive_covers_without_gaps = false;
 	return false;
 }
 
@@ -5524,6 +5546,46 @@ bool GSRendererHW::IsConstantDirectWriteMemClear()
 		return true;
 
 	return false;
+}
+
+void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, const GSVector4i& unscaled_uv_rect,
+	const GSVector2i& unscaled_size, const GSVector4i& scissor)
+{
+	const GSVector4i fpr = unscaled_rect.sll32(4);
+	const GSVector4i fpuv = unscaled_uv_rect.sll32(4);
+	GSVertex* v = m_vertex.buff;
+
+	v[0].XYZ.X = static_cast<u16>(m_context->XYOFFSET.OFX + fpr.x);
+	v[0].XYZ.Y = static_cast<u16>(m_context->XYOFFSET.OFY + fpr.y);
+
+	v[1].XYZ.X = static_cast<u16>(m_context->XYOFFSET.OFX + fpr.z);
+	v[1].XYZ.Y = static_cast<u16>(m_context->XYOFFSET.OFY + fpr.w);
+
+	if (PRIM->FST)
+	{
+		v[0].U = fpuv.x;
+		v[0].V = fpuv.y;
+		v[1].U = fpuv.z;
+		v[1].V = fpuv.w;
+	}
+	else
+	{
+		const float th = static_cast<float>(1 << m_cached_ctx.TEX0.TH);
+		const GSVector4 st = GSVector4(unscaled_uv_rect) / GSVector4(GSVector4i(unscaled_size).xyxy());
+		GSVector4::storel(&v[0].ST.S, st);
+		GSVector4::storeh(&v[1].ST.S, st);
+	}
+
+	m_vertex.head = m_vertex.tail = m_vertex.next = 2;
+	m_index.tail = 2;
+
+	m_r = unscaled_rect;
+	m_context->scissor.in = scissor;
+}
+
+void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, const GSVector2i& unscaled_size)
+{
+	ReplaceVerticesWithSprite(unscaled_rect, unscaled_rect, unscaled_size, unscaled_rect);
 }
 
 GSHWDrawConfig& GSRendererHW::BeginHLEHardwareDraw(
