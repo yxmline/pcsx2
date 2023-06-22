@@ -1663,16 +1663,31 @@ void GSRendererHW::Draw()
 	const bool draw_sprite_tex = PRIM->TME && (m_vt.m_primclass == GS_SPRITE_CLASS);
 
 	// We trigger the sw prim render here super early, to avoid creating superfluous render targets.
-	if (CanUseSwPrimRender(no_rt, no_ds, draw_sprite_tex) && SwPrimRender(*this, true))
+	if (CanUseSwPrimRender(no_rt, no_ds, draw_sprite_tex) && SwPrimRender(*this, true, true))
 	{
 		GL_CACHE("Possible texture decompression, drawn with SwPrimRender() (BP %x BW %u TBP0 %x TBW %u)",
 			m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBMSK, m_cached_ctx.TEX0.TBP0, m_cached_ctx.TEX0.TBW);
 		return;
 	}
 
-	// The rectangle of the draw rounded up.
-	const GSVector4 rect = m_vt.m_min.p.upld(m_vt.m_max.p + GSVector4::cxpr(0.5f));
-	m_r = GSVector4i(rect).rintersect(context->scissor.in);
+	// GS doesn't fill the right or bottom edges of sprites/triangles, and for a pixel to be shaded, the vertex
+	// must cross the center. In other words, the range is equal to the floor of coordinates +0.5. Except for
+	// the case where the minimum equals the maximum, because at least one pixel is filled per line.
+	// Test cases for the math:
+	//                                --------------------------------------
+	//                                | Position range | Draw Range | Size |
+	//                                |       -0.5,0.0 |        0-0 |    1 |
+	//                                |       -0.5,0.5 |        0-0 |    1 |
+	//                                |            0,1 |        0-0 |    1 |
+	//                                |          0,1.5 |        0-1 |    2 |
+	//                                |        0.5,1.5 |        1-1 |    1 |
+	//                                |       0.5,1.75 |        1-1 |    1 |
+	//                                |       0.5,2.25 |        1-1 |    1 |
+	//                                |        0.5,2.5 |        1-2 |    2 |
+	//                                --------------------------------------
+	m_r = GSVector4i(m_vt.m_min.p.upld(m_vt.m_max.p) + GSVector4::cxpr(0.5f));
+	m_r = m_r.blend8(m_r + GSVector4i::cxpr(0, 0, 1, 1), (m_r.xyxy() == m_r.zwzw()));
+	m_r = m_r.rintersect(context->scissor.in);
 
 	const bool process_texture = PRIM->TME && !(PRIM->ABE && m_context->ALPHA.IsBlack() && !m_cached_ctx.TEX0.TCC);
 	const u32 frame_end_bp = GSLocalMemory::GetEndBlockAddress(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, m_r);
@@ -1685,7 +1700,7 @@ void GSRendererHW::Draw()
 		m_mem.m_clut.ClearDrawInvalidity();
 		if (result == CLUTDrawTestResult::CLUTDrawOnCPU && GSConfig.UserHacks_CPUCLUTRender > 0)
 		{
-			if (SwPrimRender(*this, true))
+			if (SwPrimRender(*this, true, true))
 			{
 				GL_CACHE("Possible clut draw, drawn with SwPrimRender()");
 				return;
