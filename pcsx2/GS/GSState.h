@@ -235,6 +235,7 @@ public:
 	u32 m_dirty_gs_regs = 0;
 	int m_backed_up_ctx = 0;
 	std::vector<GSUploadQueue> m_draw_transfers;
+	std::vector<GSUploadQueue> m_draw_transfers_double_buff;
 
 	static int s_n;
 	static int s_last_transfer_draw_n;
@@ -917,7 +918,7 @@ public:
 	virtual void PurgePool();
 	virtual void PurgeTextureCache();
 	virtual void ReadbackTextureCache();
-	virtual void InvalidateVideoMem(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r, bool eewrite = false) {}
+	virtual void InvalidateVideoMem(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r) {}
 	virtual void InvalidateLocalMem(const GIFRegBITBLTBUF& BITBLTBUF, const GSVector4i& r, bool clut = false) {}
 
 	virtual void Move();
