@@ -24,6 +24,7 @@
 
 #include "MemoryCardFile.h"
 #include "MemoryCardFolder.h"
+#include "Sio.h"
 
 #include "System.h"
 #include "Config.h"
@@ -292,14 +293,11 @@ void FileMemoryCard::Open()
 			cont = true;
 		}
 
-		if (EmuConfig.Mcd[slot].Type != MemoryCardType::File)
-		{
-			str = "[is not memcard file]";
+		if (EmuConfig.Mcd[slot].Type == MemoryCardType::File)
+			Console.WriteLn(cont ? Color_Gray : Color_Green, fmt::format("McdSlot {} [File]: {}", slot, str));
+		else
 			cont = true;
-		}
 
-		Console.WriteLn(cont ? Color_Gray : Color_Green, "McdSlot %u [File]: %.*s", slot,
-			static_cast<int>(str.size()), str.data());
 		if (cont)
 			continue;
 
@@ -622,11 +620,8 @@ uint FileMcd_ConvertToSlot(uint port, uint slot)
 	return slot + 4;     // multitap 2
 }
 
-void FileMcd_EmuOpen()
+void FileMcd_SetType()
 {
-	if(FileMcd_Open)
-		return;
-	FileMcd_Open = true;
 	// detect inserted memory card types
 	for (uint slot = 0; slot < 8; ++slot)
 	{
@@ -645,6 +640,14 @@ void FileMcd_EmuOpen()
 			EmuConfig.Mcd[slot].Type = type;
 		}
 	}
+}
+
+void FileMcd_EmuOpen()
+{
+	if(FileMcd_Open)
+		return;
+	FileMcd_Open = true;
+	
 
 	Mcd::impl.Open();
 	Mcd::implFolder.SetFiltering(EmuConfig.McdFolderAutoManage);
@@ -658,6 +661,20 @@ void FileMcd_EmuClose()
 	FileMcd_Open = false;
 	Mcd::implFolder.Close();
 	Mcd::impl.Close();
+}
+
+void FileMcd_CancelEject()
+{
+	AutoEject::ClearAll();
+}
+
+void FileMcd_Reopen(std::string new_serial)
+{
+	Console.WriteLn("Reopening memory cards...");
+	FileMcd_EmuClose();
+	FileMcd_SetType();
+	sioSetGameSerial(new_serial);
+	FileMcd_EmuOpen();
 }
 
 s32 FileMcd_IsPresent(uint port, uint slot)
@@ -776,20 +793,25 @@ void FileMcd_NextFrame(uint port, uint slot)
 	}
 }
 
-bool FileMcd_ReIndex(uint port, uint slot, const std::string& filter)
+int FileMcd_ReIndex(uint port, uint slot, const std::string& filter)
 {
-	const uint combinedSlot = FileMcd_ConvertToSlot(port, slot);
+	const int combinedSlot = FileMcd_ConvertToSlot(port, slot);
+
 	switch (EmuConfig.Mcd[combinedSlot].Type)
 	{
 		//case MemoryCardType::File:
 		//	return Mcd::impl.ReIndex( combinedSlot, filter );
 		//	break;
 		case MemoryCardType::Folder:
-			return Mcd::implFolder.ReIndex(combinedSlot, EmuConfig.McdFolderAutoManage, filter);
+			if (!Mcd::implFolder.ReIndex(combinedSlot, EmuConfig.McdFolderAutoManage, filter))
+				return -1;
 			break;
 		default:
-			return false;
+				return -1;
+			break;
 	}
+
+	return combinedSlot;
 }
 
 // --------------------------------------------------------------------------------------
