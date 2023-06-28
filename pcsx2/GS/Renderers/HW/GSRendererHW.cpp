@@ -122,16 +122,11 @@ void GSRendererHW::VSync(u32 field, bool registers_written, bool idle_frame)
 			for (auto iter = m_draw_transfers.rbegin(); iter != m_draw_transfers.rend(); iter++)
 			{
 				if ((s_n - iter->draw) > 5)
-					break;
-				else // Keep the last 5 draws worth of transfers.
 				{
-					GSUploadQueue transfer = *iter;
-					m_draw_transfers_double_buff.push_back(transfer);
+					m_draw_transfers.erase(m_draw_transfers.begin(), std::next(iter).base());
+					break;
 				}
 			}
-			m_draw_transfers.clear();
-			// Flip EE queue.
-			m_draw_transfers.swap(m_draw_transfers_double_buff);
 		}
 	}
 	else if (!idle_frame)
@@ -143,17 +138,16 @@ void GSRendererHW::VSync(u32 field, bool registers_written, bool idle_frame)
 			for (auto iter = m_draw_transfers.rbegin(); iter != m_draw_transfers.rend(); iter++)
 			{
 				if ((s_n - iter->draw) > 5)
-					break;
-				else // Keep the last 5 draws worth of transfers.
 				{
-					GSUploadQueue transfer = *iter;
-					m_draw_transfers_double_buff.push_back(transfer);
+					m_draw_transfers.erase(m_draw_transfers.begin(), std::next(iter).base());
+					break;
 				}
 			}
 		}
-		m_draw_transfers.clear();
-		// Flip EE queue.
-		m_draw_transfers.swap(m_draw_transfers_double_buff);
+		else
+		{
+			m_draw_transfers.clear();
+		}
 	}
 
 	if (GSConfig.LoadTextureReplacements)
@@ -1094,11 +1088,11 @@ void GSRendererHW::InvalidateLocalMem(const GIFRegBITBLTBUF& BITBLTBUF, const GS
 	if (clut)
 		return; // FIXME
 
-	std::vector<GSState::GSUploadQueue>::iterator iter = GSRendererHW::GetInstance()->m_draw_transfers.end();
+	auto iter = m_draw_transfers.end();
 	bool skip = false;
 	// If the EE write overlaps the readback and was done since the last draw, there's no need to read it back.
 	// Dog's life does this.
-	while (iter != GSRendererHW::GetInstance()->m_draw_transfers.begin())
+	while (iter != m_draw_transfers.begin())
 	{
 		--iter;
 
@@ -2050,15 +2044,21 @@ void GSRendererHW::Draw()
 		const bool is_square = (t_size.y == t_size.x) && m_r.w >= 1023 && PrimitiveCoversWithoutGaps();
 		const bool is_clear = is_possible_mem_clear && is_square;
 		rt = g_texture_cache->LookupTarget(FRAME_TEX0, t_size, target_scale, GSTextureCache::RenderTarget, true,
-			fm, false, is_clear, force_preload, preload_uploads);
+			fm, false, force_preload, preload_uploads);
 
 		// Draw skipped because it was a clear and there was no target.
 		if (!rt)
 		{
-			GL_INS("Clear draw with no target, skipping.");
-			cleanup_cancelled_draw();
-			OI_GsMemClear();
-			return;
+			if (is_clear)
+			{
+				GL_INS("Clear draw with no target, skipping.");
+				cleanup_cancelled_draw();
+				OI_GsMemClear();
+				return;
+			}
+
+			rt = g_texture_cache->CreateTarget(FRAME_TEX0, t_size, target_scale, GSTextureCache::RenderTarget, true,
+				fm, false, force_preload, preload_uploads);
 		}
 	}
 
@@ -2072,7 +2072,12 @@ void GSRendererHW::Draw()
 		ZBUF_TEX0.PSM = m_cached_ctx.ZBUF.PSM;
 
 		ds = g_texture_cache->LookupTarget(ZBUF_TEX0, t_size, target_scale, GSTextureCache::DepthStencil,
-			m_cached_ctx.DepthWrite(), 0, false, false, force_preload);
+			m_cached_ctx.DepthWrite(), 0, false, force_preload);
+		if (!ds)
+		{
+			ds = g_texture_cache->CreateTarget(ZBUF_TEX0, t_size, target_scale, GSTextureCache::DepthStencil,
+				m_cached_ctx.DepthWrite(), 0, false, force_preload);
+		}
 	}
 
 	if (process_texture)
@@ -4869,8 +4874,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 // If the EE uploaded a new CLUT since the last draw, use that.
 bool GSRendererHW::HasEEUpload(GSVector4i r)
 {
-	std::vector<GSState::GSUploadQueue>::iterator iter;
-	for (iter = m_draw_transfers.begin(); iter != m_draw_transfers.end();)
+	for (auto iter = m_draw_transfers.begin(); iter != m_draw_transfers.end(); ++iter)
 	{
 		if (iter->draw == (s_n - 1) && iter->blit.DBP == m_cached_ctx.TEX0.TBP0 && GSUtil::HasSharedBits(iter->blit.DPSM, m_cached_ctx.TEX0.PSM))
 		{
@@ -4893,8 +4897,6 @@ bool GSRendererHW::HasEEUpload(GSVector4i r)
 			if (rect.rintersect(r).eq(r))
 				return true;
 		}
-
-		iter++;
 	}
 	return false;
 }
