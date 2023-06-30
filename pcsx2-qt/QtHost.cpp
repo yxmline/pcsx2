@@ -42,12 +42,12 @@
 #include "pcsx2/MTGS.h"
 #include "pcsx2/PAD/Host/PAD.h"
 #include "pcsx2/PerformanceMetrics.h"
+#include "pcsx2/SysForwardDefs.h"
 #include "pcsx2/VMManager.h"
 
 #include "common/Assertions.h"
 #include "common/Console.h"
 #include "common/CrashHandler.h"
-#include "common/Exceptions.h"
 #include "common/FileSystem.h"
 #include "common/Path.h"
 #include "common/SettingsWrapper.h"

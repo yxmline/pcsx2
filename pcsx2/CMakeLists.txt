@@ -1179,7 +1179,7 @@ target_link_libraries(PCSX2_FLAGS INTERFACE
 	cpuinfo
 	zydis
 	ZLIB::ZLIB
-	PkgConfig::SOUNDTOUCH
+	SoundTouch::SoundTouch
 	PNG::PNG
 	LibLZMA::LibLZMA
 	Zstd::Zstd
@@ -1232,6 +1232,9 @@ target_include_directories(PCSX2_FLAGS INTERFACE
 	"${CMAKE_BINARY_DIR}/common/include"
 	"${CMAKE_SOURCE_DIR}/3rdparty/xbyak"
 	"${FFMPEG_INCLUDE_DIRS}"
+)
+target_compile_definitions(PCSX2_FLAGS INTERFACE
+	XBYAK_NO_EXCEPTION
 )
 
 if(COMMAND target_precompile_headers)

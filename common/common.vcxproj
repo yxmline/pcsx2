@@ -46,10 +46,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AlignedMalloc.cpp" />
+    <ClCompile Include="Assertions.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DynamicLibrary.cpp" />
-    <ClCompile Include="Exceptions.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="FastJmp.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -109,6 +110,7 @@
     <ClInclude Include="DynamicLibrary.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="boost_spsc_queue.hpp" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="FastJmp.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="HashCombine.h" />
@@ -131,7 +133,6 @@
     <ClInclude Include="SettingsWrapper.h" />
     <ClInclude Include="Assertions.h" />
     <ClInclude Include="Console.h" />
-    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="General.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Path.h" />
