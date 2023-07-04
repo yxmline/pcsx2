@@ -790,21 +790,6 @@ void GSDeviceVK::DrawIndexedPrimitive(int offset, int count)
 	vkCmdDrawIndexed(g_vulkan_context->GetCurrentCommandBuffer(), count, 1, m_index.start + offset, m_vertex.start, 0);
 }
 
-void GSDeviceVK::ClearRenderTarget(GSTexture* t, u32 c)
-{
-	t->SetClearColor(c);
-}
-
-void GSDeviceVK::InvalidateRenderTarget(GSTexture* t)
-{
-	t->SetState(GSTexture::State::Invalidated);
-}
-
-void GSDeviceVK::ClearDepth(GSTexture* t, float d)
-{
-	t->SetClearDepth(d);
-}
-
 VkFormat GSDeviceVK::LookupNativeFormat(GSTexture::Format format) const
 {
 	static constexpr std::array<VkFormat, static_cast<int>(GSTexture::Format::BC7) + 1> s_format_mapping = {{
@@ -1274,9 +1259,23 @@ void GSDeviceVK::DoMerge(GSTexture* sTex[3], GSVector4* sRect, GSTexture* dTex, 
 	EndRenderPass();
 
 	// transition everything before starting the new render pass
-	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ColorAttachment);
-	if (sTex[0])
+	const bool has_input_0 =
+		(sTex[0] && (sTex[0]->GetState() == GSTexture::State::Dirty ||
+						(sTex[0]->GetState() == GSTexture::State::Cleared || sTex[0]->GetClearColor() != 0)));
+	const bool has_input_1 = (PMODE.SLBG == 0 || feedback_write_2_but_blend_bg) && sTex[1] &&
+							 (sTex[1]->GetState() == GSTexture::State::Dirty ||
+								 (sTex[1]->GetState() == GSTexture::State::Cleared || sTex[1]->GetClearColor() != 0));
+	if (has_input_0)
+	{
+		static_cast<GSTextureVK*>(sTex[0])->CommitClear();
 		static_cast<GSTextureVK*>(sTex[0])->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
+	}
+	if (has_input_1)
+	{
+		static_cast<GSTextureVK*>(sTex[1])->CommitClear();
+		static_cast<GSTextureVK*>(sTex[1])->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
+	}
+	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ColorAttachment);
 
 	const GSVector2i dsize(dTex->GetSize());
 	const GSVector4i darea(0, 0, dsize.x, dsize.y);
@@ -1522,6 +1521,14 @@ void GSDeviceVK::OMSetRenderTargets(GSTexture* rt, GSTexture* ds, const GSVector
 	{
 		if (vkRt)
 		{
+			// NVIDIA drivers appear to return random garbage when sampling the RT via a feedback loop, if the load op for
+			// the render pass is CLEAR. Using vkCmdClearAttachments() doesn't work, so we have to clear the image instead.
+			if (feedback_loop & FeedbackLoopFlag_ReadAndWriteRT && vkRt->GetState() == GSTexture::State::Cleared &&
+				g_vulkan_context->IsDeviceNVIDIA())
+			{
+				vkRt->CommitClear();
+			}
+
 			vkRt->TransitionToLayout((feedback_loop & FeedbackLoopFlag_ReadAndWriteRT) ?
 				GSTextureVK::Layout::FeedbackLoop :
 										 GSTextureVK::Layout::ColorAttachment);
