@@ -23119,7 +23119,7 @@ SLES-55215:
   region: "PAL-E"
   compat: 5
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLES-55216:
   name: "Baroque"
   region: "PAL-E"
@@ -26726,7 +26726,7 @@ SLPM-61148:
   name: "Growlanser V - Generations [Taikenban Demo]"
   region: "NTSC-J"
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLPM-61153:
   name: "Dengeki PS2 PlayStation D92"
   region: "NTSC-J"
@@ -33579,7 +33579,7 @@ SLPM-66249:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLPM-66250:
   name: "Choro Q HG 4 [Takara Best]"
   region: "NTSC-J"
@@ -34203,7 +34203,7 @@ SLPM-66418:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLPM-66419:
   name: "Valkyrie Profile 2 - Silmeria"
   region: "NTSC-J"
@@ -35423,7 +35423,7 @@ SLPM-66716:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLPM-66717:
   name: "Standard Daisenryaku - Dengekisen [Sega the Best]"
   region: "NTSC-J"
@@ -50505,7 +50505,7 @@ SLUS-21571:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    textureInsideRT: 1 # Fixes character layering issue.
+    moveHandler: "MV_Growlanser" # Fixes precomputed depth buffer.
 SLUS-21572:
   name: "Surf's Up"
   region: "NTSC-U"
