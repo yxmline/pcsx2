@@ -949,9 +949,11 @@ void VMManager::UpdateELFInfo(std::string elf_path)
 {
 	Error error;
 	ElfObject elfo;
-	if (!cdvdLoadElf(&elfo, elf_path, false, &error))
+	if (elf_path.empty() || !cdvdLoadElf(&elfo, elf_path, false, &error))
 	{
-		Console.Error(fmt::format("Failed to read ELF being loaded: {}: {}", elf_path, error.GetDescription()));
+		if (!elf_path.empty())
+			Console.Error(fmt::format("Failed to read ELF being loaded: {}: {}", elf_path, error.GetDescription()));
+
 		s_elf_path = {};
 		s_elf_text_range = {};
 		s_elf_entry_point = 0xFFFFFFFFu;
@@ -1039,7 +1041,6 @@ bool VMManager::AutoDetectSource(const std::string& filename)
 	{
 		// make sure we're not fast booting when we have no filename
 		CDVDsys_ChangeSource(CDVD_SourceType::NoDisc);
-		s_fast_boot_requested = false;
 		return true;
 	}
 }
@@ -1125,17 +1126,14 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 		Console.WriteLn("Loading BIOS...");
 		if (!LoadBIOS())
 		{
-			// TODO: When we translate core strings, translate this.
-
-			const char* message =
-				"PCSX2 requires a PS2 BIOS in order to run.\n\n"
-				"For legal reasons, you *must* obtain a BIOS from an actual PS2 unit that you own (borrowing "
-				"doesn't count).\n\n"
-				"Once dumped, this BIOS image should be placed in the bios folder within the data directory "
-				"(Tools Menu -> Open Data Directory).\n\n"
-				"Please consult the FAQs and Guides for further instructions.";
-
-			Host::ReportErrorAsync("Startup Error", message);
+			Host::ReportErrorAsync(TRANSLATE_SV("VMManager", "Error"),
+				TRANSLATE_SV("VMManager",
+					"PCSX2 requires a PS2 BIOS in order to run.\n\n"
+					"For legal reasons, you *must* obtain a BIOS from an actual PS2 unit that you own (borrowing "
+					"doesn't count).\n\n"
+					"Once dumped, this BIOS image should be placed in the bios folder within the data directory "
+					"(Tools Menu -> Open Data Directory).\n\n"
+					"Please consult the FAQs and Guides for further instructions."));
 			return false;
 		}
 	}
@@ -1157,6 +1155,7 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 	// ELFs must be fast booted, and GS dumps are never fast booted.
 	s_fast_boot_requested =
 		(boot_params.fast_boot.value_or(static_cast<bool>(EmuConfig.EnableFastBoot)) || !s_elf_override.empty()) &&
+		(CDVDsys_GetSourceType() != CDVD_SourceType::NoDisc || !s_elf_override.empty()) &&
 		!GSDumpReplayer::IsReplayingDump();
 
 	if (!s_elf_override.empty())
@@ -1169,7 +1168,6 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 		}
 
 		Hle_SetElfPath(s_elf_override.c_str());
-		s_fast_boot_requested = true;
 	}
 	else
 	{

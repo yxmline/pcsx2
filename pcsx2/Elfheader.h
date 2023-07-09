@@ -15,10 +15,10 @@
 
 #pragma once
 
-#include "common/Error.h"
-#include "CDVD/IsoFS/IsoFSCDVD.h"
-#include "CDVD/IsoFS/IsoFS.h"
 #include <vector>
+
+class Error;
+class IsoReader;
 
 struct ELF_HEADER {
 	u8	e_ident[16];	//0x7f,"ELF"  (ELF file identifier)
@@ -125,11 +125,12 @@ public:
 	ElfObject(const ElfObject&) = delete;
 	~ElfObject();
 
+	__fi const std::vector<u8>& GetData() const { return data; }
 	__fi const ELF_HEADER& GetHeader() const { return *reinterpret_cast<const ELF_HEADER*>(data.data()); }
 	__fi u32 GetSize() const { return static_cast<u32>(data.size()); }
 
 	bool OpenFile(std::string srcfile, bool isPSXElf_, Error* error);
-	bool OpenIsoFile(std::string srcfile, IsoFile& isofile, bool isPSXElf_, Error* error);
+	bool OpenIsoFile(std::string srcfile, IsoReader& isor, bool isPSXElf_, Error* error);
 
 	void LoadHeaders();
 
