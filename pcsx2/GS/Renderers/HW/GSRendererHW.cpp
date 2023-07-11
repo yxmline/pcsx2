@@ -2116,6 +2116,9 @@ void GSRendererHW::Draw()
 			cleanup_cancelled_draw();
 			return;
 		}
+
+		if(GSLocalMemory::m_psm[src->m_TEX0.PSM].pal == 0)
+			CalcAlphaMinMax(src->m_alpha_minmax.first, src->m_alpha_minmax.second);
 	}
 
 	// Estimate size based on the scissor rectangle and height cache.
@@ -4667,7 +4670,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 			GL_PERF("DATE: Fast with FBA, all pixels will be >= 128");
 			DATE_one = !m_cached_ctx.TEST.DATM;
 		}
-		else if (m_conf.colormask.wa && !m_cached_ctx.TEST.ATE)
+		else if (m_conf.colormask.wa && !m_cached_ctx.TEST.ATE && !(m_cached_ctx.FRAME.FBMSK & 0x80000000))
 		{
 			// Performance note: check alpha range with GetAlphaMinMax()
 			// Note: all my dump are already above 120fps, but it seems to reduce GPU load
@@ -4736,6 +4739,52 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	}
 
 	// Blend
+	if (rt)
+	{
+		if (!m_channel_shuffle && !m_texture_shuffle)
+		{
+			const int fba_value = m_prev_env.CTXT[m_prev_env.PRIM.CTXT].FBA.FBA * 128;
+			if ((m_cached_ctx.FRAME.FBMSK & 0xff000000) == 0)
+			{
+				if (rt->m_valid.rintersect(m_r).eq(rt->m_valid) && PrimitiveCoversWithoutGaps() && !(m_cached_ctx.TEST.DATE || m_cached_ctx.TEST.ATE || m_cached_ctx.TEST.ZTST != ZTST_ALWAYS))
+				{
+					rt->m_alpha_max = GetAlphaMinMax().max | fba_value;
+					rt->m_alpha_min = GetAlphaMinMax().min | fba_value;
+				}
+				else
+				{
+					rt->m_alpha_max = std::max(GetAlphaMinMax().max | fba_value, rt->m_alpha_max);
+					rt->m_alpha_min = std::min(GetAlphaMinMax().min | fba_value, rt->m_alpha_min);
+				}
+			}
+			else if ((m_cached_ctx.FRAME.FBMSK & 0xff000000) != 0xff000000) // We can't be sure of the alpha if it's partially masked.
+			{
+				rt->m_alpha_max |= std::max(GetAlphaMinMax().max | fba_value, rt->m_alpha_max);
+				rt->m_alpha_min = std::min(GetAlphaMinMax().min | fba_value, rt->m_alpha_min);
+			}
+			else
+			{
+				// If both are zero then we probably don't know what the alpha is.
+				if (rt->m_alpha_max == 0 && rt->m_alpha_min == 0)
+				{
+					rt->m_alpha_max = 255;
+					rt->m_alpha_min = 0;
+				}
+			}
+		}
+		else if ((m_texture_shuffle && m_conf.ps.write_rg == false) || m_channel_shuffle)
+		{
+			rt->m_alpha_max = 255;
+			rt->m_alpha_min = 0;
+		}
+	}
+
+	// Not gonna spend too much time with this, it's not likely to be used much, can't be less accurate than it was.
+	if (ds)
+	{
+		ds->m_alpha_max = std::max(ds->m_alpha_max, static_cast<int>(m_vt.m_max.p.z) >> 24);
+		ds->m_alpha_min = std::min(ds->m_alpha_min, static_cast<int>(m_vt.m_min.p.z) >> 24);
+	}
 
 	bool blending_alpha_pass = false;
 	if ((!IsOpaque() || m_context->ALPHA.IsBlack()) && rt && (m_conf.colormask.wrgba & 0x7))
@@ -5331,15 +5380,34 @@ bool GSRendererHW::DetectStripedDoubleClear(bool& no_rt, bool& no_ds)
 							(m_cached_ctx.FRAME.PSM & 0xF) == (m_cached_ctx.ZBUF.PSM & 0xF) && m_vt.m_eq.z == 1 &&
 							m_vertex.buff[1].XYZ.Z == m_vertex.buff[1].RGBAQ.U32[0];
 
-	const GSVector2i page_size = GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].pgs;
-	const int vertex_offset =
-		(single_page_offset && m_vertex.tail > 2) ?
-			((m_vertex.buff[2].XYZ.X - m_vertex.buff[1].XYZ.X) >> 4) : // FBP & ZBP off by 1 expect 1 page offset.
-			(((m_vertex.buff[1].XYZ.X - m_vertex.buff[0].XYZ.X) + 0xF) >> 4); // FBP == ZBP (maybe) expect 1/2 page offset.
-	const bool is_strips = vertex_offset == ((single_page_offset) ? page_size.x : (page_size.x / 2));
-
 	// Z and color must be constant and the same and must be drawing strips.
-	if (!z_is_frame || !is_strips || m_vt.m_eq.rgba != 0xFFFF)
+	if (!z_is_frame || m_vt.m_eq.rgba != 0xFFFF)
+		return false;
+
+	const GSVector2i page_size = GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].pgs;
+	const int strip_size = ((single_page_offset) ? page_size.x : (page_size.x / 2));
+
+	// Find the biggest gap out of all the verts, most of the time games are nice and do strips,
+	// however Lord of the Rings - The Third Age draws the strips 8x8 per sprite, until it makes up 32x8, then does the next 32x8 below.
+	// I know, unneccesary, but that's what they did. But this loop should calculate the largest gap, then we can confirm it.
+	// LOTR has 4096 verts, so this isn't going to be super fast on that game, most games will be just 16 verts so they should be ok,
+	// and I could cheat and stop when we get a size that matches, but that might be a lucky misdetection, I don't wanna risk it.
+	int vertex_offset = 0;
+	int last_vertex = m_vertex.buff[0].XYZ.X;
+
+	for (u32 i = 1; i < m_vertex.tail; i++)
+	{
+		vertex_offset = std::max(static_cast<int>((m_vertex.buff[i].XYZ.X - last_vertex) >> 4), vertex_offset);
+		last_vertex = m_vertex.buff[i].XYZ.X;
+
+		// Found a gap which is much bigger, no point continuing to scan.
+		if (vertex_offset > strip_size)
+			break;
+	}
+
+	const bool is_strips = vertex_offset == strip_size;
+
+	if (!is_strips)
 		return false;
 
 	// Half a page extra width is written through Z.
@@ -5492,6 +5560,8 @@ bool GSRendererHW::TryTargetClear(GSTextureCache::Target* rt, GSTextureCache::Ta
 			const u32 c = GetConstantDirectWriteMemClearColor();
 			GL_INS("TryTargetClear(): RT at %x <= %08X", rt->m_TEX0.TBP0, c);
 			g_gs_device->ClearRenderTarget(rt->m_texture, c);
+			rt->m_alpha_max = c >> 24;
+			rt->m_alpha_min = c >> 24;
 		}
 		else
 		{
@@ -5508,6 +5578,8 @@ bool GSRendererHW::TryTargetClear(GSTextureCache::Target* rt, GSTextureCache::Ta
 			const float d = static_cast<float>(z) * (g_gs_device->Features().clip_control ? 0x1p-32f : 0x1p-24f);
 			GL_INS("TryTargetClear(): DS at %x <= %f", ds->m_TEX0.TBP0, d);
 			g_gs_device->ClearDepth(ds->m_texture, d);
+			ds->m_alpha_max = z >> 24;
+			ds->m_alpha_min = z >> 24;
 		}
 		else
 		{
