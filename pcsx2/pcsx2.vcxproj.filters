@@ -1274,9 +1274,6 @@
     <ClCompile Include="GS\Renderers\DX11\D3D11ShaderCache.cpp">
       <Filter>System\Ps2\GS\Renderers\Direct3D11</Filter>
     </ClCompile>
-    <ClCompile Include="GS\Renderers\DX12\D3D12Context.cpp">
-      <Filter>System\Ps2\GS\Renderers\Direct3D12</Filter>
-    </ClCompile>
     <ClCompile Include="GS\Renderers\DX12\D3D12DescriptorHeapManager.cpp">
       <Filter>System\Ps2\GS\Renderers\Direct3D12</Filter>
     </ClCompile>
@@ -1310,9 +1307,6 @@
     <ClCompile Include="GS\Renderers\Vulkan\VKBuilders.cpp">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="GS\Renderers\Vulkan\VKContext.cpp">
-      <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="GS\Renderers\Vulkan\VKLoader.cpp">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClCompile>
@@ -1323,9 +1317,6 @@
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="GS\Renderers\Vulkan\VKSwapChain.cpp">
-      <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="GS\Renderers\Vulkan\VKUtil.cpp">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="Dmac.cpp">
@@ -2223,9 +2214,6 @@
     <ClInclude Include="GS\Renderers\DX11\D3D11ShaderCache.h">
       <Filter>System\Ps2\GS\Renderers\Direct3D11</Filter>
     </ClInclude>
-    <ClInclude Include="GS\Renderers\DX12\D3D12Context.h">
-      <Filter>System\Ps2\GS\Renderers\Direct3D12</Filter>
-    </ClInclude>
     <ClInclude Include="GS\Renderers\DX12\D3D12DescriptorHeapManager.h">
       <Filter>System\Ps2\GS\Renderers\Direct3D12</Filter>
     </ClInclude>
@@ -2256,9 +2244,6 @@
     <ClInclude Include="GS\Renderers\Vulkan\VKBuilders.h">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="GS\Renderers\Vulkan\VKContext.h">
-      <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="GS\Renderers\Vulkan\VKEntryPoints.h">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClInclude>
@@ -2272,9 +2257,6 @@
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="GS\Renderers\Vulkan\VKSwapChain.h">
-      <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="GS\Renderers\Vulkan\VKUtil.h">
       <Filter>System\Ps2\GS\Renderers\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="ps2\pgif.h">
