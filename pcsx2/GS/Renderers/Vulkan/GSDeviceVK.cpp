@@ -2866,7 +2866,8 @@ void GSDeviceVK::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture*
 		int(dRect.right - dRect.left), int(dRect.bottom - dRect.top));
 
 	DoStretchRect(static_cast<GSTextureVK*>(sTex), sRect, static_cast<GSTextureVK*>(dTex), dRect,
-		dTex ? m_convert[static_cast<int>(shader)] : m_present[static_cast<int>(shader)], linear, true);
+		dTex ? m_convert[static_cast<int>(shader)] : m_present[static_cast<int>(shader)], linear,
+		ShaderConvertWriteMask(shader) == 0xf);
 }
 
 void GSDeviceVK::StretchRect(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect, bool red,
@@ -3902,6 +3903,8 @@ bool GSDeviceVK::CompileConvertPipelines()
 			gpb.SetNoStencilState();
 		}
 
+		gpb.SetColorWriteMask(0, ShaderConvertWriteMask(i));
+
 		VkShaderModule ps = GetUtilityFragmentShader(*shader, shaderName(i));
 		if (ps == VK_NULL_HANDLE)
 			return false;
@@ -4552,9 +4555,12 @@ void GSDeviceVK::DestroyResources()
 		if (it != VK_NULL_HANDLE)
 			vkDestroyPipeline(m_device, it, nullptr);
 	}
-	vkDestroyPipelineLayout(m_device, m_cas_pipeline_layout, nullptr);
-	vkDestroyDescriptorSetLayout(m_device, m_cas_ds_layout, nullptr);
-	vkDestroyPipeline(m_device, m_imgui_pipeline, nullptr);
+	if (m_cas_pipeline_layout != VK_NULL_HANDLE)
+		vkDestroyPipelineLayout(m_device, m_cas_pipeline_layout, nullptr);
+	if (m_cas_ds_layout != VK_NULL_HANDLE)
+		vkDestroyDescriptorSetLayout(m_device, m_cas_ds_layout, nullptr);
+	if (m_imgui_pipeline != VK_NULL_HANDLE)
+		vkDestroyPipeline(m_device, m_imgui_pipeline, nullptr);
 
 	for (const auto& it : m_samplers)
 	{
