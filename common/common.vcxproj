@@ -103,9 +103,8 @@
     <MASM Include="FastJmp.asm" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Align.h" />
+    <ClInclude Include="BitUtils.h" />
     <ClInclude Include="AlignedMalloc.h" />
-    <ClInclude Include="BitCast.h" />
     <ClInclude Include="ByteSwap.h" />
     <ClInclude Include="CrashHandler.h" />
     <ClInclude Include="DynamicLibrary.h" />
@@ -135,7 +134,6 @@
     <ClInclude Include="Assertions.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="General.h" />
-    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="PrecompiledHeader.h" />
     <ClInclude Include="ReadbackSpinManager.h" />

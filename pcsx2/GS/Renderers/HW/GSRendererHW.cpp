@@ -1,5 +1,5 @@
 /*  PCSX2 - PS2 Emulator for PCs
- *  Copyright (C) 2002-2021 PCSX2 Dev Team
+ *  Copyright (C) 2002-2023 PCSX2 Dev Team
  *
  *  PCSX2 is free software: you can redistribute it and/or modify it under the terms
  *  of the GNU Lesser General Public License as published by the Free Software Found-
@@ -20,8 +20,9 @@
 #include "GS/GSPerfMon.h"
 #include "GS/GSUtil.h"
 #include "Host.h"
-#include "common/Align.h"
+#include "common/BitUtils.h"
 #include "common/StringUtil.h"
+#include <bit>
 
 GSRendererHW::GSRendererHW()
 	: GSRenderer()
@@ -1088,7 +1089,12 @@ bool GSRendererHW::CheckNextDrawForSplitClear(const GSVector4i& r, u32* pages_co
 {
 	const u32 end_block = GSLocalMemory::GetEndBlockAddress(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, r);
 	if (pages_covered_by_this_draw)
-		*pages_covered_by_this_draw = ((end_block - m_cached_ctx.FRAME.Block()) + (BLOCKS_PER_PAGE)) / BLOCKS_PER_PAGE;
+	{
+		if (end_block < m_cached_ctx.FRAME.Block())
+			*pages_covered_by_this_draw = (((MAX_BLOCKS - end_block) + m_cached_ctx.FRAME.Block()) + (BLOCKS_PER_PAGE)) / BLOCKS_PER_PAGE;
+		else
+			*pages_covered_by_this_draw = ((end_block - m_cached_ctx.FRAME.Block()) + (BLOCKS_PER_PAGE)) / BLOCKS_PER_PAGE;
+	}
 
 	// must be changing FRAME
 	if (m_backed_up_ctx < 0 || (m_dirty_gs_regs & (1u << DIRTY_REG_FRAME)) == 0)
@@ -1847,7 +1853,7 @@ void GSRendererHW::Draw()
 	}
 
 	const bool process_texture = PRIM->TME && !(PRIM->ABE && m_context->ALPHA.IsBlack() && !m_cached_ctx.TEX0.TCC);
-	const u32 frame_end_bp = GSLocalMemory::GetEndBlockAddress(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, m_r);
+	const u32 frame_end_bp = GSLocalMemory::GetUnwrappedEndBlockAddress(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, m_r);
 	bool preserve_rt_color =
 		((!no_rt && (!IsDiscardingDstColor() || !PrimitiveCoversWithoutGaps() || !all_depth_tests_pass)) || // Using Dst Color or draw has gaps
 			(process_texture && m_cached_ctx.TEX0.TBP0 >= m_cached_ctx.FRAME.Block() &&
@@ -2484,7 +2490,7 @@ void GSRendererHW::Draw()
 			// Grandia Xtreme, Onimusha Warlord.
 			if (!new_rect && new_height && old_end_block != rt->m_end_block)
 			{
-				old_rt = g_texture_cache->FindTargetOverlap(old_end_block, rt->m_end_block, GSTextureCache::RenderTarget, m_cached_ctx.FRAME.PSM);
+				old_rt = g_texture_cache->FindTargetOverlap(rt, GSTextureCache::RenderTarget, m_cached_ctx.FRAME.PSM);
 
 				if (old_rt && old_rt != rt && GSUtil::HasSharedBits(old_rt->m_TEX0.PSM, rt->m_TEX0.PSM))
 				{
@@ -2522,7 +2528,7 @@ void GSRendererHW::Draw()
 
 			if (!new_rect && new_height && old_end_block != ds->m_end_block)
 			{
-				old_ds = g_texture_cache->FindTargetOverlap(old_end_block, ds->m_end_block, GSTextureCache::DepthStencil, m_cached_ctx.ZBUF.PSM);
+				old_ds = g_texture_cache->FindTargetOverlap(ds, GSTextureCache::DepthStencil, m_cached_ctx.ZBUF.PSM);
 
 				if (old_ds && old_ds != ds && GSUtil::HasSharedBits(old_ds->m_TEX0.PSM, ds->m_TEX0.PSM))
 				{
@@ -4455,7 +4461,7 @@ bool GSRendererHW::CanUseTexIsFB(const GSTextureCache::Target* rt, const GSTextu
 		}
 		else if (clamp == CLAMP_REGION_REPEAT)
 		{
-			const u32 req_tbits = (tmax > 1) ? static_cast<u32>(Common::NextPow2(tmax - 1) - 1) : 0x1;
+			const u32 req_tbits = (tmax > 1) ? (std::bit_ceil(static_cast<u32>(tmax - 1)) - 1) : 0x1;
 			if ((min & req_tbits) != req_tbits)
 			{
 				GL_CACHE("Can't use tex-is-fb because of REGION_REPEAT [%d, %d] with TMM of [%d, %d] and tbits of %d",
@@ -5453,7 +5459,8 @@ bool GSRendererHW::DetectDoubleHalfClear(bool& no_rt, bool& no_ds)
 	// GTA: LCS does this setup, along with a few other games. Thankfully if it's a zero clear, we'll clear both
 	// separately, and the end result is the same because it gets invalidated. That's better than falsely detecting
 	// double half clears, and ending up with 1024 high render targets which really shouldn't be.
-	if (frame_psm.fmt != zbuf_psm.fmt && m_cached_ctx.FRAME.FBMSK != ((zbuf_psm.fmt == 1) ? 0xFF000000u : 0))
+	if ((frame_psm.fmt != zbuf_psm.fmt && m_cached_ctx.FRAME.FBMSK != ((zbuf_psm.fmt == 1) ? 0xFF000000u : 0)) ||
+		!GSUtil::HasCompatibleBits(m_cached_ctx.FRAME.PSM & ~0x30, m_cached_ctx.ZBUF.PSM & ~0x30)) // Bit depth is not the same (i.e. 32bit + 16bit).
 	{
 		GL_INS("Inconsistent FRAME [%s, %08x] and ZBUF [%s] formats, not using double-half clear.",
 			psm_str(m_cached_ctx.FRAME.PSM), m_cached_ctx.FRAME.FBMSK, psm_str(m_cached_ctx.ZBUF.PSM));

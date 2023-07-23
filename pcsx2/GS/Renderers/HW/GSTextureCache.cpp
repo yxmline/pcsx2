@@ -19,11 +19,10 @@
 #include "GSRendererHW.h"
 #include "GS/GSState.h"
 #include "GS/GSGL.h"
-#include "GS/GSIntrin.h"
 #include "GS/GSPerfMon.h"
 #include "GS/GSUtil.h"
 #include "GS/GSXXH.h"
-#include "common/Align.h"
+#include "common/BitUtils.h"
 #include "common/HashCombine.h"
 
 #ifdef __APPLE__
@@ -1223,14 +1222,13 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const GIFRegTEX0& TEX0, con
 	return src;
 }
 
-GSTextureCache::Target* GSTextureCache::FindTargetOverlap(u32 bp, u32 end_block, int type, int psm)
+GSTextureCache::Target* GSTextureCache::FindTargetOverlap(Target* target, int type, int psm)
 {
-	u32 end_block_bp = end_block < bp ? (MAX_BP + 1) : end_block;
-
 	for (auto t : m_dst[type])
 	{
 		// Only checks that the texure starts at the requested bp, which shares data. Size isn't considered.
-		if (t->m_TEX0.TBP0 >= bp && t->m_TEX0.TBP0 < end_block_bp && GSUtil::HasCompatibleBits(t->m_TEX0.PSM, psm))
+		if (t != target && t->m_TEX0.TBW == target->m_TEX0.TBW && t->m_TEX0.TBP0 >= target->m_TEX0.TBP0 &&
+			t->UnwrappedEndBlock() <= target->UnwrappedEndBlock() && GSUtil::HasCompatibleBits(t->m_TEX0.PSM, psm))
 			return t;
 	}
 	return nullptr;
@@ -1658,9 +1656,7 @@ void GSTextureCache::PreloadTarget(GIFRegTEX0 TEX0, const GSVector2i& size, cons
 
 				for (iter = GSRendererHW::GetInstance()->m_draw_transfers.begin(); iter != GSRendererHW::GetInstance()->m_draw_transfers.end(); )
 				{
-					u32 transfer_end = GSLocalMemory::GetEndBlockAddress(iter->blit.DBP, iter->blit.DBW, iter->blit.DPSM, iter->rect);
-					if (transfer_end < iter->blit.DBP)
-						transfer_end += MAX_BLOCKS;
+					const u32 transfer_end = GSLocalMemory::GetUnwrappedEndBlockAddress(iter->blit.DBP, iter->blit.DBW, iter->blit.DPSM, iter->rect);
 
 					// If the format, and location doesn't overlap
 					if (transfer_end >= TEX0.TBP0 && iter->blit.DBP <= rect_end && GSUtil::HasCompatibleBits(iter->blit.DPSM, TEX0.PSM))
@@ -1748,6 +1744,29 @@ void GSTextureCache::PreloadTarget(GIFRegTEX0 TEX0, const GSVector2i& size, cons
 	else
 	{
 		dst->UpdateValidity(GSVector4i::loadh(valid_size));
+	}
+	
+	for (int type = 0; type < 2; type++)
+	{
+		auto& list = m_dst[type];
+		for (auto i = list.begin(); i != list.end();)
+		{
+			auto j = i;
+			Target* t = *j;
+
+			// could be overwriting a double buffer, so if it's the second half of it, just reduce the size down to half.
+			if (dst != t && t->m_TEX0.TBW == dst->m_TEX0.TBW &&
+				t->m_TEX0.PSM == dst->m_TEX0.PSM &&
+				((((t->m_end_block + 1) - t->m_TEX0.TBP0) >> 1) + t->m_TEX0.TBP0) == dst->m_TEX0.TBP0)
+			{
+				//DevCon.Warning("Found one %x->%x BW %d PSM %x (new target %x->%x BW %d PSM %x)", t->m_TEX0.TBP0, t->m_end_block, t->m_TEX0.TBW, t->m_TEX0.PSM, dst->m_TEX0.TBP0, dst->m_end_block, dst->m_TEX0.TBW, dst->m_TEX0.PSM);
+				GSVector4i new_valid = t->m_valid;
+				new_valid.w /= 2;
+				t->ResizeValidity(new_valid);
+				return;
+			}
+			i++;
+		}
 	}
 }
 
@@ -2182,7 +2201,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 	// Unfortunately sometimes the draw rect is incorrect, and since the end block gets the rect -1, it'll underflow,
 	// so we need to prevent that from happening. Just make it a single block in that case, and hope for the best.
 	const u32 start_bp = GSLocalMemory::GetStartBlockAddress(off.bp(), off.bw(), off.psm(), rect);
-	const u32 end_bp = rect.rempty() ? start_bp : GSLocalMemory::GetEndBlockAddress(off.bp(), off.bw(), off.psm(), rect);
+	const u32 end_bp = rect.rempty() ? start_bp : GSLocalMemory::GetUnwrappedEndBlockAddress(off.bp(), off.bw(), off.psm(), rect);
 
 	// Ideally in the future we can turn this on unconditionally, but for now it breaks too much.
 	const bool check_inside_target = (GSConfig.UserHacks_TargetPartialInvalidation ||
@@ -2349,7 +2368,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 							else
 							{
 								if (GSLocalMemory::m_psm[psm].bpp == GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp ||
-									((100.0f / static_cast<float>(t->m_end_block - t->m_TEX0.TBP0)) * static_cast<float>(end_bp - bp)) < 20.0f)
+									((100.0f / static_cast<float>(t->UnwrappedEndBlock() - t->m_TEX0.TBP0)) * static_cast<float>(end_bp - bp)) < 20.0f)
 								{
 									SurfaceOffset so = ComputeSurfaceOffset(off, r, t);
 									if (so.is_valid)
@@ -2422,7 +2441,7 @@ void GSTextureCache::InvalidateVideoMem(const GSOffset& off, const GSVector4i& r
 			// TODO Use ComputeSurfaceOffset below.
 			if (GSUtil::HasSharedBits(psm, t->m_TEX0.PSM))
 			{
-				if (t->m_TEX0.TBP0 >= start_bp && t->m_end_block <= end_bp)
+				if (t->m_TEX0.TBP0 >= start_bp && t->UnwrappedEndBlock() <= end_bp)
 				{
 					// If we're clearing C24 but the target is C32, then we need to dirty instead.
 					if (rgba._u32 != GSUtil::GetChannelMask(t->m_TEX0.PSM))
@@ -2961,7 +2980,7 @@ void GSTextureCache::InvalidateLocalMem(const GSOffset& off, const GSVector4i& r
 						t->m_drawn_since_read.z = targetr.x;
 				}
 
-				if (exact_bp)
+				if (exact_bp && read_end <= t->m_end_block)
 					return;
 			}
 		}
@@ -5152,8 +5171,6 @@ void GSTextureCache::Target::Update()
 		g_gs_device->DrawMultiStretchRects(drects, ndrects, m_texture, shader);
 	}
 
-	UpdateValidity(total_rect);
-	// We don't know what the dirty alpha is gonna be, so assume max.
 	m_alpha_min = 0;
 	m_alpha_max = 255;
 	g_gs_device->Recycle(t);

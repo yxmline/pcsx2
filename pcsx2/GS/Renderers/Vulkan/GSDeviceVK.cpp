@@ -26,12 +26,13 @@
 
 #include "Host.h"
 
-#include "common/Align.h"
+#include "common/BitUtils.h"
 #include "common/Path.h"
 #include "common/ScopedGuard.h"
 
 #include "imgui.h"
 
+#include <bit>
 #include <mutex>
 #include <sstream>
 #include <limits>
@@ -2548,7 +2549,7 @@ bool GSDeviceVK::CreateDeviceAndSwapChain()
 		std::max(m_device_properties.limits.minTexelBufferOffsetAlignment, static_cast<VkDeviceSize>(32));
 	m_device_properties.limits.optimalBufferCopyOffsetAlignment =
 		std::max(m_device_properties.limits.optimalBufferCopyOffsetAlignment, static_cast<VkDeviceSize>(32));
-	m_device_properties.limits.optimalBufferCopyRowPitchAlignment = Common::NextPow2(
+	m_device_properties.limits.optimalBufferCopyRowPitchAlignment = std::bit_ceil(
 		std::max(m_device_properties.limits.optimalBufferCopyRowPitchAlignment, static_cast<VkDeviceSize>(32)));
 	m_device_properties.limits.bufferImageGranularity =
 		std::max(m_device_properties.limits.bufferImageGranularity, static_cast<VkDeviceSize>(32));
