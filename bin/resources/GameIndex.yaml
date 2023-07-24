@@ -9583,9 +9583,9 @@ SLAJ-25049:
   region: "NTSC-Unk"
 SLAJ-25051:
   name: "Lord of the Rings, The - The Third Age"
-  region: "NTSC-Unk"
+  region: "NTSC-Ch"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLAJ-25052:
   name: "Urbz, The - Sims in the City"
   region: "NTSC-Unk"
@@ -10245,6 +10245,11 @@ SLED-54401:
     mergeSprite: 1 # Fixes misaligned bloom.
     halfPixelOffset: 2 # Fixes misaligned bloom.
     autoFlush: 2 # Fixes sun occlusion and brightness.
+SLED-54509:
+  name: "Guitar Hero II [Demo]"
+  region: "PAL-M5"
+  roundModes:
+    vu1RoundMode: 0 # Massages the Z on the score meter for hardware mode, software doesn't really need this.
 SLES-50003:
   name: "Swap Magic DVD Disc v2.0"
   region: "PAL-Unk"
@@ -16705,25 +16710,27 @@ SLES-52801:
   name: "Lord of the Rings, The - The Third Age"
   region: "PAL-M5"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-52802:
   name: "Seigneur des anneaux, Le - Le Tiers Âge"
   region: "PAL-F"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-52803:
   name: "Herr der Ringe, Der - Das dritte Zeitalter"
   region: "PAL-G"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-52804:
   name: "Signore degli Anelli, Il - La Terza Era"
   region: "PAL-I"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-52805:
   name: "Señor de Los Anillos, El - La Tercera Edad"
   region: "PAL-S"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLES-52807:
   name: "Lemony Snicket's A Series of Unfortunate Events"
   region: "PAL-E"
@@ -16927,7 +16934,8 @@ SLES-52877:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurriness.
+    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
+    roundSprite: 1 # Further reduces blurriness.
     beforeDraw: "OI_HauntingGround" # Fix bloom.
 SLES-52882:
   name: "Stolen"
@@ -22649,6 +22657,8 @@ SLES-54962:
   region: "PAL-E"
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    textureInsideRT: 1 # Crowd textures.
 SLES-54963:
   name: "Tony Hawk's Proving Ground"
   region: "PAL-E"
@@ -22680,6 +22690,8 @@ SLES-54974:
   region: "PAL-M4"
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    textureInsideRT: 1 # Crowd textures.
 SLES-54975:
   name: "George Of The Jungle"
   region: "PAL-E"
@@ -24176,6 +24188,7 @@ SLES-55605:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
     halfPixelOffset: 1 # Corrects post processing position.
+    cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLES-55609:
@@ -25449,7 +25462,7 @@ SLKA-25237:
   name: "Lord of the Rings, The - The Third Age"
   region: "NTSC-K"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLKA-25241:
   name: "Need for Speed - Underground 2"
   region: "NTSC-K"
@@ -25937,6 +25950,13 @@ SLKA-25410:
 SLKA-25413:
   name: "SD Gundam G - Generation Spirits"
   region: "NTSC-K"
+SLKA-25414:
+  name: "Guitar Hero III - Legends of Rock"
+  region: "NTSC-K"
+  roundModes:
+    vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    textureInsideRT: 1 # Crowd textures.
 SLKA-25422:
   name: "Silent Hill - Origins"
   region: "NTSC-K"
@@ -32270,6 +32290,8 @@ SLPM-65845:
 SLPM-65846:
   name: "Lord of the Rings, The - Uchitsu Kuni Daisanki"
   region: "NTSC-J"
+  gsHWFixes:
+    halfPixelOffset: 2 # Fixes ghosting.
 SLPM-65847:
   name: "Soriaro no Fuukin Remix [First Print - Limited Edition]"
   region: "NTSC-J"
@@ -36936,6 +36958,7 @@ SLPM-68019:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
     halfPixelOffset: 1 # Corrects post processing position.
+    cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPM-68503:
@@ -41941,6 +41964,7 @@ SLPS-25837:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
     halfPixelOffset: 1 # Corrects post processing position.
+    cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPS-25838:
@@ -41954,6 +41978,8 @@ SLPS-25840:
   region: "NTSC-J"
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    textureInsideRT: 1 # Crowd textures.
 SLPS-25841:
   name: "Tales of Destiny [Director's Cut] [Premium Box]"
   region: "NTSC-J"
@@ -42133,10 +42159,12 @@ SLPS-25889:
   roundModes:
     vu1RoundMode: 0 # Fixes VU size spam and potential graphical issues with GH3 engine.
 SLPS-25890:
-  name: "Guitar Hero III - Legends of Rock [with Guitar]"
+  name: "Guitar Hero III - Legends of Rock"
   region: "NTSC-J"
   roundModes:
     vu1RoundMode: 0 # Crashes without.
+  gsHWFixes:
+    textureInsideRT: 1 # Crowd textures.
 SLPS-25892:
   name: "Nogizaka Haruka no Himitsu - Cosplay Hajimemashita"
   region: "NTSC-J"
@@ -44446,6 +44474,15 @@ SLUS-20347:
     eeClampMode: 3 # Fixes invisible characters in various scenes.
   gsHWFixes:
     partialTargetInvalidation: 1 # Fixes black screens on judgement wheel.
+  patches:
+    default:
+      content: |-
+        author=refraction
+        // Fixes bad clip flag arrangement
+        patch=1,EE,00249e10,word,48509000
+        patch=1,EE,00249e14,word,4BDD69FF
+        patch=1,EE,00249e9c,word,48509000
+        patch=1,EE,00249ea0,word,4BDD69FF
 SLUS-20348:
   name: "Monopoly Party"
   region: "NTSC-U"
@@ -47962,7 +47999,7 @@ SLUS-21027:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes ghosting in cutscenes.
+    halfPixelOffset: 2 # Fixes ghosting.
 SLUS-21028:
   name: "World Championship Poker"
   region: "NTSC-U"
@@ -48220,7 +48257,8 @@ SLUS-21075:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes blurriness.
+    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
+    roundSprite: 1 # Further reduces blurriness.
     beforeDraw: "OI_HauntingGround" # Fix bloom.
 SLUS-21076:
   name: "Atari Anthology"
@@ -53532,6 +53570,11 @@ SLUS-29174:
 SLUS-29175:
   name: "Namco Transmission Demo Disc Vol. 3.2"
   region: "NTSC-U"
+SLUS-29177:
+  name: "Guitar Hero [Demo]"
+  region: "NTSC-U"
+  roundModes:
+    vu1RoundMode: 1 # Fixes cut-off numbers and restores missing whitespace inside combo meter.
 SLUS-29178:
   name: "TOCA Race Driver 3 [Demo]"
   region: "NTSC-U"
