@@ -3339,6 +3339,26 @@ GSTextureCache::Target* GSTextureCache::GetTargetWithSharedBits(u32 BP, u32 PSM)
 	return nullptr;
 }
 
+GSTextureCache::Target* GSTextureCache::FindOverlappingTarget(u32 BP, u32 end_bp) const
+{
+	for (int i = 0; i < 2; i++)
+	{
+		for (Target* tgt : m_dst[i])
+		{
+			if (CheckOverlap(tgt->m_TEX0.TBP0, tgt->m_end_block, BP, end_bp))
+				return tgt;
+		}
+	}
+
+	return nullptr;
+}
+
+GSTextureCache::Target* GSTextureCache::FindOverlappingTarget(u32 BP, u32 BW, u32 PSM, GSVector4i rc) const
+{
+	const u32 end_bp = GSLocalMemory::GetUnwrappedEndBlockAddress(BP, BW, PSM, rc);
+	return FindOverlappingTarget(BP, end_bp);
+}
+
 GSVector2i GSTextureCache::GetTargetSize(u32 bp, u32 fbw, u32 psm, s32 min_width, s32 min_height)
 {
 	TargetHeightElem search = {};
@@ -5111,8 +5131,8 @@ void GSTextureCache::Target::Update()
 	// Bilinear filtering this is probably not a good thing, at least in native, but upscaling Nearest can be gross and messy.
 	// It's needed for depth, though.. filtering depth doesn't make much sense, but SMT3 needs it..
 	const bool upscaled = (m_scale != 1.0f);
-	const bool override_linear = upscaled && GSConfig.UserHacks_BilinearHack;
-	const bool linear = (m_type == RenderTarget && upscaled);
+	const bool override_linear = (upscaled && GSConfig.UserHacks_BilinearHack == GSBilinearDirtyMode::ForceBilinear);
+	const bool linear = (m_type == RenderTarget && upscaled && GSConfig.UserHacks_BilinearHack != GSBilinearDirtyMode::ForceNearest);
 
 	GSDevice::MultiStretchRect* drects = static_cast<GSDevice::MultiStretchRect*>(
 		alloca(sizeof(GSDevice::MultiStretchRect) * static_cast<u32>(m_dirty.size())));
