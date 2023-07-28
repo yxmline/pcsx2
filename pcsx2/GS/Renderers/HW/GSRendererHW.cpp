@@ -4933,8 +4933,8 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		const bool commutative_depth = (m_conf.depth.ztst == ZTST_GEQUAL && m_vt.m_eq.z) || (m_conf.depth.ztst == ZTST_ALWAYS);
 		const bool commutative_alpha = (m_context->ALPHA.C != 1); // when either Alpha Src or a constant
 
-		ate_RGBA_then_Z = (m_cached_ctx.TEST.AFAIL == AFAIL_FB_ONLY) && commutative_depth;
-		ate_RGB_then_ZA = (m_cached_ctx.TEST.AFAIL == AFAIL_RGB_ONLY) && commutative_depth && commutative_alpha;
+		ate_RGBA_then_Z = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM) == AFAIL_FB_ONLY && commutative_depth;
+		ate_RGB_then_ZA = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM) == AFAIL_RGB_ONLY && commutative_depth && commutative_alpha;
 	}
 
 	if (ate_RGBA_then_Z)
@@ -5030,8 +5030,8 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		bool g = m_conf.colormask.wg;
 		bool b = m_conf.colormask.wb;
 		bool a = m_conf.colormask.wa;
-
-		switch (m_cached_ctx.TEST.AFAIL)
+		const int fail_type = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM);
+		switch (fail_type)
 		{
 			case AFAIL_KEEP: z = r = g = b = a = false; break; // none
 			case AFAIL_FB_ONLY: z = false; break; // rgba
@@ -5159,7 +5159,7 @@ GSRendererHW::CLUTDrawTestResult GSRendererHW::PossibleCLUTDraw()
 		return CLUTDrawTestResult::NotCLUTDraw;
 
 	// Keep the draws simple, no alpha testing, blending, mipmapping, Z writes, and make sure it's flat.
-	const bool fb_only = m_cached_ctx.TEST.ATE && m_cached_ctx.TEST.AFAIL == 1 && m_cached_ctx.TEST.ATST == ATST_NEVER;
+	const bool fb_only = m_cached_ctx.TEST.ATE && m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM) == AFAIL_FB_ONLY && m_cached_ctx.TEST.ATST == ATST_NEVER;
 
 	// No Z writes, unless it's points, then it's quite likely to be a palette and they left it on.
 	if (!m_cached_ctx.ZBUF.ZMSK && !fb_only && !(m_vt.m_primclass == GS_POINT_CLASS))
@@ -5964,6 +5964,9 @@ void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, co
 
 	v[0].XYZ.X = static_cast<u16>(m_context->XYOFFSET.OFX + fpr.x);
 	v[0].XYZ.Y = static_cast<u16>(m_context->XYOFFSET.OFY + fpr.y);
+	v[0].XYZ.Z = v[1].XYZ.Z;
+	v[0].RGBAQ = v[1].RGBAQ;
+	v[0].FOG = v[1].FOG;
 
 	v[1].XYZ.X = static_cast<u16>(m_context->XYOFFSET.OFX + fpr.z);
 	v[1].XYZ.Y = static_cast<u16>(m_context->XYOFFSET.OFY + fpr.w);
@@ -5981,6 +5984,23 @@ void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, co
 		GSVector4::storel(&v[0].ST.S, st);
 		GSVector4::storeh(&v[1].ST.S, st);
 	}
+
+	// Fix up vertex trace.
+	m_vt.m_min.p.x = unscaled_rect.x;
+	m_vt.m_min.p.y = unscaled_rect.y;
+	m_vt.m_min.p.z = v[0].XYZ.Z;
+	m_vt.m_max.p.x = unscaled_rect.z;
+	m_vt.m_max.p.y = unscaled_rect.w;
+	m_vt.m_max.p.z = v[0].XYZ.Z;
+	m_vt.m_min.t.x = unscaled_uv_rect.x;
+	m_vt.m_min.t.y = unscaled_uv_rect.y;
+	m_vt.m_max.t.x = unscaled_uv_rect.z;
+	m_vt.m_max.t.y = unscaled_uv_rect.w;
+	m_vt.m_min.c = GSVector4i(v[0].RGBAQ.U32[0]).u8to32();
+	m_vt.m_max.c = m_vt.m_min.c;
+	m_vt.m_eq.rgba = 0xFFFF;
+	m_vt.m_eq.z = true;
+	m_vt.m_eq.f = true;
 
 	m_vertex.head = m_vertex.tail = m_vertex.next = 2;
 	m_index.tail = 2;
