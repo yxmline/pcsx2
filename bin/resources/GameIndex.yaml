@@ -1911,6 +1911,7 @@ SCAJ-25037:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SCAJ-25045:
   name: "Sakura Taisen V - Episode 0"
   region: "NTSC-Unk"
@@ -10608,6 +10609,7 @@ SLAJ-25037:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLAJ-25039:
   name: "Beni no Umi 2"
   region: "NTSC-Unk"
@@ -14604,6 +14606,8 @@ SLES-51282:
 SLES-51283:
   name: "WWE SmackDown! Shut Your Mouth"
   region: "PAL-E"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-51284:
   name: "Contra - Shattered Soldier"
   region: "PAL-M3"
@@ -15211,6 +15215,8 @@ SLES-51595:
 SLES-51600:
   name: "WWE Crush Hour"
   region: "PAL-E"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-51602:
   name: "All-Star Baseball 2004 featuring Derek Jeter"
   region: "PAL-E"
@@ -16242,6 +16248,8 @@ SLES-52036:
   name: "WWE SmackDown! - Here Comes the Pain!"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-52038:
   name: "Terminator 3 - Rebellion der Maschinen"
   region: "PAL-G"
@@ -17155,6 +17163,7 @@ SLES-52486:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLES-52490:
   name: "Dance UK - Extra Trax"
   region: "PAL-E"
@@ -17929,6 +17938,8 @@ SLES-52779:
 SLES-52781:
   name: "WWE SmackDown! vs. RAW"
   region: "PAL-E"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-52782:
   name: "Call of Duty - Finest Hour"
   region: "PAL-E"
@@ -20480,9 +20491,13 @@ SLES-53676:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-53677:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "PAL-I"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-53682:
   name: "James Pond - Codename Robocod"
   region: "PAL-E"
@@ -21757,7 +21772,7 @@ SLES-54165:
   name: "One Piece - Grand Adventure"
   region: "PAL-E"
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes character outlines, shadow misaligment and more.
+    halfPixelOffset: 2 # Fixes character outlines, shadow misaligment and more.
 SLES-54166:
   name: "Call of Duty 3"
   region: "PAL-E"
@@ -23491,7 +23506,6 @@ SLES-54793:
   region: "PAL-E"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54795:
   name: "Falling Stars"
@@ -23710,7 +23724,6 @@ SLES-54879:
   name: "WWE SmackDown vs. Raw 2008"
   region: "PAL-M5"
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLES-54880:
   name: "NBA 2K8"
@@ -24774,14 +24787,12 @@ SLES-55250:
   name: "WWE SmackDown vs. Raw 2009"
   region: "PAL-A"
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLES-55251:
   name: "WWE SmackDown vs. Raw 2009"
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLES-55252:
   name: "NHL 2K9"
@@ -25584,6 +25595,8 @@ SLES-55648:
   name: "WWE All-Stars"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLES-55652:
   name: "FIFA 12"
   region: "PAL-M4"
@@ -26134,6 +26147,8 @@ SLKA-25029:
 SLKA-25030:
   name: "WWE SmackDown! Shut Your Mouth"
   region: "NTSC-K"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLKA-25031:
   name: "Tom Clancy's Ghost Recon"
   region: "NTSC-K"
@@ -26412,6 +26427,8 @@ SLKA-25115:
 SLKA-25116:
   name: "WWE SmackDown! Here Comes the Pain"
   region: "NTSC-K"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLKA-25117:
   name: "World Soccer Winning Eleven 7 International"
   region: "NTSC-K"
@@ -26536,6 +26553,7 @@ SLKA-25159:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLKA-25160:
   name: "Shin Megami Tensei III - Nocturne Maniax"
   region: "NTSC-K"
@@ -26560,6 +26578,8 @@ SLKA-25167:
 SLKA-25168:
   name: "WWE SmackDown! vs. RAW 2007"
   region: "NTSC-K"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes broken text.
 SLKA-25170:
   name: "SD Gundam G Generation Seed"
   region: "NTSC-K"
@@ -26845,6 +26865,8 @@ SLKA-25243:
 SLKA-25244:
   name: "WWE SmackDown! vs. Raw"
   region: "NTSC-K"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLKA-25245:
   name: "Spongebob SquarePants - Movin' With Friends"
   region: "NTSC-K"
@@ -27091,6 +27113,8 @@ SLKA-25317:
 SLKA-25318:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "NTSC-K"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLKA-25319:
   name: "Spongebob SquarePants - Lights, Camera, PANTS"
   region: "NTSC-K"
@@ -27256,7 +27280,6 @@ SLKA-25365:
   name: "WWE Smack Down Vs RAW 2008"
   region: "NTSC-K"
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLKA-25366:
   name: "Naruto - Uzumaki Chronicles 2"
@@ -27307,7 +27330,7 @@ SLKA-25388:
   region: "NTSC-K"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes character outlines, shadow misaligment and more.
+    halfPixelOffset: 2 # Fixes character outlines, shadow misaligment and more.
 SLKA-25389:
   name: "Shinobido Imashime"
   region: "NTSC-K"
@@ -27409,7 +27432,6 @@ SLKA-25451:
   name: "WWE SmackDown! vs. Raw 2008"
   region: "NTSC-K"
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLKA-25452:
   name: "Viewtiful Joe - A New Hope"
@@ -28560,6 +28582,8 @@ SLPM-60195:
 SLPM-60197:
   name: "Exciting Pro Wres 4"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-60198:
   name: "MotoGP 3 [Trial]"
   region: "NTSC-J"
@@ -29073,6 +29097,8 @@ SLPM-61097:
 SLPM-61098:
   name: "Exciting Pro Wres 6 - WWE SmackDown! vs. Raw"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-61100:
   name: "Juuouki - Project Altered Beast"
   region: "NTSC-J"
@@ -33875,6 +33901,7 @@ SLPM-65551:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLPM-65552:
   name: "Metal Wolf Rev [Limited Edition]"
   region: "NTSC-J"
@@ -34692,6 +34719,8 @@ SLPM-65778:
 SLPM-65779:
   name: "Exciting Pro Wrestling 5 [Yuke's the Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-65780:
   name: "Kessen III [Treasure Box]"
   region: "NTSC-J"
@@ -35062,6 +35091,8 @@ SLPM-65880:
 SLPM-65881:
   name: "SmackDown vs. Raw - Exciting Professional Wrestling 6"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-65882:
   name: "Duel Masters"
   region: "NTSC-J"
@@ -36297,6 +36328,8 @@ SLPM-66186:
 SLPM-66187:
   name: "Exciting Pro Wrestling 6 - SmackDown vs. RAW [Yuke's the Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-66188:
   name: "Exciting Pro Wres 7"
   region: "NTSC-J"
@@ -36650,6 +36683,8 @@ SLPM-66267:
 SLPM-66268:
   name: "Smackdown! vs. Raw 2006 - Exciting Pro Wrestling 7"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPM-66269:
   name: "Blazing Souls [Limited Edition]"
   region: "NTSC-J"
@@ -39051,7 +39086,6 @@ SLPM-66863:
   name: "WWE SmackDown vs. RAW 2008"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLPM-66864:
   name: "Umisho"
@@ -42864,6 +42898,8 @@ SLPS-25209:
 SLPS-25210:
   name: "Exciting Pro Wres 4"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPS-25212:
   name: "Giren no Yabou - Zeon Dokuritsu Sensouden"
   region: "NTSC-J"
@@ -43178,6 +43214,8 @@ SLPS-25308:
 SLPS-25309:
   name: "Exciting Pro Wrestling 4 [Yuke's The Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPS-25310:
   name: "Disney-Pixar's Finding Nemo"
   region: "NTSC-J"
@@ -43243,9 +43281,13 @@ SLPS-25324:
 SLPS-25326:
   name: "WWE Smackdown! Here Comes the Pain - Exciting Pro Wrestling 5 [Limited Edition]"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPS-25327:
   name: "Exciting Pro Wres 5"
   region: "NTSC-J"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLPS-25329:
   name: "Kuon"
   region: "NTSC-J"
@@ -48097,6 +48139,8 @@ SLUS-20385:
   name: "WWE Crush Hour"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-20386:
   name: "Lethal Skies - Elite Pilot - Team SW"
   region: "NTSC-U"
@@ -48591,6 +48635,8 @@ SLUS-20483:
   name: "WWE SmackDown! Shut Your Mouth"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-20484:
   name: "Devil May Cry 2 [Disc 1 of 2]"
   region: "NTSC-U"
@@ -50143,6 +50189,8 @@ SLUS-20787:
   name: "WWE SmackDown! Here Comes the Pain"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-20788:
   name: "Ford Racing 2"
   region: "NTSC-U"
@@ -50509,6 +50557,7 @@ SLUS-20867:
     eeRoundMode: 0 # Fixes character behaviour.
   gsHWFixes:
     autoFlush: 2 # Fixes flame bloom.
+    halfPixelOffset: 2 # Fixes misaligned bloom.
 SLUS-20868:
   name: "MVP Baseball 2004"
   region: "NTSC-U"
@@ -51646,6 +51695,8 @@ SLUS-21060:
   name: "WWE SmackDown! vs. RAW"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-21062:
   name: "Jaws Unleashed"
   region: "NTSC-U"
@@ -52918,6 +52969,8 @@ SLUS-21286:
   name: "WWE SmackDown! vs. RAW 2006"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-21287:
   name: "Prince of Persia - The Two Thrones"
   region: "NTSC-U"
@@ -53843,7 +53896,7 @@ SLUS-21435:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Fixes character outlines, shadow misaligment and more.
+    halfPixelOffset: 2 # Fixes character outlines, shadow misaligment and more.
 SLUS-21436:
   name: "Just Cause"
   region: "NTSC-U"
@@ -54816,7 +54869,6 @@ SLUS-21645:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21646:
   name: "Tiger Woods PGA Tour 08"
@@ -55627,7 +55679,6 @@ SLUS-21810:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 1 # Lessens blur around people and fixes depth bleed on the right side.
     partialTargetInvalidation: 1 # Fixes broken text.
 SLUS-21811:
   name: "MotoGP 08"
@@ -56189,6 +56240,8 @@ SLUS-21940:
   name: "WWE All-Stars"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 SLUS-21941:
   name: "FIFA Soccer 11"
   region: "NTSC-U"
@@ -56245,6 +56298,9 @@ SLUS-21954:
   region: "NTSC-U" # Latin America with En,Fr,Es
 SLUS-21955:
   name: "Pro Evolution Soccer 2013"
+  region: "NTSC-U"
+SLUS-27014:
+  name: "WWE SmackDown vs Raw - Superstar Series [Bundle]"
   region: "NTSC-U"
 SLUS-27029:
   name: "Disney Sing It [Bundle]"
@@ -57421,6 +57477,8 @@ TLES-52768:
 TLES-52781:
   name: "WWE - Smackdown Vs Raw Beta Trial Code"
   region: "PAL-E"
+  gsHWFixes:
+    partialTargetInvalidation: 1 # Fixes menu corruption.
 TLES-52940:
   name: "S.L.A.I. Phantom Crash Beta Trial Code"
   region: "PAL-E"
