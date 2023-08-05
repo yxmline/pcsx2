@@ -1132,7 +1132,7 @@ bool GSRendererHW::IsTBPFrameOrZ(u32 tbp) const
 
 	const u32 max_z = (0xFFFFFFFF >> (GSLocalMemory::m_psm[m_cached_ctx.ZBUF.PSM].fmt * 8));
 	const bool no_rt = (m_context->ALPHA.IsCd() && PRIM->ABE && (m_cached_ctx.FRAME.PSM == 1))
-		|| (!m_cached_ctx.TEST.DATE && (m_cached_ctx.FRAME.FBMSK & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) == GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk);
+		|| (!m_cached_ctx.TEST.DATE && (fm & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) == GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk);
 	const bool no_ds = (
 		// Depth is always pass/fail (no read) and write are discarded.
 		(zm != 0 && m_cached_ctx.TEST.ZTST <= ZTST_ALWAYS) ||
@@ -1761,7 +1761,7 @@ void GSRendererHW::Draw()
 	// Note: FF DoC has both buffer at same location but disable the depth test (write?) with ZTE = 0
 	const u32 max_z = (0xFFFFFFFF >> (GSLocalMemory::m_psm[m_cached_ctx.ZBUF.PSM].fmt * 8));
 	bool no_rt = (context->ALPHA.IsCd() && PRIM->ABE && (m_cached_ctx.FRAME.PSM == 1))
-						|| (!m_cached_ctx.TEST.DATE && (m_cached_ctx.FRAME.FBMSK & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) == GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk);
+						|| (!m_cached_ctx.TEST.DATE && (fm & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) == GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk);
 	const bool all_depth_tests_pass =
 		// Depth is always pass/fail (no read) and write are discarded.
 		(!m_cached_ctx.TEST.ZTE || m_cached_ctx.TEST.ZTST <= ZTST_ALWAYS) ||
@@ -2122,8 +2122,32 @@ void GSRendererHW::Draw()
 			return;
 		}
 
-		if(GSLocalMemory::m_psm[src->m_TEX0.PSM].pal == 0)
+		// We don't know the alpha range of direct sources when we first tried to optimize the alpha test.
+		// Moving the texture lookup before the ATST optimization complicates things a lot, so instead,
+		// recompute it, and everything derived from it again if it changes.
+		if (GSLocalMemory::m_psm[src->m_TEX0.PSM].pal == 0)
+		{
 			CalcAlphaMinMax(src->m_alpha_minmax.first, src->m_alpha_minmax.second);
+
+			u32 new_fm = m_context->FRAME.FBMSK;
+			u32 new_zm = m_context->ZBUF.ZMSK || m_context->TEST.ZTE == 0 ? 0xffffffff : 0;
+			if (m_cached_ctx.TEST.ATE && GSRenderer::TryAlphaTest(new_fm, fm_mask, new_zm))
+			{
+				m_cached_ctx.TEST.ATE = false;
+				m_cached_ctx.FRAME.FBMSK = new_fm;
+				m_cached_ctx.ZBUF.ZMSK = (new_zm != 0);
+				fm = new_fm;
+				zm = new_zm;
+				no_rt = no_rt || (!m_cached_ctx.TEST.DATE && (fm & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) == GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk);
+				no_ds = no_ds || (zm != 0 && all_depth_tests_pass);
+				if (no_rt && no_ds)
+				{
+					GL_INS("Late draw cancel because no pixels pass alpha test.");
+					cleanup_cancelled_draw();
+					return;
+				}
+			}
+		}
 	}
 
 	// Estimate size based on the scissor rectangle and height cache.
@@ -4748,6 +4772,12 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 			blend_alpha_min = std::min(blend_alpha_min, rt->m_alpha_min);
 			blend_alpha_max = std::max(blend_alpha_max, rt->m_alpha_max);
 		}
+
+		if (!rt->m_32_bits_fmt)
+		{
+			rt->m_alpha_max &= 128;
+			rt->m_alpha_min &= 128;
+		}
 	}
 
 	// Not gonna spend too much time with this, it's not likely to be used much, can't be less accurate than it was.
@@ -4756,6 +4786,12 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		ds->m_alpha_max = std::max(ds->m_alpha_max, static_cast<int>(m_vt.m_max.p.z) >> 24);
 		ds->m_alpha_min = std::min(ds->m_alpha_min, static_cast<int>(m_vt.m_min.p.z) >> 24);
 		GL_INS("New DS Alpha Range: %d-%d", ds->m_alpha_min, ds->m_alpha_max);
+
+		if (GSLocalMemory::m_psm[ds->m_TEX0.PSM].bpp == 16)
+		{
+			ds->m_alpha_max &= 128;
+			ds->m_alpha_min &= 128;
+		}
 	}
 
 	bool blending_alpha_pass = false;
@@ -5546,6 +5582,12 @@ bool GSRendererHW::TryTargetClear(GSTextureCache::Target* rt, GSTextureCache::Ta
 			g_gs_device->ClearRenderTarget(rt->m_texture, c);
 			rt->m_alpha_max = c >> 24;
 			rt->m_alpha_min = c >> 24;
+
+			if (!rt->m_32_bits_fmt)
+			{
+				rt->m_alpha_max &= 128;
+				rt->m_alpha_min &= 128;
+			}
 		}
 		else
 		{
@@ -5564,6 +5606,12 @@ bool GSRendererHW::TryTargetClear(GSTextureCache::Target* rt, GSTextureCache::Ta
 			g_gs_device->ClearDepth(ds->m_texture, d);
 			ds->m_alpha_max = z >> 24;
 			ds->m_alpha_min = z >> 24;
+
+			if (GSLocalMemory::m_psm[ds->m_TEX0.PSM].bpp == 16)
+			{
+				ds->m_alpha_max &= 128;
+				ds->m_alpha_min &= 128;
+			}
 		}
 		else
 		{
