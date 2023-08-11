@@ -868,7 +868,8 @@ SCAJ-20010:
   name: "Bakusou Dekotora Densetsu - Otoko Hanamichi Yume Roman"
   region: "NTSC-Unk"
   gsHWFixes:
-    beforeDraw: "OI_BigMuthaTruckers"
+    textureInsideRT: 1 # Fixes inside RT shuffling.
+    getSkipCount: "GSC_BigMuthaTruckers"
 SCAJ-20011:
   name: "Armored Core 3 - Silent Line"
   region: "NTSC-HK"
@@ -10905,9 +10906,8 @@ SLAJ-25080:
   name: "Godfather, The"
   region: "NTSC-Unk"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLAJ-25081:
   name: "FIFA World Cup - Germany 2006"
   region: "NTSC-Unk"
@@ -11460,11 +11460,16 @@ SLED-53664:
 SLED-53673:
   name: "007 - From Russia with Love [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    recommendedBlendingLevel: 4 # Fixes lighting.
 SLED-53681:
   name: "007 - From Russia with Love & Need for Speed Most Wanted & SSX On Tour [Demo]"
   region: "PAL-E"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+    textureInsideRT: 1 # Required for complex offset shuffles on 007.
+    recommendedBlendingLevel: 4 # Fixes lighting in 007.
 SLED-53711:
   name: "Brothers in Arms - Earned in Blood"
   region: "PAL-A"
@@ -14582,6 +14587,7 @@ SLES-51230:
   region: "PAL-E"
   gsHWFixes:
     cpuCLUTRender: 1 # Fixes light bleed through objects.
+    autoFlush: 1 # Fixes light bloom intensity.
 SLES-51232:
   name: "Virtua Tennis 2"
   region: "PAL-M4"
@@ -14831,11 +14837,13 @@ SLES-51317:
   region: "PAL-F"
   gsHWFixes:
     cpuCLUTRender: 1 # Fixes light bleed through objects.
+    autoFlush: 1 # Fixes light bloom intensity.
 SLES-51318:
   name: "Minority Report"
   region: "PAL-G"
   gsHWFixes:
     cpuCLUTRender: 1 # Fixes light bleed through objects.
+    autoFlush: 1 # Fixes light bloom intensity.
 SLES-51322:
   name: "Robotech Battlecry"
   region: "PAL-M5"
@@ -14915,7 +14923,8 @@ SLES-51355:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    beforeDraw: "OI_BigMuthaTruckers"
+    textureInsideRT: 1 # Fixes inside RT shuffling.
+    getSkipCount: "GSC_BigMuthaTruckers"
 SLES-51356:
   name: "Road Trip Adventure"
   region: "PAL-M3"
@@ -17584,21 +17593,18 @@ SLES-52588:
   name: "Mercenaries - Playground of Destruction"
   region: "PAL-E"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLES-52589:
   name: "Mercenaries - Playground of Destruction"
   region: "PAL-F"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLES-52590:
   name: "Mercenaries - Playground of Destruction"
   region: "PAL-G"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLES-52591:
@@ -18721,7 +18727,6 @@ SLES-53008:
   name: "Mercenaries - Playground of Destruction"
   region: "PAL-I-S"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLES-53009:
@@ -20268,6 +20273,9 @@ SLES-53552:
 SLES-53553:
   name: "007 - From Russia with Love"
   region: "PAL-M7"
+  gsHWFixes:
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    recommendedBlendingLevel: 4 # Fixes lighting.
 SLES-53556:
   name: "Driver - Parallel Lines"
   region: "PAL-M3"
@@ -21417,37 +21425,32 @@ SLES-53967:
   name: "Godfather, The"
   region: "PAL-M6"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53968:
   name: "Parrain, Le"
   region: "PAL-F"
   gsHWFixes:
-    cpuCLUTRender: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53969:
   name: "Pate, Der"
   region: "PAL-G"
   gsHWFixes:
-    cpuCLUTRender: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53970:
   name: "Padrino, Il"
   region: "PAL-I"
   gsHWFixes:
-    cpuCLUTRender: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53971:
   name: "Padrino, El"
   region: "PAL-S"
   gsHWFixes:
-    cpuCLUTRender: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53972:
   name: "Stock Car Crash"
   region: "PAL-E"
@@ -27521,9 +27524,8 @@ SLKA-25338:
   name: "Godfather, The"
   region: "NTSC-K"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLKA-25339:
   name: "Jin Samguk Mussang 4"
   region: "NTSC-K"
@@ -33324,7 +33326,8 @@ SLPM-65234:
   name: "Bakusou Dekotora Densetsu - Otoko Hanamichi Yume Roman"
   region: "NTSC-J"
   gsHWFixes:
-    beforeDraw: "OI_BigMuthaTruckers"
+    textureInsideRT: 1 # Fixes inside RT shuffling.
+    getSkipCount: "GSC_BigMuthaTruckers"
 SLPM-65235:
   name: "New Roommania - Porori Seishun"
   region: "NTSC-J"
@@ -35857,7 +35860,6 @@ SLPM-65942:
   name: "Mercenaries - Playground of Destruction"
   region: "NTSC-J"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLPM-65943:
@@ -37461,6 +37463,9 @@ SLPM-66321:
 SLPM-66322:
   name: "007 - Russia yori Ai o Komete"
   region: "NTSC-J"
+  gsHWFixes:
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    recommendedBlendingLevel: 4 # Fixes lighting.
 SLPM-66323:
   name: "Princess Software Collection, The"
   region: "NTSC-J"
@@ -38058,7 +38063,6 @@ SLPM-66465:
   name: "Mercenaries - Playground of Destruction [EA Best Hits]"
   region: "NTSC-J"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLPM-66467:
@@ -39064,9 +39068,8 @@ SLPM-66710:
   name: "Godfather, The"
   region: "NTSC-J"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLPM-66712:
   name: "Rozen Maiden - Geppetto Garden [Limited Edition]"
   region: "NTSC-J"
@@ -40006,9 +40009,8 @@ SLPM-66966:
   name: "Godfather, The [EA-SY! 1980]"
   region: "NTSC-J"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLPM-66967:
   name: "Aria - The Natural - Tooi Yume no Mirage [Alchemist Best Collection]"
   region: "NTSC-J"
@@ -48269,7 +48271,8 @@ SLUS-20291:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    beforeDraw: "OI_BigMuthaTruckers"
+    textureInsideRT: 1 # Fixes inside RT shuffling.
+    getSkipCount: "GSC_BigMuthaTruckers"
 SLUS-20292:
   name: "Tsugunai - Atonement"
   region: "NTSC-U"
@@ -48454,6 +48457,7 @@ SLUS-20331:
   compat: 5
   gsHWFixes:
     cpuCLUTRender: 1 # Fixes light bleed through objects.
+    autoFlush: 1 # Fixes light bloom intensity.
 SLUS-20332:
   name: "NCAA March Madness 2002"
   region: "NTSC-U"
@@ -49851,7 +49855,8 @@ SLUS-20605:
   name: "Big Mutha Truckers"
   region: "NTSC-U"
   gsHWFixes:
-    beforeDraw: "OI_BigMuthaTruckers"
+    textureInsideRT: 1 # Fixes inside RT shuffling.
+    getSkipCount: "GSC_BigMuthaTruckers"
 SLUS-20606:
   name: "Bounty Hunter - Seek & Destroy"
   region: "NTSC-U"
@@ -51522,7 +51527,6 @@ SLUS-20932:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLUS-20933:
@@ -53529,6 +53533,9 @@ SLUS-21282:
   name: "007 - From Russia with Love"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    recommendedBlendingLevel: 4 # Fixes lighting.
 SLUS-21283:
   name: "Total Overdose - A Gunslinger's Tale in Mexico"
   region: "NTSC-U"
@@ -54186,9 +54193,8 @@ SLUS-21385:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLUS-21386:
   name: "Tales of the Abyss"
   region: "NTSC-U"
@@ -54301,9 +54307,8 @@ SLUS-21406:
   name: "Godfather, The - Collector's Edition"
   region: "NTSC-U"
   gsHWFixes:
-    gpuTargetCLUT: 1 # Fixes light occlusion.
-    skipDrawStart: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
-    skipDrawEnd: 1 # Removes mono-colored sepia bottom and vertical sepia bars on top.
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    halfPixelOffset: 2 # Fixes center line in post processing.
 SLUS-21407:
   name: "NFL Head Coach"
   region: "NTSC-U"
@@ -57522,7 +57527,6 @@ SLUS-29137:
   name: "Mercenaries - Playground of Destruction [Demo]"
   region: "NTSC-U"
   gsHWFixes:
-    halfBottomOverride: 1 # Bottom screen has wrong colors.
     autoFlush: 2 # Fixes missing lighting.
     # halfPixelOffset: 1 # Fixes lighting misalignment. Do not enable this, it breaks a lot of graphics.
 SLUS-29138:
@@ -57657,9 +57661,14 @@ SLUS-29167:
   region: "NTSC-U"
   gsHWFixes:
     halfPixelOffset: 2 # Fixes blurriness.
+    textureInsideRT: 1 # Required for complex offset shuffles in 007.
+    recommendedBlendingLevel: 4 # Fixes lighting in 007.
 SLUS-29168:
   name: "007 - From Russia with Love [Demo]"
   region: "NTSC-U"
+  gsHWFixes:
+    textureInsideRT: 1 # Required for complex offset shuffles.
+    recommendedBlendingLevel: 4 # Fixes lighting.
 SLUS-29169:
   name: "Resident Evil 4 [Demo]"
   region: "NTSC-U"
