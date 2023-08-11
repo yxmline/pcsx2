@@ -10906,6 +10906,8 @@ SLAJ-25080:
   name: "Godfather, The"
   region: "NTSC-Unk"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLAJ-25081:
@@ -20965,6 +20967,10 @@ SLES-53761:
 SLES-53763:
   name: "Tom Clancy's Ghost Recon - Advanced Warfighter"
   region: "PAL-M5"
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes building and ground colours.
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-53764:
   name: "Atelier Iris - Eternal Mana"
   region: "PAL-E"
@@ -21425,6 +21431,8 @@ SLES-53967:
   name: "Godfather, The"
   region: "PAL-M6"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53968:
@@ -21443,12 +21451,16 @@ SLES-53970:
   name: "Padrino, Il"
   region: "PAL-I"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53971:
   name: "Padrino, El"
   region: "PAL-S"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLES-53972:
@@ -27494,6 +27506,14 @@ SLKA-25329:
 SLKA-25330:
   name: "Battlefield 2 - Modern Combat"
   region: "NTSC-K"
+  gsHWFixes:
+    autoFlush: 2 # Post-processing.
+    halfPixelOffset: 2 # Offset post-processing.
+    texturePreloading: 1 # Spikes all over the place otherwise.
+    textureInsideRT: 1 # Fixes light shinging through objects.
+    cpuCLUTRender: 1 # Fixes light shining through objects.
+    getSkipCount: "GSC_Battlefield2" # Depth clear.
+    beforeDraw: "OI_Battlefield2" # Framebuffer copy, fixes rendering for bottom part of screen.
 SLKA-25331:
   name: "Marc Ecko's Getting Up - Contents Under Pressure"
   region: "NTSC-K"
@@ -27524,6 +27544,8 @@ SLKA-25338:
   name: "Godfather, The"
   region: "NTSC-K"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLKA-25339:
@@ -27551,6 +27573,10 @@ SLKA-25343:
 SLKA-25344:
   name: "Tom Clancy's Ghost Recon - Advanced Warfighter"
   region: "NTSC-K"
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes building and ground colours.
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
 SLKA-25345:
   name: "Disney's Chicken Little"
   region: "NTSC-K"
@@ -38050,6 +38076,10 @@ SLPM-66460:
 SLPM-66461:
   name: "Tom Clancy's Ghost Recon - Advanced Warfighter"
   region: "NTSC-J"
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes  building and ground colours.
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
 SLPM-66462:
   name: "Disney-Pixar's Cars"
   region: "NTSC-J"
@@ -39068,6 +39098,8 @@ SLPM-66710:
   name: "Godfather, The"
   region: "NTSC-J"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLPM-66712:
@@ -39468,6 +39500,10 @@ SLPM-66807:
 SLPM-66808:
   name: "Tom Clancy's Ghost Recon - Advanced Warfighter [Ubisoft the Best]"
   region: "NTSC-J"
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes  building and ground colours.
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
 SLPM-66809:
   name: "Saishu Shiken Kujira - Alive"
   region: "NTSC-J"
@@ -40009,6 +40045,8 @@ SLPM-66966:
   name: "Godfather, The [EA-SY! 1980]"
   region: "NTSC-J"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLPM-66967:
@@ -54193,6 +54231,8 @@ SLUS-21385:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLUS-21386:
@@ -54307,6 +54347,8 @@ SLUS-21406:
   name: "Godfather, The - Collector's Edition"
   region: "NTSC-U"
   gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
     textureInsideRT: 1 # Required for complex offset shuffles.
     halfPixelOffset: 2 # Fixes center line in post processing.
 SLUS-21407:
@@ -54414,6 +54456,10 @@ SLUS-21422:
   name: "Tom Clancy's Ghost Recon - Advanced Warfighter"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes  building and ground colours.
+    mipmap: 2 # Mipmap + trilinear, improves building textures to match sw renderer.
+    trilinearFiltering: 1
 SLUS-21423:
   name: "Grand Theft Auto - Liberty City Stories"
   region: "NTSC-U"
