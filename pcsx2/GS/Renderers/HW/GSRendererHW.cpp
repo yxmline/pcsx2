@@ -2345,7 +2345,7 @@ void GSRendererHW::Draw()
 		{
 			// Hypothesis: texture shuffle is used as a postprocessing effect so texture will be an old target.
 			// Initially code also tested the RT but it gives too much false-positive
-			const int first_x = (v[0].XYZ.X + 8) >> 4;
+			const int first_x = ((v[0].XYZ.X - m_context->XYOFFSET.OFX) + 8) >> 4;
 			const int first_u = PRIM->FST ? ((v[0].U + 8) >> 4) : static_cast<int>(((1 << m_cached_ctx.TEX0.TW) * (v[0].ST.S / v[1].RGBAQ.Q)) + 0.5f);
 			const bool shuffle_coords = (first_x ^ first_u) & 8;
 			const u32 draw_end = GSLocalMemory::GetEndBlockAddress(m_cached_ctx.FRAME.Block(), m_cached_ctx.FRAME.FBW, m_cached_ctx.FRAME.PSM, m_r) + 1;
@@ -3466,21 +3466,23 @@ __ri bool GSRendererHW::EmulateChannelShuffle(GSTextureCache::Target* src, bool 
 
 void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DATE_PRIMID, bool& DATE_BARRIER, bool& blending_alpha_pass)
 {
-	// AA1: Don't enable blending on AA1, not yet implemented on hardware mode,
-	// it requires coverage sample so it's safer to turn it off instead.
-	const bool AA1 = PRIM->AA1 && (m_vt.m_primclass == GS_LINE_CLASS || m_vt.m_primclass == GS_TRIANGLE_CLASS);
-	// PABE: Check condition early as an optimization.
-	const bool PABE = PRIM->ABE && m_draw_env->PABE.PABE && (GetAlphaMinMax().max < 128);
-	// FBMASK: Color is not written, no need to do blending.
-	const u32 temp_fbmask = m_conf.ps.dfmt == 2 ? 0x00F8F8F8 : 0x00FFFFFF;
-	const bool FBMASK = (m_cached_ctx.FRAME.FBMSK & temp_fbmask) == temp_fbmask;
-
-	// No blending or coverage anti-aliasing so early exit
-	if (FBMASK || PABE || !(PRIM->ABE || AA1))
 	{
-		m_conf.blend = {};
-		m_conf.ps.no_color1 = true;
-		return;
+		// AA1: Don't enable blending on AA1, not yet implemented on hardware mode,
+		// it requires coverage sample so it's safer to turn it off instead.
+		const bool AA1 = PRIM->AA1 && (m_vt.m_primclass == GS_LINE_CLASS || m_vt.m_primclass == GS_TRIANGLE_CLASS);
+		// PABE: Check condition early as an optimization.
+		const bool PABE = PRIM->ABE && m_draw_env->PABE.PABE && (GetAlphaMinMax().max < 128);
+		// FBMASK: Color is not written, no need to do blending.
+		const u32 temp_fbmask = m_conf.ps.dfmt == 2 ? 0x00F8F8F8 : 0x00FFFFFF;
+		const bool FBMASK = (m_cached_ctx.FRAME.FBMSK & temp_fbmask) == temp_fbmask;
+
+		// No blending or coverage anti-aliasing so early exit
+		if (FBMASK || PABE || !(PRIM->ABE || AA1))
+		{
+			m_conf.blend = {};
+			m_conf.ps.no_color1 = true;
+			return;
+		}
 	}
 
 	// Compute the blending equation to detect special case
@@ -3510,11 +3512,20 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		m_conf.ps.fixed_one_a = 1;
 		m_conf.ps.blend_c = 0;
 	}
-	// 24 bits doesn't have an alpha channel so use 128 (1.0f) fix factor as equivalent.
-	else if (m_conf.ps.dfmt == 1 && m_conf.ps.blend_c == 1)
+	else if (m_conf.ps.blend_c == 1)
 	{
-		AFIX = 128;
-		m_conf.ps.blend_c = 2;
+		// When both rt alpha min and max are equal replace Ad with Af, easier to manage.
+		if (rt_alpha_min == rt_alpha_max)
+		{
+			AFIX = rt_alpha_min;
+			m_conf.ps.blend_c = 2;
+		}
+		// 24 bits doesn't have an alpha channel so use 128 (1.0f) fix factor as equivalent.
+		else if (m_conf.ps.dfmt == 1)
+		{
+			AFIX = 128;
+			m_conf.ps.blend_c = 2;
+		}
 	}
 
 	// Get alpha value
@@ -3522,12 +3533,10 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 	const bool alpha_c0_one = (m_conf.ps.blend_c == 0 && (GetAlphaMinMax().min == 128) && (GetAlphaMinMax().max == 128));
 	const bool alpha_c0_high_min_one = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().min > 128);
 	const bool alpha_c0_high_max_one = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max > 128);
-	const bool alpha_c1_zero = (m_conf.ps.blend_c == 1 && rt_alpha_min == 0 && rt_alpha_max == 0);
-	const bool alpha_c1_one = (m_conf.ps.blend_c == 1 && rt_alpha_min == 128 && rt_alpha_max == 128);
 	const bool alpha_c2_zero = (m_conf.ps.blend_c == 2 && AFIX == 0u);
 	const bool alpha_c2_one = (m_conf.ps.blend_c == 2 && AFIX == 128u);
 	const bool alpha_c2_high_one = (m_conf.ps.blend_c == 2 && AFIX > 128u);
-	const bool alpha_one = alpha_c0_one || alpha_c1_one || alpha_c2_one;
+	const bool alpha_one = alpha_c0_one || alpha_c2_one;
 
 	// Optimize blending equations, must be done before index calculation
 	if ((m_conf.ps.blend_a == m_conf.ps.blend_b) || ((m_conf.ps.blend_b == m_conf.ps.blend_d) && alpha_one))
@@ -3546,7 +3555,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		m_conf.ps.blend_b = 0;
 		m_conf.ps.blend_c = 0;
 	}
-	else if (alpha_c0_zero || alpha_c1_zero || alpha_c2_zero)
+	else if (alpha_c0_zero || alpha_c2_zero)
 	{
 		// C == 0.0f
 		// (A - B) * C, result will be 0.0f so set A B to Cs
@@ -4017,7 +4026,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		{
 			m_conf.ps.blend_hw = 1;
 		}
-		else if (blend_flag & (BLEND_HW_CLR2))
+		else if (blend_flag & BLEND_HW_CLR2)
 		{
 			if (m_conf.ps.blend_c == 2)
 				m_conf.cb_ps.TA_MaxDepth_Af.a = static_cast<float>(AFIX) / 128.0f;
