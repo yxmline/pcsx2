@@ -25696,6 +25696,7 @@ SLES-55605:
     halfPixelOffset: 1 # Corrects post processing position.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLES-55609:
   name: "Scooby-Doo! and the Spooky Swamp"
@@ -40469,6 +40470,7 @@ SLPM-68019:
     halfPixelOffset: 1 # Corrects post processing position.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPM-68020:
   name: "Suzumiya Haruhi no Tomadoi - Uchuu-hatsu! Full CG - Odoru SOS-dan (Chou Eizou-ban)"
@@ -45919,6 +45921,7 @@ SLPS-25837:
     halfPixelOffset: 1 # Corrects post processing position.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPS-25838:
   name: "Taiheiyou no Arashi - Senkan Yamato, Akatsuki ni Shutsugeki su"
