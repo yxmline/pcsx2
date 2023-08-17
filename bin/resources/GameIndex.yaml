@@ -11089,6 +11089,11 @@ SLED-51186:
 SLED-51211:
   name: "Burnout 2 - Point of Impact [Demo]"
   region: "PAL-E"
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLED-51212:
@@ -14055,6 +14060,11 @@ SLES-51044:
   name: "Burnout 2 - Point of Impact"
   region: "PAL-M5"
   compat: 5
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLES-51045:
@@ -18621,6 +18631,11 @@ SLES-52968:
   name: "Burnout 2 - Point of Impact"
   region: "PAL-E"
   compat: 5
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLES-52973:
@@ -25432,8 +25447,10 @@ SLES-55481:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLES-55482:
   name: "Naruto Shippuden - Ultimate Ninja 4"
@@ -25441,8 +25458,10 @@ SLES-55482:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLES-55483:
   name: "Guilty Gear XX Accent Core Plus"
@@ -25693,7 +25712,7 @@ SLES-55605:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
-    halfPixelOffset: 1 # Corrects post processing position.
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu0ClampMode: 3 # Fixes bad dialog backgrounds.
@@ -26406,6 +26425,11 @@ SLKA-25038:
 SLKA-25039:
   name: "Burnout 2 - Point of Impact"
   region: "NTSC-K"
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLKA-25041:
@@ -29880,8 +29904,10 @@ SLPM-61157:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPM-61158:
   name: "Saint Seiya - Meiou Hades Juunikyuu-hen"
@@ -33491,6 +33517,27 @@ SLPM-65267:
 SLPM-65268:
   name: "Initial D - Special Stage"
   region: "NTSC-J"
+  patches:
+    A62EBC2C:
+      content: |-
+        author=refraction
+        // Fixes bad clip flag COP2 ordering.
+        patch=1,EE,0017D88C,word,48439000
+        patch=1,EE,0017D890,word,4BC319FF
+        patch=1,EE,0017D8B8,word,48439000
+        patch=1,EE,0017D8BC,word,4BC421FF
+        patch=1,EE,0017D8E8,word,48439000
+        patch=1,EE,0017D8EC,word,4BC529FF
+        patch=1,EE,0017D918,word,48439000
+        patch=1,EE,0017D91C,word,4BC631FF
+        patch=1,EE,0017D948,word,48439000
+        patch=1,EE,0017D94C,word,4BC739FF
+        patch=1,EE,0017D978,word,48439000
+        patch=1,EE,0017D97C,word,4BC841FF
+        patch=1,EE,0017D9A8,word,48439000
+        patch=1,EE,0017D9AC,word,4BC949FF
+        patch=1,EE,0017D9D8,word,48439000
+        patch=1,EE,0017D9DC,word,4BCA51FF
 SLPM-65269:
   name: "NBA 2K3"
   region: "NTSC-J"
@@ -40467,7 +40514,7 @@ SLPM-68019:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
-    halfPixelOffset: 1 # Corrects post processing position.
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu0ClampMode: 3 # Fixes bad dialog backgrounds.
@@ -44028,6 +44075,11 @@ SLPS-25350:
 SLPS-25351:
   name: "Burnout 2 - Point of Impact"
   region: "NTSC-J"
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLPS-25352:
@@ -45676,8 +45728,10 @@ SLPS-25768:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLPS-25769:
   name: "Netsu Chu! Pro Baseball 2007"
@@ -45918,7 +45972,7 @@ SLPS-25837:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
-    halfPixelOffset: 1 # Corrects post processing position.
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
     vu0ClampMode: 3 # Fixes bad dialog backgrounds.
@@ -49332,6 +49386,11 @@ SLUS-20497:
   name: "Burnout 2 - Point of Impact"
   region: "NTSC-U"
   compat: 5
+  gsHWFixes:
+    gpuTargetCLUT: 1 # Fixes bloom and sun rendering in front of everything.
+    autoFlush: 1 # Fixes bloom and sun rendering in front of everything.
+    halfPixelOffset: 2 # Aligns bloom effect a little bit better when upscaled.
+    bilinearUpscale: 2 # Reduces color banding of the sun glare.
   roundModes:
     vu1RoundMode: 1 # Bright lights in cars.
 SLUS-20498:
@@ -56522,8 +56581,10 @@ SLUS-21862:
   gameFixes:
     - SoftwareRendererFMVHack # Fixes vertical lines in FMVs.
   gsHWFixes:
+    roundSprite: 2 # Corrects post processing position + fixes subsequent runs of starter FMV vertical lines.
     cpuCLUTRender: 1 # Reduces the bloomy blur of characters.
   clampModes:
+    vu0ClampMode: 3 # Fixes bad dialog backgrounds.
     vu1ClampMode: 3 # Fixes SPS on characters.
 SLUS-21863:
   name: "Suzuki TT Superbikes - Real Road Racing Championship"
