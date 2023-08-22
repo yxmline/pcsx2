@@ -23898,7 +23898,8 @@ SLES-54878:
   name: "Naruto - Ultimate Ninja 2"
   region: "PAL-M5"
   clampModes:
-    vuClampMode: 0 # Fixes glow effects.
+    vu0ClampMode: 0 # Fixes glow effects.
+    vu1ClampMode: 3 # Fixes rare SPS.
 SLES-54879:
   name: "WWE SmackDown vs. Raw 2008"
   region: "PAL-M5"
@@ -43632,6 +43633,15 @@ SLPS-25230:
 SLPS-25231:
   name: "Myst III - Exile"
   region: "NTSC-J"
+  patches:
+    D7CCA373:
+      content: |-
+        // Waits for IPU command to finish.
+        // Replaces wait loop that had a very short wait period.
+        patch=0,EE,001F0490,word,3C021000
+        patch=0,EE,001F0494,word,34422010
+        patch=0,EE,001F0498,word,8c430000
+        patch=0,EE,001F04A8,word,0460FFFA
 SLPS-25233:
   name: "Do DonPachi Daioujou"
   region: "NTSC-J"
@@ -44284,7 +44294,8 @@ SLPS-25398:
   name: "Naruto - Narutimett Hero 2"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes glow effects.
+    vu0ClampMode: 0 # Fixes glow effects.
+    vu1ClampMode: 3 # Fixes rare SPS.
 SLPS-25399:
   name: "Keroro Gunsou - Mero Mero Battle Royale"
   region: "NTSC-J"
@@ -46721,7 +46732,8 @@ SLPS-73221:
   name: "Naruto Narutimett Hero 2 [PlayStation 2 The Best]"
   region: "NTSC-J"
   clampModes:
-    vuClampMode: 0 # Fixes glow effects.
+    vu0ClampMode: 0 # Fixes glow effects.
+    vu1ClampMode: 3 # Fixes rare SPS.
 SLPS-73222:
   name: "Harvest Moon - A Wonderful Life [PlayStation 2 The Best]"
   region: "NTSC-J"
@@ -55178,7 +55190,8 @@ SLUS-21575:
   region: "NTSC-U"
   compat: 5
   clampModes:
-    vuClampMode: 0 # Fixes glow effects.
+    vu0ClampMode: 0 # Fixes glow effects.
+    vu1ClampMode: 3 # Fixes rare SPS.
 SLUS-21576:
   name: "Rayman - Raving Rabbids"
   region: "NTSC-U"
