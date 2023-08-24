@@ -1808,8 +1808,11 @@ void GSState::CheckWriteOverlap(bool req_write, bool req_read)
 		}
 	}
 
-	// Invalid the CLUT if it crosses paths.
-	m_mem.m_clut.InvalidateRange(write_start_bp, write_end_bp);
+	if (req_write)
+	{
+		// Invalid the CLUT if it crosses paths.
+		m_mem.m_clut.InvalidateRange(write_start_bp, write_end_bp);
+	}
 }
 
 void GSState::Write(const u8* mem, int len)
@@ -1849,11 +1852,12 @@ void GSState::Write(const u8* mem, int len)
 			m_draw_transfers.pop_back();
 			transfer.rect = transfer.rect.runion(r);
 			transfer.draw = s_n;
+			transfer.zero_clear = false;
 			m_draw_transfers.push_back(transfer);
 		}
 		else
 		{
-			GSUploadQueue new_transfer = { blit, r, s_n };
+			GSUploadQueue new_transfer = { blit, r, s_n, false };
 			m_draw_transfers.push_back(new_transfer);
 		}
 
@@ -2039,11 +2043,12 @@ void GSState::Move()
 		m_draw_transfers.pop_back();
 		transfer.rect = transfer.rect.runion(r);
 		transfer.draw = s_n;
+		transfer.zero_clear = false;
 		m_draw_transfers.push_back(transfer);
 	}
 	else
 	{
-		GSUploadQueue new_transfer = { m_env.BITBLTBUF, r, s_n };
+		GSUploadQueue new_transfer = { m_env.BITBLTBUF, r, s_n, false };
 		m_draw_transfers.push_back(new_transfer);
 	}
 
@@ -3682,7 +3687,7 @@ GSState::TextureMinMaxResult GSState::GetTextureMinMax(GIFRegTEX0 TEX0, GIFRegCL
 			// If it's the start of the texture and our little adjustment is all that pushed it over, clamp it to 0.
 			// This stops the border check failing when using repeat but needed less than the full texture
 			// since this was making it take the full texture even though it wasn't needed.
-			if (!clamp_to_tsize && ((m_vt.m_min.t == GSVector4::zero()).mask() & 0x3) == 0x3)
+			if (!clamp_to_tsize && ((m_vt.m_min.t.floor() == GSVector4::zero()).mask() & 0x3) == 0x3)
 				st = st.max(GSVector4::zero());
 		}
 		else
