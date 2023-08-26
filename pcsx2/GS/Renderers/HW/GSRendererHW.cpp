@@ -1399,22 +1399,23 @@ void GSRendererHW::SwSpriteRender()
 
 	for (int y = 0; y < h; y++, ++sy, ++dy)
 	{
-		const auto& spa = spo.paMulti(m_mem.vm32(), sx, sy);
-		const auto& dpa = dpo.paMulti(m_mem.vm32(), dx, dy);
+		u32* vm = m_mem.vm32();
+		const GSOffset::PAHelper spa = spo.paMulti(sx, sy);
+		const GSOffset::PAHelper dpa = dpo.paMulti(dx, dy);
 
 		ASSERT(w % 2 == 0);
 
 		for (int x = 0; x < w; x += 2)
 		{
-			u32* di = dpa.value(x);
-			ASSERT(di + 1 == dpa.value(x + 1)); // Destination pixel pair is adjacent in memory
+			u32* di = &vm[dpa.value(x)];
+			ASSERT(di + 1 == &vm[dpa.value(x + 1)]); // Destination pixel pair is adjacent in memory
 
 			GSVector4i sc = {};
 			if (texture_mapping_enabled)
 			{
-				const u32* si = spa.value(x);
+				const u32* si = &vm[spa.value(x)];
 				// Read 2 source pixel colors
-				ASSERT(si + 1 == spa.value(x + 1)); // Source pixel pair is adjacent in memory
+				ASSERT(si + 1 == &vm[spa.value(x + 1)]); // Source pixel pair is adjacent in memory
 				sc = GSVector4i::loadl(si).u8to16(); // 0x00AA00BB00GG00RR00aa00bb00gg00rr
 
 				// Apply TFX
@@ -1444,10 +1445,11 @@ void GSRendererHW::SwSpriteRender()
 				// Blending
 				const GSVector4i A = alpha_a == 0 ? sc : alpha_a == 1 ? dc0 : GSVector4i::zero();
 				const GSVector4i B = alpha_b == 0 ? sc : alpha_b == 1 ? dc0 : GSVector4i::zero();
-				const GSVector4i C = alpha_c == 2 ? GSVector4i(alpha_fix).xxxx().ps32() : (alpha_c == 0 ? sc : dc0).yyww() // 0x00AA00BB00AA00BB00aa00bb00aa00bb
-																							  .srl32(16) // 0x000000AA000000AA000000aa000000aa
-																							  .ps32() // 0x00AA00AA00aa00aa00AA00AA00aa00aa
-																							  .xxyy(); // 0x00AA00AA00AA00AA00aa00aa00aa00aa
+				const GSVector4i C = alpha_c == 2 ? GSVector4i(alpha_fix).xxxx().ps32()
+				                                  : (alpha_c == 0 ? sc : dc0).yyww()    // 0x00AA00BB00AA00BB00aa00bb00aa00bb
+				                                                             .srl32(16) // 0x000000AA000000AA000000aa000000aa
+				                                                             .ps32()    // 0x00AA00AA00aa00aa00AA00AA00aa00aa
+				                                                             .xxyy();   // 0x00AA00AA00AA00AA00aa00aa00aa00aa
 				const GSVector4i D = alpha_d == 0 ? sc : alpha_d == 1 ? dc0 : GSVector4i::zero();
 				dc = A.sub16(B).mul16l(C).sra16(7).add16(D); // (((A - B) * C) >> 7) + D, must use sra16 due to signed 16 bit values.
 				// dc alpha channels (dc.u16[3], dc.u16[7]) dirty
@@ -4190,7 +4192,7 @@ __ri void GSRendererHW::EmulateTextureSampler(const GSTextureCache::Target* rt, 
 
 		// Force a 32 bits access (normally shuffle is done on 16 bits)
 		// m_ps_sel.tex_fmt = 0; // removed as an optimization
-		m_conf.ps.aem = TEXA.AEM;
+
 		//ASSERT(tex->m_target);
 
 		// Require a float conversion if the texure is a depth otherwise uses Integral scaling
@@ -4200,10 +4202,19 @@ __ri void GSRendererHW::EmulateTextureSampler(const GSTextureCache::Target* rt, 
 		}
 
 		// Shuffle is a 16 bits format, so aem is always required
-		GSVector4 ta(TEXA & GSVector4i::x000000ff());
-		ta /= 255.0f;
-		m_conf.cb_ps.TA_MaxDepth_Af.x = ta.x;
-		m_conf.cb_ps.TA_MaxDepth_Af.y = ta.y;
+		if (m_cached_ctx.TEX0.TCC)
+		{
+			m_conf.ps.aem = TEXA.AEM;
+			GSVector4 ta(TEXA & GSVector4i::x000000ff());
+			ta /= 255.0f;
+			m_conf.cb_ps.TA_MaxDepth_Af.x = ta.x;
+			m_conf.cb_ps.TA_MaxDepth_Af.y = ta.y;
+		}
+		else
+		{
+			m_conf.cb_ps.TA_MaxDepth_Af.x = 0;
+			m_conf.cb_ps.TA_MaxDepth_Af.y = 1.0f;
+		}
 
 		// The purpose of texture shuffle is to move color channel. Extra interpolation is likely a bad idea.
 		bilinear &= m_vt.IsLinear();
@@ -5693,16 +5704,16 @@ bool GSRendererHW::DetectDoubleHalfClear(bool& no_rt, bool& no_ds)
 	// Have to check both contexts, because God of War 2 likes to do this in-between setting TRXDIR, which
 	// causes a flush, and we don't have the next context backed up index set.
 	bool horizontal = false;
-	if ((m_env.CTXT[0].FRAME.FBW == m_cached_ctx.FRAME.FBW &&
+	if (((m_env.CTXT[0].FRAME.FBW == m_cached_ctx.FRAME.FBW &&
 			((m_env.CTXT[0].FRAME.FBP == base &&
 				 (!m_env.CTXT[0].ZBUF.ZMSK || (m_env.CTXT[0].TEST.ZTE && m_env.CTXT[0].TEST.ZTST >= ZTST_GEQUAL)) &&
 				 m_env.CTXT[0].ZBUF.ZBP != half) ||
-				(m_env.CTXT[0].ZBUF.ZBP == base && m_env.CTXT[0].FRAME.FBP != half))) ||
-		m_env.CTXT[1].FRAME.FBW == m_cached_ctx.FRAME.FBW &&
+				(m_env.CTXT[0].ZBUF.ZBP == base && m_env.CTXT[0].FRAME.FBP != half)))) ||
+		(m_env.CTXT[1].FRAME.FBW == m_cached_ctx.FRAME.FBW &&
 			((m_env.CTXT[1].FRAME.FBP == base && m_env.CTXT[1].ZBUF.ZBP != half) ||
 				(m_env.CTXT[1].ZBUF.ZBP == base &&
 					(!m_env.CTXT[1].ZBUF.ZMSK || (m_env.CTXT[1].TEST.ZTE && m_env.CTXT[1].TEST.ZTST >= ZTST_GEQUAL)) &&
-					m_env.CTXT[1].FRAME.FBP != half)))
+					m_env.CTXT[1].FRAME.FBP != half))))
 	{
 		// Needed for Spider-Man 2 (target was previously half size, double half cleared at new size).
 		GL_INS("Confirmed double-half clear by next FBP/ZBP");
@@ -5953,24 +5964,26 @@ void GSRendererHW::ClearGSLocalMemory(const GSOffset& off, const GSVector4i& r, 
 	if (format == 0)
 	{
 		// Based on WritePixel32
+		u32* vm = m_mem.vm32();
 		for (int y = top; y < bottom; y++)
 		{
-			auto pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(m_mem.vm32(), 0, y);
+			GSOffset::PAHelper pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(0, y);
 
 			for (int x = left; x < right; x++)
-				*pa.value(x) = vert_color;
+				vm[pa.value(x)] = vert_color;
 		}
 	}
 	else if (format == 1)
 	{
 		// Based on WritePixel24
+		u32* vm = m_mem.vm32();
 		const u32 write_color = vert_color & 0xffffffu;
 		for (int y = top; y < bottom; y++)
 		{
-			auto pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(m_mem.vm32(), 0, y);
+			GSOffset::PAHelper pa = off.assertSizesMatch(GSLocalMemory::swizzle32).paMulti(0, y);
 
 			for (int x = left; x < right; x++)
-				*pa.value(x) = (*pa.value(x) & 0xff000000u) | write_color;
+				vm[pa.value(x)] = (vm[pa.value(x)] & 0xff000000u) | write_color;
 		}
 	}
 	else if (format == 2)
@@ -5978,12 +5991,13 @@ void GSRendererHW::ClearGSLocalMemory(const GSOffset& off, const GSVector4i& r, 
 		const u16 converted_color = ((vert_color >> 16) & 0x8000) | ((vert_color >> 9) & 0x7C00) | ((vert_color >> 6) & 0x7E0) | ((vert_color >> 3) & 0x1F);
 
 		// Based on WritePixel16
+		u16* vm = m_mem.vm16();
 		for (int y = top; y < bottom; y++)
 		{
-			auto pa = off.assertSizesMatch(GSLocalMemory::swizzle16).paMulti(m_mem.vm16(), 0, y);
+			GSOffset::PAHelper pa = off.assertSizesMatch(GSLocalMemory::swizzle16).paMulti(0, y);
 
 			for (int x = left; x < right; x++)
-				*pa.value(x) = converted_color;
+				vm[pa.value(x)] = converted_color;
 		}
 	}
 }
