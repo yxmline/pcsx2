@@ -542,6 +542,8 @@ PCPX-96312:
 PCPX-96314:
   name: "The Sky Odyssey"
   region: "NTSC-J"
+  clampModes:
+    vu0ClampMode: 3 # Fixes runway line thickness on minimap.
 PCPX-96315:
   name: "Phase Paradox"
   region: "NTSC-J"
@@ -3856,6 +3858,8 @@ SCES-50034:
 SCES-50105:
   name: "Sky Odyssey"
   region: "PAL-M5"
+  clampModes:
+    vu0ClampMode: 3 # Fixes runway line thickness on minimap.
 SCES-50139:
   name: "World Rally Championship"
   region: "PAL-M7"
@@ -6969,6 +6973,8 @@ SCPS-15002:
 SCPS-15003:
   name: "Sky Odyssey"
   region: "NTSC-J"
+  clampModes:
+    vu0ClampMode: 3 # Fixes runway line thickness on minimap.
 SCPS-15004:
   name: "Dark Cloud"
   region: "NTSC-J"
@@ -22739,6 +22745,11 @@ SLES-54521:
 SLES-54522:
   name: "Nickelodeon SpongeBob and Friends - Battle for Volcano Island"
   region: "PAL-A"
+  gsHWFixes:
+    mipmap: 2 # Better characters and environment.
+    trilinearFiltering: 1 # Using mipmaps, so may as well.
+    autoFlush: 2 # Fixes texture corruptions.
+    getSkipCount: "GSC_BlueTongueGames" # Render mipmaps on the CPU.
 SLES-54527:
   name: "Flushed Away"
   region: "PAL-M5"
@@ -24028,12 +24039,14 @@ SLES-54990:
   gsHWFixes:
     mipmap: 1 # Fixes garbage textures in the distance.
     halfPixelOffset: 2 # Corrects most vertical lines.
+    getSkipCount: "GSC_BlueTongueGames" # Mipmap rendering on CPU.
 SLES-54991:
   name: "Nickelodeon SpongeBob and Friends - Attack of the Toybots"
   region: "PAL-M6"
   gsHWFixes:
     mipmap: 1 # Fixes garbage textures in the distance.
     halfPixelOffset: 2 # Corrects most vertical lines.
+    getSkipCount: "GSC_BlueTongueGames" # Mipmap rendering on CPU.
 SLES-54992:
   name: "PDC World Championship Darts 2008"
   region: "PAL-M6"
@@ -47243,6 +47256,8 @@ SLUS-20134:
   name: "Sky Odyssey"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vu0ClampMode: 3 # Fixes runway line thickness on minimap.
 SLUS-20136:
   name: "Barbarian"
   region: "NTSC-U"
@@ -54883,6 +54898,7 @@ SLUS-21605:
   gsHWFixes:
     mipmap: 1 # Fixes garbage textures in the distance.
     halfPixelOffset: 2 # Corrects most vertical lines.
+    getSkipCount: "GSC_BlueTongueGames" # Mipmap rendering on CPU.
 SLUS-21606:
   name: "Metropolismania 2"
   region: "NTSC-U"
