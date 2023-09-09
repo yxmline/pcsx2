@@ -8487,9 +8487,11 @@ SCPS-56016:
   gameFixes:
     - GIFFIFOHack
   gsHWFixes:
-    mipmap: 1
-    autoFlush: 2
-    estimateTextureRegion: 1 # Improves performance.
+    estimateTextureRegion: 1 # Improves performance and reduces hash cache size.
+    gpuPaletteConversion: 2 # Improves performance and reduces hash cache size.
+    autoFlush: 1 # Corrects shadows (Currently still broken even with this).
+    mipmap: 2 # Mipmap + trilinear, matches sw renderer.
+    trilinearFiltering: 1
 SCPS-72001:
   name: "Gran Turismo 3 - A-Spec"
   region: "NTSC-J"
@@ -10415,6 +10417,8 @@ SCUS-97621:
   name: "Twisted Metal - Head-On [Extra Twisted Edition]"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    vu1ClampMode: 3 # Fixes missing textures.
   gameFixes:
     - VUSyncHack # Fixes black doors on vehicles.
   patches:
@@ -10423,6 +10427,8 @@ SCUS-97621:
         author=refraction
         // COP2 rearrangement. RSQRT directly followed by DIV and a few ops using Q causes issues
         // Fixes fire effects
+        patch=1,EE,00237eb0,word,4b000060
+        patch=1,EE,00237ec0,word,4a0203bd
         patch=1,EE,002461d8,word,4bf4b33c
         patch=1,EE,002461dc,word,4b806d9c
         patch=1,EE,002461e0,word,4bc069fc
@@ -21155,9 +21161,11 @@ SLES-53904:
   clampModes:
     vuClampMode: 0 # Fixes black artifacts on tracks
   gsHWFixes:
-    mipmap: 1
-    autoFlush: 2
-    estimateTextureRegion: 1 # Improves performance.
+    estimateTextureRegion: 1 # Improves performance and reduces hash cache size.
+    gpuPaletteConversion: 2 # Improves performance and reduces hash cache size.
+    autoFlush: 1 # Corrects shadows (Currently still broken even with this).
+    mipmap: 2 # Mipmap + trilinear, matches sw renderer.
+    trilinearFiltering: 1
 SLES-53906:
   name: "50 Cent - Bulletproof"
   region: "PAL-F"
@@ -28915,8 +28923,11 @@ SLPM-60194:
   name: "Kotoba no Puzzle - Mojipittan"
   region: "NTSC-J"
 SLPM-60195:
-  name: "Kaidou Battle - Nikko, Haruna, Rokko, Hakone"
+  name: "Kaido Battle - Nikko, Haruna, Rokko, Hakone [Taikenban]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-60197:
   name: "Exciting Pro Wres 4"
   region: "NTSC-J"
@@ -28943,8 +28954,12 @@ SLPM-60205:
   name: "Initial D - Special Stage"
   region: "NTSC-J"
 SLPM-60206:
-  name: "Shutokou Battle 01"
+  name: "Shutokou Battle 01 [Taikenban]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # Improves visual clarity whilst upscaling.
+    roundSprite: 1 # Reduces graphics garbage on UI whilst upscaling.
 SLPM-60207:
   name: "Rockman X7"
   region: "NTSC-J"
@@ -28998,8 +29013,11 @@ SLPM-60226:
   name: "Shadow Hearts II"
   region: "NTSC-J"
 SLPM-60228:
-  name: "Kaidou Battle 2 - Chain Reaction"
+  name: "Kaido Battle 2 - Chain Reaction [Taikenban]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-60237:
   name: "Densha de Go! Final"
   region: "NTSC-J"
@@ -29497,8 +29515,11 @@ SLPM-61114:
   name: "Shadow of Rome"
   region: "NTSC-J"
 SLPM-61115:
-  name: "Racing Battle - C1 Grand Prix"
+  name: "Racing Battle - C1 Grand Prix [Taikenban]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-61116:
   name: "Bouken-ou Beet - Darkness Century"
   region: "NTSC-J"
@@ -29533,8 +29554,11 @@ SLPM-61120:
     mergeSprite: 1 # Align sprite fixes FMVs but not garbage in-game, so needs merge sprite instead.
     texturePreloading: 1 # Performs better with partial preload because it is slow on locations outside gameplay foremost.
 SLPM-61121:
-  name: "Kaidou - Touge no Densetsu"
+  name: "Kaido - Touge no Densetsu [Taikenban]"
   region: "NTSC-J"
+  gsHWFixes:
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-61122:
   name: "Dengeki PS2 PlayStation D81"
   region: "NTSC-J"
@@ -35518,7 +35542,7 @@ SLPM-65897:
   name: "Racing Battle - C1 Grand Prix"
   region: "NTSC-J"
   gsHWFixes:
-    alignSprite: 1 # Fixes black lines when upscaling.
+    alignSprite: 1 # Fixes vertical lines.
     wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-65898:
   name: "Castle Fantasia [Deluxe Pack]"
@@ -35996,7 +36020,7 @@ SLPM-66022:
   name: "Kaido Touge no Densetsu"
   region: "NTSC-J"
   gsHWFixes:
-    alignSprite: 1 # Fixes black lines when upscaling.
+    alignSprite: 1 # Fixes vertical lines.
     wildArmsHack: 1 # De-blurs the 3D image.
 SLPM-66023:
   name: "Fushigi Yuugi - ShigiYuugi Kurotake Kaiden Gaiden - Kagami no Fujo [Limited Edition]"
@@ -52145,9 +52169,11 @@ SLUS-21095:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    mipmap: 1
-    autoFlush: 2
-    estimateTextureRegion: 1 # Improves performance.
+    estimateTextureRegion: 1 # Improves performance and reduces hash cache size.
+    gpuPaletteConversion: 2 # Improves performance and reduces hash cache size.
+    autoFlush: 1 # Corrects shadows (Currently still broken even with this).
+    mipmap: 2 # Mipmap + trilinear, matches sw renderer.
+    trilinearFiltering: 1
 SLUS-21096:
   name: "Ape Escape - Pumped & Primed"
   region: "NTSC-U"
@@ -53955,7 +53981,8 @@ SLUS-21394:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    alignSprite: 1 # Fixes black lines when upscaling.
+    alignSprite: 1 # Fixes vertical lines.
+    wildArmsHack: 1 # De-blurs the 3D image.
 SLUS-21395:
   name: "Avatar - The Last Airbender"
   region: "NTSC-U"
@@ -55897,6 +55924,12 @@ SLUS-21793:
   name: "DT Carnage"
   region: "NTSC-U"
   compat: 3
+  gsHWFixes:
+    estimateTextureRegion: 1 # Improves performance and reduces hash cache size.
+    gpuPaletteConversion: 2 # Improves performance and reduces hash cache size.
+    autoFlush: 1 # Corrects shadows (Currently still broken even with this).
+    mipmap: 2 # Mipmap + trilinear, matches sw renderer.
+    trilinearFiltering: 1
 SLUS-21794:
   name: "Go, Diego, Go! Great Dinosaur Rescue"
   region: "NTSC-U"
