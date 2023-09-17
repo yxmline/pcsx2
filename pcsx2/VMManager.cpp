@@ -65,6 +65,7 @@
 #include "common/emitter/tools.h"
 
 #include "IconsFontAwesome5.h"
+#include "discord_rpc.h"
 #include "fmt/core.h"
 
 #include <atomic>
@@ -83,10 +84,6 @@
 
 #ifdef __APPLE__
 #include "common/Darwin/DarwinMisc.h"
-#endif
-
-#ifdef ENABLE_DISCORD_PRESENCE
-#include "discord_rpc.h"
 #endif
 
 namespace VMManager
@@ -192,9 +189,7 @@ static bool s_screensaver_inhibited = false;
 
 static PINEServer s_pine_server;
 
-#ifdef ENABLE_DISCORD_PRESENCE
 static bool s_discord_presence_active = false;
-#endif
 
 bool VMManager::PerformEarlyHardwareChecks(const char** error)
 {
@@ -1186,7 +1181,6 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 		Hle_ClearElfPath();
 	}
 
-#ifdef ENABLE_ACHIEVEMENTS
 	// Check for resuming with hardcore mode.
 	Achievements::ResetChallengeMode();
 	if (!state_to_load.empty() && Achievements::ChallengeModeActive() &&
@@ -1194,7 +1188,6 @@ bool VMManager::Initialize(VMBootParameters boot_params)
 	{
 		return false;
 	}
-#endif
 
 	s_limiter_mode = GetInitialLimiterMode();
 	s_target_speed = GetTargetSpeedForLimiterMode(s_limiter_mode);
@@ -1427,14 +1420,12 @@ void VMManager::Reset()
 		return;
 	}
 
-#ifdef ENABLE_ACHIEVEMENTS
 	if (!Achievements::OnReset())
 		return;
 
 	// Re-enforce hardcode mode constraints if we're now enabling it.
 	if (Achievements::ResetChallengeMode())
 		ApplySettings();
-#endif
 
 	vu1Thread.WaitVU();
 	vu1Thread.Reset();
@@ -1694,12 +1685,8 @@ u32 VMManager::DeleteSaveStates(const char* game_serial, u32 game_crc, bool also
 
 bool VMManager::LoadState(const char* filename)
 {
-#ifdef ENABLE_ACHIEVEMENTS
 	if (Achievements::ChallengeModeActive() && !Achievements::ConfirmChallengeModeDisable("Loading state"))
-	{
 		return false;
-	}
-#endif
 
 	// TODO: Save the current state so we don't need to reset.
 	if (DoLoadState(filename))
@@ -1720,12 +1707,8 @@ bool VMManager::LoadStateFromSlot(s32 slot)
 		return false;
 	}
 
-#ifdef ENABLE_ACHIEVEMENTS
 	if (Achievements::ChallengeModeActive() && !Achievements::ConfirmChallengeModeDisable("Loading state"))
-	{
 		return false;
-	}
-#endif
 
 	Host::AddIconOSDMessage("LoadStateFromSlot", ICON_FA_FOLDER_OPEN,
 		fmt::format(TRANSLATE_FS("VMManager", "Loading state from slot {}..."), slot), Host::OSD_QUICK_DURATION);
@@ -1912,10 +1895,8 @@ void VMManager::FrameAdvance(u32 num_frames /*= 1*/)
 	if (!HasValidVM())
 		return;
 
-#ifdef ENABLE_ACHIEVEMENTS
 	if (Achievements::ChallengeModeActive() && !Achievements::ConfirmChallengeModeDisable("Frame advancing"))
 		return;
-#endif
 
 	s_frame_advance_count = num_frames;
 	SetState(VMState::Running);
@@ -2980,8 +2961,6 @@ void VMManager::ReloadPINE()
 	}
 }
 
-#ifdef ENABLE_DISCORD_PRESENCE
-
 void VMManager::InitializeDiscordPresence()
 {
 	if (s_discord_presence_active)
@@ -3042,22 +3021,3 @@ void VMManager::PollDiscordPresence()
 	Discord_RunCallbacks();
 }
 
-#else // ENABLE_DISCORD_PRESENCE
-
-void VMManager::InitializeDiscordPresence()
-{
-}
-
-void VMManager::ShutdownDiscordPresence()
-{
-}
-
-void VMManager::UpdateDiscordPresence(const std::string& rich_presence)
-{
-}
-
-void VMManager::PollDiscordPresence()
-{
-}
-
-#endif // ENABLE_DISCORD_PRESENCE

@@ -1428,8 +1428,6 @@ bool Pcsx2Config::PadOptions::Port::operator!=(const PadOptions::Port& right) co
 	return !this->operator==(right);
 }
 
-#ifdef ENABLE_ACHIEVEMENTS
-
 Pcsx2Config::AchievementsOptions::AchievementsOptions()
 {
 	Enabled = false;
@@ -1465,8 +1463,6 @@ void Pcsx2Config::AchievementsOptions::LoadSave(SettingsWrapper& wrap)
 		NotificationsDuration = std::clamp(NotificationsDuration, 3, 10);
 	}
 }
-
-#endif
 
 Pcsx2Config::Pcsx2Config()
 {
@@ -1549,9 +1545,7 @@ void Pcsx2Config::LoadSaveCore(SettingsWrapper& wrap)
 	Debugger.LoadSave(wrap);
 	Trace.LoadSave(wrap);
 
-#ifdef ENABLE_ACHIEVEMENTS
 	Achievements.LoadSave(wrap);
-#endif
 
 	SettingsWrapEntry(GzipIsoIndexTemplate);
 	SettingsWrapEntry(PINESlot);
@@ -1737,16 +1731,12 @@ void EmuFolders::SetDataDirectory()
 		const char* home_dir = getenv("HOME");
 		if (home_dir)
 		{
-#ifdef USE_LEGACY_USER_DIRECTORY
-			DataRoot = Path::Combine(home_dir, "PCSX2");
-#else
 			// ~/.config should exist, but just in case it doesn't and this is a fresh profile..
 			const std::string config_dir(Path::Combine(home_dir, ".config"));
 			if (!FileSystem::DirectoryExists(config_dir.c_str()))
 				FileSystem::CreateDirectoryPath(config_dir.c_str(), false);
 
 			DataRoot = Path::Combine(config_dir, "PCSX2");
-#endif
 		}
 	}
 #elif defined(__APPLE__)
