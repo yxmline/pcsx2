@@ -5952,6 +5952,7 @@ void GSRendererHW::ClearGSLocalMemory(const GSOffset& off, const GSVector4i& r, 
 			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
 			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += fbw)
 			{
+				current_page &= 0x7ff;
 				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
 				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
@@ -5966,6 +5967,7 @@ void GSRendererHW::ClearGSLocalMemory(const GSOffset& off, const GSVector4i& r, 
 			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
 			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += fbw)
 			{
+				current_page &= 0x7ff;
 				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
 				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
@@ -5984,6 +5986,7 @@ void GSRendererHW::ClearGSLocalMemory(const GSOffset& off, const GSVector4i& r, 
 			pxAssert((off.bp() & (BLOCKS_PER_PAGE - 1)) == 0);
 			for (u32 current_page = off.bp() >> 5; top < page_aligned_bottom; top += pgs.y, current_page += fbw)
 			{
+				current_page &= 0x7ff;
 				GSVector4i* ptr = reinterpret_cast<GSVector4i*>(m_mem.vm8() + current_page * PAGE_SIZE);
 				GSVector4i* const ptr_end = ptr + iterations_per_page;
 				while (ptr != ptr_end)
@@ -6222,7 +6225,7 @@ bool GSRendererHW::PrimitiveCoversWithoutGaps()
 
 bool GSRendererHW::IsConstantDirectWriteMemClear()
 {
-	const bool direct_draw = (m_vt.m_primclass == GS_SPRITE_CLASS) || (m_index.tail == 6 && m_vt.m_primclass == GS_TRIANGLE_CLASS);
+	const bool direct_draw = (m_vt.m_primclass == GS_SPRITE_CLASS) || (((m_index.tail % 6) == 0 && TrianglesAreQuads()) && m_vt.m_primclass == GS_TRIANGLE_CLASS);
 	// Constant Direct Write without texture/test/blending (aka a GS mem clear)
 	if (direct_draw && !PRIM->TME // Direct write
 		&& !(m_draw_env->SCANMSK.MSK & 2)
@@ -6329,6 +6332,7 @@ void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, co
 
 	m_r = unscaled_rect;
 	m_context->scissor.in = scissor;
+	m_vt.m_primclass = GS_SPRITE_CLASS;
 }
 
 void GSRendererHW::ReplaceVerticesWithSprite(const GSVector4i& unscaled_rect, const GSVector2i& unscaled_size)
