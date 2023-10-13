@@ -30197,13 +30197,17 @@ SLPM-62105:
   name: "Taikou Risshiden IV"
   region: "NTSC-J"
 SLPM-62107:
-  name: "Growlanser 3 - The Duel Darkness"
+  name: "Growlanser 3 - The Duel Darkness [Limited Edition]"
   region: "NTSC-J"
   compat: 4
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPM-62108:
   name: "Growlanser 3 - The Duel Darkness"
   region: "NTSC-J"
   compat: 4
+  gameFixes:
+    - SoftwareRendererFMVHack
 SLPM-62109:
   name: "Hippa Linda"
   region: "NTSC-J"
