@@ -12664,6 +12664,12 @@ SLES-50212:
 SLES-50213:
   name: "NFL Quarterback Club 2002"
   region: "PAL-E"
+  patches:
+    F64D1146:
+      content: |-
+        // Fix freezes caused by sceipusync.
+        patch=1,EE,0026918c,word,00000000
+        patch=1,EE,002690d4,word,00000000
 SLES-50214:
   name: "18 Wheeler - American Pro Trucker"
   region: "PAL-M4"
@@ -15621,6 +15627,8 @@ SLES-51459:
 SLES-51460:
   name: "Football Manager 2004"
   region: "PAL-I"
+  clampModes:
+    vu1ClampMode: 3 # Fixes 3D rendering.
 SLES-51461:
   name: "Manager de Liga 2004"
   region: "PAL-S"
@@ -16836,6 +16844,8 @@ SLES-52021:
 SLES-52022:
   name: "Total Club Manager 2004"
   region: "PAL-M4"
+  clampModes:
+    vu1ClampMode: 3 # Fixes 3D rendering.
 SLES-52023:
   name: "Manhunt"
   region: "PAL-M5"
@@ -18375,6 +18385,11 @@ SLES-52673:
 SLES-52674:
   name: "Fussball Manager 2005"
   region: "PAL-M5"
+  clampModes:
+    vu1ClampMode: 3 # Fixes 3D rendering.
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-52675:
   name: "Hugo Cannon Cruise"
   region: "PAL-Unk"
@@ -55477,6 +55492,12 @@ SLUS-20153:
 SLUS-20154:
   name: "NFL Quarterback Club 2002"
   region: "NTSC-U"
+  patches:
+    F3773B92:
+      content: |-
+        // Fix freezes caused by sceipusync.
+        patch=1,EE,0026918c,word,00000000
+        patch=1,EE,002690d4,word,00000000
 SLUS-20158:
   name: "Heroes of Might and Magic"
   region: "NTSC-U"
