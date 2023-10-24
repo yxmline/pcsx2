@@ -17841,7 +17841,7 @@ SLES-52510:
   clampModes:
     eeClampMode: 2 # Reduces FPU calculation errors.
   gameFixes:
-    - SoftwareRendererFMVHack  
+    - SoftwareRendererFMVHack
 SLES-52511:
   name: "Headhunter - Redemption"
   region: "PAL-E"
@@ -27749,7 +27749,7 @@ SLKA-25227:
   clampModes:
     eeClampMode: 2 # Reduces FPU calculation errors.
   gameFixes:
-    - SoftwareRendererFMVHack    
+    - SoftwareRendererFMVHack
 SLKA-25228:
   name: "The Lord of the Rings - The Return of the King"
   region: "NTSC-K"
@@ -28906,7 +28906,7 @@ SLPM-55065:
         patch=1,EE,00131A64,word,10000003
 SLPM-55068:
   name: "Koihime Musou"
-  region: "NTSC-J"  
+  region: "NTSC-J"
 SLPM-55067:
   name: "Koi-hime Musou - Doki Otome Darake no Sangokushi Engi"
   region: "NTSC-J"
@@ -38355,7 +38355,7 @@ SLPM-65752:
   clampModes:
     eeClampMode: 2 # Reduces FPU calculation errors.
   gameFixes:
-    - SoftwareRendererFMVHack    
+    - SoftwareRendererFMVHack
 SLPM-65753:
   name: 決戦 [コーエー定番シリーズ]
   name-sort: けっせん [こーえーていばんしりーず]
@@ -39664,7 +39664,7 @@ SLPM-65990:
   clampModes:
     eeClampMode: 2 # Reduces FPU calculation errors.
   gameFixes:
-    - SoftwareRendererFMVHack    
+    - SoftwareRendererFMVHack
 SLPM-65991:
   name: ANUBIS ZONE OF THE ENDERS SPECIAL EDITION [コナミ殿堂セレクション]
   name-sort: ANUBIS ZONE OF THE ENDERS SPECIAL EDITION [こなみでんどうせれくしょん]
@@ -59525,7 +59525,7 @@ SLUS-20961:
   clampModes:
     eeClampMode: 2 # Reduces FPU calculation errors.
   gameFixes:
-    - SoftwareRendererFMVHack    
+    - SoftwareRendererFMVHack
 SLUS-20962:
   name: "Castle of Shikigami 2"
   region: "NTSC-U"
