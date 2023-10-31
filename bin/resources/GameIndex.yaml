@@ -268,6 +268,11 @@ PAPX-90236:
 PAPX-90330:
   name: "Saru! Get You! 2 - Ukki Ukki Disc"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
+  gsHWFixes:
+    mipmap: 2 # Fixes miptrick texture effects.
+    trilinearFiltering: 1 # Fixes miptrick blending.
 PAPX-90501:
   name: "Dark Cloud"
   region: "NTSC-J"
@@ -782,6 +787,14 @@ PCPX-96656:
 PCPX-96657:
   name: "Saru! Get You! 3"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
+  gsHWFixes:
+    preloadFrameData: 1 # Fixes black background in the pause menu.
+    mipmap: 2 # Fixes miptrick texture effects.
+    trilinearFiltering: 1 # Fixes miptrick blending.
+    halfPixelOffset: 2 # Fixes misaligned blur.
+    autoFlush: 2 # Fixes corruption in cutscenes and brightens the image.
 PCPX-96660:
   name: "Tourist Trophy [Demo]"
   region: "NTSC-J"
@@ -1164,6 +1177,8 @@ SCAJ-20067:
 SCAJ-20068:
   name: "Final Fantasy X-2 International"
   region: "NTSC-Unk"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -1571,6 +1586,8 @@ SCAJ-20137:
 SCAJ-20138:
   name: "Ape Escape 3"
   region: "NTSC-Unk"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -1876,6 +1893,8 @@ SCAJ-20194:
 SCAJ-20195:
   name: "Ape Escape 3 [PS2 The Best]"
   region: "NTSC-C"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -1930,6 +1949,8 @@ SCAJ-25008:
 SCAJ-25012:
   name: "Final Fantasy X-2"
   region: "NTSC-Unk"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -2061,6 +2082,8 @@ SCAJ-30011:
 SCCS-40001:
   name: "Ape Escape 2"
   region: "NTSC-C"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -2285,6 +2308,8 @@ SCED-50642:
   region: "PAL-E"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCED-50660:
@@ -2407,6 +2432,8 @@ SCED-50907:
   region: "PAL-Unk"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCED-50916:
@@ -2536,6 +2563,8 @@ SCED-51359:
 SCED-51366:
   name: "Ape Escape 2 [Demo]"
   region: "PAL-M5"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -4067,6 +4096,8 @@ SCES-50490:
   compat: 5
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCES-50491:
@@ -4074,6 +4105,8 @@ SCES-50491:
   region: "PAL-F"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCES-50492:
@@ -4082,6 +4115,8 @@ SCES-50492:
   compat: 5
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCES-50493:
@@ -4089,6 +4124,8 @@ SCES-50493:
   region: "PAL-I"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCES-50494:
@@ -4096,6 +4133,8 @@ SCES-50494:
   region: "PAL-S"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SCES-50499:
@@ -4229,6 +4268,8 @@ SCES-50878:
 SCES-50885:
   name: "Ape Escape 2"
   region: "PAL-E"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -4347,24 +4388,32 @@ SCES-51041:
 SCES-51102:
   name: "Ape Escape 2"
   region: "PAL-F"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
 SCES-51103:
   name: "Ape Escape 2"
   region: "PAL-I"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
 SCES-51104:
   name: "Ape Escape 2"
   region: "PAL-G"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
 SCES-51105:
   name: "Ape Escape 2"
   region: "PAL-S"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -5208,6 +5257,8 @@ SCES-53642:
   name: "Ape Escape 3"
   region: "PAL-M5"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -6489,6 +6540,8 @@ SCKA-20061:
 SCKA-20062:
   name: "Ape Escape 3"
   region: "NTSC-K"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -6694,6 +6747,8 @@ SCKA-20098:
 SCKA-20099:
   name: "Persona 3"
   region: "NTSC-K"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 1
 SCKA-20100:
@@ -7316,6 +7371,11 @@ SCPS-15025:
   name-en: "Saru Get You 2"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
+  gsHWFixes:
+    mipmap: 2 # Fixes miptrick texture effects.
+    trilinearFiltering: 1 # Fixes miptrick blending.
 SCPS-15026:
   name: ぼくのなつやすみ2 海の冒険篇
   name-sort: ぼくのなつやすみ2 うみのぼうけんへん
@@ -7833,6 +7893,8 @@ SCPS-15096:
   name-en: "Saru Get You! 3"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -8182,6 +8244,11 @@ SCPS-19151:
 SCPS-19152:
   name: "Saru Get You! 2 [PS2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
+  gsHWFixes:
+    mipmap: 2 # Fixes miptrick texture effects.
+    trilinearFiltering: 1 # Fixes miptrick blending.
 SCPS-19153:
   name: ピポサル2001 PS2 the Best
   name-sort: ぴぽさる2001 PS2 the Best
@@ -8233,6 +8300,8 @@ SCPS-19206:
   name-sort: さるげっちゅ2 PS2 the Best
   name-en: "Ape Escape 2 [PS2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -8413,6 +8482,11 @@ SCPS-19308:
   name-sort: さるげっちゅ2 PS2 the Best
   name-en: "Saru Get You 2 [PS2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
+  gsHWFixes:
+    mipmap: 2 # Fixes miptrick texture effects.
+    trilinearFiltering: 1 # Fixes miptrick blending.
 SCPS-19309:
   name: ラチェット＆クランク3 突撃！ガラクチック★レンジャーズ PS2 the Best
   name-sort: らちぇっと＆くらんく3 とつげき！がらくちっく★れんじゃーず PS2 the Best
@@ -8439,6 +8513,8 @@ SCPS-19311:
   name-sort: さるげっちゅ3 PS2 the Best
   name-en: "Saru Get You 3 [PS2 The Best]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -8612,10 +8688,14 @@ SCPS-19327:
   name-sort: さるげっちゅ3 PS2 the Best
   name-en: "Ape Escape 3 [PS2 the Best - Reprint]"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
+    halfPixelOffset: 2 # Fixes misaligned blur.
+    autoFlush: 2 # Fixes corruption in cutscenes and brightens the image.
 SCPS-19328:
   name: ラチェット＆クランク4th ギリギリ銀河のギガバトル PS2 the Best
   name-sort: らちぇっと＆くらんく4th ぎりぎりぎんがのぎがばとる PS2 the Best
@@ -8872,6 +8952,8 @@ SCPS-55032:
 SCPS-55035:
   name: "Ape Escape 2"
   region: "NTSC-J"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -10649,6 +10731,8 @@ SCUS-97501:
   name: "Ape Escape 3"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -10841,6 +10925,8 @@ SCUS-97545:
 SCUS-97548:
   name: "Ape Escape 3 [Demo]"
   region: "NTSC-U"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     preloadFrameData: 1 # Fixes black background in the pause menu.
     mipmap: 2 # Fixes miptrick texture effects.
@@ -11132,6 +11218,8 @@ SLAJ-25011:
 SLAJ-25012:
   name: "Final Fantasy X-2"
   region: "NTSC-Unk"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -11641,8 +11729,14 @@ SLED-51902:
     gpuTargetCLUT: 1 # Fixes sun penetrating buildings.
     autoFlush: 1 # Fixes sun occlusion.
 SLED-51921:
-  name: "Final Fantasy X-2"
+  name: "Final Fantasy X-2 [Demo]"
   region: "PAL-Unk"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
+  gsHWFixes:
+    roundSprite: 1 # Fixes font artifacts.
 SLED-51961:
   name: "Prince of Persia - The Sands of Time [Demo]"
   region: "PAL-E"
@@ -16266,6 +16360,8 @@ SLES-51815:
   name: "Final Fantasy X-2"
   region: "PAL-E"
   compat: 5
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -16273,6 +16369,8 @@ SLES-51815:
 SLES-51816:
   name: "Final Fantasy X-2"
   region: "PAL-F"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -16281,6 +16379,8 @@ SLES-51817:
   name: "Final Fantasy X-2"
   region: "PAL-G"
   compat: 5
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -16288,6 +16388,8 @@ SLES-51817:
 SLES-51818:
   name: "Final Fantasy X-2"
   region: "PAL-I"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -16296,6 +16398,8 @@ SLES-51819:
   name: "Final Fantasy X-2"
   region: "PAL-S"
   compat: 5
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -23836,11 +23940,6 @@ SLES-54644:
     roundSprite: 1 # Fixes area transition vertical lines and lessens red forest vertical lines.
     textureInsideRT: 1 # Required for swirl battle transition.
     nativePaletteDraw: 1
-  patches:
-    04CCB600:
-      content: |-
-        // Modifies the wait loop on FMV's to make sure 304 hsyncs pass instead of 288.
-        patch=1,EE,002B9A44,word,24110130
 SLES-54645:
   name: "Valkyrie Profile 2 - Silmeria"
   region: "PAL-F"
@@ -24979,6 +25078,8 @@ SLES-55018:
   name: "Shin Megami Tensei - Persona 3"
   region: "PAL-E"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 1
 SLES-55019:
@@ -27425,6 +27526,8 @@ SLKA-25144:
   name: "Final Fantasy X-2"
   region: "NTSC-K"
   compat: 5
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -27702,6 +27805,8 @@ SLKA-25214:
   region: "NTSC-K"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLKA-25215:
@@ -35015,6 +35120,8 @@ SLPM-65115:
   region: "NTSC-J"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPM-65116:
@@ -36934,6 +37041,8 @@ SLPM-65478:
   name-sort: ふぁいなるふぁんたじーX-2 いんたーなしょなる+らすとみっしょん
   name-en: "Final Fantasy X-2 International"
   region: "NTSC-J"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   compat: 5
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
@@ -40478,6 +40587,8 @@ SLPM-66124:
   region: "NTSC-J"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPM-66125:
@@ -40485,6 +40596,8 @@ SLPM-66125:
   name-sort: ふぁいなるふぁんたじーX-2 [あるてぃめっとひっつ]
   name-en: "Final Fantasy X-2 [Ultimate Hits]"
   region: "NTSC-J"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -42367,6 +42480,8 @@ SLPM-66445:
   name-en: "Persona 3"
   region: "NTSC-J"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 1
 SLPM-66446:
@@ -43750,6 +43865,8 @@ SLPM-66677:
   region: "NTSC-J"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPM-66678:
@@ -43757,6 +43874,8 @@ SLPM-66678:
   name-sort: ふぁいなるふぁんたじーX-2 いんたーなしょなる+らすとみっしょん [あるてぃめっとひっつ]
   name-en: "Final Fantasy X-2 - International + Last Mission [Ultimate Hits]"
   region: "NTSC-J"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -45658,6 +45777,8 @@ SLPM-67513:
   region: "NTSC-K"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPM-67514:
@@ -49270,6 +49391,8 @@ SLPS-25088:
   compat: 5
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPS-25089:
@@ -50115,6 +50238,8 @@ SLPS-25250:
   name-sort: ふぁいなるふぁんたじーX-2
   name-en: "Final Fantasy X-2"
   region: "NTSC-J"
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -54120,6 +54245,8 @@ SLPS-72501:
   region: "NTSC-J"
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLPS-72502:
@@ -56222,6 +56349,8 @@ SLUS-20312:
   compat: 5
   roundModes:
     eeRoundMode: 1 # Fixes reverse control and boss in some places.
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
 SLUS-20313:
@@ -58044,6 +58173,8 @@ SLUS-20672:
   name: "Final Fantasy X-2"
   region: "NTSC-U"
   compat: 5
+  clampModes:
+    eeClampMode: 3 # Fixes animations.
   gameFixes:
     - SoftwareRendererFMVHack # Fixes brightness and overlapping subtitles.
   gsHWFixes:
@@ -58109,6 +58240,8 @@ SLUS-20685:
   name: "Ape Escape 2"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 2 # Fixes miptrick texture effects.
     trilinearFiltering: 1 # Fixes miptrick blending.
@@ -61443,6 +61576,7 @@ SLUS-21284:
 SLUS-21285:
   name: "Ultimate Spider-Man [Limited Edition]"
   region: "NTSC-U"
+  compat: 5
   clampModes:
     vu1ClampMode: 0 # Fixes Spider-Man's eyes texture.
   gsHWFixes:
@@ -62952,6 +63086,8 @@ SLUS-21569:
   name: "Shin Megami Tensei - Persona 3"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 1
 SLUS-21570:
@@ -65015,6 +65151,8 @@ SLUS-28065:
 SLUS-28067:
   name: "Shin Megami Tensei - Persona 3 [Trade Demo]"
   region: "NTSC-U"
+  gameFixes:
+    - SoftwareRendererFMVHack # Fixes interlacing.
   gsHWFixes:
     mipmap: 1
 SLUS-28068:
