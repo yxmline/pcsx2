@@ -1794,6 +1794,8 @@ SCAJ-20173:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -4085,6 +4087,8 @@ SCES-50410:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
 SCES-50411:
   name: "Vampire Night"
   region: "PAL-M5"
@@ -5427,6 +5431,8 @@ SCES-54041:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   memcardFilters: # Reads AC4 and 5 saves for bonus unlockables.
     - "SCES-54041"
     - "SCES-50410"
@@ -6631,6 +6637,8 @@ SCKA-20070:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   patches:
     2799A4E5:
       content: |-
@@ -26677,6 +26685,7 @@ SLES-82009:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLES-82010:
   name: "Metal Gear Solid 2, Document of"
@@ -28857,6 +28866,7 @@ SLKA-35001:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLKA-35003:
   name: "Sakura Taisen - Atsuki Chishioni"
@@ -29998,6 +30008,8 @@ SLPM-60149:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
 SLPM-60150:
   name: "Tamamayu Monogatari 2 - Horobi no Mushi"
   region: "NTSC-J"
@@ -45758,6 +45770,7 @@ SLPM-67002:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLPM-67003:
   name: サクラ大戦 〜熱き血潮に〜
@@ -45798,6 +45811,7 @@ SLPM-67008:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLPM-67009:
   name: サクラ大戦V 〜さらば愛しき人よ〜
@@ -46780,6 +46794,7 @@ SLPM-74901:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLPM-84075:
   name: "Anubis Zone of Enders Special Edition [Konami Dendou Selection]"
@@ -49348,6 +49363,8 @@ SLPS-25052:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
 SLPS-25053:
   name: 栄冠は君に 甲子園の覇者
   name-sort: えいかんはきみに こうしえんのはしゃ
@@ -52505,6 +52522,8 @@ SLPS-25629:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -54560,6 +54579,8 @@ SLPS-73205:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
 SLPS-73206:
   name: 第2次スーパーロボット大戦α PS2 the Best
   name-sort: だい2じすーぱーろぼっとたいせんあるふぁ PS2 the Best
@@ -54938,6 +54959,8 @@ SLPS-73250:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   memcardFilters:
     - "SCAJ-20173"
     - "SLPS-25629"
@@ -55111,6 +55134,8 @@ SLPS-73410:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
 SLPS-73411:
   name: "Armored Core 2 - Another Age [PS2 The Best]"
   region: "NTSC-J"
@@ -55809,6 +55834,8 @@ SLUS-20152:
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Fixes vertical lines.
     gpuTargetCLUT: 1 # Fixes broken sun.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   patches:
     A32F7CD0:
       content: |-
@@ -57722,6 +57749,7 @@ SLUS-20554:
     - InstantDMAHack # Fixes broken half-bottom artifacts.
   gsHWFixes:
     roundSprite: 2 # Fixes font artifacts.
+    autoFlush: 1 # Fixes depth of field blur.
     recommendedBlendingLevel: 3 # Fixes broken skin colour on Vlad and others.
 SLUS-20555:
   name: "Reel Fishing 3"
@@ -62126,6 +62154,8 @@ SLUS-21346:
     roundSprite: 1 # Fixes HUD artifacts.
     alignSprite: 1 # Fixes vertical lines.
     mergeSprite: 1 # Better aligns main menu strips, improving font readability.
+    cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
+    cpuSpriteRenderLevel: 2 # Needed for above.
   memcardFilters:
     - "SLUS-21346"
     - "SLUS-20152"
