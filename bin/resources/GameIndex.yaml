@@ -4091,6 +4091,7 @@ SCES-50410:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
 SCES-50411:
   name: "Vampire Night"
   region: "PAL-M5"
@@ -26223,7 +26224,7 @@ SLES-55444:
   roundModes:
     eeRoundMode: 0 # Fixes "Fall through floor" bug when approaching chests.
   gsHWFixes:
-    roundSprite: 1 # Fixes textboxes and character portraits.
+    roundSprite: 2 # Fixes textboxes and character portraits.
     beforeDraw: "OI_ArTonelico2"
 SLES-55448:
   name: "Indiana Jones and the Staff of Kings"
@@ -30040,6 +30041,7 @@ SLPM-60149:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
 SLPM-60150:
   name: "Tamamayu Monogatari 2 - Horobi no Mushi"
   region: "NTSC-J"
@@ -49405,6 +49407,7 @@ SLPS-25052:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
 SLPS-25053:
   name: 栄冠は君に 甲子園の覇者
   name-sort: えいかんはきみに こうしえんのはしゃ
@@ -53678,7 +53681,7 @@ SLPS-25819:
   roundModes:
     eeRoundMode: 0 # Fixes "Fall through floor" bug when approaching chests.
   gsHWFixes:
-    roundSprite: 1 # Fixes textboxes and character portraits.
+    roundSprite: 2 # Fixes textboxes and character portraits.
     beforeDraw: "OI_ArTonelico2"
 SLPS-25820:
   name: 家庭教師ヒットマンREBORN! Let’s暗殺!? 狙われた10代目!
@@ -54621,6 +54624,7 @@ SLPS-73205:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
 SLPS-73206:
   name: 第2次スーパーロボット大戦α PS2 the Best
   name-sort: だい2じすーぱーろぼっとたいせんあるふぁ PS2 the Best
@@ -55077,7 +55081,7 @@ SLPS-73263:
   roundModes:
     eeRoundMode: 0 # Fixes "Fall through floor" bug when approaching chests.
   gsHWFixes:
-    roundSprite: 1 # Fixes textboxes and character portraits.
+    roundSprite: 2 # Fixes textboxes and character portraits.
     beforeDraw: "OI_ArTonelico2"
 SLPS-73264:
   name: "Suzumiya Haruhi no Tomadoi"
@@ -55176,6 +55180,7 @@ SLPS-73410:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
 SLPS-73411:
   name: "Armored Core 2 - Another Age [PS2 The Best]"
   region: "NTSC-J"
@@ -55876,6 +55881,7 @@ SLUS-20152:
     gpuTargetCLUT: 1 # Fixes broken sun.
     cpuSpriteRenderBW: 2 # Fixes broken terrain rendering (See #10271 for details).
     cpuSpriteRenderLevel: 2 # Needed for above.
+    estimateTextureRegion: 1 # Improves performance and reduces HC size.
   patches:
     A32F7CD0:
       content: |-
@@ -64494,7 +64500,7 @@ SLUS-21788:
   roundModes:
     eeRoundMode: 0 # Fixes "Fall through floor" bug when approaching chests.
   gsHWFixes:
-    roundSprite: 1 # Fixes textboxes and character portraits.
+    roundSprite: 2 # Fixes textboxes and character portraits.
     beforeDraw: "OI_ArTonelico2"
 SLUS-21789:
   name: "Cabela's Legendary Adventures"
