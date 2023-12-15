@@ -844,12 +844,12 @@ void FullscreenUI::DestroyResources()
 
 ImGuiFullscreen::FileSelectorFilters FullscreenUI::GetOpenFileFilters()
 {
-	return {"*.bin", "*.iso", "*.cue", "*.mdf", "*.chd", "*.cso", "*.gz", "*.elf", "*.irx", "*.gs", "*.gs.xz", "*.gs.zst", "*.dump"};
+	return {"*.bin", "*.iso", "*.cue", "*.mdf", "*.chd", "*.cso", "*.zso", "*.gz", "*.elf", "*.irx", "*.gs", "*.gs.xz", "*.gs.zst", "*.dump"};
 }
 
 ImGuiFullscreen::FileSelectorFilters FullscreenUI::GetDiscImageFilters()
 {
-	return {"*.bin", "*.iso", "*.cue", "*.mdf", "*.chd", "*.cso", "*.gz"};
+	return {"*.bin", "*.iso", "*.cue", "*.mdf", "*.chd", "*.cso", "*.zso", "*.gz"};
 }
 
 void FullscreenUI::DoStartPath(const std::string& path, std::optional<s32> state_index, std::optional<bool> fast_boot)
@@ -5272,7 +5272,7 @@ void FullscreenUI::DrawSaveStateSelector(bool is_loading)
 					const float t = std::min<float>(std::abs(std::sin(ImGui::GetTime() * 0.75) * 1.1), 1.0f);
 					ImGui::PushStyleColor(ImGuiCol_Border, ImGui::GetColorU32(ImGuiCol_Border, t));
 
-					ImGui::RenderFrame(bb.Min, bb.Max, col, true, 0.0f);
+					ImGuiFullscreen::DrawMenuButtonFrame(bb.Min, bb.Max, col, true, 0.0f);
 
 					ImGui::PopStyleColor();
 				}
@@ -5889,7 +5889,7 @@ void FullscreenUI::DrawGameGrid(const ImVec2& heading_size)
 				const float t = std::min<float>(std::abs(std::sin(ImGui::GetTime() * 0.75) * 1.1), 1.0f);
 				ImGui::PushStyleColor(ImGuiCol_Border, ImGui::GetColorU32(ImGuiCol_Border, t));
 
-				ImGui::RenderFrame(bb.Min, bb.Max, col, true, 0.0f);
+				ImGuiFullscreen::DrawMenuButtonFrame(bb.Min, bb.Max, col, true, 0.0f);
 
 				ImGui::PopStyleColor();
 			}

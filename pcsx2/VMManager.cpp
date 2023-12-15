@@ -32,6 +32,7 @@
 #include "Host.h"
 #include "INISettingsInterface.h"
 #include "ImGui/FullscreenUI.h"
+#include "ImGui/ImGuiOverlays.h"
 #include "Input/InputManager.h"
 #include "IopBios.h"
 #include "LogSink.h"
@@ -1446,6 +1447,7 @@ void VMManager::Shutdown(bool save_resume_state)
 
 	s_state.store(VMState::Shutdown, std::memory_order_release);
 	FullscreenUI::OnVMDestroyed();
+	SaveStateSelectorUI::Clear();
 	UpdateInhibitScreensaver(false);
 	Host::OnVMDestroyed();
 
@@ -1764,7 +1766,7 @@ bool VMManager::LoadState(const char* filename)
 bool VMManager::LoadStateFromSlot(s32 slot)
 {
 	const std::string filename = GetCurrentSaveStateFileName(slot);
-	if (filename.empty())
+	if (filename.empty() || !FileSystem::FileExists(filename.c_str()))
 	{
 		Host::AddIconOSDMessage("LoadStateFromSlot", ICON_FA_EXCLAMATION_TRIANGLE,
 			fmt::format(TRANSLATE_FS("VMManager", "There is no save state in slot {}."), slot),
@@ -2110,7 +2112,7 @@ bool VMManager::IsSaveStateFileName(const std::string_view& path)
 
 bool VMManager::IsDiscFileName(const std::string_view& path)
 {
-	static const char* extensions[] = {".iso", ".bin", ".img", ".mdf", ".gz", ".cso", ".chd"};
+	static const char* extensions[] = {".iso", ".bin", ".img", ".mdf", ".gz", ".cso", ".zso", ".chd"};
 
 	for (const char* test_extension : extensions)
 	{
