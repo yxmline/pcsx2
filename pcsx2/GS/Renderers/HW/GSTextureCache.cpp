@@ -459,7 +459,7 @@ void GSTextureCache::DirtyRectByPage(u32 sbp, u32 spsm, u32 sbw, Target* t, GSVe
 
 	int page_offset = (block_offset) >> 5;
 	// remove any hoizontal offset, this is added back on later.
-	int start_page = page_offset + (src_r.x / src_info->pgs.x) + ((src_r.y / src_info->pgs.y) * std::max(static_cast<int>(sbw), 1));
+	int start_page = page_offset + (in_rect.x / src_info->pgs.x) + ((in_rect.y / src_info->pgs.y) * std::max(static_cast<int>(src_width / 64), 1));
 	const int horizontal_pages = (start_page % src_pg_width);
 	start_page -= horizontal_pages;
 
@@ -508,6 +508,9 @@ void GSTextureCache::DirtyRectByPage(u32 sbp, u32 spsm, u32 sbw, Target* t, GSVe
 		}
 		const int vertical_offset = (inc_vertical_offset / src_info->pgs.y) * src_pg_width;
 		page_offset -= vertical_offset;
+
+		if (start_page < 0 && in_rect.x == 0 && in_rect.y == 0)
+			start_page -= vertical_offset;
 
 		sbp -= vertical_offset << 5;
 		// Update the block offset.
@@ -1032,12 +1035,10 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 		const u32 bw = TEX0.TBW;
 
 		GSVector4i req_rect = r;
-		// The read area might be offset but the start of the texture is at the beginning of the space.
-		req_rect.x = 0;
-		req_rect.y = 0;
 
-		if (region.HasX() || region.HasY())
-			req_rect = req_rect + region.GetOffset(req_rect.z, req_rect.w);
+		// The read area might be offset but the start of the texture is at the beginning of the space.
+		req_rect.x = region.HasX() ? region.GetMinX() : 0;
+		req_rect.y = region.HasY() ? region.GetMinY() : 0;
 
 		// Arc the Lad finds the wrong surface here when looking for a depth stencil.
 		// Since we're currently not caching depth stencils (check ToDo in CreateSource) we should not look for it here.
@@ -1219,7 +1220,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 				else
 				{
 					rect_clean = t->m_dirty.empty();
-					if (!possible_shuffle && rect_clean && bp == t->m_TEX0.TBP0 && t && GSUtil::HasCompatibleBits(psm, t->m_TEX0.PSM) && width_match && real_fmt_match)
+					if (!possible_shuffle && frame_fbp != t->m_TEX0.TBP0 && rect_clean && bp == t->m_TEX0.TBP0 && t && GSUtil::HasCompatibleBits(psm, t->m_TEX0.PSM) && width_match && real_fmt_match)
 					{
 						if (!tex_merge_rt && t->Overlaps(bp, bw, psm, req_rect))
 							ResizeTarget(t, req_rect, bp, psm, bw);
@@ -1291,7 +1292,7 @@ GSTextureCache::Source* GSTextureCache::LookupSource(const bool is_color, const 
 						// 1/ it just works :)
 						// 2/ even with upscaling
 						// 3/ for both Direct3D and OpenGL
-						if (GSConfig.UserHacks_CPUFBConversion && (psm == PSMT4 || psm == PSMT8))
+						if (psm == PSMT4 || (GSConfig.UserHacks_CPUFBConversion && psm == PSMT8))
 						{
 							// Forces 4-bit and 8-bit frame buffer conversion to be done on the CPU instead of the GPU, but performance will be slower.
 							// There is no dedicated shader to handle 4-bit conversion (Stuntman has been confirmed to use 4-bit).
@@ -2180,6 +2181,20 @@ GSTextureCache::Target* GSTextureCache::CreateTarget(GIFRegTEX0 TEX0, const GSVe
 		// Not *strictly* correct if RGB is masked, but we won't use it as a texture if not..
 		dst->m_valid_rgb = true;
 
+		// If there is an opposite target without valid RGB, we need to match them up
+		auto& rev_list = m_dst[1 - type];
+		for (auto j = rev_list.begin(); j != rev_list.end();)
+		{
+			Target* const rev_t = *j;
+			if (rev_t->m_TEX0.TBP0 == dst->m_TEX0.TBP0 && GSLocalMemory::m_psm[rev_t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[dst->m_TEX0.PSM].bpp)
+			{
+				if(!rev_t->m_valid_rgb)
+					rev_t->m_was_dst_matched = true;
+				break;
+			}
+			++j;
+		}
+
 		const int bpp = GSLocalMemory::m_psm[TEX0.PSM].trbpp;
 		const u32 mask = GSLocalMemory::m_psm[TEX0.PSM].fmsk;
 		// If the alpha is masked and preloaded, we need to say it's valid else textures might fail to use the whole texture if RGB is valid.
@@ -2773,6 +2788,18 @@ void GSTextureCache::InvalidateContainedTargets(u32 start_bp, u32 end_bp, u32 wr
 			// Don't keep partial depth buffers around.
 			if ((!t->m_valid_alpha_low && !t->m_valid_alpha_high && !t->m_valid_rgb) || type == DepthStencil)
 			{
+				auto& rev_list = m_dst[1 - type];
+				for (auto j = rev_list.begin(); j != rev_list.end();)
+				{
+					Target* const rev_t = *j;
+					if (rev_t->m_TEX0.TBP0 == t->m_TEX0.TBP0 && GSLocalMemory::m_psm[rev_t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp)
+					{
+						rev_t->m_was_dst_matched = false;
+						break;
+					}
+					++j;
+				}
+
 				GL_CACHE("TC: InvalidateContainedTargets: Remove Target %s[%x, %s]", to_string(type), t->m_TEX0.TBP0, psm_str(t->m_TEX0.PSM));
 				i = list.erase(i);
 				delete t;
@@ -2826,6 +2853,19 @@ void GSTextureCache::InvalidateVideoMemType(int type, u32 bp, u32 write_psm, u32
 
 		// Need to also remove any sources which reference this target.
 		InvalidateSourcesFromTarget(t);
+
+		// If we dst_matched and copied, no need to keep it marked as a copy if the original no longer exists.
+		auto& rev_list = m_dst[1 - type];
+		for (auto j = rev_list.begin(); j != rev_list.end();)
+		{
+			Target* const rev_t = *j;
+			if (rev_t->m_TEX0.TBP0 == t->m_TEX0.TBP0 && GSLocalMemory::m_psm[rev_t->m_TEX0.PSM].bpp == GSLocalMemory::m_psm[t->m_TEX0.PSM].bpp)
+			{
+				rev_t->m_was_dst_matched = false;
+				break;
+			}
+			++j;
+		}
 
 		list.erase(i);
 		delete t;
@@ -5780,10 +5820,19 @@ bool GSTextureCache::Target::HasValidBitsForFormat(u32 psm, bool req_color, bool
 		default:
 			alpha_valid = ((m_TEX0.PSM & 0xF) == 0x1) ? true : (m_valid_alpha_low || m_valid_alpha_high);
 			color_valid = m_valid_rgb;
+			if (req_alpha && !alpha_valid && color_valid)
+			{
+				RGBAMask mask;
+				mask._u32 = 0x8;
+				AddDirtyRectTarget(this, this->m_valid, m_TEX0.PSM, m_TEX0.TBW, mask, false);
+				alpha_valid = true; // This is going to get resolved going forward.
+				m_valid_alpha_low = true;
+				m_valid_alpha_high = true;
+			}
 			break;
 	}
 
-	return (color_valid && req_color) || (!req_color && ((alpha_valid && req_alpha) || !req_alpha));
+	return (!req_color || color_valid) && (!req_alpha || alpha_valid);
 }
 
 void GSTextureCache::Target::ResizeDrawn(const GSVector4i& rect)
