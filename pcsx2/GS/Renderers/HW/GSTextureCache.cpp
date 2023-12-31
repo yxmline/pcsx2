@@ -13,6 +13,7 @@
 #include "common/Console.h"
 #include "common/BitUtils.h"
 #include "common/HashCombine.h"
+#include "common/SmallString.h"
 
 #include "fmt/format.h"
 
@@ -30,6 +31,20 @@ static u8* s_unswizzle_buffer;
 
 /// List of candidates for purging when the hash cache gets too large.
 static std::vector<std::pair<GSTextureCache::HashCacheMap::iterator, s32>> s_hash_cache_purge_list;
+
+#ifdef PCSX2_DEVBUILD
+// We can only set one texture name per command buffer, which would break our fancy texture cache RT/DS/texture naming.
+// So, when debug device is enabled, don't reuse any textures that are drawable.
+__fi static bool PreferReusedLabelledTexture()
+{
+	return !GSConfig.UseDebugDevice;
+}
+#else
+__fi static constexpr bool PreferReusedLabelledTexture()
+{
+	return true;
+}
+#endif
 
 GSTextureCache::GSTextureCache()
 {
@@ -1948,15 +1963,35 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(GIFRegTEX0 TEX0, const GSVe
 		// Drop dirty rect if we're overwriting the whole target.
 		if (!preserve_target && draw_rect.rintersect(dst->m_valid).eq(dst->m_valid))
 		{
-			if (!dst->m_dirty.empty())
+			// Preserve alpha if this is a 32-bit target being used as 24-bit.
+			const bool dont_invalidate_alpha = (dst->HasValidAlpha() && (psm_s.fmt == GSLocalMemory::PSM_FMT_24 || (fbmask & 0xFF000000u) != 0));
+			if (dont_invalidate_alpha)
 			{
-				GL_INS("TC: Clearing dirty list for %s[%x] because we're overwriting the whole target.", to_string(type), dst->m_TEX0.TBP0);
-				dst->m_dirty.clear();
-			}
+				GL_INS("TC: Preserving alpha on 24-bit/masked %s[%x] because it was previously valid.", to_string(type), dst->m_TEX0.TBP0);
 
-			// And invalidate the target, we're drawing over it so we don't care what's there.
-			GL_INS("TC: Invalidating target %s[%x] because it's completely overwritten.", to_string(type), dst->m_TEX0.TBP0);
-			g_gs_device->InvalidateRenderTarget(dst->m_texture);
+				// We can still toss all dirty RGB writes though. Gotta save those uploads.
+				if (!dst->m_dirty.empty())
+				{
+					GL_INS("TC: Clearing RGB dirty list for %s[%x] because we're overwriting the whole target.", to_string(type), dst->m_TEX0.TBP0);
+					for (s32 i = static_cast<s32>(dst->m_dirty.size()) - 1; i >= 0; i--)
+					{
+						if (!dst->m_dirty[i].rgba.c.a)
+							dst->m_dirty.erase(dst->m_dirty.begin() + static_cast<size_t>(i));
+					}
+				}
+			}
+			else
+			{
+				if (!dst->m_dirty.empty())
+				{
+					GL_INS("TC: Clearing dirty list for %s[%x] because we're overwriting the whole target.", to_string(type), dst->m_TEX0.TBP0);
+					dst->m_dirty.clear();
+				}
+
+				// And invalidate the target, we're drawing over it so we don't care what's there.
+				GL_INS("TC: Invalidating target %s[%x] because it's completely overwritten.", to_string(type), dst->m_TEX0.TBP0);
+				g_gs_device->InvalidateRenderTarget(dst->m_texture);
+			}
 		}
 	}
 	else if (!is_frame && !GSConfig.UserHacks_DisableDepthSupport)
@@ -2025,7 +2060,7 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(GIFRegTEX0 TEX0, const GSVe
 			calcRescale(dst_match);
 
 			// If we don't need A, and the existing target doesn't have valid alpha, don't bother converting it.
-			const bool has_alpha = dst_match->m_valid_alpha_low || dst_match->m_valid_alpha_high;
+			const bool has_alpha = dst_match->HasValidAlpha();
 			const bool preserve_target = (preserve_rgb || (preserve_alpha && has_alpha)) ||
 										 !draw_rect.rintersect(dst_match->m_valid).eq(dst_match->m_valid);
 
@@ -2760,6 +2795,11 @@ bool GSTextureCache::PrepareDownloadTexture(u32 width, u32 height, GSTexture::Fo
 		Console.WriteLn("Failed to create %ux%u download texture", new_width, new_height);
 		return false;
 	}
+
+#ifdef PCSX2_DEVBUILD
+	(*tex)->SetDebugName(TinyString::from_fmt("Texture Cache {}x{} {} Readback",
+		new_width, new_height, GSTexture::GetFormatName(format)));
+#endif
 
 	return true;
 }
@@ -4059,8 +4099,8 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 			const bool outside_target = ((x + w) > dst->m_texture->GetWidth() || (y + h) > dst->m_texture->GetHeight());
 			GSTexture* sTex = dst->m_texture;
 			GSTexture* dTex = outside_target ?
-								  g_gs_device->CreateRenderTarget(w, h, GSTexture::Format::Color, true) :
-								  g_gs_device->CreateTexture(w, h, tlevels, GSTexture::Format::Color, true);
+								  g_gs_device->CreateRenderTarget(w, h, GSTexture::Format::Color, true, PreferReusedLabelledTexture()) :
+								  g_gs_device->CreateTexture(w, h, tlevels, GSTexture::Format::Color, PreferReusedLabelledTexture());
 			if (!dTex) [[unlikely]]
 			{
 				Console.Error("Failed to allocate %dx%d texture for offset source", w, h);
@@ -4133,6 +4173,22 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 			// Attach palette for GPU texture conversion
 			AttachPaletteToSource(src, psm.pal, true);
 		}
+
+#ifdef PCSX2_DEVBUILD
+		if (GSConfig.UseDebugDevice)
+		{
+			if (psm.pal > 0)
+			{
+				src->m_texture->SetDebugName(TinyString::from_fmt("Offset {},{} from 0x{:X} {} CBP 0x{:X}", x_offset, y_offset,
+					static_cast<u32>(TEX0.TBP0), psm_str(TEX0.PSM), static_cast<u32>(TEX0.CBP)));
+			}
+			else
+			{
+				src->m_texture->SetDebugName(TinyString::from_fmt("Offset {},{} from 0x{:X} {} ", x_offset, y_offset,
+					static_cast<u32>(TEX0.TBP0), psm_str(TEX0.PSM), static_cast<u32>(TEX0.CBP)));
+			}
+		}
+#endif
 	}
 	else if (dst)
 	{
@@ -4341,8 +4397,10 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 			// 'src' is the new texture cache entry (hence the output)
 			GSTexture* sTex = dst->m_texture;
 			GSTexture* dTex = use_texture ?
-								  g_gs_device->CreateTexture(new_size.x, new_size.y, 1, GSTexture::Format::Color, true) :
-								  g_gs_device->CreateRenderTarget(new_size.x, new_size.y, GSTexture::Format::Color, source_rect_empty || destX != 0 || destY != 0);
+								  g_gs_device->CreateTexture(new_size.x, new_size.y, 1, GSTexture::Format::Color,
+									  PreferReusedLabelledTexture()) :
+								  g_gs_device->CreateRenderTarget(new_size.x, new_size.y, GSTexture::Format::Color,
+									  source_rect_empty || destX != 0 || destY != 0, PreferReusedLabelledTexture());
 			if (!dTex) [[unlikely]]
 			{
 				Console.Error("Failed to allocate %dx%d texture for target copy to source", new_size.x, new_size.y);
@@ -4357,6 +4415,14 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 			{
 				g_gs_device->CopyRect(sTex, dTex, sRect, destX, destY);
 				g_perfmon.Put(GSPerfMon::TextureCopies, 1);
+
+#ifdef PCSX2_DEVBUILD
+				if (GSConfig.UseDebugDevice)
+				{
+					src->m_texture->SetDebugName(TinyString::from_fmt("{}x{} copy of 0x{:X} {}", new_size.x, new_size.y,
+						static_cast<u32>(TEX0.TBP0), psm_str(TEX0.PSM)));
+				}
+#endif
 			}
 			else if (!source_rect_empty)
 			{
@@ -4374,6 +4440,22 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 				}
 
 				g_perfmon.Put(GSPerfMon::TextureCopies, 1);
+
+#ifdef PCSX2_DEVBUILD
+				if (GSConfig.UseDebugDevice)
+				{
+					if (psm.pal > 0)
+					{
+						src->m_texture->SetDebugName(TinyString::from_fmt("Reinterpret 0x{:X} from {} to {} CBP 0x{:X}",
+							static_cast<u32>(TEX0.TBP0), psm_str(dst->m_TEX0.PSM), psm_str(TEX0.PSM), static_cast<u32>(TEX0.CBP)));
+					}
+					else
+					{
+						src->m_texture->SetDebugName(TinyString::from_fmt("Reinterpret 0x{:X} from {} to {}",
+							static_cast<u32>(TEX0.TBP0), psm_str(dst->m_TEX0.PSM), psm_str(TEX0.PSM)));
+					}
+				}
+#endif
 			}
 		}
 
@@ -4452,6 +4534,23 @@ GSTextureCache::Source* GSTextureCache::CreateSource(const GIFRegTEX0& TEX0, con
 			else if (psm.pal > 0)
 				AttachPaletteToSource(src, psm.pal, false);
 		}
+
+#ifdef PCSX2_DEVBUILD
+		if (GSConfig.UseDebugDevice)
+		{
+			if (psm.pal > 0)
+			{
+				src->m_texture->SetDebugName(TinyString::from_fmt("{}x{} {} @ 0x{:X} TBW={} CBP=0x{:X}",
+					tw, th, psm_str(TEX0.PSM), static_cast<u32>(TEX0.TBP0), static_cast<u32>(TEX0.TBW),
+					static_cast<u32>(TEX0.CBP)));
+			}
+			else
+			{
+				src->m_texture->SetDebugName(TinyString::from_fmt("{}x{} {} @ 0x{:X} TBW={}",
+					tw, th, psm_str(TEX0.PSM), static_cast<u32>(TEX0.TBP0), static_cast<u32>(TEX0.TBW)));
+			}
+		}
+#endif
 	}
 
 	pxAssert(src->m_texture);
@@ -4991,8 +5090,8 @@ GSTextureCache::Target* GSTextureCache::Target::Create(GIFRegTEX0 TEX0, int w, i
 	const int scaled_w = static_cast<int>(std::ceil(static_cast<float>(w) * scale));
 	const int scaled_h = static_cast<int>(std::ceil(static_cast<float>(h) * scale));
 	GSTexture* texture = (type == RenderTarget) ?
-		g_gs_device->CreateRenderTarget(scaled_w, scaled_h, GSTexture::Format::Color, clear) :
-		g_gs_device->CreateDepthStencil(scaled_w, scaled_h, GSTexture::Format::DepthStencil, clear);
+		g_gs_device->CreateRenderTarget(scaled_w, scaled_h, GSTexture::Format::Color, clear, PreferReusedLabelledTexture()) :
+		g_gs_device->CreateDepthStencil(scaled_w, scaled_h, GSTexture::Format::DepthStencil, clear, PreferReusedLabelledTexture());
 	if (!texture)
 		return nullptr;
 
@@ -5001,6 +5100,8 @@ GSTextureCache::Target* GSTextureCache::Target::Create(GIFRegTEX0 TEX0, int w, i
 	g_texture_cache->m_target_memory_usage += t->m_texture->GetMemUsage();
 
 	g_texture_cache->m_dst[type].push_front(t);
+
+	t->UpdateTextureDebugName();
 
 	return t;
 }
@@ -5894,8 +5995,10 @@ bool GSTextureCache::Target::ResizeTexture(int new_unscaled_width, int new_unsca
 	const bool clear = (new_size.x > size.x || new_size.y > size.y);
 
 	GSTexture* tex = m_texture->IsDepthStencil() ?
-						 g_gs_device->CreateDepthStencil(new_size.x, new_size.y, m_texture->GetFormat(), clear) :
-						 g_gs_device->CreateRenderTarget(new_size.x, new_size.y, m_texture->GetFormat(), clear);
+						 g_gs_device->CreateDepthStencil(new_size.x, new_size.y, m_texture->GetFormat(), clear,
+							 PreferReusedLabelledTexture()) :
+						 g_gs_device->CreateRenderTarget(new_size.x, new_size.y, m_texture->GetFormat(), clear,
+							 PreferReusedLabelledTexture());
 	if (!tex)
 	{
 		Console.Error("(ResizeTexture) Failed to allocate %dx%d texture from %dx%d texture", size.x, size.y, new_size.x, new_size.y);
@@ -5943,7 +6046,21 @@ bool GSTextureCache::Target::ResizeTexture(int new_unscaled_width, int new_unsca
 	m_texture = tex;
 	m_unscaled_size = new_unscaled_size;
 
+	UpdateTextureDebugName();
+
 	return true;
+}
+
+void GSTextureCache::Target::UpdateTextureDebugName()
+{
+#ifdef PCSX2_DEVBUILD
+	if (GSConfig.UseDebugDevice)
+	{
+		m_texture->SetDebugName(SmallString::from_fmt("{} 0x{:X} {} BW={} {}x{}",
+			m_type ? "DS" : "RT", static_cast<u32>(m_TEX0.TBP0), psm_str(m_TEX0.PSM), static_cast<u32>(m_TEX0.TBW),
+			m_unscaled_size.x, m_unscaled_size.y));
+	}
+#endif
 }
 
 // GSTextureCache::SourceMap
@@ -6241,8 +6358,8 @@ void GSTextureCache::InjectHashCacheTexture(const HashCacheKey& key, GSTexture* 
 		m_hash_cache_replacement_memory_usage -= it->second.texture->GetMemUsage();
 
 	it->second.is_replacement = true;
-	it->second.texture->Swap(tex);
-	g_gs_device->Recycle(tex);
+	g_gs_device->Recycle(it->second.texture);
+	it->second.texture = tex;	
 }
 
 // GSTextureCache::Palette
