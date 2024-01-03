@@ -13630,6 +13630,8 @@ SLES-50539:
   region: "PAL-M6"
   clampModes:
     vuClampMode: 2 # Fixes corrupt textures.
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes lighting
 SLES-50540:
   name: "Simpsons Road Rage"
   region: "PAL-E"
@@ -14512,6 +14514,8 @@ SLES-50880:
 SLES-50882:
   name: "Mary-Kate and Ashley - Sweet 16"
   region: "PAL-E"
+  gameFixes:
+    - EETimingHack # Fixes random crashes in mini games.
 SLES-50886:
   name: "TransWorld Surf"
   region: "PAL-M5"
@@ -26459,6 +26463,8 @@ SLES-55457:
 SLES-55458:
   name: "Rock Band - Song Pack 2"
   region: "PAL-M5"
+  speedHacks:
+    mvuFlag: 0 # Fixes broken rendering.
 SLES-55459:
   name: "Jelly Belly - Ballistic Beans"
   region: "PAL-M5"
@@ -46237,6 +46243,8 @@ SLPM-67505:
   compat: 5
   clampModes:
     vuClampMode: 2 # Fixes corrupt textures.
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes lighting
 SLPM-67506:
   name: "Thunder Strike - Operation Phoenix"
   region: "NTSC-K"
@@ -56713,6 +56721,8 @@ SLUS-20265:
   compat: 5
   clampModes:
     vuClampMode: 2 # Fixes corrupt textures.
+  gsHWFixes:
+    recommendedBlendingLevel: 4 # Fixes lighting
 SLUS-20266:
   name: "NASCAR - Thunder 2002"
   region: "NTSC-U"
@@ -58434,6 +58444,8 @@ SLUS-20603:
   name: "Mary-Kate & Ashley - Sweet Sixteen - Licensed to Drive"
   region: "NTSC-U"
   compat: 5
+  gameFixes:
+    - EETimingHack # Fixes random crashes in mini games.
 SLUS-20604:
   name: "MTV's Celebrity Deathmatch"
   region: "NTSC-U"
@@ -65070,6 +65082,8 @@ SLUS-21830:
   name: "Rock Band Track Pack - Volume 2"
   region: "NTSC-U"
   compat: 3
+  speedHacks:
+    mvuFlag: 0 # Fixes broken rendering.
 SLUS-21831:
   name: "Army Men - Soldiers of Misfortune"
   region: "NTSC-U"
