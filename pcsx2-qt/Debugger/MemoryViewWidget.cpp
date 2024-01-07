@@ -391,7 +391,7 @@ void MemoryViewWidget::customMenuRequested(QPoint pos)
 		m_contextMenu->addAction(action);
 		connect(action, &QAction::triggered, this, [this]() { QApplication::clipboard()->setText(QString::number(m_table.selectedAddress, 16).toUpper()); });
 
-		action = new QAction(tr("Go to in disassembly"));
+		action = new QAction(tr("Go to in Disassembly"));
 		m_contextMenu->addAction(action);
 		connect(action, &QAction::triggered, this, [this]() { emit gotoInDisasm(m_table.selectedAddress); });
 
@@ -423,6 +423,10 @@ void MemoryViewWidget::customMenuRequested(QPoint pos)
 		connect(m_actionDWORD, &QAction::triggered, this, [this]() { m_table.SetViewType(MemoryViewType::DWORD); });
 
 		m_contextMenu->addSeparator();
+
+		action = new QAction((tr("Add to Saved Memory Addresses")));
+		m_contextMenu->addAction(action);
+		connect(action, &QAction::triggered, this, [this]() { emit addToSavedAddresses(m_table.selectedAddress); });
 
 		action = new QAction(tr("Copy Byte"));
 		m_contextMenu->addAction(action);
