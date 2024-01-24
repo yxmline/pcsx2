@@ -150,6 +150,7 @@ namespace EmuFolders
 	std::string AppRoot;
 	std::string DataRoot;
 	std::string Settings;
+	std::string DebuggerSettings;
 	std::string Bios;
 	std::string Snapshots;
 	std::string Savestates;
@@ -1697,11 +1698,6 @@ Pcsx2Config::Pcsx2Config()
 	InhibitScreensaver = true;
 	BackupSavestate = true;
 	SavestateZstdCompression = true;
-
-#ifdef _WIN32
-	McdCompressNTFS = true;
-#endif
-
 	WarnAboutUnsafeSettings = true;
 
 	// To be moved to FileMemoryCard pluign (someday)
@@ -1769,10 +1765,6 @@ void Pcsx2Config::LoadSaveCore(SettingsWrapper& wrap)
 	BaseFilenames.LoadSave(wrap);
 	EmulationSpeed.LoadSave(wrap);
 	LoadSaveMemcards(wrap);
-
-#ifdef _WIN32
-	SettingsWrapEntry(McdCompressNTFS);
-#endif
 
 	if (wrap.IsLoading())
 	{
@@ -2013,6 +2005,7 @@ void EmuFolders::LoadConfig(SettingsInterface& si)
 	Textures = LoadPathFromSettings(si, DataRoot, "Textures", "textures");
 	InputProfiles = LoadPathFromSettings(si, DataRoot, "InputProfiles", "inputprofiles");
 	Videos = LoadPathFromSettings(si, DataRoot, "Videos", "videos");
+	DebuggerSettings = LoadPathFromSettings(si, Settings, "DebuggerSettings", "debuggersettings");
 
 	Console.WriteLn("BIOS Directory: %s", Bios.c_str());
 	Console.WriteLn("Snapshots Directory: %s", Snapshots.c_str());
@@ -2029,6 +2022,7 @@ void EmuFolders::LoadConfig(SettingsInterface& si)
 	Console.WriteLn("Textures Directory: %s", Textures.c_str());
 	Console.WriteLn("Input Profile Directory: %s", InputProfiles.c_str());
 	Console.WriteLn("Video Dumping Directory: %s", Videos.c_str());
+	Console.WriteLn("Debugger Settings Directory: %s", DebuggerSettings.c_str());
 }
 
 bool EmuFolders::EnsureFoldersExist()
@@ -2044,6 +2038,7 @@ bool EmuFolders::EnsureFoldersExist()
 	result = FileSystem::CreateDirectoryPath(Covers.c_str(), false) && result;
 	result = FileSystem::CreateDirectoryPath(GameSettings.c_str(), false) && result;
 	result = FileSystem::CreateDirectoryPath(UserResources.c_str(), false) && result;
+	result = FileSystem::CreateDirectoryPath(DebuggerSettings.c_str(), false) && result;
 	result = FileSystem::CreateDirectoryPath(Cache.c_str(), false) && result;
 	result = FileSystem::CreateDirectoryPath(Textures.c_str(), false) && result;
 	result = FileSystem::CreateDirectoryPath(InputProfiles.c_str(), false) && result;
