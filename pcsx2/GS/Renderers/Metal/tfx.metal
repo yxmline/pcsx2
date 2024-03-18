@@ -41,6 +41,8 @@ constant uint PS_BLEND_D            [[function_constant(GSMTLConstantIndex_PS_BL
 constant uint PS_BLEND_HW           [[function_constant(GSMTLConstantIndex_PS_BLEND_HW)]];
 constant bool PS_A_MASKED           [[function_constant(GSMTLConstantIndex_PS_A_MASKED)]];
 constant bool PS_HDR                [[function_constant(GSMTLConstantIndex_PS_HDR)]];
+constant bool PS_RTA_CORRECTION     [[function_constant(GSMTLConstantIndex_PS_RTA_CORRECTION)]];
+constant bool PS_RTA_SRC_CORRECTION [[function_constant(GSMTLConstantIndex_PS_RTA_SRC_CORRECTION)]];
 constant bool PS_COLCLIP            [[function_constant(GSMTLConstantIndex_PS_COLCLIP)]];
 constant uint PS_BLEND_MIX          [[function_constant(GSMTLConstantIndex_PS_BLEND_MIX)]];
 constant bool PS_ROUND_INV          [[function_constant(GSMTLConstantIndex_PS_ROUND_INV)]];
@@ -479,9 +481,18 @@ struct PSMain
 		c.y = sample_c(uv.zy).a;
 		c.z = sample_c(uv.xw).a;
 		c.w = sample_c(uv.zw).a;
-
-		uint4 i = uint4(c * 255.5f); // Denormalize value
-
+		
+		uint4 i;
+		
+		if (PS_RTA_SRC_CORRECTION)
+		{
+			i = uint4(c * 128.25f); // Denormalize value
+		}
+		else
+		{
+			i = uint4(c * 255.5f); // Denormalize value
+		}
+		
 		if (PS_PAL_FMT == 1)
 			return i & 0xF;
 		if (PS_PAL_FMT == 2)
@@ -713,9 +724,13 @@ struct PSMain
 		else
 			t = c[0];
 
+		if (PS_AEM_FMT == FMT_32 && PS_PAL_FMT == 0 && PS_RTA_SRC_CORRECTION)
+			t.a = t.a * (128.5f / 255.0f);
+			
 		// The 0.05f helps to fix the overbloom of sotc
 		// I think the issue is related to the rounding of texture coodinate. The linear (from fixed unit)
 		// interpolation could be slightly below the correct one.
+		
 		return trunc(t * 255.f + 0.05f);
 	}
 
@@ -914,7 +929,7 @@ struct PSMain
 					return;
 			}
 
-			float Ad = trunc(current_color.a * 255.5f) / 128.f;
+			float Ad = PS_RTA_CORRECTION ? trunc(current_color.a * 128.1f) / 128.f : trunc(current_color.a * 255.1f) / 128.f;
 
 			float3 Cd = trunc(current_color.rgb * 255.5f);
 			float3 Cs = Color.rgb;
@@ -990,7 +1005,7 @@ struct PSMain
 				float Alpha = PS_BLEND_C == 2 ? cb.alpha_fix : As;
 				Color.rgb = saturate(Alpha - 1.f) * 255.f;
 			}
-			else if (PS_BLEND_HW == 3)
+			else if (PS_BLEND_HW == 3 && PS_RTA_CORRECTION == 0)
 			{
 				// Needed for Cs*Ad, Cs*Ad + Cd, Cd - Cs*Ad
 				// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value when rgb are below 128.
@@ -1018,7 +1033,7 @@ struct PSMain
 		{
 			// 1 => DATM == 0, 2 => DATM == 1
 			float rt_a = PS_WRITE_RG ? current_color.g : current_color.a;
-			bool bad = (PS_DATE & 3) == 1 ? (rt_a > 0.5) : (rt_a < 0.5);
+			bool bad = PS_RTA_CORRECTION ? ((PS_DATE & 3) == 1 ? (rt_a > (254.5f / 255.f)) : (rt_a < (254.5f / 255.f))) : ((PS_DATE & 3) == 1 ? (rt_a > 0.5) : (rt_a < 0.5));
 
 			if (bad)
 				discard_fragment();
@@ -1043,7 +1058,15 @@ struct PSMain
 			C.a = 128.0f;
 		}
 
-		float4 alpha_blend = SW_AD_TO_HW ? float4(trunc(current_color.a * 255.5f) / 128.f) : float4(C.a / 128.f);
+		float4 alpha_blend = float4(0.f);
+		if (SW_AD_TO_HW)
+		{
+			alpha_blend = PS_RTA_CORRECTION ? float4(trunc(current_color.a * 128.f) / 128.f) : float4(trunc(current_color.a * 255.5f) / 128.f);
+		}
+		else
+		{
+			alpha_blend = float4(C.a / 128.f);
+		}
 
 		if (PS_DST_FMT == FMT_16)
 		{
@@ -1130,7 +1153,8 @@ struct PSMain
 		ps_fbmask(C);
 
 		if (PS_COLOR0)
-			out.c0 = PS_HDR ? float4(C.rgb / 65535.f, C.a / 255.f) : C / 255.f;
+			out.c0.a = PS_RTA_CORRECTION ? C.a / 128.f : C.a / 255.f;
+			out.c0.rgb = PS_HDR ? float3(C.rgb / 65535.f) : C.rgb / 255.f;
 		if (PS_COLOR0 && PS_ONLY_ALPHA)
 			out.c0.rgb = 0;
 		if (PS_COLOR1)

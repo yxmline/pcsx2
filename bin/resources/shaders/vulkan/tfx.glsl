@@ -523,7 +523,12 @@ uvec4 sample_4_index(vec4 uv)
 	c.w = sample_c(uv.zw).a;
 
 	// Denormalize value
+			
+#if PS_RTA_SRC_CORRECTION
+	uvec4 i = uvec4(c * 128.25f);
+#else
 	uvec4 i = uvec4(c * 255.5f);
+#endif
 
 	#if PS_PAL_FMT == 1
 		// 4HL
@@ -835,7 +840,9 @@ vec4 sample_color(vec2 st)
 		t = c[0];
 	}
 	#endif
-
+#if PS_AEM_FMT == FMT_32 && PS_PAL_FMT == 0 && PS_RTA_SRC_CORRECTION
+	t.a = t.a * (128.5f / 255.0f);
+#endif
 	return trunc(t * 255.0f + 0.05f);
 }
 
@@ -1049,18 +1056,20 @@ void ps_blend(inout vec4 Color, inout vec4 As_rgba)
 		#endif
 
 		#if PS_FEEDBACK_LOOP_IS_NEEDED
-			vec4 RT = trunc(sample_from_rt() * 255.0f + 0.1f);
+			vec4 RT = sample_from_rt();
 		#else
 			// Not used, but we define it to make the selection below simpler.
 			vec4 RT = vec4(0.0f);
 		#endif
 
-			// FIXME FMT_16 case
-			// FIXME Ad or Ad * 2?
-			float Ad = RT.a / 128.0f;
+		#if PS_RTA_CORRECTION
+			float Ad = trunc(RT.a * 128.0f + 0.1f) / 128.0f;
+		#else
+			float Ad = trunc(RT.a * 255.0f + 0.1f) / 128.0f;
+		#endif
 
 			// Let the compiler do its jobs !
-			vec3 Cd = RT.rgb;
+			vec3 Cd = trunc(RT.rgb * 255.0f + 0.1f);
 			vec3 Cs = Color.rgb;
 
 		#if PS_BLEND_A == 0
@@ -1161,7 +1170,7 @@ void ps_blend(inout vec4 Color, inout vec4 As_rgba)
 
 			Color.rgb = max(vec3(0.0f), (Alpha - vec3(1.0f)));
 			Color.rgb *= vec3(255.0f);
-		#elif PS_BLEND_HW == 3
+		#elif PS_BLEND_HW == 3 && PS_RTA_CORRECTION == 0
 			// Needed for Cs*Ad, Cs*Ad + Cd, Cd - Cs*Ad
 			// Multiply Color.rgb by (255/128) to compensate for wrong Ad/255 value when rgb are below 128.
 			// When any color channel is higher than 128 then adjust the compensation automatically
@@ -1192,10 +1201,18 @@ void main()
 
 #if (PS_DATE & 3) == 1
 	// DATM == 0: Pixel with alpha equal to 1 will failed
-	bool bad = (127.5f / 255.0f) < rt_a;
+	#if PS_RTA_CORRECTION
+		bool bad = (254.5f / 255.0f) < rt_a;
+	#else
+		bool bad = (127.5f / 255.0f) < rt_a;
+	#endif
 #elif (PS_DATE & 3) == 2
 	// DATM == 1: Pixel with alpha equal to 0 will failed
-	bool bad = rt_a < (127.5f / 255.0f);
+	#if PS_RTA_CORRECTION
+		bool bad = rt_a < (254.5f / 255.0f);
+	#else
+		bool bad = rt_a < (127.5f / 255.0f);
+	#endif
 #endif
 
 	if (bad) {
@@ -1223,8 +1240,13 @@ void main()
 	C.a = 128.0f;
 #endif
 
-#if (SW_AD_TO_HW)
-	vec4 RT = trunc(sample_from_rt() * 255.0f + 0.1f);
+#if SW_AD_TO_HW
+	#if PS_RTA_CORRECTION
+		vec4 RT = trunc(sample_from_rt() * 128.0f + 0.1f);
+	#else
+		vec4 RT = trunc(sample_from_rt() * 255.0f + 0.1f);
+	#endif
+
 	vec4 alpha_blend = vec4(RT.a / 128.0f);
 #else
 	vec4 alpha_blend = vec4(C.a / 128.0f);
@@ -1307,10 +1329,15 @@ void main()
 	ps_fbmask(C);
 
 	#if !PS_NO_COLOR
-		#if PS_HDR == 1
-			o_col0 = vec4(C.rgb / 65535.0f, C.a / 255.0f);
+		#if PS_RTA_CORRECTION
+			o_col0.a = C.a / 128.0f;
 		#else
-			o_col0 = C / 255.0f;
+			o_col0.a = C.a / 255.0f;
+		#endif
+		#if PS_HDR == 1
+			o_col0.rgb = vec3(C.rgb / 65535.0f);
+		#else
+			o_col0.rgb = C.rgb / 255.0f;
 		#endif
 		#if !defined(DISABLE_DUAL_SOURCE) && !PS_NO_COLOR1
 			o_col1 = alpha_blend;
