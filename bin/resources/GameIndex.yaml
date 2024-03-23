@@ -18305,6 +18305,8 @@ SLES-52282:
 SLES-52283:
   name: "Terminator 3 - The Redemption"
   region: "PAL-M5"
+  gsHWFixes:
+    autoFlush: 2 # Fixes environment lights visible through player model.
 SLES-52284:
   name: "Deadly Skies III"
   region: "PAL-M5"
@@ -19039,6 +19041,9 @@ SLES-52573:
   region: "PAL-M5"
   roundModes:
     eeRoundMode: 2 # Fixes abnormal character behaviour.
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLES-52576:
   name: "Yu-Gi-Oh! Capsule Monster Coliseum"
   region: "PAL-M5"
@@ -40753,6 +40758,8 @@ SLPM-65837:
   name-sort: Terminator 3:The Redemption
   name-en: "Terminator 3 - Redemption"
   region: "NTSC-J"
+  gsHWFixes:
+    autoFlush: 2 # Fixes environment lights visible through player model.
 SLPM-65838:
   name: 半熟銀河弁当 半熟英雄4 〜7人の半熟英雄〜 [限定版]
   name-sort: はんじゅくぎんがべんとう はんじゅくひーろー4 7にんのはんじゅくひーろー [げんていばん]
@@ -63208,6 +63215,9 @@ SLUS-21172:
   compat: 5
   roundModes:
     eeRoundMode: 2 # Fixes abnormal character behaviour.
+  gsHWFixes:
+    mipmap: 2 # Mipmap + trilinear, improves ground textures to match sw renderer.
+    trilinearFiltering: 1
 SLUS-21173:
   name: "Dora the Explorer - To the Purple Planet"
   region: "NTSC-U"
@@ -63933,15 +63943,22 @@ SLUS-21278:
       content: |-
         author=refraction and jordanthetoast
         // Rearrange COP2 codes.
-        patch=1,EE,0032e084,word,DA5A0000
-        patch=1,EE,00324668,word,D8DA0000
-        patch=1,EE,0032e2bc,word,D8DA0000
-        patch=1,EE,00324668,word,D8DA0000
-        patch=1,EE,0032c43c,word,DA5A0000
-        patch=1,EE,0032c5c0,word,D89A0000
-        patch=1,EE,0032c990,word,D89A0000
-        patch=1,EE,0032e360,word,D8FA0000
-        patch=1,EE,0032f494,word,D8DA0000
+        patch=1,EE,0032465c,word,48478800
+        patch=1,EE,00324668,word,4BF9D6EC
+        patch=1,EE,0032465c,word,48478800
+        patch=1,EE,00324668,word,4BF9D6EC
+        patch=1,EE,0032c430,word,48428800
+        patch=1,EE,0032c43c,word,4BF9D6EC
+        patch=1,EE,0032c5b4,word,48428800
+        patch=1,EE,0032c5c0,word,4BF9D6EC
+        patch=1,EE,0032c984,word,48428800
+        patch=1,EE,0032c990,word,4BF9D6EC
+        patch=1,EE,0032e078,word,48428800
+        patch=1,EE,0032e084,word,4BF9D6EC
+        patch=1,EE,0032e2b0,word,48428800
+        patch=1,EE,0032e2bc,word,4BF9D6EC
+        patch=1,EE,0032f488,word,48428800
+        patch=1,EE,0032f494,word,4BF9D6EC
 SLUS-21279:
   name: "NBA Live '06"
   region: "NTSC-U"
