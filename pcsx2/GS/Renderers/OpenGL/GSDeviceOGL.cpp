@@ -733,7 +733,7 @@ bool GSDeviceOGL::CheckFeatures(bool& buggy_pbo)
 	m_features.bptc_textures =
 		GLAD_GL_VERSION_4_2 || GLAD_GL_ARB_texture_compression_bptc || GLAD_GL_EXT_texture_compression_bptc;
 	m_features.prefer_new_textures = false;
-	m_features.dual_source_blend = !GSConfig.DisableDualSourceBlend;
+	m_features.dual_source_blend = true;
 	m_features.clip_control = GLAD_GL_ARB_clip_control;
 	if (!m_features.clip_control)
 		Host::AddOSDMessage(
@@ -1348,6 +1348,7 @@ std::string GSDeviceOGL::GetPSSource(const PSSelector& sel)
 		+ fmt::format("#define PS_TFX {}\n", sel.tfx)
 		+ fmt::format("#define PS_TCC {}\n", sel.tcc)
 		+ fmt::format("#define PS_ATST {}\n", sel.atst)
+		+ fmt::format("#define PS_AFAIL {}\n", sel.afail)
 		+ fmt::format("#define PS_FOG {}\n", sel.fog)
 		+ fmt::format("#define PS_BLEND_HW {}\n", sel.blend_hw)
 		+ fmt::format("#define PS_A_MASKED {}\n", sel.a_masked)
@@ -1386,8 +1387,6 @@ std::string GSDeviceOGL::GetPSSource(const PSSelector& sel)
 		+ fmt::format("#define PS_SCANMSK {}\n", sel.scanmsk)
 		+ fmt::format("#define PS_NO_COLOR {}\n", sel.no_color)
 		+ fmt::format("#define PS_NO_COLOR1 {}\n", sel.no_color1)
-		+ fmt::format("#define PS_NO_ABLEND {}\n", sel.no_ablend)
-		+ fmt::format("#define PS_ONLY_ALPHA {}\n", sel.only_alpha)
 	;
 
 	std::string src = GenGlslHeader("ps_main", GL_FRAGMENT_SHADER, macro);
@@ -2210,7 +2209,8 @@ void GSDeviceOGL::OMUnbindTexture(GSTextureOGL* tex)
 		OMAttachDs();
 }
 
-void GSDeviceOGL::OMSetBlendState(bool enable, GLenum src_factor, GLenum dst_factor, GLenum op, bool is_constant, u8 constant)
+void GSDeviceOGL::OMSetBlendState(bool enable, GLenum src_factor, GLenum dst_factor, GLenum op,
+	GLenum src_factor_alpha, GLenum dst_factor_alpha, bool is_constant, u8 constant)
 {
 	if (enable)
 	{
@@ -2233,26 +2233,20 @@ void GSDeviceOGL::OMSetBlendState(bool enable, GLenum src_factor, GLenum dst_fac
 			glBlendEquationSeparate(op, GL_FUNC_ADD);
 		}
 
-		if (GLState::f_sRGB != src_factor || GLState::f_dRGB != dst_factor)
+		if (GLState::f_sRGB != src_factor || GLState::f_dRGB != dst_factor ||
+			GLState::f_sA != src_factor_alpha || GLState::f_dA != dst_factor_alpha)
 		{
 			GLState::f_sRGB = src_factor;
 			GLState::f_dRGB = dst_factor;
-			glBlendFuncSeparate(src_factor, dst_factor, GL_ONE, GL_ZERO);
+			GLState::f_sA = src_factor_alpha;
+			GLState::f_dA = dst_factor_alpha;
+			glBlendFuncSeparate(src_factor, dst_factor, src_factor_alpha, dst_factor_alpha);
 		}
 	}
 	else
 	{
 		if (GLState::blend)
 		{
-			// make sure we're not using dual source
-			if (GLState::f_sRGB == GL_SRC1_ALPHA || GLState::f_sRGB == GL_ONE_MINUS_SRC1_ALPHA ||
-				GLState::f_dRGB == GL_SRC1_ALPHA || GLState::f_dRGB == GL_ONE_MINUS_SRC1_ALPHA)
-			{
-				glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
-				GLState::f_sRGB = GL_ONE;
-				GLState::f_dRGB = GL_ZERO;
-			}
-
 			GLState::blend = false;
 			glDisable(GL_BLEND);
 		}
@@ -2541,6 +2535,7 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 
 	OMSetBlendState(config.blend.enable, s_gl_blend_factors[config.blend.src_factor],
 		s_gl_blend_factors[config.blend.dst_factor], s_gl_blend_ops[config.blend.op],
+		s_gl_blend_factors[config.blend.src_factor_alpha], s_gl_blend_factors[config.blend.dst_factor_alpha],
 		config.blend.constant_enable, config.blend.constant);
 
 	// avoid changing framebuffer just to switch from rt+depth to rt and vice versa
@@ -2570,25 +2565,6 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 
 	SendHWDraw(config, psel.ps.IsFeedbackLoop());
 
-	if (config.separate_alpha_pass)
-	{
-		GSHWDrawConfig::BlendState dummy_bs;
-		SetHWDrawConfigForAlphaPass(&psel.ps, &config.colormask, &dummy_bs, &config.depth);
-		SetupPipeline(psel);
-		OMSetColorMaskState(config.alpha_second_pass.colormask);
-		SetupOM(config.alpha_second_pass.depth);
-		OMSetBlendState();
-		SendHWDraw(config, psel.ps.IsFeedbackLoop());
-
-		// restore blend state if we're doing a second pass
-		if (config.alpha_second_pass.enable)
-		{
-			OMSetBlendState(config.blend.enable, s_gl_blend_factors[config.blend.src_factor],
-				s_gl_blend_factors[config.blend.dst_factor], s_gl_blend_ops[config.blend.op],
-				config.blend.constant_enable, config.blend.constant);
-		}
-	}
-
 	if (config.alpha_second_pass.enable)
 	{
 		// cbuffer will definitely be dirty if aref changes, no need to check it
@@ -2604,17 +2580,6 @@ void GSDeviceOGL::RenderHW(GSHWDrawConfig& config)
 		OMSetColorMaskState(config.alpha_second_pass.colormask);
 		SetupOM(config.alpha_second_pass.depth);
 		SendHWDraw(config, psel.ps.IsFeedbackLoop());
-
-		if (config.second_separate_alpha_pass)
-		{
-			GSHWDrawConfig::BlendState dummy_bs;
-			SetHWDrawConfigForAlphaPass(&psel.ps, &config.colormask, &dummy_bs, &config.depth);
-			SetupPipeline(psel);
-			OMSetColorMaskState(config.alpha_second_pass.colormask);
-			SetupOM(config.alpha_second_pass.depth);
-			OMSetBlendState();
-			SendHWDraw(config, psel.ps.IsFeedbackLoop());
-		}
 	}
 
 	if (primid_texture)

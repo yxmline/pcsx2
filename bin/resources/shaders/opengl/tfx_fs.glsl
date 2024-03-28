@@ -86,14 +86,12 @@ in SHADER
 	#endif
 #endif
 
-#if !PS_NO_COLOR
-#if !defined(DISABLE_DUAL_SOURCE) && !PS_NO_COLOR1
+#if !PS_NO_COLOR && !PS_NO_COLOR1
 	// Same buffer but 2 colors for dual source blending
 	layout(location = 0, index = 0) TARGET_0_QUALIFIER vec4 SV_Target0;
 	layout(location = 0, index = 1) out vec4 SV_Target1;
-#else
+#elif !PS_NO_COLOR
 	layout(location = 0) TARGET_0_QUALIFIER vec4 SV_Target0;
-#endif
 #endif
 
 #if NEEDS_TEX
@@ -642,20 +640,21 @@ vec4 tfx(vec4 T, vec4 C)
 	return C_out;
 }
 
-void atst(vec4 C)
+bool atst(vec4 C)
 {
 	float a = C.a;
 
-#if (PS_ATST == 0)
-	// nothing to do
-#elif (PS_ATST == 1)
-	if (a > AREF) discard;
+#if (PS_ATST == 1)
+	return (a <= AREF);
 #elif (PS_ATST == 2)
-	if (a < AREF) discard;
+	return (a >= AREF);
 #elif (PS_ATST == 3)
-	if (abs(a - AREF) > 0.5f) discard;
+	return (abs(a - AREF) <= 0.5f);
 #elif (PS_ATST == 4)
-	if (abs(a - AREF) < 0.5f) discard;
+	return (abs(a - AREF) >= 0.5f);
+#else
+	// nothing to do
+	return true;
 #endif
 }
 
@@ -986,6 +985,12 @@ void ps_main()
 #endif
 
 	vec4 C = ps_color();
+	bool atst_pass = atst(C);
+
+#if PS_AFAIL == 0 // KEEP or ATST off
+	if (!atst_pass)
+		discard;
+#endif
 
 	// Must be done before alpha correction
 
@@ -1104,6 +1109,11 @@ void ps_main()
 
 	ps_fbmask(C);
 
+#if PS_AFAIL == 3 // RGB_ONLY
+	// Use alpha blend factor to determine whether to update A.
+	alpha_blend.a = float(atst_pass);
+#endif
+
 #if !PS_NO_COLOR
 	#if PS_RTA_CORRECTION
 		SV_Target0.a = C.a / 128.0f;
@@ -1117,15 +1127,6 @@ void ps_main()
 	#endif
 	#if !defined(DISABLE_DUAL_SOURCE) && !PS_NO_COLOR1
 		SV_Target1 = alpha_blend;
-	#endif
-
-	#if PS_NO_ABLEND
-		// write alpha blend factor into col0
-		SV_Target0.a = alpha_blend.a;
-	#endif
-	#if PS_ONLY_ALPHA
-		// rgb isn't used
-		SV_Target0.rgb = vec3(0.0f);
 	#endif
 #endif
 

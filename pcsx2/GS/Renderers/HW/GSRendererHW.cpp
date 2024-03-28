@@ -2290,7 +2290,7 @@ void GSRendererHW::Draw()
 			if (PRIM->FST)
 			{
 				pxAssert(lcm == 1);
-				pxAssert(((m_vt.m_min.t.uph(m_vt.m_max.t) == GSVector4::zero()).mask() & 3) == 3); // ratchet and clank (menu)
+				//pxAssert(((m_vt.m_min.t.uph(m_vt.m_max.t) == GSVector4::zero()).mask() & 3) == 3); // ratchet and clank (menu)
 
 				lcm = 1;
 			}
@@ -3784,7 +3784,7 @@ __ri bool GSRendererHW::EmulateChannelShuffle(GSTextureCache::Target* src, bool 
 	return true;
 }
 
-void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DATE_PRIMID, bool& DATE_BARRIER, bool& blending_alpha_pass, GSTextureCache::Target* rt)
+void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DATE_PRIMID, bool& DATE_BARRIER, GSTextureCache::Target* rt)
 {
 	{
 		// AA1: Blending needs to be enabled on draw.
@@ -3928,7 +3928,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		blend_ad_alpha_masked = false;
 
 	u8 blend_index = static_cast<u8>(((m_conf.ps.blend_a * 3 + m_conf.ps.blend_b) * 3 + m_conf.ps.blend_c) * 3 + m_conf.ps.blend_d);
-	const HWBlend blend_preliminary = GSDevice::GetBlend(blend_index, false);
+	const HWBlend blend_preliminary = GSDevice::GetBlend(blend_index);
 	const int blend_flag = blend_preliminary.flags;
 
 	// Re set alpha, it was modified, must be done after index calculation
@@ -4068,33 +4068,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		}
 	}
 
-	bool replace_dual_src = false;
-	if (!features.dual_source_blend && GSDevice::IsDualSourceBlend(blend_index))
-	{
-		// if we don't have an alpha channel, we don't need a second pass, just output the alpha blend
-		// in the single colour's alpha chnanel, and blend with it
-		if (!m_conf.colormask.wa)
-		{
-			GL_INS("Outputting alpha blend in col0 because of no alpha write");
-			m_conf.ps.no_ablend = true;
-			replace_dual_src = true;
-		}
-		else if (features.framebuffer_fetch || m_conf.require_one_barrier || m_conf.require_full_barrier)
-		{
-			// prefer single pass sw blend (if barrier) or framebuffer fetch over dual pass alpha when supported
-			sw_blending = true;
-			color_dest_blend = false;
-			accumulation_blend &= !features.framebuffer_fetch;
-			blend_mix = false;
-		}
-		else
-		{
-			// split the draw into two
-			blending_alpha_pass = true;
-			replace_dual_src = true;
-		}
-	}
-	else if (features.framebuffer_fetch)
+	if (features.framebuffer_fetch)
 	{
 		// If we have fbfetch, use software blending when we need the fb value for anything else.
 		// This saves outputting the second color when it's not needed.
@@ -4209,12 +4183,11 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		if (m_conf.ps.blend_c == 2)
 			m_conf.cb_ps.TA_MaxDepth_Af.a = static_cast<float>(AFIX) / 128.0f;
 
-		const HWBlend blend = GSDevice::GetBlend(blend_index, replace_dual_src);
+		const HWBlend blend = GSDevice::GetBlend(blend_index);
 		if (accumulation_blend)
 		{
 			// Keep HW blending to do the addition/subtraction
-			m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::CONST_ONE, blend.op, false, 0};
-			blending_alpha_pass = false;
+			m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::CONST_ONE, blend.op, GSDevice::CONST_ONE, GSDevice::CONST_ZERO, false, 0};
 
 			// Remove Cd from sw blend, it's handled in hw
 			if (m_conf.ps.blend_a == 1)
@@ -4266,7 +4239,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			}
 
 			// For mixed blend, the source blend is done in the shader (so we use CONST_ONE as a factor).
-			m_conf.blend = {true, GSDevice::CONST_ONE, blend.dst, blend.op, m_conf.ps.blend_c == 2, AFIX};
+			m_conf.blend = {true, GSDevice::CONST_ONE, blend.dst, blend.op, GSDevice::CONST_ONE, GSDevice::CONST_ZERO,m_conf.ps.blend_c == 2, AFIX};
 			m_conf.ps.blend_mix = (blend.op == GSDevice::OP_REV_SUBTRACT) ? 2 : 1;
 
 			// Elide DSB colour output if not used by dest.
@@ -4279,7 +4252,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 					// Replace Cs*Alpha + Cd*(1 - Alpha) with Cs*Alpha - Cd*(Alpha - 1).
 					// Alpha - 1 subtraction is only done for the dual source output (hw blending part) since we are changing the equation.
 					// Af will be replaced with As in shader and send it to dual source output.
-					m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::SRC1_COLOR, GSDevice::OP_SUBTRACT, false, 0};
+					m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::SRC1_COLOR, GSDevice::OP_SUBTRACT, GSDevice::CONST_ONE, GSDevice::CONST_ZERO, false, 0};
 					// blend hw 1 will disable alpha clamp, we can reuse the old bits.
 					m_conf.ps.blend_hw = 1;
 					// DSB output will always be used.
@@ -4299,7 +4272,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			{
 				// Allow to compensate when Cs*(Alpha + 1) overflows, to compensate we change
 				// the alpha output value for Cd*Alpha.
-				m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::SRC1_COLOR, blend.op, false, 0};
+				m_conf.blend = {true, GSDevice::CONST_ONE, GSDevice::SRC1_COLOR, blend.op, GSDevice::CONST_ONE, GSDevice::CONST_ZERO,false, 0};
 				m_conf.ps.blend_hw = 3;
 				m_conf.ps.no_color1 = false;
 
@@ -4319,8 +4292,6 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			// Disable HW blending
 			m_conf.blend = {};
 			m_conf.ps.no_color1 = true;
-			replace_dual_src = false;
-			blending_alpha_pass = false;
 
 			// No need to set a_masked bit for blend_ad_alpha_masked case
 			const bool blend_non_recursive_one_barrier = blend_non_recursive && blend_ad_alpha_masked;
@@ -4364,8 +4335,8 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			m_conf.ps.blend_hw = 3;
 		}
 
-		const HWBlend blend(GSDevice::GetBlend(blend_index, replace_dual_src));
-		m_conf.blend = {true, blend.src, blend.dst, blend.op, m_conf.ps.blend_c == 2, AFIX};
+		const HWBlend blend = GSDevice::GetBlend(blend_index);
+		m_conf.blend = {true, blend.src, blend.dst, blend.op, GSDevice::CONST_ONE, GSDevice::CONST_ZERO,m_conf.ps.blend_c == 2, AFIX};
 
 		// Remove second color output when unused. Works around bugs in some drivers (e.g. Intel).
 		m_conf.ps.no_color1 |= !GSDevice::IsDualSourceBlendFactor(m_conf.blend.src_factor) &&
@@ -5083,9 +5054,6 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	bool DATE_BARRIER = false;
 	bool DATE_one = false;
 
-	const bool ate_first_pass = m_cached_ctx.TEST.DoFirstPass();
-	const bool ate_second_pass = m_cached_ctx.TEST.DoSecondPass();
-
 	ResetStates();
 
 	const float scale_factor = rt ? rt->GetScale() : ds->GetScale();
@@ -5441,10 +5409,9 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		m_conf.ps.rta_correction = rt->m_rt_alpha_scale;
 	}
 
-	bool blending_alpha_pass = false;
 	if ((!IsOpaque() || m_context->ALPHA.IsBlack()) && rt && ((m_conf.colormask.wrgba & 0x7) || (m_texture_shuffle && !m_copy_16bit_to_target_shuffle && !m_same_group_texture_shuffle)))
 	{
-		EmulateBlending(blend_alpha_min, blend_alpha_max, DATE_PRIMID, DATE_BARRIER, blending_alpha_pass, rt);
+		EmulateBlending(blend_alpha_min, blend_alpha_max, DATE_PRIMID, DATE_BARRIER, rt);
 
 		if (req_src_update && tex->m_texture != rt->m_texture)
 			tex->m_texture = rt->m_texture;
@@ -5470,6 +5437,80 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 				rt->m_rt_alpha_scale = true;
 
 			m_conf.ps.rta_correction = rt->m_rt_alpha_scale;
+		}
+	}
+
+	// Warning must be done after EmulateZbuffer
+	// Depth test is always true so it can be executed in 2 passes (no order required) unlike color.
+	// The idea is to compute first the color which is independent of the alpha test. And then do a 2nd
+	// pass to handle the depth based on the alpha test.
+	const bool ate_first_pass = m_cached_ctx.TEST.DoFirstPass();
+	bool ate_second_pass = m_cached_ctx.TEST.DoSecondPass();
+	bool ate_RGBA_then_Z = false;
+	bool ate_RGB_then_Z = false;
+	GL_INS("%sAlpha Test, ATST=%s, AFAIL=%s", (ate_first_pass && ate_second_pass) ? "Complex" : "",
+		GSUtil::GetATSTName(m_cached_ctx.TEST.ATST), GSUtil::GetAFAILName(m_cached_ctx.TEST.AFAIL));
+	if (ate_first_pass && ate_second_pass)
+	{
+		const bool commutative_depth = (m_conf.depth.ztst == ZTST_GEQUAL && m_vt.m_eq.z) || (m_conf.depth.ztst == ZTST_ALWAYS) || !m_conf.depth.zwe;
+		const bool commutative_alpha = (m_context->ALPHA.C != 1) || !m_conf.colormask.wa; // when either Alpha Src or a constant, or not updating A
+		const u32 afail = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM);
+
+		ate_RGBA_then_Z = (afail == AFAIL_FB_ONLY) && commutative_depth;
+		ate_RGB_then_Z = (afail == AFAIL_RGB_ONLY) && commutative_depth && commutative_alpha;
+	}
+
+	if (ate_RGBA_then_Z)
+	{
+		GL_INS("Alternate ATE handling: ate_RGBA_then_Z");
+		// Render all color but don't update depth
+		// ATE is disabled here
+		m_conf.depth.zwe = false;
+	}
+	else
+	{
+		float aref = m_conf.cb_ps.FogColor_AREF.a;
+		EmulateATST(aref, m_conf.ps, false);
+
+		// avoid redundant cbuffer updates
+		m_conf.cb_ps.FogColor_AREF.a = aref;
+		m_conf.alpha_second_pass.ps_aref = aref;
+
+		if (ate_RGB_then_Z)
+		{
+			GL_INS("Alternate ATE handling: ate_RGB_then_Z");
+
+			// Blending might be off, ensure it's enabled.
+			// We write the alpha pass/fail to SRC1_ALPHA, which is used to update A.
+			m_conf.ps.afail = AFAIL_RGB_ONLY;
+			m_conf.ps.no_color1 = false;
+			if (!m_conf.blend.enable)
+			{
+				m_conf.blend = GSHWDrawConfig::BlendState(true, GSDevice::CONST_ONE, GSDevice::CONST_ZERO,
+					GSDevice::OP_ADD, GSDevice::SRC1_ALPHA, GSDevice::INV_SRC1_ALPHA, false, 0);
+			}
+			else
+			{
+				m_conf.blend.src_factor_alpha = GSDevice::SRC1_ALPHA;
+				m_conf.blend.dst_factor_alpha = GSDevice::INV_SRC1_ALPHA;
+			}
+
+			// If Z writes are on, unfortunately we can't single pass it.
+			// But we can write Z in the second pass instead.
+			ate_RGBA_then_Z = m_conf.depth.zwe;
+			ate_second_pass &= ate_RGBA_then_Z;
+			m_conf.depth.zwe = false;
+
+			// Swap stencil DATE for PrimID DATE, for both Z on and off cases.
+			// Because we're making some pixels pass, but not update A, the stencil won't be synced.
+			if (DATE && !DATE_BARRIER && features.primitive_id)
+			{
+				if (!DATE_PRIMID)
+					GL_INS("Swap stencil DATE for PrimID, due to AFAIL");
+
+				DATE_one = false;
+				DATE_PRIMID = true;
+			}
 		}
 	}
 
@@ -5610,47 +5651,6 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		m_conf.cb_ps.FogColor_AREF = fc.blend32<8>(m_conf.cb_ps.FogColor_AREF);
 	}
 
-	// Warning must be done after EmulateZbuffer
-	// Depth test is always true so it can be executed in 2 passes (no order required) unlike color.
-	// The idea is to compute first the color which is independent of the alpha test. And then do a 2nd
-	// pass to handle the depth based on the alpha test.
-	bool ate_RGBA_then_Z = false;
-	bool ate_RGB_then_ZA = false;
-	if (ate_first_pass && ate_second_pass)
-	{
-		GL_DBG("Complex Alpha Test");
-		const bool commutative_depth = (m_conf.depth.ztst == ZTST_GEQUAL && m_vt.m_eq.z) || (m_conf.depth.ztst == ZTST_ALWAYS);
-		const bool commutative_alpha = (m_context->ALPHA.C != 1); // when either Alpha Src or a constant
-
-		ate_RGBA_then_Z = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM) == AFAIL_FB_ONLY && commutative_depth;
-		ate_RGB_then_ZA = m_cached_ctx.TEST.GetAFAIL(m_cached_ctx.FRAME.PSM) == AFAIL_RGB_ONLY && commutative_depth && commutative_alpha;
-	}
-
-	if (ate_RGBA_then_Z)
-	{
-		GL_DBG("Alternate ATE handling: ate_RGBA_then_Z");
-		// Render all color but don't update depth
-		// ATE is disabled here
-		m_conf.depth.zwe = false;
-	}
-	else if (ate_RGB_then_ZA)
-	{
-		GL_DBG("Alternate ATE handling: ate_RGB_then_ZA");
-		// Render RGB color but don't update depth/alpha
-		// ATE is disabled here
-		m_conf.depth.zwe = false;
-		m_conf.colormask.wa = false;
-	}
-	else
-	{
-		float aref = m_conf.cb_ps.FogColor_AREF.a;
-		EmulateATST(aref, m_conf.ps, false);
-
-		// avoid redundant cbuffer updates
-		m_conf.cb_ps.FogColor_AREF.a = aref;
-		m_conf.alpha_second_pass.ps_aref = aref;
-	}
-
 	GSTexture* tex_copy = nullptr;
 	if (tex)
 	{
@@ -5696,11 +5696,14 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	if (ate_second_pass)
 	{
 		pxAssert(!env.PABE.PABE);
-		memcpy(&m_conf.alpha_second_pass.ps,        &m_conf.ps,        sizeof(m_conf.ps));
-		memcpy(&m_conf.alpha_second_pass.colormask, &m_conf.colormask, sizeof(m_conf.colormask));
-		memcpy(&m_conf.alpha_second_pass.depth,     &m_conf.depth,     sizeof(m_conf.depth));
+		std::memcpy(&m_conf.alpha_second_pass.ps, &m_conf.ps, sizeof(m_conf.ps));
+		std::memcpy(&m_conf.alpha_second_pass.colormask, &m_conf.colormask, sizeof(m_conf.colormask));
+		std::memcpy(&m_conf.alpha_second_pass.depth, &m_conf.depth, sizeof(m_conf.depth));
 
-		if (ate_RGBA_then_Z || ate_RGB_then_ZA)
+		// Not doing single pass AFAIL.
+		m_conf.alpha_second_pass.ps.afail = AFAIL_KEEP;
+
+		if (ate_RGBA_then_Z)
 		{
 			// Enable ATE as first pass to update the depth
 			// of pixels that passed the alpha test
@@ -5712,7 +5715,6 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 			// the alpha test
 			EmulateATST(m_conf.alpha_second_pass.ps_aref, m_conf.alpha_second_pass.ps, true);
 		}
-
 
 		bool z = m_conf.depth.zwe;
 		bool r = m_conf.colormask.wr;
@@ -5735,12 +5737,6 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		{
 			z = !m_cached_ctx.ZBUF.ZMSK;
 			r = g = b = a = false;
-		}
-		else if (ate_RGB_then_ZA)
-		{
-			z = !m_cached_ctx.ZBUF.ZMSK;
-			a = (m_cached_ctx.FRAME.FBMSK & 0xFF000000) != 0xFF000000;
-			r = g = b = false;
 		}
 
 		if (z || r || g || b || a)
@@ -5768,40 +5764,11 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 		}
 
 		// RenderHW always renders first pass, replace first pass with second
-		memcpy(&m_conf.ps,        &m_conf.alpha_second_pass.ps,        sizeof(m_conf.ps));
-		memcpy(&m_conf.colormask, &m_conf.alpha_second_pass.colormask, sizeof(m_conf.colormask));
-		memcpy(&m_conf.depth,     &m_conf.alpha_second_pass.depth,     sizeof(m_conf.depth));
+		std::memcpy(&m_conf.ps, &m_conf.alpha_second_pass.ps, sizeof(m_conf.ps));
+		std::memcpy(&m_conf.colormask, &m_conf.alpha_second_pass.colormask, sizeof(m_conf.colormask));
+		std::memcpy(&m_conf.depth, &m_conf.alpha_second_pass.depth, sizeof(m_conf.depth));
 		m_conf.cb_ps.FogColor_AREF.a = m_conf.alpha_second_pass.ps_aref;
 		m_conf.alpha_second_pass.enable = false;
-	}
-
-	if (blending_alpha_pass)
-	{
-		// write alpha blend as the single alpha output
-		m_conf.ps.no_ablend = true;
-
-		// there's a case we can skip this: RGB_then_ZA alternate handling.
-		// but otherwise, we need to write alpha separately.
-		if (m_conf.colormask.wa)
-		{
-			m_conf.colormask.wa = false;
-			m_conf.separate_alpha_pass = true;
-		}
-
-		// do we need to do this for the failed alpha fragments?
-		if (m_conf.alpha_second_pass.enable)
-		{
-			// there's also a case we can skip here: when we're not writing RGB, there's
-			// no blending, so we can just write the normal alpha!
-			const u8 second_pass_wrgba = m_conf.alpha_second_pass.colormask.wrgba;
-			if ((second_pass_wrgba & (1 << 3)) != 0 && second_pass_wrgba != (1 << 3))
-			{
-				// this sucks. potentially up to 4 passes. but no way around it when we don't have dual-source blend.
-				m_conf.alpha_second_pass.ps.no_ablend = true;
-				m_conf.alpha_second_pass.colormask.wa = false;
-				m_conf.second_separate_alpha_pass = true;
-			}
-		}
 	}
 
 	m_conf.drawlist = (m_conf.require_full_barrier && m_vt.m_primclass == GS_SPRITE_CLASS) ? &m_drawlist : nullptr;
@@ -7069,8 +7036,6 @@ GSHWDrawConfig& GSRendererHW::BeginHLEHardwareDraw(
 	config.destination_alpha = GSHWDrawConfig::DestinationAlphaMode::Off;
 	config.datm = SetDATM::DATM0;
 	config.line_expand = false;
-	config.separate_alpha_pass = false;
-	config.second_separate_alpha_pass = false;
 	config.alpha_second_pass.enable = false;
 	config.vs.key = 0;
 	config.vs.tme = tex != nullptr;

@@ -304,6 +304,7 @@ struct alignas(16) GSHWDrawConfig
 				// Pixel test
 				u32 date : 3;
 				u32 atst : 3;
+				u32 afail : 2;
 				// Color sampling
 				u32 fst : 1; // Investigate to do it on the VS
 				u32 tfx : 3;
@@ -340,8 +341,6 @@ struct alignas(16) GSHWDrawConfig
 				u32 pabe           : 1;
 				u32 no_color       : 1; // disables color output entirely (depth only)
 				u32 no_color1      : 1; // disables second color output (when unnecessary)
-				u32 no_ablend      : 1; // output alpha blend in col0 (for no-DSB)
-				u32 only_alpha     : 1; // don't bother computing RGB
 
 				// Others ways to fetch the texture
 				u32 channel : 3;
@@ -489,9 +488,9 @@ struct alignas(16) GSHWDrawConfig
 			};
 			u8 key;
 		};
-		DepthStencilSelector(): key(0) {}
-		DepthStencilSelector(u8 k): key(k) {}
-		static DepthStencilSelector NoDepth()
+		constexpr DepthStencilSelector(): key(0) {}
+		constexpr DepthStencilSelector(u8 k): key(k) {}
+		static constexpr DepthStencilSelector NoDepth()
 		{
 			DepthStencilSelector out;
 			out.ztst = ZTST_ALWAYS;
@@ -517,8 +516,8 @@ struct alignas(16) GSHWDrawConfig
 			};
 			u8 key;
 		};
-		ColorMaskSelector(): key(0xF) {}
-		ColorMaskSelector(u8 c): key(0) { wrgba = c; }
+		constexpr ColorMaskSelector(): key(0xF) {}
+		constexpr ColorMaskSelector(u8 c): key(0) { wrgba = c; }
 	};
 #pragma pack(pop)
 	struct alignas(16) VSConstantBuffer
@@ -616,14 +615,17 @@ struct alignas(16) GSHWDrawConfig
 				u8 enable : 1;
 				u8 constant_enable : 1;
 				u8 op : 6;
-				u8 src_factor;
-				u8 dst_factor;
+				u8 src_factor : 4;
+				u8 dst_factor : 4;
+				u8 src_factor_alpha : 4;
+				u8 dst_factor_alpha : 4;
 				u8 constant;
 			};
 			u32 key;
 		};
-		BlendState(): key(0) {}
-		BlendState(bool enable_, u8 src_factor_, u8 dst_factor_, u8 op_, bool constant_enable_, u8 constant_)
+		constexpr BlendState(): key(0) {}
+		constexpr BlendState(bool enable_, u8 src_factor_, u8 dst_factor_, u8 op_,
+			u8 src_alpha_factor_, u8 dst_alpha_factor_, bool constant_enable_, u8 constant_)
 			: key(0)
 		{
 			enable = enable_;
@@ -631,8 +633,13 @@ struct alignas(16) GSHWDrawConfig
 			src_factor = src_factor_;
 			dst_factor = dst_factor_;
 			op = op_;
+			src_factor_alpha = src_alpha_factor_;
+			dst_factor_alpha = dst_alpha_factor_;
 			constant = constant_;
 		}
+
+		// Blending has no effect if RGB is masked.
+		bool IsEffective(ColorMaskSelector colormask) const;
 	};
 	enum class DestinationAlphaMode : u8
 	{
@@ -671,8 +678,6 @@ struct alignas(16) GSHWDrawConfig
 	DestinationAlphaMode destination_alpha;
 	SetDATM datm : 2;
 	bool line_expand : 1;
-	bool separate_alpha_pass : 1;
-	bool second_separate_alpha_pass : 1;
 
 	struct AlphaPass
 	{
@@ -763,7 +768,6 @@ private:
 	u64 m_pool_memory_usage = 0;
 
 	static const std::array<HWBlend, 3*3*3*3> m_blendMap;
-	static const std::array<u8, 16> m_replaceDualSrcBlendMap;
 
 protected:
 	static constexpr int NUM_INTERLACE_SHADERS = 5;
@@ -960,8 +964,7 @@ public:
 
 	__fi static constexpr bool IsDualSourceBlendFactor(u8 factor)
 	{
-		return (factor == SRC1_ALPHA || factor == INV_SRC1_ALPHA || factor == SRC1_COLOR
-			/* || factor == INV_SRC1_COLOR*/); // not used
+		return (factor == SRC1_ALPHA || factor == INV_SRC1_ALPHA || factor == SRC1_COLOR || factor == INV_SRC1_COLOR);
 	}
 	__fi static constexpr bool IsConstantBlendFactor(u16 factor)
 	{
@@ -970,28 +973,8 @@ public:
 
 	// Convert the GS blend equations to HW blend factors/ops
 	// Index is computed as ((((A * 3 + B) * 3) + C) * 3) + D. A, B, C, D taken from ALPHA register.
-	__ri static HWBlend GetBlend(u32 index, bool replace_dual_src)
-	{
-		HWBlend ret = m_blendMap[index];
-		if (replace_dual_src)
-		{
-			ret.src = m_replaceDualSrcBlendMap[ret.src];
-			ret.dst = m_replaceDualSrcBlendMap[ret.dst];
-		}
-		return ret;
-	}
+	__ri static HWBlend GetBlend(u32 index) { return m_blendMap[index]; }
 	__ri static u16 GetBlendFlags(u32 index) { return m_blendMap[index].flags; }
-	__fi static bool IsDualSourceBlend(u32 index)
-	{
-		return (IsDualSourceBlendFactor(m_blendMap[index].src) ||
-				IsDualSourceBlendFactor(m_blendMap[index].dst));
-	}
-
-	/// Alters the pipeline configuration for drawing the separate alpha pass.
-	static void SetHWDrawConfigForAlphaPass(GSHWDrawConfig::PSSelector* ps,
-		GSHWDrawConfig::ColorMaskSelector* cms,
-		GSHWDrawConfig::BlendState* bs,
-		GSHWDrawConfig::DepthStencilSelector* dss);
 };
 
 template <>

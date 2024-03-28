@@ -2669,7 +2669,7 @@ bool GSDeviceVK::CheckFeatures()
 
 	m_features.prefer_new_textures = true;
 	m_features.provoking_vertex_last = m_optional_extensions.vk_ext_provoking_vertex;
-	m_features.dual_source_blend = m_device_features.dualSrcBlend && !GSConfig.DisableDualSourceBlend;
+	m_features.dual_source_blend = m_device_features.dualSrcBlend;
 	m_features.clip_control = true;
 	m_features.vs_expand = !GSConfig.DisableVertexShaderExpand;
 
@@ -4791,6 +4791,7 @@ VkShaderModule GSDeviceVK::GetTFXFragmentShader(const GSHWDrawConfig::PSSelector
 	AddMacro(ss, "PS_TFX", sel.tfx);
 	AddMacro(ss, "PS_TCC", sel.tcc);
 	AddMacro(ss, "PS_ATST", sel.atst);
+	AddMacro(ss, "PS_AFAIL", sel.afail);
 	AddMacro(ss, "PS_FOG", sel.fog);
 	AddMacro(ss, "PS_BLEND_HW", sel.blend_hw);
 	AddMacro(ss, "PS_A_MASKED", sel.a_masked);
@@ -4830,8 +4831,6 @@ VkShaderModule GSDeviceVK::GetTFXFragmentShader(const GSHWDrawConfig::PSSelector
 	AddMacro(ss, "PS_TEX_IS_FB", sel.tex_is_fb);
 	AddMacro(ss, "PS_NO_COLOR", sel.no_color);
 	AddMacro(ss, "PS_NO_COLOR1", sel.no_color1);
-	AddMacro(ss, "PS_NO_ABLEND", sel.no_ablend);
-	AddMacro(ss, "PS_ONLY_ALPHA", sel.only_alpha);
 	ss << m_tfx_source;
 
 	VkShaderModule mod = g_vulkan_shader_cache->GetFragmentShader(ss.str());
@@ -4852,7 +4851,7 @@ VkPipeline GSDeviceVK::CreateTFXPipeline(const PipelineSelector& p)
 
 	GSHWDrawConfig::BlendState pbs{p.bs};
 	GSHWDrawConfig::PSSelector pps{p.ps};
-	if ((p.cms.wrgba & 0x7) == 0)
+	if (!p.bs.IsEffective(p.cms))
 	{
 		// disable blending when colours are masked
 		pbs = {};
@@ -4944,7 +4943,8 @@ VkPipeline GSDeviceVK::CreateTFXPipeline(const PipelineSelector& p)
 		// clang-format on
 
 		gpb.SetBlendAttachment(0, true, vk_blend_factors[pbs.src_factor], vk_blend_factors[pbs.dst_factor],
-			vk_blend_ops[pbs.op], VK_BLEND_FACTOR_ONE, VK_BLEND_FACTOR_ZERO, VK_BLEND_OP_ADD, p.cms.wrgba);
+			vk_blend_ops[pbs.op], vk_blend_factors[pbs.src_factor_alpha], vk_blend_factors[pbs.dst_factor_alpha],
+			VK_BLEND_OP_ADD, p.cms.wrgba);
 	}
 	else
 	{
@@ -5850,15 +5850,7 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 
 	// now we can do the actual draw
 	if (BindDrawPipeline(pipe))
-	{
 		SendHWDraw(config, draw_rt, skip_first_barrier);
-		if (config.separate_alpha_pass)
-		{
-			SetHWDrawConfigForAlphaPass(&pipe.ps, &pipe.cms, &pipe.bs, &pipe.dss);
-			if (BindDrawPipeline(pipe))
-				SendHWDraw(config, draw_rt, false);
-		}
-	}
 
 	// and the alpha pass
 	if (config.alpha_second_pass.enable)
@@ -5875,15 +5867,7 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 		pipe.dss = config.alpha_second_pass.depth;
 		pipe.bs = config.blend;
 		if (BindDrawPipeline(pipe))
-		{
 			SendHWDraw(config, draw_rt, false);
-			if (config.second_separate_alpha_pass)
-			{
-				SetHWDrawConfigForAlphaPass(&pipe.ps, &pipe.cms, &pipe.bs, &pipe.dss);
-				if (BindDrawPipeline(pipe))
-					SendHWDraw(config, draw_rt, false);
-			}
-		}
 	}
 
 	if (draw_rt_clone)

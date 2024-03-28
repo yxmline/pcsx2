@@ -1749,8 +1749,6 @@ static MTLBlendOperation ConvertBlendOp(GSDevice::BlendOp generic)
 	}
 }
 
-static constexpr MTLColorWriteMask MTLColorWriteMaskRGB = MTLColorWriteMaskRed | MTLColorWriteMaskGreen | MTLColorWriteMaskBlue;
-
 static GSMTLExpandType ConvertVSExpand(GSHWDrawConfig::VSExpand generic)
 {
 	switch (generic)
@@ -1805,6 +1803,7 @@ void GSDeviceMTL::MRESetHWPipelineState(GSHWDrawConfig::VSSelector vssel, GSHWDr
 		setFnConstantB(m_fn_constants, pssel.fog,                   GSMTLConstantIndex_PS_FOG);
 		setFnConstantI(m_fn_constants, pssel.date,                  GSMTLConstantIndex_PS_DATE);
 		setFnConstantI(m_fn_constants, pssel.atst,                  GSMTLConstantIndex_PS_ATST);
+		setFnConstantI(m_fn_constants, pssel.afail,                 GSMTLConstantIndex_PS_AFAIL);
 		setFnConstantI(m_fn_constants, pssel.tfx,                   GSMTLConstantIndex_PS_TFX);
 		setFnConstantB(m_fn_constants, pssel.tcc,                   GSMTLConstantIndex_PS_TCC);
 		setFnConstantI(m_fn_constants, pssel.wms,                   GSMTLConstantIndex_PS_WMS);
@@ -1836,8 +1835,6 @@ void GSDeviceMTL::MRESetHWPipelineState(GSHWDrawConfig::VSSelector vssel, GSHWDr
 		setFnConstantB(m_fn_constants, pssel.pabe,                  GSMTLConstantIndex_PS_PABE);
 		setFnConstantB(m_fn_constants, pssel.no_color,              GSMTLConstantIndex_PS_NO_COLOR);
 		setFnConstantB(m_fn_constants, pssel.no_color1,             GSMTLConstantIndex_PS_NO_COLOR1);
-		// no_ablend ignored for now (No Metal driver has had DSB so broken that it's needed to be disabled, though Intel's was pretty close)
-		setFnConstantB(m_fn_constants, pssel.only_alpha,            GSMTLConstantIndex_PS_ONLY_ALPHA);
 		setFnConstantI(m_fn_constants, pssel.channel,               GSMTLConstantIndex_PS_CHANNEL);
 		setFnConstantI(m_fn_constants, pssel.dither,                GSMTLConstantIndex_PS_DITHER);
 		setFnConstantI(m_fn_constants, pssel.dither_adjust,         GSMTLConstantIndex_PS_DITHER_ADJUST);
@@ -1876,14 +1873,16 @@ void GSDeviceMTL::MRESetHWPipelineState(GSHWDrawConfig::VSSelector vssel, GSHWDr
 		color.destinationRGBBlendFactor = MTLBlendFactorOne;
 		color.writeMask = MTLColorWriteMaskRed;
 	}
-	else if (extras.blend_enable && (extras.writemask & MTLColorWriteMaskRGB))
+	else if (blend.IsEffective(cms))
 	{
 		color.blendingEnabled = YES;
 		color.rgbBlendOperation = ConvertBlendOp(extras.blend_op);
 		color.sourceRGBBlendFactor = ConvertBlendFactor(extras.src_factor);
 		color.destinationRGBBlendFactor = ConvertBlendFactor(extras.dst_factor);
+		color.sourceAlphaBlendFactor = ConvertBlendFactor(extras.src_factor_alpha);
+		color.destinationAlphaBlendFactor = ConvertBlendFactor(extras.dst_factor_alpha);
 	}
-	NSString* pname = [NSString stringWithFormat:@"HW Render %x.%x.%llx.%x", vssel_mtl.key, pssel.key_hi, pssel.key_lo, extras.fullkey()];
+	NSString* pname = [NSString stringWithFormat:@"HW Render %x.%x.%llx.%x", vssel_mtl.key, pssel.key_hi, pssel.key_lo, extras.fullkey];
 	auto pipeline = MakePipeline(pdesc, vs, ps, pname);
 
 	[m_current_render.encoder setRenderPipelineState:pipeline];
