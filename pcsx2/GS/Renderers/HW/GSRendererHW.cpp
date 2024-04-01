@@ -2100,6 +2100,7 @@ void GSRendererHW::Draw()
 	//                                --------------------------------------
 	m_r = GSVector4i(m_vt.m_min.p.upld(m_vt.m_max.p) + GSVector4::cxpr(0.5f));
 	m_r = m_r.blend8(m_r + GSVector4i::cxpr(0, 0, 1, 1), (m_r.xyxy() == m_r.zwzw()));
+	m_r_no_scissor = m_r;
 	m_r = m_r.rintersect(context->scissor.in);
 
 	// Draw is too small, just skip it.
@@ -2404,7 +2405,7 @@ void GSRendererHW::Draw()
 			TEX0 = m_cached_ctx.TEX0;
 		}
 
-		tmm = GetTextureMinMax(TEX0, MIP_CLAMP, m_vt.IsLinear(), false);
+		tmm = GetTextureMinMax(TEX0, MIP_CLAMP, m_vt.IsLinear(), false, no_gaps);
 
 		// Snowblind games set TW/TH to 1024, and use UVs for smaller textures inside that.
 		// Such textures usually contain junk in local memory, so try to make them smaller based on UVs.
@@ -2489,7 +2490,7 @@ void GSRendererHW::Draw()
 			// We don't know the alpha range of direct sources when we first tried to optimize the alpha test.
 			// Moving the texture lookup before the ATST optimization complicates things a lot, so instead,
 			// recompute it, and everything derived from it again if it changes.
-			if (GSLocalMemory::m_psm[src->m_TEX0.PSM].pal == 0)
+			if (src->m_valid_alpha_minmax)
 			{
 				CalcAlphaMinMax(src->m_alpha_minmax.first, src->m_alpha_minmax.second);
 
@@ -2795,7 +2796,7 @@ void GSRendererHW::Draw()
 				m_vt.m_min.t *= 0.5f;
 				m_vt.m_max.t *= 0.5f;
 
-				tmm = GetTextureMinMax(MIP_TEX0, MIP_CLAMP, m_vt.IsLinear(), false);
+				tmm = GetTextureMinMax(MIP_TEX0, MIP_CLAMP, m_vt.IsLinear(), false, no_gaps);
 
 				src->UpdateLayer(MIP_TEX0, tmm.coverage, layer - m_lod.x);
 			}
@@ -4368,7 +4369,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		const bool rta_correction = m_can_correct_alpha && !blend_ad_alpha_masked && m_conf.ps.blend_c == 1 && !(blend_flag & BLEND_A_MAX);
 		if (rta_correction)
 		{
-			rt->RTACorrect(rt);
+			rt->RTACorrect();
 			m_conf.ps.rta_correction = rt->m_rt_alpha_scale;
 			m_conf.rt = rt->m_texture;
 		}
@@ -5411,7 +5412,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 				{
 					m_can_correct_alpha = false;
 
-					rt->RTADecorrect(rt);
+					rt->RTADecorrect();
 					m_conf.rt = rt->m_texture;
 
 					if (req_src_update)
@@ -5427,7 +5428,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 					else if (m_cached_ctx.FRAME.FBMSK & 0xFFFC0000)
 					{
 						m_can_correct_alpha = false;
-						rt->RTADecorrect(rt);
+						rt->RTADecorrect();
 						m_conf.rt = rt->m_texture;
 
 						if (req_src_update)
@@ -5440,7 +5441,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 				if (m_conf.ps.tales_of_abyss_hle || (tex && tex->m_from_target && tex->m_from_target == rt && m_conf.ps.channel == ChannelFetch_ALPHA) || partial_fbmask || rt->m_alpha_max > 128)
 				{
 					m_can_correct_alpha = false;
-					rt->RTADecorrect(rt);
+					rt->RTADecorrect();
 					m_conf.rt = rt->m_texture;
 
 					if (req_src_update)
@@ -5455,7 +5456,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 			else
 			{
 				m_can_correct_alpha = false;
-				rt->RTADecorrect(rt);
+				rt->RTADecorrect();
 				m_conf.rt = rt->m_texture;
 
 				if (req_src_update)
@@ -5489,7 +5490,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 
 			if (!full_cover)
 			{
-				rt->RTACorrect(rt);
+				rt->RTACorrect();
 				m_conf.rt = rt->m_texture;
 			}
 			else
@@ -5947,7 +5948,7 @@ GSRendererHW::CLUTDrawTestResult GSRendererHW::PossibleCLUTDraw()
 	if (m_process_texture)
 	{
 		// If we're using a texture to draw our CLUT/whatever, we need the GPU to write back dirty data we need.
-		const GSVector4i r = GetTextureMinMax(m_cached_ctx.TEX0, m_cached_ctx.CLAMP, m_vt.IsLinear(), false).coverage;
+		const GSVector4i r = GetTextureMinMax(m_cached_ctx.TEX0, m_cached_ctx.CLAMP, m_vt.IsLinear(), false, m_vt.m_primclass == GS_SPRITE_CLASS && PrimitiveCoversWithoutGaps()).coverage;
 
 		// If we have GPU CLUT enabled, don't do a CPU draw when it would result in a download.
 		if (GSConfig.UserHacks_GPUTargetCLUTMode != GSGPUTargetCLUTMode::Disabled)
@@ -5959,7 +5960,7 @@ GSRendererHW::CLUTDrawTestResult GSRendererHW::PossibleCLUTDraw()
 				m_cached_ctx.TEX0.TBP0, m_cached_ctx.TEX0.TBW, m_cached_ctx.TEX0.PSM, r);
 			if (tgt)
 			{
-				tgt->RTADecorrect(tgt);
+				tgt->RTADecorrect();
 				bool is_dirty = false;
 				for (const GSDirtyRect& rc : tgt->m_dirty)
 				{
@@ -6060,7 +6061,7 @@ bool GSRendererHW::CanUseSwPrimRender(bool no_rt, bool no_ds, bool draw_sprite_t
 			// If the EE has written over our sample area, we're fine to do this on the CPU, despite the target.
 			if (!src_target->m_dirty.empty())
 			{
-				const GSVector4i tr(GetTextureMinMax(m_cached_ctx.TEX0, m_cached_ctx.CLAMP, m_vt.IsLinear(), false).coverage);
+				const GSVector4i tr(GetTextureMinMax(m_cached_ctx.TEX0, m_cached_ctx.CLAMP, m_vt.IsLinear(), false, m_vt.m_primclass == GS_SPRITE_CLASS && PrimitiveCoversWithoutGaps()).coverage);
 				for (GSDirtyRect& rc : src_target->m_dirty)
 				{
 					if (!rc.GetDirtyRect(m_cached_ctx.TEX0, false).rintersect(tr).rempty())
@@ -6729,106 +6730,6 @@ bool GSRendererHW::IsDiscardingDstAlpha() const
 {
 	return ((!PRIM->ABE || m_context->ALPHA.C != 1) && // not using Ad
 			((m_cached_ctx.FRAME.FBMSK & GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].fmsk) & 0xFF000000u) == 0); // alpha isn't masked
-}
-
-bool GSRendererHW::PrimitiveCoversWithoutGaps()
-{
-	if (m_primitive_covers_without_gaps.has_value())
-		return m_primitive_covers_without_gaps.value();
-
-	// Draw shouldn't be offset.
-	if (((m_r.eq32(GSVector4i::zero())).mask() & 0xff) != 0xff)
-	{
-		m_primitive_covers_without_gaps = false;
-		return false;
-	}
-
-	if (m_vt.m_primclass == GS_POINT_CLASS)
-	{
-		m_primitive_covers_without_gaps = (m_vertex.next < 2);
-		return m_primitive_covers_without_gaps.value();
-	}
-	else if (m_vt.m_primclass == GS_TRIANGLE_CLASS)
-	{
-		m_primitive_covers_without_gaps = (m_index.tail == 6 && TrianglesAreQuads());
-		return m_primitive_covers_without_gaps.value();
-	}
-	else if (m_vt.m_primclass != GS_SPRITE_CLASS)
-	{
-		m_primitive_covers_without_gaps = false;
-		return false;
-	}
-
-	// Simple case: one sprite.
-	if (m_index.tail == 2)
-	{
-		m_primitive_covers_without_gaps = true;
-		return true;
-	}
-
-	// Check that the height matches. Xenosaga 3 draws a letterbox around
-	// the FMV with a sprite at the top and bottom of the framebuffer.
-	const GSVertex* v = &m_vertex.buff[0];
-	const int first_dpY = v[1].XYZ.Y - v[0].XYZ.Y;
-	const int first_dpX = v[1].XYZ.X - v[0].XYZ.X;
-
-	// Horizontal Match.
-	if ((first_dpX >> 4) == m_r.z)
-	{
-		// Borrowed from MergeSprite() modified to calculate heights.
-		for (u32 i = 2; i < m_vertex.next; i += 2)
-		{
-			const int last_pY = v[i - 1].XYZ.Y;
-			const int dpY = v[i + 1].XYZ.Y - v[i].XYZ.Y;
-			if (std::abs(dpY - first_dpY) >= 16 || std::abs(static_cast<int>(v[i].XYZ.Y) - last_pY) >= 16)
-			{
-				m_primitive_covers_without_gaps = false;
-				return false;
-			}
-		}
-
-		m_primitive_covers_without_gaps = true;
-		return true;
-	}
-
-	// Vertical Match.
-	if ((first_dpY >> 4) == m_r.w)
-	{
-		// Borrowed from MergeSprite().
-		const int offset_X = m_context->XYOFFSET.OFX;
-		for (u32 i = 2; i < m_vertex.next; i += 2)
-		{
-			const int last_pX = v[i - 1].XYZ.X;
-			const int this_start_X = v[i].XYZ.X;
-			const int last_start_X = v[i - 2].XYZ.X;
-
-			const int  dpX = v[i + 1].XYZ.X - v[i].XYZ.X;
-
-			if (this_start_X < last_start_X)
-			{
-				const int prev_X = last_start_X - offset_X;
-				if (std::abs(dpX - prev_X) >= 16 || std::abs(this_start_X - offset_X) >= 16)
-				{
-					m_primitive_covers_without_gaps = false;
-					return false;
-				}
-			}
-			else
-			{
-				if (std::abs(dpX - first_dpX) >= 16 || std::abs(this_start_X - last_pX) >= 16)
-				{
-					m_primitive_covers_without_gaps = false;
-					return false;
-				}
-			}
-		}
-
-		m_primitive_covers_without_gaps = true;
-		return true;
-	}
-
-	m_primitive_covers_without_gaps = false;
-	return false;
 }
 
 // Like PrimitiveCoversWithoutGaps but with texture coordinates.
