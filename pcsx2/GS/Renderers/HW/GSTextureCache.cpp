@@ -2683,7 +2683,7 @@ void GSTextureCache::Target::RTACorrect()
 		{
 			const GSVector2i rtsize(m_texture->GetSize());
 			const GSVector4i valid_rect = GSVector4i(GSVector4(m_valid) * GSVector4(m_scale));
-			GL_PUSH("RTACorrect(valid=({},{}=>{},{}))", m_valid.x, m_valid.y, m_valid.z, m_valid.w);
+			GL_PUSH("RTACorrect(valid=(%dx%d %d,%d=>%d,%d))", m_valid.width(), m_valid.height(), m_valid.x, m_valid.y, m_valid.z, m_valid.w);
 
 			if (GSTexture* temp_rt = g_gs_device->CreateRenderTarget(rtsize.x, rtsize.y, GSTexture::Format::Color, !GSVector4i::loadh(rtsize).eq(valid_rect)))
 			{
@@ -2709,7 +2709,7 @@ void GSTextureCache::Target::RTADecorrect()
 		{
 			const GSVector2i rtsize(m_texture->GetSize());
 			const GSVector4i valid_rect = GSVector4i(GSVector4(m_valid) * GSVector4(m_scale));
-			GL_PUSH("RTADecorrect(valid=({},{}=>{},{}))", m_valid.x, m_valid.y, m_valid.z, m_valid.w);
+			GL_PUSH("RTADecorrect(valid=(%dx%d %d,%d=>%d,%d))", m_valid.width(), m_valid.height(), m_valid.x, m_valid.y, m_valid.z, m_valid.w);
 
 			if (GSTexture* temp_rt = g_gs_device->CreateRenderTarget(rtsize.x, rtsize.y, GSTexture::Format::Color, !GSVector4i::loadh(rtsize).eq(valid_rect)))
 			{
@@ -3648,8 +3648,9 @@ bool GSTextureCache::Move(u32 SBP, u32 SBW, u32 SPSM, int sx, int sy, u32 DBP, u
 
 	// Beware of the case where a game might create a larger texture by moving a bunch of chunks around.
 	// We use dx/dy == 0 and the TBW check as a safeguard to make sure these go through to local memory.
+	// We can also recreate the target if it's previously been created in the height cache with a valid size.
 	// Good test case for this is the Xenosaga I cutscene transitions, or Gradius V.
-	if (src && !dst && dx == 0 && dy == 0 && ((static_cast<u32>(w) + 63) / 64) <= DBW)
+	if (src && !dst && ((dx == 0 && dy == 0 && ((static_cast<u32>(w) + 63) / 64) <= DBW) || HasTargetInHeightCache(DBP, DBW, DPSM, 10)))
 	{
 		GIFRegTEX0 new_TEX0 = {};
 		new_TEX0.TBP0 = DBP;
@@ -4105,6 +4106,31 @@ GSVector2i GSTextureCache::GetTargetSize(u32 bp, u32 fbw, u32 psm, s32 min_width
 	DbgCon.WriteLn("New size at %x %u %u: %ux%u", bp, fbw, psm, min_width, min_height);
 	m_target_heights.push_front(search);
 	return GSVector2i(min_width, min_height);
+}
+
+bool GSTextureCache::HasTargetInHeightCache(u32 bp, u32 fbw, u32 psm, u32 max_age, bool move_front)
+{
+	TargetHeightElem search = {};
+	search.bp = bp;
+	search.fbw = fbw;
+	search.psm = psm;
+
+	for (auto it = m_target_heights.begin(); it != m_target_heights.end(); ++it)
+	{
+		TargetHeightElem& elem = const_cast<TargetHeightElem&>(*it);
+		if (elem.bits == search.bits)
+		{
+			if (elem.age > max_age)
+				return false;
+
+			if (move_front)
+				m_target_heights.MoveFront(it.Index());
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool GSTextureCache::Has32BitTarget(u32 bp)
