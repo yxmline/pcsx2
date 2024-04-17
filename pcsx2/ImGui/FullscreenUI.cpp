@@ -6211,7 +6211,7 @@ void FullscreenUI::DrawGameListSettingsWindow()
 	{
 		BeginNavBar();
 
-		if (NavButton(ICON_FA_BACKWARD, true, true))
+		if (NavButton(ICON_PF_BACKWARD, true, true))
 		{
 			s_current_main_window = MainWindowType::GameList;
 			QueueResetFocus();
@@ -6284,7 +6284,7 @@ void FullscreenUI::DrawGameListSettingsWindow()
 					if (index == 0)
 					{
 						// Open In File Browser.
-						Host::OpenURL(Path::CreateFileURL(dir));
+						ExitFullscreenAndOpenURL(Path::CreateFileURL(dir));
 					}
 					else if (index == 1)
 					{
