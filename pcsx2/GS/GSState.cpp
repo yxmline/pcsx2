@@ -495,7 +495,11 @@ void GSState::DumpVertices(const std::string& filename)
 			file << uv_U << DEL << uv_V;
 		}
 		else
-			file << v.ST.S << "(" << std::bit_cast<u32>(v.ST.S) << ")" << DEL << v.ST.T << "(" << std::bit_cast<u32>(v.ST.T) << ")" << DEL << v.RGBAQ.Q << "(" << std::bit_cast<u32>(v.RGBAQ.Q) << ")";
+		{
+			float x = (v.ST.S / v.RGBAQ.Q) * (1 << m_context->TEX0.TW);
+			float y = (v.ST.T / v.RGBAQ.Q) * (1 << m_context->TEX0.TH);
+			file << v.ST.S << "(" << std::hex << std::bit_cast<u32>(v.ST.S) << ")" << DEL << v.ST.T << "(" << std::hex << std::bit_cast<u32>(v.ST.T) << ")" << DEL << v.RGBAQ.Q << "(" << std::hex << std::bit_cast<u32>(v.RGBAQ.Q) << ") - " << x << "," << y;
+		}
 
 		file << std::endl;
 	}
@@ -3086,6 +3090,10 @@ __forceinline bool GSState::IsAutoFlushDraw(u32 prim)
 	if (!PRIM->TME || (GSConfig.UserHacks_AutoFlush == GSHWAutoFlushLevel::SpritesOnly && prim != GS_SPRITE))
 		return false;
 
+	// Not using the same channels.
+	if (!(GSUtil::GetChannelMask(m_context->TEX0.PSM) & GSUtil::GetChannelMask(m_context->FRAME.PSM, m_context->FRAME.FBMSK | ~(GSLocalMemory::m_psm[m_context->FRAME.PSM].fmsk))))
+		return false;
+
 	const u32 frame_mask = GSLocalMemory::m_psm[m_context->FRAME.PSM].fmsk;
 	const bool frame_hit = m_context->FRAME.Block() == m_context->TEX0.TBP0 && !(m_context->TEST.ATE && m_context->TEST.ATST == 0 && m_context->TEST.AFAIL == 2) && ((m_context->FRAME.FBMSK & frame_mask) != frame_mask);
 	// There's a strange behaviour we need to test on a PS2 here, if the FRAME is a Z format, like Powerdrome something swaps over, and it seems Alpha Fail of "FB Only" writes to the Z.. it's odd.
@@ -3268,8 +3276,9 @@ __forceinline void GSState::HandleAutoFlush()
 		if (tex_rect.y == tex_rect.w)
 			tex_rect += GSVector4i::cxpr(0, 0, 0, 1);
 
+		const bool swap_index = index_swap && GSUtil::GetPrimClass(m_prev_env.PRIM.PRIM) != GS_SPRITE_CLASS;
 		// Get the last texture position from the last draw.
-		const GSVertex* v = &m_vertex.buff[m_index.buff[m_index.tail - (index_swap ? n : 1)]];
+		const GSVertex* v = &m_vertex.buff[m_index.buff[m_index.tail - (swap_index ? n : 1)]];
 
 		if (PRIM->FST)
 		{
