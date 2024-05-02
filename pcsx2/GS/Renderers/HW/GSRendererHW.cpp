@@ -3956,7 +3956,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 	const bool alpha_c0_less_max_one = (m_conf.ps.blend_c == 0 && GetAlphaMinMax().max <= 128);
 	const bool alpha_c1_high_min_one = (m_conf.ps.blend_c == 1 && rt_alpha_min > 128);
 	const bool alpha_c1_high_max_one = (m_conf.ps.blend_c == 1 && rt_alpha_max > 128);
-	const bool alpha_c1_high_no_rta_correct = m_conf.ps.blend_c == 1 && !(new_rt_alpha_scale || can_scale_rt_alpha);
+	bool alpha_c1_high_no_rta_correct = m_conf.ps.blend_c == 1 && !(new_rt_alpha_scale || can_scale_rt_alpha);
 	const bool alpha_c2_zero = (m_conf.ps.blend_c == 2 && AFIX == 0u);
 	const bool alpha_c2_one = (m_conf.ps.blend_c == 2 && AFIX == 128u);
 	const bool alpha_c2_less_one = (m_conf.ps.blend_c == 2 && AFIX <= 128u);
@@ -4075,14 +4075,6 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 	const bool free_blend = blend_non_recursive // Free sw blending, doesn't require barriers or reading fb
 							|| accumulation_blend; // Mix of hw/sw blending
 
-	// Blend can be done on hw. As and F cases should be accurate.
-	// BLEND_HW1 with Ad, BLEND_HW3 might require sw blend.
-	// BLEND_HW1 with As/F and BLEND_HW2 can be done in hw.
-	bool clr_blend1_2 = (blend_flag & (BLEND_HW1 | BLEND_HW2)) && (m_conf.ps.blend_c != 1) // As or Af cases only.
-						&& !(m_draw_env->PABE.PABE && GetAlphaMinMax().min < 128) // No PABE as it will require sw blending.
-						&& (COLCLAMP.CLAMP) // Let's add a colclamp check too, hw blend will clamp to 0-1.
-						&& !prefer_sw_blend; // Don't run if sw blend is preferred.
-
 	// Warning no break on purpose
 	// Note: the [[fallthrough]] attribute tell compilers not to complain about not having breaks.
 	bool sw_blending = false;
@@ -4091,17 +4083,17 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		const bool blend_requires_barrier = (blend_flag & BLEND_A_MAX) // Impossible blending
 			// Sw blend, either full barrier or one barrier with no overlap.
 			|| prefer_sw_blend
-			// Blend can be done in a single draw, and we already need a barrier
-			// On fbfetch, one barrier is like full barrier
+			// Blend can be done in a single draw, and we already need a barrier.
+			// On fbfetch, one barrier is like full barrier.
 			|| (one_barrier && (no_prim_overlap || features.framebuffer_fetch))
-			|| ((alpha_c2_high_one || alpha_c0_high_max_one) && no_prim_overlap)
+			// Blending with alpha > 1 will be wrong, except BLEND_HW2.
+			|| (!(blend_flag & BLEND_HW2) && (alpha_c2_high_one || alpha_c0_high_max_one) && no_prim_overlap)
 			// Ad blends are completely wrong without sw blend (Ad is 0.5 not 1 for 128). We can spare a barrier for it.
 			|| (blend_ad && no_prim_overlap);
 
 		switch (GSConfig.AccurateBlendingUnit)
 		{
 			case AccBlendLevel::Maximum:
-				clr_blend1_2 = false;
 				sw_blending |= true;
 				[[fallthrough]];
 			case AccBlendLevel::Full:
@@ -4122,8 +4114,6 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 				accumulation_blend &= !prefer_sw_blend;
 				// Enable sw blending for barriers.
 				sw_blending |= blend_requires_barrier;
-				// Try to do hw blend for clr2 case.
-				sw_blending &= !clr_blend1_2;
 				// Enable sw blending for free blending.
 				sw_blending |= free_blend;
 				// Do not run BLEND MIX if sw blending is already present, it's less accurate.
@@ -4143,11 +4133,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 		{
 			case AccBlendLevel::Maximum:
 				// Enable sw blend when prims don't overlap.
-				if (no_prim_overlap)
-				{
-					clr_blend1_2 = false;
-					sw_blending |= true;
-				}
+				sw_blending |= no_prim_overlap;
 				[[fallthrough]];
 			case AccBlendLevel::Full:
 				// Enable sw blend on cases where Alpha > 128 when prims don't overlap.
@@ -4167,8 +4153,6 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 				accumulation_blend &= !prefer_sw_blend;
 				// Enable sw blending for reading fb.
 				sw_blending |= prefer_sw_blend;
-				// Try to do hw blend for clr2 case.
-				sw_blending &= !clr_blend1_2;
 				// Enable sw blending for free blending.
 				sw_blending |= free_blend;
 				// Do not run BLEND MIX if sw blending is already present, it's less accurate.
@@ -4426,6 +4410,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			}
 
 			new_rt_alpha_scale = true;
+			alpha_c1_high_no_rta_correct = false;
 			
 			m_conf.ps.rta_correction = rt->m_rt_alpha_scale;
 		}
@@ -4458,14 +4443,17 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			{
 				// Alpha = As or Af.
 				// Cs + Cd*Alpha, Cs - Cd*Alpha.
+				const u8 dither = m_conf.ps.dither;
 				// Render pass 1: Calculate Cd*Alpha with an alpha range of 0-2.
 				m_conf.ps.blend_hw = 2;
+				m_conf.ps.dither = 0;
 				blend.src = GSDevice::DST_COLOR;
 				blend.dst = (m_conf.ps.blend_c == 2) ? GSDevice::CONST_COLOR : GSDevice::SRC1_COLOR;
 				blend.op = GSDevice::OP_ADD;
 				// Render pass 2: Add or subtract result of render pass 1(Cd) from Cs.
 				m_conf.blend_second_pass.enable = true;
 				m_conf.blend_second_pass.blend_hw = 0;
+				m_conf.blend_second_pass.dither = dither;
 				m_conf.blend_second_pass.blend = {true, blend_second_pass.src, GSDevice::CONST_ONE, blend_second_pass.op, GSDevice::CONST_ONE, GSDevice::CONST_ZERO, false, 0};
 			}
 			else if (alpha_c1_high_no_rta_correct && (blend_flag & BLEND_HW5))
