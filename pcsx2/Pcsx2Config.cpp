@@ -513,6 +513,7 @@ Pcsx2Config::CpuOptions::CpuOptions()
 	VU0FPCR = DEFAULT_VU_FP_CONTROL_REGISTER;
 	VU1FPCR = DEFAULT_VU_FP_CONTROL_REGISTER;
 	AffinityControlMode = 0;
+	ExtraMemory = false;
 }
 
 void Pcsx2Config::CpuOptions::ApplySanityCheck()
@@ -544,6 +545,7 @@ void Pcsx2Config::CpuOptions::LoadSave(SettingsWrapper& wrap)
 	read_fpcr(VU1FPCR, "VU1");
 
 	SettingsWrapEntry(AffinityControlMode);
+	SettingsWrapBitBool(ExtraMemory);
 
 	Recompiler.LoadSave(wrap);
 }
@@ -1159,6 +1161,7 @@ void Pcsx2Config::DEV9Options::LoadSave(SettingsWrapper& wrap)
 		SettingsWrapEntry(EthEnable);
 		SettingsWrapEnumEx(EthApi, "EthApi", NetApiNames);
 		SettingsWrapEntry(EthDevice);
+		SettingsWrapEntry(EthLogDHCP);
 		SettingsWrapEntry(EthLogDNS);
 
 		SettingsWrapEntry(InterceptDHCP);
@@ -1252,6 +1255,7 @@ bool Pcsx2Config::DEV9Options::operator==(const DEV9Options& right) const
 	return OpEqu(EthEnable) &&
 		   OpEqu(EthApi) &&
 		   OpEqu(EthDevice) &&
+		   OpEqu(EthLogDHCP) &&
 		   OpEqu(EthLogDNS) &&
 
 		   OpEqu(InterceptDHCP) &&
