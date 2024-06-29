@@ -4283,7 +4283,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 			// Blending with alpha > 1 will be wrong, except BLEND_HW2.
 			|| (!(blend_flag & BLEND_HW2) && (alpha_c2_high_one || alpha_c0_high_max_one) && no_prim_overlap)
 			// Ad blends are completely wrong without sw blend (Ad is 0.5 not 1 for 128). We can spare a barrier for it.
-			|| (blend_ad && no_prim_overlap);
+			|| (blend_ad && no_prim_overlap && !new_rt_alpha_scale);
 
 		switch (GSConfig.AccurateBlendingUnit)
 		{
@@ -4376,13 +4376,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, bool& DAT
 	// Color clip
 	if (COLCLAMP.CLAMP == 0)
 	{
-		bool free_colclip = false;
-		if (features.framebuffer_fetch)
-			free_colclip = true;
-		else if (features.texture_barrier)
-			free_colclip = no_prim_overlap || blend_non_recursive;
-		else
-			free_colclip = blend_non_recursive;
+		const bool free_colclip = features.framebuffer_fetch || no_prim_overlap || blend_non_recursive;
 
 		GL_DBG("COLCLIP Info (Blending: %u/%u/%u/%u, OVERLAP: %d)", m_conf.ps.blend_a, m_conf.ps.blend_b, m_conf.ps.blend_c, m_conf.ps.blend_d, m_prim_overlap);
 		if (color_dest_blend || color_dest_blend2)
