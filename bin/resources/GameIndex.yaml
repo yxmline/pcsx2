@@ -16715,6 +16715,7 @@ SLES-51434:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
   memcardFilters:
     - "SLES-51434"
     - "SLES-50382"
@@ -29243,6 +29244,7 @@ SLKA-25065:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
 SLKA-25066:
   name: "Zone of the Enders - The 2nd Runner SE"
   region: "NTSC-K"
@@ -38485,6 +38487,7 @@ SLPM-65257:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
   memcardFilters:
     - "SLPM-65257"
     - "SLPM-65622"
@@ -40480,6 +40483,7 @@ SLPM-65622:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
   memcardFilters:
     - "SLPM-65257"
     - "SLPM-65622"
@@ -42738,6 +42742,7 @@ SLPM-66018:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
   memcardFilters:
     - "SLPM-65257"
     - "SLPM-65622"
@@ -61384,6 +61389,7 @@ SLUS-20622:
     - SoftwareRendererFMVHack # Fixes blackscreen when FMV.
   gsHWFixes:
     recommendedBlendingLevel: 4 # Fixes menu transparancy effects and text.
+    deinterlace: 9 # Fixes incorrect field order in FMVs.
   memcardFilters: # Reads Silent Hill 2 for easter egg.
     - "SLUS-20622"
     - "SLUS-20228"
