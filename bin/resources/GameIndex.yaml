@@ -31854,9 +31854,6 @@ SLPM-55065:
         // Game does weird stack manipulation, causing data sent to the IOP to be corrupted unless EE data cache is enabled.
         // This patch skips over the stack code, allowing the game to boot.
         patch=1,EE,00131A64,word,10000003
-SLPM-55068:
-  name: "Koihime Musou"
-  region: "NTSC-J"
 SLPM-55067:
   name: "恋姫†夢想 ～ドキッ☆乙女だらけの三国志演義～ [初回限定版]"
   name-sort: "こいひめむそう ～どきっおとめだらけのさんごくしえんぎ～ [しょかいげんていばん]"
