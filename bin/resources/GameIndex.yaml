@@ -20905,11 +20905,10 @@ SLES-52877:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
-    roundSprite: 1 # Further reduces blurriness.
+    halfPixelOffset: 5 # Reduces blurriness.
     bilinearUpscale: 1 # Smooths out fire textures.
     nativeScaling: 2 # Fixes post processing.
-    beforeDraw: "OI_HauntingGround" # Fix bloom.
+    textureInsideRT: 1 # Fixes post effects.
 SLES-52882:
   name: "Stolen"
   region: "PAL-M5"
@@ -44541,11 +44540,10 @@ SLPM-65913:
   region: "NTSC-J"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
-    roundSprite: 1 # Further reduces blurriness.
+    halfPixelOffset: 5 # Reduces blurriness.
     bilinearUpscale: 1 # Smooths out fire textures.
     nativeScaling: 2 # Fixes post processing.
-    beforeDraw: "OI_HauntingGround" # Fix bloom.
+    textureInsideRT: 1 # Fixes post effects.
 SLPM-65914:
   name: "NANA"
   name-sort: "ナナ"
@@ -49079,11 +49077,10 @@ SLPM-66638:
   name-en: "Demento [CapColle]"
   region: "NTSC-J"
   gsHWFixes:
-    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
-    roundSprite: 1 # Further reduces blurriness.
+    halfPixelOffset: 5 # Reduces blurriness.
     bilinearUpscale: 1 # Smooths out fire textures.
     nativeScaling: 2 # Fixes post processing.
-    beforeDraw: "OI_HauntingGround" # Fix bloom.
+    textureInsideRT: 1 # Fixes post effects.
 SLPM-66639:
   name: "ストリートファイターⅢ 3rd STRIKE Fight for the future [カプコレ]"
   name-sort: "すとりーとふぁいたー3 3rd STRIKE Fight for the future [かぷこれ]"
@@ -67352,11 +67349,10 @@ SLUS-21075:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
-    halfPixelOffset: 2 # Reduces blurriness. Normal Vertex works better, but causes some lights to disappear.
-    roundSprite: 1 # Further reduces blurriness.
+    halfPixelOffset: 5 # Reduces blurriness.
     bilinearUpscale: 1 # Smooths out fire textures.
     nativeScaling: 2 # Fixes post processing.
-    beforeDraw: "OI_HauntingGround" # Fix bloom.
+    textureInsideRT: 1 # Fixes post effects.
 SLUS-21076:
   name: "Atari Anthology"
   region: "NTSC-U"
