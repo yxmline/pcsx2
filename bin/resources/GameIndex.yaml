@@ -13656,6 +13656,7 @@ SLED-53440:
   name: "Area 51"
   region: "PAL-Unk"
   gsHWFixes:
+    textureInsideRT: 1 # Fixes shadows in some scenarios.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects, needs Special otherwise lights flicker.
     nativeScaling: 2 # Fixes lights.
 SLED-53442:
@@ -20230,6 +20231,7 @@ SLES-52570:
   region: "PAL-M5"
   compat: 5
   gsHWFixes:
+    textureInsideRT: 1 # Fixes shadows in some scenarios.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects, needs Special otherwise lights flicker.
     nativeScaling: 2 # Fixes lights.
 SLES-52571:
@@ -21859,6 +21861,7 @@ SLES-53075:
   name: "Area 51"
   region: "PAL-M5"
   gsHWFixes:
+    textureInsideRT: 1 # Fixes shadows in some scenarios.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects, needs Special otherwise lights flicker.
     nativeScaling: 2 # Fixes lights.
 SLES-53076:
@@ -28946,6 +28949,7 @@ SLES-55349:
   region: "PAL-E"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -28968,6 +28972,7 @@ SLES-55350:
   region: "PAL-F-G"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -28990,6 +28995,7 @@ SLES-55351:
   region: "PAL-I-S"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -29013,6 +29019,7 @@ SLES-55352:
   compat: 5
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -29035,6 +29042,7 @@ SLES-55353:
   region: "PAL-M6"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -32194,6 +32202,7 @@ SLKA-25446:
   region: "NTSC-K"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     getSkipCount: "GSC_NFSUndercover"
   memcardFilters:
@@ -33059,6 +33068,7 @@ SLPM-55127:
   region: "NTSC-J"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -33657,6 +33667,7 @@ SLPM-55244:
   region: "NTSC-J"
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
@@ -48435,6 +48446,7 @@ SLPM-66468:
   name-en: "Area 51"
   region: "NTSC-J"
   gsHWFixes:
+    textureInsideRT: 1 # Fixes shadows in some scenarios.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects, needs Special otherwise lights flicker.
     nativeScaling: 2 # Fixes lights.
 SLPM-66469:
@@ -65127,6 +65139,7 @@ SLUS-20595:
   region: "NTSC-U"
   compat: 5
   gsHWFixes:
+    textureInsideRT: 1 # Fixes shadows in some scenarios.
     halfPixelOffset: 2 # Fixes misaligned lighting and other effects, needs Special otherwise lights flicker.
     nativeScaling: 2 # Fixes lights.
 SLUS-20596:
@@ -72247,6 +72260,7 @@ SLUS-21801:
   compat: 5
   gsHWFixes:
     recommendedBlendingLevel: 3 # Improves car reflections.
+    textureInsideRT: 1 # Fixes sun glare.
     halfPixelOffset: 2 # Fixes blurriness.
     bilinearUpscale: 2 # Fixes sun glare textures.
     gpuTargetCLUT: 1 # Fixes sun penetration.
