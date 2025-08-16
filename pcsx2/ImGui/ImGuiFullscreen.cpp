@@ -1939,6 +1939,11 @@ bool ImGuiFullscreen::NavTab(const char* title, bool is_active, bool enabled /* 
 	if (enabled)
 	{
 		pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held, ImGuiButtonFlags_NoNavFocus);
+		if (hovered)
+		{
+			const ImU32 col = ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered, 1.0f);
+			DrawMenuButtonFrame(bb.Min, bb.Max, col, true, 0.0f);
+		}
 	}
 	else
 	{
@@ -1947,11 +1952,11 @@ bool ImGuiFullscreen::NavTab(const char* title, bool is_active, bool enabled /* 
 		hovered = false;
 	}
 
-	const ImU32 col =
-		hovered ? ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered, 1.0f) :
-				  ImGui::GetColorU32(is_active ? background : ImVec4(background.x, background.y, background.z, 0.5f));
-
-	DrawMenuButtonFrame(bb.Min, bb.Max, col, true, 0.0f);
+	if (!hovered)
+	{
+		const ImU32 col = ImGui::GetColorU32(is_active ? background : ImVec4(background.x, background.y, background.z, 0.5f));
+		ImGui::RenderFrame(bb.Min, bb.Max, col, false, 0.0f);
+	}
 
 #if 0
 	// This looks a bit rubbish... but left it here if someone thinks they can improve it.
@@ -2235,6 +2240,7 @@ void ImGuiFullscreen::DrawFileSelector()
 
 	bool is_open = !WantsToCloseMenu();
 	bool directory_selected = false;
+	bool parent_wanted = false;
 	if (ImGui::BeginPopupModal(
 			s_file_selector_title.c_str(), &is_open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
 	{
@@ -2264,6 +2270,12 @@ void ImGuiFullscreen::DrawFileSelector()
 		EndMenuButtons();
 
 		ImGui::PopStyleColor(1);
+
+		if ((ImGui::Shortcut(ImGuiKey_Backspace, false) || ImGui::Shortcut(ImGuiKey_NavGamepadInput, false)) &&
+			(!s_file_selector_items.empty() && s_file_selector_items.front().display_name == ICON_FA_FOLDER_OPEN " <Parent Directory>"))
+		{
+			parent_wanted = true;
+		}
 
 		ImGui::EndPopup();
 	}
@@ -2301,17 +2313,10 @@ void ImGuiFullscreen::DrawFileSelector()
 		s_file_selector_callback(no_path);
 		CloseFileSelector();
 	}
-	else
+	else if (parent_wanted)
 	{
-		if (ImGui::IsKeyPressed(ImGuiKey_Backspace, false) || ImGui::IsKeyPressed(ImGuiKey_NavGamepadMenu, false))
-		{
-			if (!s_file_selector_items.empty() && s_file_selector_items.front().display_name == ICON_FA_FOLDER_OPEN
-													  "  <Parent Directory>")
-			{
-				SetFileSelectorDirectory(std::move(s_file_selector_items.front().full_path));
-				QueueResetFocus(FocusResetType::Other);
-			}
-		}
+		SetFileSelectorDirectory(std::move(s_file_selector_items.front().full_path));
+		QueueResetFocus(FocusResetType::Other);
 	}
 }
 

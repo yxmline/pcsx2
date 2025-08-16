@@ -2095,7 +2095,7 @@ void Achievements::DrawGameOverlays()
 	using ImGuiFullscreen::g_medium_font;
 	using ImGuiFullscreen::LayoutScale;
 
-	if (!HasActiveGame() || !EmuConfig.Achievements.Overlays)
+	if (!HasActiveGame() || !(EmuConfig.Achievements.Overlays || EmuConfig.Achievements.LBOverlays))
 		return;
 
 	const auto lock = GetLock();
@@ -2107,7 +2107,7 @@ void Achievements::DrawGameOverlays()
 	ImVec2 position = CalculateOverlayPosition(io, padding, EmuConfig.Achievements.OverlayPosition);
 	ImDrawList* dl = ImGui::GetBackgroundDrawList();
 
-	if (!s_active_challenge_indicators.empty())
+	if (!s_active_challenge_indicators.empty() && EmuConfig.Achievements.Overlays)
 	{
 		const ImVec2 stack_direction = GetStackingDirection(EmuConfig.Achievements.OverlayPosition);
 		ImVec2 current_position = AdjustPositionForAlignment(position, image_size, EmuConfig.Achievements.OverlayPosition);
@@ -2162,7 +2162,7 @@ void Achievements::DrawGameOverlays()
 		position.y += stack_direction.y * (image_size.y + padding);
 	}
 
-	if (s_active_progress_indicator.has_value())
+	if (s_active_progress_indicator.has_value() && EmuConfig.Achievements.Overlays)
 	{
 		const AchievementProgressIndicator& indicator = s_active_progress_indicator.value();
 		const float opacity = IndicatorOpacity(indicator);
@@ -2206,7 +2206,7 @@ void Achievements::DrawGameOverlays()
 		position.y += stack_direction.y * (progress_box_size.y + padding);
 	}
 
-	if (!s_active_leaderboard_trackers.empty())
+	if (!s_active_leaderboard_trackers.empty() && EmuConfig.Achievements.LBOverlays)
 	{
 		const ImVec2 stack_direction = GetStackingDirection(EmuConfig.Achievements.OverlayPosition);
 		
@@ -2848,8 +2848,14 @@ void Achievements::DrawLeaderboardsWindow()
 				const float tab_width = (ImGui::GetWindowWidth() / ImGuiFullscreen::g_layout_scale) * 0.5f;
 				ImGui::SetCursorPos(ImVec2(0.0f, top + spacing_small));
 
-				if (ImGui::IsKeyPressed(ImGuiKey_NavGamepadTweakSlow, false) || ImGui::IsKeyPressed(ImGuiKey_NavGamepadTweakFast, false))
+				if (ImGui::IsKeyPressed(ImGuiKey_NavGamepadTweakSlow, false) || ImGui::IsKeyPressed(ImGuiKey_NavGamepadTweakFast, false) ||
+					ImGui::IsKeyPressed(ImGuiKey_GamepadDpadLeft, false) || ImGui::IsKeyPressed(ImGuiKey_GamepadDpadRight, false) ||
+					ImGui::IsKeyPressed(ImGuiKey_LeftArrow, false) || ImGui::IsKeyPressed(ImGuiKey_RightArrow, false))
+				{
 					s_is_showing_all_leaderboard_entries = !s_is_showing_all_leaderboard_entries;
+				}
+
+				ImGuiFullscreen::BeginNavBar();
 
 				for (const bool show_all : {false, true})
 				{
@@ -2860,6 +2866,8 @@ void Achievements::DrawLeaderboardsWindow()
 						s_is_showing_all_leaderboard_entries = show_all;
 					}
 				}
+
+				ImGuiFullscreen::EndNavBar();
 
 				const ImVec2 bg_pos = ImVec2(0.0f, ImGui::GetCurrentWindow()->DC.CursorPos.y + LayoutScale(tab_height_unscaled));
 				const ImVec2 bg_size =
@@ -2914,7 +2922,6 @@ void Achievements::DrawLeaderboardsWindow()
 		}
 	}
 	ImGuiFullscreen::EndFullscreenWindow();
-	FullscreenUI::SetStandardSelectionFooterText(true);
 
 	if (!is_leaderboard_open)
 	{
@@ -2935,6 +2942,8 @@ void Achievements::DrawLeaderboardsWindow()
 			ImGuiFullscreen::EndMenuButtons();
 		}
 		ImGuiFullscreen::EndFullscreenWindow();
+
+		FullscreenUI::SetStandardSelectionFooterText(true);
 	}
 	else
 	{
@@ -3001,6 +3010,24 @@ void Achievements::DrawLeaderboardsWindow()
 			ImGuiFullscreen::EndMenuButtons();
 		}
 		ImGuiFullscreen::EndFullscreenWindow();
+
+		if (ImGuiFullscreen::IsGamepadInputSource())
+		{
+			const bool circleOK = ImGui::GetIO().ConfigNavSwapGamepadButtons;
+			ImGuiFullscreen::SetFullscreenFooterText(std::array{
+				std::make_pair(ICON_PF_DPAD_LEFT_RIGHT, TRANSLATE_SV("Achievements", "Switch Rankings")),
+				std::make_pair(ICON_PF_DPAD_UP_DOWN, TRANSLATE_SV("Achievements", "Change Selection")),
+				std::make_pair(circleOK ? ICON_PF_BUTTON_CROSS : ICON_PF_BUTTON_CIRCLE, TRANSLATE_SV("Achievements", "Back")),
+			});
+		}
+		else
+		{
+			ImGuiFullscreen::SetFullscreenFooterText(std::array{
+				std::make_pair(ICON_PF_ARROW_LEFT ICON_PF_ARROW_RIGHT, TRANSLATE_SV("Achievements", "Switch Rankings")),
+				std::make_pair(ICON_PF_ARROW_UP ICON_PF_ARROW_DOWN, TRANSLATE_SV("Achievements", "Change Selection")),
+				std::make_pair(ICON_PF_ESC, TRANSLATE_SV("Achievements", "Back")),
+			});
+		}
 	}
 
 	if (close_leaderboard_on_exit)
