@@ -2441,6 +2441,10 @@ void MainWindow::createDisplayWidget(bool fullscreen, bool render_to_main)
 		m_ui.mainContainer->setCurrentIndex(1);
 	}
 
+	// Attatch drag and drop signals
+	connect(m_display_surface, &DisplaySurface::dragEnterEvent, this, &MainWindow::dragEnterEvent);
+	connect(m_display_surface, &DisplaySurface::dropEvent, this, &MainWindow::dropEvent);
+
 	updateDisplayRelatedActions(true, render_to_main, fullscreen);
 
 	// We need the surface visible.
@@ -2498,9 +2502,6 @@ void MainWindow::destroyDisplayWidget(bool show_game_list)
 	if (!isRenderingFullscreen() && !isRenderingToMain())
 		saveDisplayWindowGeometryToConfig();
 
-	// Detatch display surface from container.
-	m_display_surface->setParent(nullptr);
-
 	if (isRenderingToMain())
 	{
 		pxAssertRel(m_ui.mainContainer->indexOf(m_display_container) == 1, "Display widget in stack");
@@ -2512,17 +2513,12 @@ void MainWindow::destroyDisplayWidget(bool show_game_list)
 		}
 	}
 
-	if (m_display_surface)
-	{
-		m_display_surface->destroy();
-		m_display_surface = nullptr;
-	}
-
-	if (m_display_container)
-	{
-		m_display_container->deleteLater();
-		m_display_container = nullptr;
-	}
+	// displau surface is always in a container
+	pxAssert(m_display_container != nullptr);
+	m_display_container->deleteLater();
+	m_display_container = nullptr;
+	// m_display_surface will be destroyed by the container's dtor
+	m_display_surface = nullptr;
 
 	updateDisplayRelatedActions(false, false, false);
 }
@@ -2634,7 +2630,7 @@ SettingsWindow* MainWindow::getSettingsWindow()
 		m_settings_window = new SettingsWindow();
 		connect(m_settings_window->getInterfaceSettingsWidget(), &InterfaceSettingsWidget::themeChanged, this, &MainWindow::onThemeChanged);
 		connect(m_settings_window->getInterfaceSettingsWidget(), &InterfaceSettingsWidget::languageChanged, this, &MainWindow::onLanguageChanged);
-		connect(m_settings_window->getInterfaceSettingsWidget(), &InterfaceSettingsWidget::backgroundChanged, m_game_list_widget, [this] { m_game_list_widget->setCustomBackground(true); });
+		connect(m_settings_window->getInterfaceSettingsWidget(), &InterfaceSettingsWidget::backgroundChanged, m_game_list_widget, [this] { m_game_list_widget->setCustomBackground(); });
 		connect(m_settings_window->getGameListSettingsWidget(), &GameListSettingsWidget::preferEnglishGameListChanged, this, [] {
 			g_main_window->m_game_list_widget->refreshGridCovers();
 		});
