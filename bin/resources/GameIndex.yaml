@@ -2239,6 +2239,8 @@ SCAJ-20152:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SCAJ-20153:
   name: "コード・エイジ コマンダーズ"
@@ -5600,7 +5602,7 @@ SCES-52033:
         author=refraction
         // Cop2 problems.
         patch=0,EE,003953F8,word,48438000
-        patch=0,EE,003735FC,word,4B06521B
+        patch=0,EE,003953FC,word,4B06521B
         author=YukiXXL
         // Speed Correction (25 FPS)
         patch=1,EE,00175E1C,extended,00000019
@@ -6229,6 +6231,8 @@ SCES-53688:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SCES-53795:
   name: "SingStar - '80s"
@@ -7698,6 +7702,8 @@ SCKA-20065:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SCKA-20066:
   name: "아이토이 - 플레이 3"
@@ -11686,6 +11692,15 @@ SCUS-97264:
         // Cop2 problems.
         patch=0,EE,003735F8,word,48438000
         patch=0,EE,003735FC,word,4B06521B
+    062BC79E:
+      content: |-
+        author=YukiXXL
+        // Cop2 problems.
+        patch=0,EE,00395D28,word,48438000
+        patch=0,EE,00395D2C,word,4B06521B
+        // Other languages SNDVAG fix
+        patch=1,EE,204A0C3C,word,482E7325
+        patch=1,EE,204A0C40,word,0000474F
 SCUS-97265:
   name: "Jak II"
   region: "NTSC-U"
@@ -12073,12 +12088,21 @@ SCUS-97396:
   gsHWFixes:
     PCRTCOffsets: 1 # Fixes boot videos screen size.
 SCUS-97397:
-  name: "Syphon Filter - The Omega Strain"
+  name: "Syphon Filter - The Omega Strain Public Beta 1.0"
   region: "NTSC-U"
   gsHWFixes:
     autoFlush: 2 # Fixes lights going through walls.
     preloadFrameData: 1 # Fixes light flicker.
     halfPixelOffset: 2 # Corrects light position.
+  gameFixes:
+    - EETimingHack # Fixes random hangs.
+  patches:
+    C909A32E:
+      content: |-
+        author=YukiXXL
+        // Cop2 problems.
+        patch=0,EE,00367798,word,48438000
+        patch=0,EE,0036779C,word,4B06521B
 SCUS-97398:
   name: "Siren [Demo]"
   region: "NTSC-U"
@@ -27830,8 +27854,6 @@ SLES-54812:
 SLES-54813:
   name: "NASCAR 08"
   region: "PAL-A-E"
-  gsHWFixes:
-    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto.
 SLES-54814:
   name: "Dead Eye Jim"
   region: "PAL-E"
@@ -29184,8 +29206,6 @@ SLES-55199:
   name: "NASCAR 09"
   region: "PAL-M5"
   compat: 5
-  gsHWFixes:
-    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto.
 SLES-55200:
   name: "Guitar Hero - Aerosmith"
   region: "PAL-M4"
@@ -35956,6 +35976,8 @@ SLPM-60272:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SLPM-60273:
   name: "絶体絶命都市2 -凍てついた記憶たち- [体験版 Type-B]"
@@ -60360,6 +60382,8 @@ SLPS-25557:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SLPS-25558:
   name: "ネオジオ バトルコロシアム"
@@ -66482,7 +66506,6 @@ SLUS-20535:
   compat: 5
   gsHWFixes:
     roundSprite: 1 # Fix horizontal and vertical lines when racing.
-    deinterlace: 8 # Fixes misdetection of game deinterlace.
 SLUS-20536:
   name: "NBA Live 2003"
   region: "NTSC-U"
@@ -67682,7 +67705,6 @@ SLUS-20754:
   region: "NTSC-U"
   gsHWFixes:
     roundSprite: 1 # Fix horizontal and vertical lines when racing.
-    deinterlace: 8 # Fixes misdetection of game deinterlace.
   memcardFilters:
     - "PSCD10088" # Enables EA Sports BIO.
     - "SLUS-20754"
@@ -68047,7 +68069,6 @@ SLUS-20824:
   region: "NTSC-U"
   gsHWFixes:
     roundSprite: 1 # Fix horizontal and vertical lines when racing.
-    deinterlace: 8 # Fixes misdetection of game deinterlace.
   memcardFilters:
     - "PSCD10088" # Enables EA Sports BIO.
     - "SLUS-20824"
@@ -70389,6 +70410,8 @@ SLUS-21209:
   gsHWFixes:
     alignSprite: 1 # Fixes vertical lines.
     textureInsideRT: 1 # Fixes corruption.
+    halfPixelOffset: 4 # Aligns post bloom.
+    nativeScaling: 2 # Fixes post effects.
     getSkipCount: "GSC_UrbanReign"
 SLUS-21212:
   name: "Spartan - Total Warrior"
@@ -73095,8 +73118,6 @@ SLUS-21639:
   name: "NASCAR 08"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto.
 SLUS-21640:
   name: "Rugby 08"
   region: "NTSC-U"
@@ -73664,8 +73685,6 @@ SLUS-21744:
   name: "NASCAR 09"
   region: "NTSC-U"
   compat: 5
-  gsHWFixes:
-    deinterlace: 8 # Game requires AdaptiveTFF de-interlacing when auto.
   patches:
     1B6C22B9:
       content: |-
@@ -75797,6 +75816,9 @@ TCES-52033:
     0DDA2728:
       content: |-
         author=YukiXXL
+        // Cop2 problems.
+        patch=0,EE,0038E8E8,word,48438000
+        patch=0,EE,0038E8EC,word,4B06521B
         // Speed Correction (25 FPS)
         patch=1,EE,00175a7c,extended,00000019
         patch=1,EE,00175848,extended,00000019

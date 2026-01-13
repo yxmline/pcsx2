@@ -211,13 +211,20 @@ protected:
 	void CorrectATEAlphaMinMax(const u32 atst, const int aref);
 
 public:
+	enum EEGS_TransferType
+	{
+		EE_to_GS,
+		GS_to_GS,
+		GS_to_EE
+	};
+
 	struct GSUploadQueue
 	{
 		GIFRegBITBLTBUF blit;
 		GSVector4i rect;
 		int draw;
 		bool zero_clear;
-		bool ee_to_gs;
+		EEGS_TransferType transfer_type;
 	};
 
 	enum NoGapsType
@@ -401,7 +408,7 @@ public:
 
 		// Calculate framebuffer read offsets, should be considered if only one circuit is enabled, or difference is more than 1 line.
 		// Only considered if "Anti-blur" is enabled.
-		void CalculateFramebufferOffset(bool scanmask);
+		void CalculateFramebufferOffset(bool scanmask, GSRegDISPFB framebuffer0Reg, GSRegDISPFB framebuffer1Reg);
 
 		// Used in software mode to align the buffer when reading. Offset is accounted for (block aligned) by GetOutput.
 		void RemoveFramebufferOffset(int display);
