@@ -193,11 +193,24 @@ void GSDevice12::LoadAgilitySDK()
 	if (agility_loaded)
 		return;
 
-	HRESULT hr;
+	// On older versions of Windows 10 (example 2019 LTSC) D3D12GetInterface may fail because it doesn't exist,
+	// in such case we can check if D3D12GetInterface exists first.
+	const HMODULE d3d12 = GetModuleHandleW(L"d3d12.dll");
+	if (!d3d12)
+		return;
+
+	using PFN_D3D12GetInterface = HRESULT(WINAPI*)(REFCLSID rclsid, REFIID riid, void** ppv);
+	auto pD3D12GetInterface = reinterpret_cast<PFN_D3D12GetInterface>(GetProcAddress(d3d12, "D3D12GetInterface"));
+	if (!pD3D12GetInterface)
+	{
+		Console.Error("D3D12: Agility SDK configuration is not available");
+		return;
+	}
 
 	// See https://microsoft.github.io/DirectX-Specs/d3d/IndependentDevices.html
 	ComPtr<ID3D12SDKConfiguration1> sdk_configuration;
-	hr = D3D12GetInterface(CLSID_D3D12SDKConfiguration, IID_PPV_ARGS(sdk_configuration.put()));
+	HRESULT hr;
+	hr = pD3D12GetInterface(CLSID_D3D12SDKConfiguration, IID_PPV_ARGS(sdk_configuration.put()));
 	if (FAILED(hr))
 	{
 		Console.Error("D3D12: Agility SDK configuration is not available");
@@ -925,6 +938,7 @@ void GSDevice12::SetVSyncMode(GSVSyncMode mode, bool allow_present_throttle)
 
 	if (GetSwapChainBufferCount() != old_buffer_count)
 	{
+		ExecuteCommandList(true);
 		DestroySwapChain();
 		if (!CreateSwapChain())
 			pxFailRel("Failed to recreate swap chain after vsync change.");
@@ -1622,14 +1636,14 @@ void GSDevice12::UpdateCLUTTexture(
 	GSTexture* sTex, float sScale, u32 offsetX, u32 offsetY, GSTexture* dTex, u32 dOffset, u32 dSize)
 {
 	// match merge cb
-	struct Uniforms
+	struct alignas(16) Uniforms
 	{
 		float scale;
 		float pad1[3];
 		u32 offsetX, offsetY, dOffset;
 		u32 pad2;
 	};
-	const Uniforms cb = {sScale, {}, offsetX, offsetY, dOffset};
+	const Uniforms cb = {sScale, {}, offsetX, offsetY, dOffset, 0};
 	SetUtilityRootSignature();
 	SetUtilityPushConstants(&cb, sizeof(cb));
 
@@ -1643,14 +1657,15 @@ void GSDevice12::ConvertToIndexedTexture(
 	GSTexture* sTex, float sScale, u32 offsetX, u32 offsetY, u32 SBW, u32 SPSM, GSTexture* dTex, u32 DBW, u32 DPSM)
 {
 	// match merge cb
-	struct Uniforms
+	struct alignas(16) Uniforms
 	{
 		float scale;
 		float pad1[3];
 		u32 SBW, DBW, SPSM;
+		u32 pad2;
 	};
 
-	const Uniforms cb = {sScale, {}, SBW, DBW, SPSM};
+	const Uniforms cb = {sScale, {}, SBW, DBW, SPSM, 0};
 	SetUtilityRootSignature();
 	SetUtilityPushConstants(&cb, sizeof(cb));
 
@@ -1662,7 +1677,7 @@ void GSDevice12::ConvertToIndexedTexture(
 
 void GSDevice12::FilteredDownsampleTexture(GSTexture* sTex, GSTexture* dTex, u32 downsample_factor, const GSVector2i& clamp_min, const GSVector4& dRect)
 {
-	struct Uniforms
+	struct alignas(16) Uniforms
 	{
 		float weight;
 		float step_multiplier;
@@ -2171,7 +2186,7 @@ void GSDevice12::RenderImGui()
 	const float B = static_cast<float>(m_window_info.surface_height);
 
 	// clang-format off
-  const float ortho_projection[4][4] =
+	const GSVector4 ortho_projection[4] =
 	{
 		{ 2.0f/(R-L),   0.0f,           0.0f,       0.0f },
 		{ 0.0f,         2.0f/(T-B),     0.0f,       0.0f },
