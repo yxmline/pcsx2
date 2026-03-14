@@ -3187,6 +3187,9 @@ void FullscreenUI::DrawGameListSettingsWindow()
 		DrawToggleSetting(bsi, FSUI_ICONSTR(ICON_FA_TAG, "Show Titles"),
 			FSUI_CSTR("Shows Titles for Games when in Game Grid View Mode"), "UI",
 			"FullscreenUIShowGameGridTitles", true);
+		DrawToggleSetting(bsi, FSUI_ICONSTR(ICON_FA_GLOBE, "Prefer English Titles"),
+			FSUI_CSTR("For games with both a title in the game's native language and one in English, prefer the English title."), "UI",
+			"PreferEnglishGameList", false);
 	}
 
 	MenuHeading(FSUI_CSTR("Cover Settings"));
@@ -4029,7 +4032,7 @@ void FullscreenUI::ReportStateSaveError(const std::string& message, std::optiona
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Translation String Area
-// To avoid having to type T_RANSLATE("FullscreenUI", ...) everywhere, we use the shorter macros in the internal 
+// To avoid having to type T_RANSLATE("FullscreenUI", ...) everywhere, we use the shorter macros in the internal
 // header file, then preprocess and generate a bunch of noops here to define the strings. Sadly that means
 // the view in Linguist is gonna suck, but you can search the file for the string for more context.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4092,6 +4095,7 @@ TRANSLATE_NOOP("FullscreenUI", "Sets which view the game list will open to.");
 TRANSLATE_NOOP("FullscreenUI", "Determines which field the game list will be sorted by.");
 TRANSLATE_NOOP("FullscreenUI", "Reverses the game list sort order from the default (usually ascending to descending).");
 TRANSLATE_NOOP("FullscreenUI", "Shows Titles for Games when in Game Grid View Mode");
+TRANSLATE_NOOP("FullscreenUI", "For games with both a title in the game's native language and one in English, prefer the English title.");
 TRANSLATE_NOOP("FullscreenUI", "Cover Settings");
 TRANSLATE_NOOP("FullscreenUI", "Downloads covers from a user-specified URL template.");
 TRANSLATE_NOOP("FullscreenUI", "Operations");
@@ -4205,6 +4209,7 @@ TRANSLATE_NOOP("FullscreenUI", "Default View");
 TRANSLATE_NOOP("FullscreenUI", "Sort By");
 TRANSLATE_NOOP("FullscreenUI", "Sort Reversed");
 TRANSLATE_NOOP("FullscreenUI", "Show Titles");
+TRANSLATE_NOOP("FullscreenUI", "Prefer English Titles");
 TRANSLATE_NOOP("FullscreenUI", "Covers Directory");
 TRANSLATE_NOOP("FullscreenUI", "Download Covers");
 TRANSLATE_NOOP("FullscreenUI", "Scan For New Games");
