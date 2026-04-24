@@ -461,7 +461,6 @@ bool GSDeviceVK::SelectDeviceFeatures()
 	m_device_features.wideLines = available_features.wideLines;
 	m_device_features.fragmentStoresAndAtomics = available_features.fragmentStoresAndAtomics;
 	m_device_features.textureCompressionBC = available_features.textureCompressionBC;
-	m_device_features.samplerAnisotropy = available_features.samplerAnisotropy;
 	m_device_features.geometryShader = available_features.geometryShader;
 
 	return true;
@@ -2702,18 +2701,8 @@ bool GSDeviceVK::CheckFeatures()
 	m_features.line_expand =
 		(m_device_features.wideLines && limits.lineWidthRange[0] <= f_upscale && limits.lineWidthRange[1] >= f_upscale);
 
-	if (m_features.texture_barrier && (GSConfig.DepthFeedbackMode == GSDepthFeedbackMode::Auto ||
-		GSConfig.DepthFeedbackMode == GSDepthFeedbackMode::Depth))
-	{
-		m_features.depth_feedback = GSDevice::DepthFeedbackSupport::Depth;
-	}
-	else
-	{
-		m_features.depth_feedback = GSDevice::DepthFeedbackSupport::None;
-	}
-
-
-	m_features.aa1 = GSConfig.HWAA1 && m_features.vs_expand && (m_features.depth_feedback != GSDevice::DepthFeedbackSupport::None);
+	m_features.depth_feedback = m_features.feedback_loops();
+	m_features.aa1 = GSConfig.HWAA1 && m_features.vs_expand && m_features.feedback_loops();
 
 	DevCon.WriteLn("Optional features:%s%s%s%s%s", m_features.primitive_id ? " primitive_id" : "",
 		m_features.texture_barrier ? " texture_barrier" : "", m_features.framebuffer_fetch ? " framebuffer_fetch" : "",
@@ -2767,8 +2756,7 @@ void GSDeviceVK::DrawPrimitive()
 
 void GSDeviceVK::DrawIndexedPrimitive()
 {
-	g_perfmon.Put(GSPerfMon::DrawCalls, 1);
-	vkCmdDrawIndexed(GetCurrentCommandBuffer(), m_index.count, 1, m_index.start, m_vertex.start, 0);
+	DrawIndexedPrimitive(0, m_index.count);
 }
 
 void GSDeviceVK::DrawIndexedPrimitive(int offset, int count)
@@ -2793,6 +2781,25 @@ void GSDeviceVK::DrawIndexedPrimitiveVSExpand(int offset, int count, bool vs_ind
 		SetVSPushConstants(m_vertex.start);
 		vkCmdDrawIndexed(GetCurrentCommandBuffer(), count, 1, m_index.start + offset, 0, 0);
 	}
+}
+
+void GSDeviceVK::Draw(const GSHWDrawConfig& config, int offset, int count)
+{
+	if (config.vs.expand != GSHWDrawConfig::VSExpand::None)
+	{
+		const bool vs_indexing = config.vs.UseVSExpandIndexBuffer();
+		const u32 vs_indexing_expansion = GetExpansionFactor(config.vs.expand);
+		DrawIndexedPrimitiveVSExpand(offset, count, vs_indexing, vs_indexing_expansion);
+	}
+	else
+	{
+		DrawIndexedPrimitive(offset, count);
+	}
+}
+
+void GSDeviceVK::Draw(const GSHWDrawConfig& config)
+{
+	Draw(config, 0, m_index.count);
 }
 
 VkFormat GSDeviceVK::LookupNativeFormat(GSTexture::Format format) const
@@ -3656,8 +3663,6 @@ VkSampler GSDeviceVK::GetSampler(GSHWDrawConfig::SamplerSelector ss)
 	if (it != m_samplers.end())
 		return it->second;
 
-	const bool aniso = (ss.aniso && GSConfig.MaxAnisotropy > 1 && m_device_features.samplerAnisotropy);
-
 	// See https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkSamplerCreateInfo.html#_description
 	// for the reasoning behind 0.25f here.
 	const VkSamplerCreateInfo ci = {
@@ -3671,8 +3676,8 @@ VkSampler GSDeviceVK::GetSampler(GSHWDrawConfig::SamplerSelector ss)
 			ss.tav ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE), // v
 		VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, // w
 		0.0f, // lod bias
-		static_cast<VkBool32>(aniso), // anisotropy enable
-		aniso ? static_cast<float>(GSConfig.MaxAnisotropy) : 1.0f, // anisotropy
+		VK_FALSE, // anisotropy enable
+		1.0f, // anisotropy
 		VK_FALSE, // compare enable
 		VK_COMPARE_OP_ALWAYS, // compare op
 		0.0f, // min lod
@@ -4902,6 +4907,7 @@ VkShaderModule GSDeviceVK::GetTFXFragmentShader(const GSHWDrawConfig::PSSelector
 	AddMacro(ss, "PS_ZTST", sel.ztst);
 	AddMacro(ss, "PS_AA1", static_cast<u32>(sel.aa1));
 	AddMacro(ss, "PS_ABE", sel.abe);
+	AddMacro(ss, "PS_ANISOTROPIC_FILTERING", sel.sw_aniso);
 
 	ss << m_tfx_source;
 
@@ -5756,7 +5762,7 @@ GSTextureVK* GSDeviceVK::SetupPrimitiveTrackingDATE(GSHWDrawConfig& config)
 	pipe.ps.no_color = false;
 	pipe.ps.no_color1 = true;
 	if (BindDrawPipeline(pipe))
-		DrawIndexedPrimitive();
+		Draw(config);
 
 	// image is initialized/prepass is done, so finish up and get ready to do the "real" draw
 	EndRenderPass();
@@ -6105,7 +6111,7 @@ void GSDeviceVK::RenderHW(GSHWDrawConfig& config)
 		if (BindDrawPipeline(pipe))
 		{
 			// TODO: This probably should have barriers, in case we want to use it conditionally.
-			DrawIndexedPrimitive();
+			Draw(config);
 		}
 	}
 
@@ -6273,24 +6279,9 @@ VkDependencyFlags GSDeviceVK::GetFeedbackBarrierDependencyFlags() const
 void GSDeviceVK::SendHWDraw(const GSHWDrawConfig& config, GSTextureVK* draw_rt, GSTextureVK* draw_ds,
 	bool one_barrier, bool full_barrier)
 {
-	const bool vs_expand = config.vs.expand != GSHWDrawConfig::VSExpand::None;
-	const bool vs_indexing = config.vs.UseVSExpandIndexBuffer();
-	const u32 vs_indexing_expansion = GetExpansionFactor(config.vs.expand);
-
-	auto Draw = [&](int offset, int count) {
-		if (vs_expand)
-		{
-			DrawIndexedPrimitiveVSExpand(offset, count, vs_indexing, vs_indexing_expansion);
-		}
-		else
-		{
-			DrawIndexedPrimitive(offset, count);
-		}
-	};
-
 	if (!m_features.texture_barrier) [[unlikely]]
 	{
-		Draw(0, m_index.count);
+		Draw(config);
 		return;
 	}
 
@@ -6346,7 +6337,7 @@ void GSDeviceVK::SendHWDraw(const GSHWDrawConfig& config, GSTextureVK* draw_rt, 
 			IssueBarriers();
 
 			const u32 count = (*config.drawlist)[n] * indices_per_prim;
-			Draw(p, count);
+			Draw(config, p, count);
 			p += count;
 		}
 
@@ -6359,5 +6350,5 @@ void GSDeviceVK::SendHWDraw(const GSHWDrawConfig& config, GSTextureVK* draw_rt, 
 		IssueBarriers();
 	}
 
-	Draw(0, m_index.count);
+	Draw(config);
 }
