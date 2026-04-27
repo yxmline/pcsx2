@@ -5362,7 +5362,7 @@ void GSRendererHW::HandleProvokingVertexFirst()
 	}
 }
 
-void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert_backup)
+void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert_backup, const bool no_rt)
 {
 	GL_PUSH("HW: IA");
 
@@ -5376,6 +5376,7 @@ void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert
 
 	const bool unscale_pt_ln = !GSConfig.UserHacks_DisableSafeFeatures && (target_scale != 1.0f);
 	const GSDevice::FeatureSupport features = g_gs_device->Features();
+	const bool draw_aa1 = !no_rt && PRIM->AA1 && features.aa1;
 
 	pxAssert(VerifyIndices());
 
@@ -5419,7 +5420,7 @@ void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert
 			{
 				m_conf.topology = GSHWDrawConfig::Topology::Line;
 				m_conf.indices_per_prim = 2;
-				if (PRIM->AA1 && features.aa1)
+				if (draw_aa1)
 				{
 					// AA1 expansion uses a similar path as upscale expansion but it is used
 					// for both upscaling and native resolution drawing.
@@ -5428,8 +5429,6 @@ void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert
 					m_conf.cb_vs.point_size = GSVector2(16.0f * sx, 16.0f * sy);
 					m_conf.topology = GSHWDrawConfig::Topology::Triangle;
 					m_conf.indices_per_prim = 6;
-					m_conf.ps.aa1 = GSHWDrawConfig::PS_AA1::LINE;
-					m_conf.ps.abe = PRIM->ABE != 0;
 					ExpandLineIndices();
 				}
 				else if (unscale_pt_ln)
@@ -5489,16 +5488,13 @@ void GSRendererHW::SetupIA(float target_scale, float sx, float sy, bool req_vert
 
 		case GS_TRIANGLE_CLASS:
 			{
-				if (PRIM->AA1 && features.aa1)
+				if (draw_aa1)
 				{
 					GL_INS("HW: AA1 triangle expand.");
 					m_conf.vs.expand = GSHWDrawConfig::VSExpand::TriangleAA1;
 					m_conf.cb_vs.point_size = GSVector2(16.0f * sx, 16.0f * sy);
 					m_conf.topology = GSHWDrawConfig::Topology::Triangle;
 					m_conf.indices_per_prim = 3;
-					m_conf.ps.aa1 = m_cached_ctx.DepthWrite() ? GSHWDrawConfig::PS_AA1::TRIANGLE_SW_Z :
-					                                            GSHWDrawConfig::PS_AA1::TRIANGLE;
-					m_conf.ps.abe = PRIM->ABE != 0;
 				}
 				else
 				{
@@ -5792,7 +5788,7 @@ void GSRendererHW::DetermineAlphaScaling(GSTextureCache::Target* rt, GSTextureCa
 	}
 }
 
-void GSRendererHW::EmulateZbufferAA1()
+void GSRendererHW::EmulateAA1()
 {
 	const GSDevice::FeatureSupport& features = g_gs_device->Features();
 
@@ -5800,29 +5796,34 @@ void GSRendererHW::EmulateZbufferAA1()
 
 	if (IsCoverageAlphaSupported())
 	{
+		m_conf.ps.abe = PRIM->ABE; // ABE flag determines how coverage is used for alpha.
+
 		if (m_vt.m_primclass == GS_LINE_CLASS)
 		{
+			GL_INS("HW: AA1 lines. No depth write.");
+
 			// AA1: Z is not written on lines since coverage is always less than 0x80.
 			m_conf.depth.zwe = false;
+			m_cached_ctx.ZBUF.ZMSK = 1;
+
+			m_conf.ps.aa1 = GSHWDrawConfig::PS_AA1::LINE;
 		}
 		else if (m_vt.m_primclass == GS_TRIANGLE_CLASS)
 		{
 			// Force SW depth so that Z writes can be prevented for edge pixels.
 			if (m_cached_ctx.DepthWrite())
 			{
-				// Z test must be also done in the shader.
-				if (m_conf.depth.ztst == ZTST_GEQUAL || m_conf.depth.ztst == ZTST_GREATER)
-				{
-					m_conf.ps.ztst = m_conf.depth.ztst; // Enable shader Z test.
-					m_conf.depth.ztst = ZTST_ALWAYS; // Disable HW Z test.
+				GL_INS("HW: AA1 triangles with depth feedback.");
 
-					// We need barriers for the feedback
-					if (features.feedback_loops())
-					{
-						m_conf.require_one_barrier |= (m_prim_overlap == PRIM_OVERLAP_NO);
-						m_conf.require_full_barrier |= (m_prim_overlap != PRIM_OVERLAP_NO);
-					}
-				}
+				m_conf.ps.aa1 = GSHWDrawConfig::PS_AA1::TRIANGLE_SW_Z; // Allows discarding depth on edge pixels.
+
+				ConfigureDepthFeedback(); // Enable barriers/SW depth test.
+			}
+			else
+			{
+				GL_INS("HW: AA1 triangles with no depth write.");
+
+				m_conf.ps.aa1 = GSHWDrawConfig::PS_AA1::TRIANGLE; // No special depth handling.
 			}
 		}
 		else
@@ -5887,24 +5888,31 @@ void GSRendererHW::EmulateDATESelectMethod(DATEOptions& date_options, GSTextureC
 	if (features.framebuffer_fetch)
 	{
 		// Full DATE is "free" with framebuffer fetch. The barrier gets cleared below.
+		GL_PERF("DATE: Accurate with framebuffer fetch");
 		date_options.barrier = true;
 		m_conf.require_full_barrier = true;
 	}
-	else if (IsCoverageAlphaSupported())
+	else if (features.feedback_loops() && IsCoverageAlphaSupported())
 	{
 		// We're using AA1 for this draw so use only full barrier DATE, to avoid the complications
 		// with stencil/primid setup with AA1 vertex shaders. AA1 triangles usually require full barriers anyway.
+		GL_PERF("DATE: Accurate with IsCoverageAlphaSupported");
 		date_options.barrier = true;
 		m_conf.require_full_barrier = true;
 	}
-	else if ((features.texture_barrier && m_prim_overlap == PRIM_OVERLAP_NO) || m_texture_shuffle)
+	else if ((features.texture_barrier && m_prim_overlap == PRIM_OVERLAP_NO))
 	{
-		GL_PERF("DATE: Accurate with %s", (features.texture_barrier && m_prim_overlap == PRIM_OVERLAP_NO) ? "no overlap" : "texture shuffle");
-		if (features.texture_barrier)
-		{
-			m_conf.require_full_barrier = true;
-			date_options.barrier = true;
-		}
+		// We only enable this for texture barriers as it's fast, multidraw fb copy might be slower.
+		GL_PERF("DATE: Accurate with no overlap");
+		m_conf.require_full_barrier = true;
+		date_options.barrier = true;
+	}
+	else if (features.feedback_loops() && m_texture_shuffle)
+	{
+		// Ensure texture shuffles run with full barrier DATE.
+		GL_PERF("DATE: Accurate with texture shuffle");
+		m_conf.require_full_barrier = true;
+		date_options.barrier = true;
 	}
 	// When Blending is disabled and Edge Anti Aliasing is enabled,
 	// the output alpha is Coverage (which we force to 128) so DATE will fail/pass guaranteed on second pass.
@@ -5988,7 +5996,7 @@ void GSRendererHW::EmulateDATEGetConfig(DATEOptions& date_options, bool scale_rt
 
 	// Always swap DATE with DATE_BARRIER if we have barriers on when alpha write is masked.
 	// This is always enabled on VK/GL/DX12 but not on DX11 as copies are slow so we can selectively enable it like now.
-	if (!m_conf.colormask.wa && (m_conf.require_one_barrier || m_conf.require_full_barrier))
+	if (!m_conf.colormask.wa && (m_conf.require_one_barrier || (m_conf.require_full_barrier && features.feedback_loops())))
 		date_options.barrier = true;
 
 	if (m_conf.ps.scanmsk & 2)
@@ -6008,17 +6016,25 @@ void GSRendererHW::EmulateDATEGetConfig(DATEOptions& date_options, bool scale_rt
 	else
 		m_conf.datm = static_cast<SetDATM>(m_cached_ctx.TEST.DATM);
 
-	if (m_conf.destination_alpha >= GSHWDrawConfig::DestinationAlphaMode::Stencil &&
-		m_conf.destination_alpha <= GSHWDrawConfig::DestinationAlphaMode::StencilOne && !m_conf.ds)
+	// DATE Stencil always needs a depth stencil texture.
+	const bool date_stencil_needs_ds = !m_conf.ds &&
+		(m_conf.destination_alpha == GSHWDrawConfig::DestinationAlphaMode::Stencil || m_conf.destination_alpha == GSHWDrawConfig::DestinationAlphaMode::StencilOne);
+	if (date_stencil_needs_ds)
 	{
-		const bool is_one_barrier = (features.texture_barrier && m_conf.require_full_barrier &&
-			(m_prim_overlap == PRIM_OVERLAP_NO || m_conf.ps.shuffle || m_channel_shuffle));
+		const bool need_barrier = m_conf.require_one_barrier || (m_conf.require_full_barrier && features.feedback_loops());
 		if ((temp_ds.reset(g_gs_device->CreateDepthStencil(m_conf.rt->GetWidth(), m_conf.rt->GetHeight(),
 			GSTexture::Format::DepthStencil, false)), temp_ds))
 		{
 			m_conf.ds = temp_ds.get();
 		}
-		else if (features.primitive_id && !(m_conf.ps.scanmsk & 2) && (!m_conf.require_full_barrier || is_one_barrier))
+		else if (need_barrier)
+		{
+			date_options.stencil_one = false;
+			date_options.barrier = true;
+			m_conf.destination_alpha = GSHWDrawConfig::DestinationAlphaMode::Full;
+			DevCon.Warning("HW: Depth buffer creation failed for Stencil Date. Fallback to Full.");
+		}
+		else if (features.primitive_id && !(m_conf.ps.scanmsk & 2))
 		{
 			date_options.stencil_one = false;
 			date_options.primid = true;
@@ -6040,7 +6056,7 @@ void GSRendererHW::EmulateDATEGetConfig(DATEOptions& date_options, bool scale_rt
 	}
 	else if (date_options.stencil_one)
 	{
-		const bool multidraw_fb_copy = features.multidraw_fb_copy && (m_conf.require_one_barrier || m_conf.require_full_barrier);
+		const bool multidraw_fb_copy = m_conf.require_one_barrier || (m_conf.require_full_barrier && features.multidraw_fb_copy);
 		if (features.texture_barrier || multidraw_fb_copy)
 		{
 			m_conf.require_one_barrier = true;
@@ -6149,7 +6165,7 @@ void GSRendererHW::DetermineBarriers(GSTextureCache::Target* rt)
 
 		// If we use depth feedback directly, we must use barriers for the depth texture.
 		// If we use depth-as-color feedback, then FB fetch can be used for depth also.
-		bool need_barriers_for_depth = m_conf.ps.IsFeedbackLoopDepth() && features.depth_feedback;
+		const bool need_barriers_for_depth = m_conf.ps.IsFeedbackLoopDepth() && features.depth_feedback;
 
 		if (!need_barriers_for_depth)
 		{
@@ -6170,7 +6186,6 @@ void GSRendererHW::DetermineBarriers(GSTextureCache::Target* rt)
 	else if (!features.feedback_loops())
 	{
 		// These shouldn't be enabled if texture barriers aren't supported, make sure they are off.
-		m_conf.ps.write_rg = 0;
 		m_conf.require_full_barrier = false;
 	}
 
@@ -6246,7 +6261,7 @@ void GSRendererHW::EmulateTextureShuffleAndFbmask(GSTextureCache::Target* rt, GS
 
 		// If date is enabled you need to test the green channel instead of the alpha channel.
 		// Only enable this code in DATE mode to reduce the number of shaders.
-		m_conf.ps.write_rg = (process_rg & SHUFFLE_WRITE) && features.feedback_loops() && m_cached_ctx.TEST.DATE;
+		m_conf.ps.write_rg = (process_rg & SHUFFLE_WRITE) &&  m_cached_ctx.TEST.DATE;
 
 		m_conf.ps.real16src = m_texture_shuffle.real_16_bit_source;
 
@@ -6900,7 +6915,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, DATEOptio
 	{
 		case AccBlendLevel::Maximum:
 			sw_blending |= true;
-			accumulation_blend &= (GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].bpp == 32);
+			accumulation_blend &= !barriers_supported || (GSLocalMemory::m_psm[m_cached_ctx.FRAME.PSM].bpp == 32);
 			[[fallthrough]];
 		case AccBlendLevel::Full:
 			sw_blending |= m_conf.ps.blend_a != m_conf.ps.blend_b && alpha_c0_high_max_one;
@@ -6919,7 +6934,7 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, DATEOptio
 		case AccBlendLevel::Basic:
 		default:
 			// Prefer sw blend if possible.
-			color_dest_blend &= !(m_channel_shuffle || m_conf.ps.dither);
+			color_dest_blend &= !m_conf.ps.dither;
 			color_dest_blend2 &= !(prefer_sw_blend || m_conf.ps.dither);
 			blend_zero_to_one_range &= !(prefer_sw_blend || m_conf.ps.dither);
 			accumulation_blend &= !prefer_sw_blend;
@@ -6950,9 +6965,9 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, DATEOptio
 		}
 	}
 
-	if (m_conf.alpha_test == GSHWDrawConfig::AlphaTestMode::FEEDBACK && !features.depth_feedback)
+	if (m_conf.ps.IsFeedbackLoopDepth() && !features.depth_feedback)
 	{
-		// If we are doing feedback alpha test with a second RT we must use SW blending to avoid
+		// If we are doing depth feedback with a second RT we must use SW blending to avoid
 		// mixing dual source blending with multiple render targets.
 		sw_blending = true;
 		color_dest_blend = false;
@@ -8420,12 +8435,12 @@ void GSRendererHW::EmulateAlphaTest(DATEOptions& date_options)
 
 	// Determine whether the feedback methods require a single pass.
 	const bool feedback_one_pass = simple_fb_only || simple_rgb_only || simple_zb_only;
-
-	// If we already have the required barriers for the accurate feedback path and
-	// do not require depth feedback.
+	
+	// If we already have the required barriers for the accurate feedback path.
 	const bool free_barrier_feedback =
 		((m_conf.require_one_barrier && feedback_one_pass) || m_conf.require_full_barrier) &&
-		features.feedback_loops() && !afail_needs_depth;
+		features.feedback_loops() &&
+		(!afail_needs_depth || m_conf.ps.IsFeedbackLoopDepth());
 
 	// Determine if we can use FB-fetch for color only feedback.
 	const bool free_fbfetch_feedback = features.framebuffer_fetch && !afail_needs_depth;
@@ -8460,26 +8475,21 @@ void GSRendererHW::EmulateAlphaTest(DATEOptions& date_options)
 			m_conf.require_full_barrier |= !feedback_one_pass;
 		}
 
-		// Handle SW depth writing and/or testing.
 		if (afail_needs_depth)
 		{
 			pxAssert(zwe);
-			GL_INS("Enable SW depth write for depth feedback");
+
+			// Let the pipeline know we need depth feedback with RGB_ONLY.
 			if (afail == AFAIL_RGB_ONLY)
 				m_conf.ps.afail = PS_AFAIL::RGB_ONLY_SW_Z;
-
-			if (m_cached_ctx.DepthRead())
-			{
-				GL_INS("Enable SW depth testing for depth feedback");
-				m_conf.ps.ztst = m_cached_ctx.TEST.ZTST; // Enable SW Z test.
-				m_conf.depth.ztst = ZTST_ALWAYS; // Disable HW Z test.
-			}
 		}
 		else
 		{
 			// Should have early exited
 			pxAssert(afail != AFAIL_FB_ONLY);
 		}
+
+		ConfigureDepthFeedback(); // Enable barriers/SW depth test if needed.
 
 		m_conf.alpha_test = GSHWDrawConfig::AlphaTestMode::FEEDBACK;
 	}
@@ -8672,6 +8682,30 @@ void GSRendererHW::EmulateAlphaTestSecondPass()
 		m_conf.alpha_test = GSHWDrawConfig::AlphaTestMode::ABORT_DRAW;
 }
 
+// Setup barriers and/or SW depth testing for depth feedback.
+void GSRendererHW::ConfigureDepthFeedback()
+{
+	if (m_conf.ps.IsFeedbackLoopDepth())
+	{
+		const GSDevice::FeatureSupport& features = g_gs_device->Features();
+
+		// We need barriers for the feedback.
+		if (features.feedback_loops())
+		{
+			m_conf.require_one_barrier |= (m_prim_overlap == PRIM_OVERLAP_NO);
+			m_conf.require_full_barrier |= (m_prim_overlap != PRIM_OVERLAP_NO);
+		}
+		
+		// We need to do SW depth testing if it's used.
+		if (m_cached_ctx.DepthRead())
+		{
+			GL_INS("HW: Enable SW depth test and disable HW.");
+			m_conf.ps.ztst = m_cached_ctx.TEST.ZTST; // Enable SW Z test.
+			m_conf.depth.ztst = ZTST_ALWAYS; // Disable HW Z test.
+		}
+	}
+}
+
 void GSRendererHW::CleanupDraw(bool invalidate_temp_src)
 {
 	// Remove any RT source.
@@ -8738,7 +8772,8 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 
 	m_prim_overlap = PrimitiveOverlap(false);
 
-	EmulateZbufferAA1();
+	// Do AA1 setup early so we can mask depth if possible.
+	EmulateAA1();
 
 	if (rt)
 	{
@@ -8830,7 +8865,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 	}
 
 	// Similar to IsRTWritten(), check if the rt will change.
-	const bool no_rt = !rt || !(m_conf.colormask.wrgba || m_channel_shuffle);
+	const bool no_rt = !rt || m_conf.colormask.wrgba == 0;
 	const bool no_ds = !ds ||
 		// Depth will be written through the RT.
 		(!no_rt && m_cached_ctx.FRAME.FBP == m_cached_ctx.ZBUF.ZBP && !PRIM->TME && m_cached_ctx.ZBUF.ZMSK == 0 &&
@@ -8923,7 +8958,7 @@ __ri void GSRendererHW::DrawPrims(GSTextureCache::Target* rt, GSTextureCache::Ta
 
 	HandleProvokingVertexFirst();
 
-	SetupIA(rtscale, vs_scale_x, vs_scale_y, m_channel_shuffle_width != 0);
+	SetupIA(rtscale, vs_scale_x, vs_scale_y, m_channel_shuffle_width != 0, no_rt);
 
 	if (m_conf.ds && m_conf.ps.IsFeedbackLoopDepth() && !g_gs_device->Features().depth_feedback)
 	{
@@ -10473,5 +10508,5 @@ std::size_t GSRendererHW::ComputeDrawlistGetSize(float scale)
 
 bool GSRendererHW::IsCoverageAlphaSupported()
 {
-	return IsCoverageAlpha() && g_gs_device->Features().aa1;
+	return IsCoverageAlpha() && IsRTWritten() && g_gs_device->Features().aa1;
 }
