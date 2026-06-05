@@ -223,6 +223,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	//////////////////////////////////////////////////////////////////////////
 	// Advanced Settings
 	//////////////////////////////////////////////////////////////////////////
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.rov, "EmuCore/GS", "HWROV", true);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.useBlitSwapChain, "EmuCore/GS", "UseBlitSwapChain", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.useDebugDevice, "EmuCore/GS", "UseDebugDevice", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.useDebugBlend, "EmuCore/GS", "UseDebugBlend", false);
@@ -239,6 +240,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_advanced.palFrameRate, "EmuCore/GS", "FrameRatePAL", 50.00f);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.spinCPUDuringReadbacks, "EmuCore/GS", "HWSpinCPUForReadbacks", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.spinGPUDuringReadbacks, "EmuCore/GS", "HWSpinGPUForReadbacks", false);
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_advanced.rovBarriersVK, "EmuCore/GS", "HWROVBarriersVK", false);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_advanced.texturePreloading, "EmuCore/GS", "texture_preloading", static_cast<int>(TexturePreloadingLevel::Off));
 
 	setTabVisible(m_advanced_tab, QtHost::ShouldShowAdvancedSettings());
@@ -757,6 +759,12 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 			tr("Overrides the driver's heuristics for enabling exclusive fullscreen, or direct flip/scanout.<br>"
 			   "Disallowing exclusive fullscreen may enable smoother task switching and overlays, but increase input latency."));
 
+		dialog()->registerWidgetHelp(
+			m_advanced.rov, tr("Rasterizer Ordered View"), tr("Checked"), tr("Enables Rasterizer Ordered View (ROV), which allows feedback loops to be executed with fewer draw calls. Can improve performance in feedback heavy games with higher accuracy settings."));
+
+		dialog()->registerWidgetHelp(m_advanced.rovBarriersVK, tr("ROV Barriers Vulkan"), tr("Unchecked"),
+			tr("Forces extra barriers when using ROV with Vulkan to fix graphical issues present in some games and hardware configurations."));
+
 		dialog()->registerWidgetHelp(m_advanced.disableMailboxPresentation, tr("Disable Mailbox Presentation"), tr("Unchecked"),
 			tr("Forces the use of FIFO over Mailbox presentation, i.e. double buffering instead of triple buffering. "
 			   "Usually results in worse frame pacing."));
@@ -1002,6 +1010,7 @@ void GraphicsSettingsWidget::updateRendererDependentOptions()
 	const bool is_software = (type == GSRendererType::SW);
 	const bool is_auto = (type == GSRendererType::Auto);
 	const bool is_vk = (type == GSRendererType::VK);
+	const bool is_ogl = (type == GSRendererType::OGL);
 	const bool is_disable_barriers = (type == GSRendererType::Metal || type == GSRendererType::SW);
 	const bool hw_fixes = (is_hardware && m_hw.enableHWFixes && m_hw.enableHWFixes->checkState() == Qt::Checked);
 
@@ -1043,6 +1052,9 @@ void GraphicsSettingsWidget::updateRendererDependentOptions()
 
 	if (m_advanced.exclusiveFullscreenControl)
 		m_advanced.exclusiveFullscreenControl->setEnabled(is_auto || is_vk);
+
+	if (m_advanced.rov)
+		m_advanced.rov->setDisabled(!is_hardware || is_ogl);
 
 	// populate adapters
 	std::vector<GSAdapterInfo> adapters = GSGetAdapterInfo(type);
