@@ -152,6 +152,29 @@ bool GSDevice12::SupportsProgrammableSamplePositions()
 	return false;
 }
 
+D3D_SHADER_MODEL GSDevice12::DetectShaderModelSupport() {
+	// CheckFeatureSupport will fail if the runtime dosen't support a requested shader model.
+	// Loop though ranges of valid shader models until the check succeeds.
+	constexpr std::array<std::array<D3D_SHADER_MODEL, 2>, 2> shader_model_ranges{{
+		{D3D_SHADER_MODEL_6_5, D3D_SHADER_MODEL_6_0},
+		{D3D_SHADER_MODEL_5_1, D3D_SHADER_MODEL_5_1},
+	}};
+	
+	for (const std::array<D3D_SHADER_MODEL, 2>& range : shader_model_ranges)
+	{
+		for (int i = range[0]; i >= range[1]; i--)
+		{
+			D3D12_FEATURE_DATA_SHADER_MODEL shader_model_device = {static_cast<D3D_SHADER_MODEL>(i)};
+			const HRESULT hr = m_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shader_model_device, sizeof(shader_model_device));
+			if (SUCCEEDED(hr))
+				return shader_model_device.HighestShaderModel;
+		}
+	}
+
+	// If the above somehow fails.
+	return D3D_SHADER_MODEL_5_1;
+}
+
 u32 GSDevice12::GetAdapterVendorID() const
 {
 	if (!m_adapter)
@@ -992,7 +1015,7 @@ bool GSDevice12::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 		m_tfx_source = std::move(*shader);
 	}
 
-	if (!m_shader_cache.Open(D3D::ShaderModel::SM51, GSConfig.UseDebugDevice))
+	if (!m_shader_cache.Open(static_cast<D3D::ShaderModel>(m_shader_model), GSConfig.UseDebugDevice))
 		Console.Warning("D3D12: Shader cache failed to open.");
 
 	if (!CreateRootSignatures())
@@ -1506,6 +1529,7 @@ void GSDevice12::InsertDebugMessage(DebugMessageCategory category, const char* f
 bool GSDevice12::CheckFeatures(const u32& vendor_id)
 {
 	//const bool isAMD = (vendor_id == 0x1002 || vendor_id == 0x1022);
+	const bool isAdreno = (vendor_id == 0x4D4F4351);
 
 	m_features.texture_barrier = GSConfig.OverrideTextureBarriers != 0;
 	m_features.multidraw_fb_copy = false;
@@ -1538,6 +1562,9 @@ bool GSDevice12::CheckFeatures(const u32& vendor_id)
 		DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allow_tearing_supported, sizeof(allow_tearing_supported));
 	m_allow_tearing_supported = (SUCCEEDED(hr) && allow_tearing_supported == TRUE);
 
+	m_shader_model = DetectShaderModelSupport();
+	Console.WriteLnFmt("D3D12: Shader Model: {}.{}", (m_shader_model & 0xF0) >> 4, (m_shader_model & 0xF));
+
 	D3D12_FEATURE_DATA_ARCHITECTURE1 device_architecture1 = {};
 	hr = m_device->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE1, &device_architecture1, sizeof(device_architecture1));
 	m_uma = SUCCEEDED(hr) && device_architecture1.UMA;
@@ -1554,6 +1581,7 @@ bool GSDevice12::CheckFeatures(const u32& vendor_id)
 	{
 		Console.WriteLnFmt("D3D12: Enhanced Barriers: {}", device_options12.EnhancedBarriersSupported ? "Supported" : "Not Supported");
 		m_enhanced_barriers = device_options12.EnhancedBarriersSupported;
+		m_rp_reorders_barriers = isAdreno;
 	}
 	else
 	{
@@ -1563,7 +1591,7 @@ bool GSDevice12::CheckFeatures(const u32& vendor_id)
 
 	D3D12_FEATURE_DATA_D3D12_OPTIONS options{};
 	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS));
-	m_features.rov = options.ROVsSupported;
+	m_features.rov = options.TypedUAVLoadAdditionalFormats && options.ROVsSupported;
 	for (u32 fmt = static_cast<u32>(GSTexture::Format::Color); fmt <= static_cast<u32>(GSTexture::Format::PrimID); fmt++)
 	{
 		if (GSTexture::IsShaderWriteFormat(static_cast<GSTexture::Format>(fmt)))
@@ -4369,6 +4397,9 @@ void GSDevice12::FeedbackBarrier(const GSTexture12* texture)
 {
 	if (m_enhanced_barriers)
 	{
+		if (m_rp_reorders_barriers)
+			EndRenderPass();
+
 		// Enhanced barriers allows for single resource feedback.
 		const D3D12_BARRIER_SYNC sync = D3D12_BARRIER_SYNC_RENDER_TARGET | D3D12_BARRIER_SYNC_PIXEL_SHADING;
 		const D3D12_BARRIER_ACCESS access = D3D12_BARRIER_ACCESS_RENDER_TARGET | D3D12_BARRIER_ACCESS_SHADER_RESOURCE;
